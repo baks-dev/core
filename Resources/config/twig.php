@@ -25,7 +25,8 @@ return static function (ContainerConfigurator $configurator, TwigConfig $config)
       ->tag('twig.extension');
     
     /** ModifyExtension */
-    $config->path('%kernel.project_dir%/src/System/Type/Modify', 'ModifyAction');
+    $config->path(__DIR__.'/../../Type/Modify', 'ModifyAction');
+	
     $services->set('modify.action.type.twig.extension')
       ->class(ModifyExtension::class)
       ->tag('twig.extension');

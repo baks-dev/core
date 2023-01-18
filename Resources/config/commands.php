@@ -13,6 +13,7 @@ return static function (ContainerConfigurator $configurator, TwigConfig $config)
       ->autoconfigure() // Automatically registers your services as commands, event subscribers, etc.
     ;
     
+
     $services->set('app:assets:install', AssetsInstallCommand::class)
       ->arg('$projectDir', '%kernel.project_dir%');
 

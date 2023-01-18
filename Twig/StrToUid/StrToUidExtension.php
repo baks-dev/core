@@ -1,6 +1,6 @@
 <?php
 
-namespace BaksDev\Core\Twig\strToUid;
+namespace BaksDev\Core\Twig\StrToUid;
 
 use Symfony\Component\Uid\Uuid;
 use Twig\Environment;

@@ -10,16 +10,18 @@ return static function (ContainerConfigurator $configurator) {
       ->autowire()
       ->autoconfigure()
     ;
+	
+	$namespace = 'BaksDev\Core';
     
-    $services->load('BaksDev\Core\Controller\\', __DIR__.'/../../Controller')
+    $services->load($namespace.'\Controller\\', __DIR__.'/../../Controller')
       ->tag('controller.service_arguments');
     
-    $services->load('BaksDev\Core\Twig\\', __DIR__.'/../../Twig');
+    $services->load($namespace.'\Twig\\', __DIR__.'/../../Twig');
 	
-    $services->load('BaksDev\Core\Form\\', __DIR__.'/../../Form')
+    $services->load($namespace.'\Form\\', __DIR__.'/../../Form')
       ->exclude(__DIR__.'/../../Form/**/*DTO.php');
 	
-	$services->load('BaksDev\Core\Services\\', __DIR__.'/../../Services/*');
+	$services->load($namespace.'\Services\\', __DIR__.'/../../Services/*');
 	
 
 };
