@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Services\DatabaseSession;
+namespace BaksDev\Core\Services\DatabaseSession;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Security;

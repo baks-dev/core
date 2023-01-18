@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Tests\Entity\EntityEvent;
+namespace BaksDev\Core\Tests\Entity\EntityEvent;
 
 use App\Module\Users\User\Type\Id\UserUid;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

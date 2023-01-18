@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Entity;
+namespace BaksDev\Core\Entity;
 
 use App\Module\Menu\Admin\Entity\Section\MenuAdminSection;
 use Doctrine\Common\Collections\ArrayCollection;

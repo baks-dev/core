@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace App\System\Services\Switcher;
+namespace BaksDev\Core\Services\Switcher;
 
 
 final class Switcher implements SwitcherInterface

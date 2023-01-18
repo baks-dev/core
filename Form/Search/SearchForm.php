@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace App\System\Form\Search;
+namespace BaksDev\Core\Form\Search;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

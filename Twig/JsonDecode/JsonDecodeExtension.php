@@ -23,7 +23,7 @@
  *
  */
 
-namespace App\System\Twig\JsonDecode;
+namespace BaksDev\Core\Twig\JsonDecode;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Type\UidType;
+namespace BaksDev\Core\Type\UidType;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;

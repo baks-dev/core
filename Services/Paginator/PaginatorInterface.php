@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace App\System\Services\Paginator;
+namespace BaksDev\Core\Services\Paginator;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 

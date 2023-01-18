@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Type\Modify;
+namespace BaksDev\Core\Type\Modify;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;

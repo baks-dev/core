@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Twig\DumpDie;
+namespace BaksDev\Core\Twig\DumpDie;
 
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;

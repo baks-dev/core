@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Type\Ip;
+namespace BaksDev\Core\Type\Ip;
 
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;

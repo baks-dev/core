@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\System\Command;
+namespace BaksDev\Core\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Attribute\AsCommand;

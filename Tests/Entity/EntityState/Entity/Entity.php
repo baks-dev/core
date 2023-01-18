@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-namespace App\System\Tests\Entity\EntityState\Entity;
+namespace BaksDev\Core\Tests\Entity\EntityState\Entity;
 
 use App\Module\Users\User\Type\Id\UserUid;
-use App\System\Entity\EntityState;
+use BaksDev\Core\Entity\EntityState;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;

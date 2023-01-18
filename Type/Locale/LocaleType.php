@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Type\Locale;
+namespace BaksDev\Core\Type\Locale;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;

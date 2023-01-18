@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Type\UidType;
+namespace BaksDev\Core\Type\UidType;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;

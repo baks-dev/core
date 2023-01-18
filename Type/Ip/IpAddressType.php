@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Type\Ip;
+namespace BaksDev\Core\Type\Ip;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\BigIntType;

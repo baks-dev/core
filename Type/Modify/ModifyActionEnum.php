@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Type\Modify;
+namespace BaksDev\Core\Type\Modify;
 
 enum ModifyActionEnum: string
 {

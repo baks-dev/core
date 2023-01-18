@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Type\Locale;
+namespace BaksDev\Core\Type\Locale;
 
 enum LocaleEnum: string
 {

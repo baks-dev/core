@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Twig\StrimWidth;
+namespace BaksDev\Core\Twig\StrimWidth;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

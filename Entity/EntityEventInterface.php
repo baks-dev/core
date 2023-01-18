@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Entity;
+namespace BaksDev\Core\Entity;
 
 use Exception;
 

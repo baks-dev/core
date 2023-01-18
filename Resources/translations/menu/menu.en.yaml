@@ -1,9 +1,0 @@
-content:
-  menu: Content
-settings:
-  menu: Settings
-users:
-  menu: User
-admin:
-  settings:
-    main: Basic Settings

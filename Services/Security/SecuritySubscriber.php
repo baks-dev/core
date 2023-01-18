@@ -23,7 +23,7 @@
  *
  */
 
-namespace App\System\Services\Security;
+namespace BaksDev\Core\Services\Security;
 
 use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace App\System\Form\Search;
+namespace BaksDev\Core\Form\Search;
 
 class SearchDTO
 {

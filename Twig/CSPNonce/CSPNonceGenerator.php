@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Twig\CSPNonce;
+namespace BaksDev\Core\Twig\CSPNonce;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;

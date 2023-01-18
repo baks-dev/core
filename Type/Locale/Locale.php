@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Type\Locale;
+namespace BaksDev\Core\Type\Locale;
 
 use Doctrine\Common\Collections\ArrayCollection;
 

@@ -16,7 +16,7 @@
  *
  */
 
-namespace App\System\Services\Switcher;
+namespace BaksDev\Core\Services\Switcher;
 
 interface SwitcherInterface
 {

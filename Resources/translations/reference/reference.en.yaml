@@ -1,8 +1,0 @@
-reference:
-  pants: Pants (jeans)
-  color: Color
-  clothing:
-    size: Clothing size
-    child: Children clothing size
-  shoe:
-    size: Shoe size

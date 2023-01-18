@@ -23,7 +23,7 @@
  *
  */
 
-namespace App\System\Services\Security;
+namespace BaksDev\Core\Services\Security;
 
 use Attribute;
 

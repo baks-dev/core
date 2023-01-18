@@ -16,14 +16,14 @@
  *
  */
 
-namespace App\System\Controller;
+namespace BaksDev\Core\Controller;
 
 use App\Module\Settings\Repository\SettingsMain\SettingsMainInterface;
 use App\Module\Users\Profile\UserProfile\Repository\MenuUserProfileByUser\MenuUserProfileByUserInterface;
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use App\Module\Users\User\Entity\User;
 
-use App\System\Type\Locale\Locale;
+use BaksDev\Core\Type\Locale\Locale;
 use Fresh\CentrifugoBundle\Service\Credentials\CredentialsGenerator;
 use LogicException;
 use Psr\Cache\InvalidArgumentException;

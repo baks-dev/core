@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-namespace App\System\Tests\Entity\EntityState\DTO;
+namespace BaksDev\Core\Tests\Entity\EntityState\DTO;
 
 use App\Module\Users\User\Type\Id\UserUid;
-use App\System\Tests\Entity\EntityState\Entity\EntityOneToMany;
-use App\System\Tests\Entity\EntityState\Entity\EntityOneToOne;
+use BaksDev\Core\Tests\Entity\EntityState\Entity\EntityOneToMany;
+use BaksDev\Core\Tests\Entity\EntityState\Entity\EntityOneToOne;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;

@@ -2,8 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use App\System\Command\AssetsInstallCommand;
-use App\System\Command\RouterPhpstormCommand;
+use BaksDev\Core\Command\AssetsInstallCommand;
+use BaksDev\Core\Command\RouterPhpstormCommand;
 use Symfony\Config\TwigConfig;
 
 return static function (ContainerConfigurator $configurator, TwigConfig $config) {

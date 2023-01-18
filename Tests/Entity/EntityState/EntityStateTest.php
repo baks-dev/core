@@ -1,6 +1,6 @@
 <?php
 
-namespace App\System\Tests\Entity\EntityState;
+namespace BaksDev\Core\Tests\Entity\EntityState;
 
 use App\Module\Users\User\Type\Id\UserUid;
 
