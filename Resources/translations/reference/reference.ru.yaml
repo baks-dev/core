@@ -1,0 +1,8 @@
+reference:
+  pants: Брюки (джинсы)
+  color: Цвет
+  clothing:
+    size: Размер одежды
+    child: Детский размер одежды
+  shoe:
+    size: Размер обуви

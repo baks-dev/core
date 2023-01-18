@@ -1,0 +1,23 @@
+<?php
+
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+use App\System\Command\AssetsInstallCommand;
+use App\System\Command\RouterPhpstormCommand;
+use Symfony\Config\TwigConfig;
+
+return static function (ContainerConfigurator $configurator, TwigConfig $config) {
+    $services = $configurator->services()
+      ->defaults()
+      ->autowire()      // Automatically injects dependencies in your services.
+      ->autoconfigure() // Automatically registers your services as commands, event subscribers, etc.
+    ;
+    
+    $services->set('app:assets:install', AssetsInstallCommand::class)
+      ->arg('$projectDir', '%kernel.project_dir%');
+
+    
+    $services->set('app:router.phpstorm', RouterPhpstormCommand::class)
+      ->tag('controller.service_arguments');
+    
+};

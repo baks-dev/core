@@ -1,0 +1,22 @@
+{% trans_default_domain 'modify.action' %}
+
+{% if action == 'modify.new' %}
+	<div class="badge badge-light-success">{{ action|trans }}</div>
+
+{% elseif action == 'modify.upd' %}
+	<div class="badge badge-light-success">{{ action|trans }}</div>
+
+{% elseif action == 'modify.del' or action == 'modify.dlt' %}
+	<div class="badge badge-light-danger">{{ action|trans }}</div>
+
+{% elseif action == 'modify.res' %}
+	<div class="badge badge-light-warning">{{ action|trans }}</div>
+
+{% elseif action == 'modify.rlb' %}
+	<div class="badge badge-light-info">{{ action|trans }}</div>
+
+{% elseif action == 'modify.tru' %}
+	<div class="badge badge-light-danger">{{ action|trans }}</div>
+
+{% endif %}
+

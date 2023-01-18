@@ -1,0 +1,9 @@
+content:
+  menu: Контент
+settings:
+  menu: Настройки
+users:
+  menu: Пользователи
+admin:
+  settings:
+    main: Основные настройки
