@@ -32,13 +32,15 @@
     "symfony/filesystem": "^6.2",
     "symfony/finder": "^6.2",
     "symfony/messenger": "^6.2",
-    "symfony/doctrine-messenger": "^6.2"
+    "symfony/doctrine-messenger": "^6.2",
+    "symfony/translation": "^6.2"
   },
 
   "require-dev": {
     "roave/security-advisories": "dev-latest",
     "symfony/test-pack": "^1.0",
-    "doctrine/doctrine-fixtures-bundle": "^3.4"
+    "doctrine/doctrine-fixtures-bundle": "^3.4",
+    "symfony/profiler-pack": "^1.0"
   },
 
   "autoload": {
