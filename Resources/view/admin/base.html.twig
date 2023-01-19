@@ -7,7 +7,11 @@
 
 	<meta name="author" content="Baks Development">
 
-	<title>{% block title %}Welcome!{% endblock %}</title>
+	<title>
+		{% block title %}
+			{{ settings.title is defined ? settings.title : 'Welcome' }}
+		{% endblock %}
+	</title>
 
 	{# Mета-описание Description #}
 	<meta name="description"
@@ -70,6 +74,7 @@
 
 {% block header %}
 	{{ include(_self|replace({ "base.html.twig": settings.device~"/header.html.twig" })) }}
+
 {% endblock %}
 
 

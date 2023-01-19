@@ -61,6 +61,7 @@ abstract class AbstractController
 	private TokenStorageInterface $tokenStorage;
 	private FormFactoryInterface $formFactory;
 	private TranslatorInterface $translator;
+	
 	private SettingsMainInterface $getSettingsMain;
 	
 	//private UserProfilesByCurrentUserInterface $userProfilesByCurrentUser;
@@ -204,6 +205,8 @@ abstract class AbstractController
 			$ModuleTemlate = "@Template";
 			
 			$view = $ModuleTemlate.'/'.$moduleName.'/'.$fileName;
+			
+			
 	
 			if($device->ismobiledevice)
 			{
@@ -224,6 +227,9 @@ abstract class AbstractController
 				}
 			}
 			
+			//dd($view);
+			
+	
 			$parameters['settings']['device'] = $this->device;
 			$content = $this->environment->render($view, $parameters);
 		}
@@ -235,6 +241,8 @@ abstract class AbstractController
 			{
 
 				$view = $moduleTemplateName.'/'.$fileName;
+				
+				
 
 				if($device->ismobiledevice)
 				{
@@ -481,13 +489,17 @@ abstract class AbstractController
 		$data = $cache->get($host.'cache.settings.'.$lang, function(ItemInterface $item){
 			/* Время кешировния настроек 31536000 = 1 год */
 			$item->expiresAfter(31536000);
-			return $this->getSettingsMain->getQuery() ?: [];
+			return $this->getSettingsMain->getSettingsMainAssociative() ?: [];
 		});
 		
 		
+		//dd($this->getSettingsMain->getQuery());
+		
+		$cache->delete($host.'cache.settings.'.$lang);
+		
 //		if(empty($data))
 //		{
-//			$cache->delete($host.'cache.settings.'.$lang);
+//
 //
 //			$data['meta_title'] = 'Добро пожаловать';
 //			$data['description'] = 'Более 150 000 товаров по низким ценам';

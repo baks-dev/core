@@ -18,25 +18,23 @@
 
 namespace BaksDev\Core\Repository\SettingsMain;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class SettingsMain implements SettingsMainInterface
 {
-	public function getQuery() : ?array
+	private readonly TranslatorInterface $translator;
+	
+	public function __construct(TranslatorInterface $translator){
+		$this->translator = $translator;
+	}
+	
+	public function getSettingsMainAssociative() : array
 	{
-		$data['meta_title'] = 'Добро пожаловать';
-		$data['description'] = 'Более 150 000 товаров по низким ценам';
-		$data['keywords'] = 'интернет, магазин, купить';
-		$data['tags'] = 'интернет, магазин, купить';
+		$data['title'] = $this->translator->trans('user.title', domain: 'settings.main');
+		$data['description'] = $this->translator->trans('user.description', domain: 'settings.main');
+		$data['keywords'] = $this->translator->trans('user.keywords', domain: 'settings.main');;
+		$data['tags'] = $this->translator->trans('user.tags', domain: 'settings.main');;
 		
 		return $data;
-	}
-	
-	public function getPhone() : ?array
-	{
-		return [];
-	}
-	
-	public function getSocial() : ?array
-	{
-		return [];
 	}
 }
