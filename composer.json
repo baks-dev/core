@@ -2,7 +2,7 @@
   "name": "baks-dev/core",
   "description": "Модуль Core",
   "homepage": "https://github.com/baks-dev/core",
-  "keywords": ["symfony", "bundle", "library", "plugin", "module", "core", "system"],
+  "keywords": ["symfony", "bundle", "library", "plugin", "module", "core", "system", "baksdev"],
   "license": "MIT",
   "type": "library",
   "authors": [
