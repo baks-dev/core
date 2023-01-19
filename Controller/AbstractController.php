@@ -64,14 +64,14 @@ abstract class AbstractController
 	private SettingsMainInterface $getSettingsMain;
 	
 	//private UserProfilesByCurrentUserInterface $userProfilesByCurrentUser;
-	private KernelInterface $appKernel;
+	//private KernelInterface $appKernel;
 	//private CredentialsGenerator $credentialsGenerator;
 	
 	private string $device = 'pc';
 	private string $user = 'guest';
 	
 	public function __construct(
-		KernelInterface $appKernel,
+		//KernelInterface $appKernel,
 		RouterInterface $router,
 		AuthorizationCheckerInterface $authorizationChecker,
 		Environment $environment,
@@ -99,7 +99,7 @@ abstract class AbstractController
 		$this->translator = $translator;
 		$this->getSettingsMain = $getSettingsMain;
 		//$this->userProfilesByCurrentUser = $userProfilesByCurrentUser;
-		$this->appKernel = $appKernel;
+		//$this->appKernel = $appKernel;
 		//$this->credentialsGenerator = $credentialsGenerator;
 		
 	}
@@ -370,7 +370,9 @@ abstract class AbstractController
 			
 			$styles = '';
 			
-			$file = $this->appKernel->getProjectDir().'/src/System/Resources/assets/css/original.min.css';
+			//$file = $this->appKernel->getProjectDir().'/src/System/Resources/assets/css/original.min.css';
+			
+			$file = __DIR__.'/..//Resources/assets/css/original.min.css';
 			
 			$css = file_get_contents($file);
 			preg_match_all('/([a-z0-9\s\.\:#_\-@,%\[\]()\'"=*\\>~\/+]+)\{([^\}]*)\}/si', $css, $arr);

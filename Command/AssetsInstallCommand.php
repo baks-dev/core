@@ -53,7 +53,6 @@ class AssetsInstallCommand extends Command
     
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        
         $exitCode = 0;
         
         /** @var KernelInterface $kernel */
@@ -70,7 +69,8 @@ class AssetsInstallCommand extends Command
         
         /* Получаем все имеющиеся папки с ресурсами ASSET */
         $ModuleAssets = $this->searchResources($kernel->getProjectDir().DIRECTORY_SEPARATOR.'src');
-        
+		$ModuleAssets = array_merge($ModuleAssets, $this->searchResources($kernel->getProjectDir().DIRECTORY_SEPARATOR.'vendor/baks-dev'));
+		
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
         
