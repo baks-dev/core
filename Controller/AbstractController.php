@@ -18,13 +18,15 @@
 
 namespace BaksDev\Core\Controller;
 
-use App\Module\Settings\Repository\SettingsMain\SettingsMainInterface;
-use App\Module\Users\Profile\UserProfile\Repository\MenuUserProfileByUser\MenuUserProfileByUserInterface;
+//use BaksDev\Settings\Main\Repository\SettingsMain\SettingsMainInterface;
+//use App\Module\Users\Profile\UserProfile\Repository\MenuUserProfileByUser\MenuUserProfileByUserInterface;
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use App\Module\Users\User\Entity\User;
 
+use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
+use BaksDev\Core\Repository\UserProfilesByUser\UserProfilesByCurrentUserInterface;
 use BaksDev\Core\Type\Locale\Locale;
-use Fresh\CentrifugoBundle\Service\Credentials\CredentialsGenerator;
+//use Fresh\CentrifugoBundle\Service\Credentials\CredentialsGenerator;
 use LogicException;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -60,14 +62,16 @@ abstract class AbstractController
 	private FormFactoryInterface $formFactory;
 	private TranslatorInterface $translator;
 	private SettingsMainInterface $getSettingsMain;
-	private MenuUserProfileByUserInterface $menuUserProfiles;
+	
+	//private UserProfilesByCurrentUserInterface $userProfilesByCurrentUser;
 	private KernelInterface $appKernel;
-	private CredentialsGenerator $credentialsGenerator;
+	//private CredentialsGenerator $credentialsGenerator;
 	
 	private string $device = 'pc';
 	private string $user = 'guest';
 	
 	public function __construct(
+		KernelInterface $appKernel,
 		RouterInterface $router,
 		AuthorizationCheckerInterface $authorizationChecker,
 		Environment $environment,
@@ -78,10 +82,10 @@ abstract class AbstractController
 		TranslatorInterface $translator,
 		TokenStorageInterface $tokenStorage,
 		SettingsMainInterface $getSettingsMain,
-		MenuUserProfileByUserInterface $menuUserProfiles,
-		KernelInterface $appKernel,
-		CredentialsGenerator $credentialsGenerator
-	
+		//UserProfilesByCurrentUserInterface $userProfilesByCurrentUser,
+		
+		//CredentialsGenerator $credentialsGenerator
+		
 	)
 	{
 		$this->router = $router;
@@ -94,9 +98,9 @@ abstract class AbstractController
 		$this->formFactory = $formFactory;
 		$this->translator = $translator;
 		$this->getSettingsMain = $getSettingsMain;
-		$this->menuUserProfiles = $menuUserProfiles;
+		//$this->userProfilesByCurrentUser = $userProfilesByCurrentUser;
 		$this->appKernel = $appKernel;
-		$this->credentialsGenerator = $credentialsGenerator;
+		//$this->credentialsGenerator = $credentialsGenerator;
 		
 	}
 	
@@ -154,9 +158,10 @@ abstract class AbstractController
 		/* Добавляем настройки в параметры */
 		$parameters['settings'] = $this->settings();
 		
-		$parameters['user_profiles'] = $this->menuUserProfiles->get();
+		/* Список профилей пользователя */
+		//$parameters['user_profiles'] = $this->userProfilesByCurrentUser->fetchAllUserProfilesAssociative();
 		
-		$parameters['jwt_token'] = $this->jwt();
+		//$parameters['jwt_token'] = $this->jwt();
 		
 		/* Если не задан модуль - присваиваем из префикса роутинга */
 		if(!$moduleTemplateName)
@@ -478,15 +483,15 @@ abstract class AbstractController
 		});
 		
 		
-		if(empty($data))
-		{
-			$cache->delete($host.'cache.settings.'.$lang);
-			
-			$data['meta_title'] = 'Добро пожаловать';
-			$data['description'] = 'Более 150 000 товаров по низким ценам';
-			$data['keywords'] = 'интернет, магазин, купить';
-			$data['tags'] = 'интернет, магазин, купить';
-		}
+//		if(empty($data))
+//		{
+//			$cache->delete($host.'cache.settings.'.$lang);
+//
+//			$data['meta_title'] = 'Добро пожаловать';
+//			$data['description'] = 'Более 150 000 товаров по низким ценам';
+//			$data['keywords'] = 'интернет, магазин, купить';
+//			$data['tags'] = 'интернет, магазин, купить';
+//		}
 		
 		//$data['template'] = 'default'; /* шаблон по умолчанию */
 		

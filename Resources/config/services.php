@@ -23,5 +23,7 @@ return static function (ContainerConfigurator $configurator) {
 	
 	$services->load($namespace.'\Services\\', __DIR__.'/../../Services/*');
 	
+	$services->load($namespace.'\Repository\\', __DIR__.'/../../Repository/*');
+	
 
 };

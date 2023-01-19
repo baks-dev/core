@@ -31,7 +31,7 @@ return static function (ContainerConfigurator $configurator, TwigConfig $config)
       ->class(ModifyExtension::class)
       ->tag('twig.extension');
 	
-    $config->path(__DIR__.'/../view/', 'System');
+    $config->path(__DIR__.'/../view/', 'Core');
 	
 };
 
