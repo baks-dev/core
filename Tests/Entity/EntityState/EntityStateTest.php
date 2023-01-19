@@ -2,7 +2,7 @@
 
 namespace BaksDev\Core\Tests\Entity\EntityState;
 
-use App\Module\Users\User\Type\Id\UserUid;
+use BaksDev\Users\User\Type\Id\UserUid;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

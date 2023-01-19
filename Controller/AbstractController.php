@@ -21,7 +21,7 @@ namespace BaksDev\Core\Controller;
 //use BaksDev\Settings\Main\Repository\SettingsMain\SettingsMainInterface;
 //use App\Module\Users\Profile\UserProfile\Repository\MenuUserProfileByUser\MenuUserProfileByUserInterface;
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use App\Module\Users\User\Entity\User;
+use BaksDev\Users\User\Entity\User;
 
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Repository\UserProfilesByUser\UserProfilesByCurrentUserInterface;

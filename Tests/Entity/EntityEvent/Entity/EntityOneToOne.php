@@ -17,7 +17,7 @@
 
 namespace BaksDev\Core\Tests\Entity\EntityEvent\Entity;
 
-use App\Module\Users\User\Type\Id\UserUid;
+use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Core\Entity\EntityEvent;
 use BaksDev\Core\Entity\EntityState;
 use Doctrine\DBAL\Types\Types;

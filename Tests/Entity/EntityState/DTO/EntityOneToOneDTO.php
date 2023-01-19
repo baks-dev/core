@@ -17,7 +17,7 @@
 
 namespace BaksDev\Core\Tests\Entity\EntityState\DTO;
 
-use App\Module\Users\User\Type\Id\UserUid;
+use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Core\Tests\Entity\EntityState\Entity\Entity;
 
 final class EntityOneToOneDTO
