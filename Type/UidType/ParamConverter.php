@@ -18,7 +18,6 @@
 
 namespace BaksDev\Core\Type\UidType;
 
-
 use Attribute;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 
