@@ -24,31 +24,32 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class SearchForm extends AbstractType
 {
-    
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        /* TextType */
-        $builder->add('query', TextType::class, [
-          'attr' => [
-            'class' => 'w-100',
-            /*'onfocus' => "this.value=''",*/
-            'placeholder' => 'Search'
-          ],
-          'label' => false,
-          'required' => false
-        ]);
-		
-    }
-    
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults
-        (
-          [
-            'data_class' => SearchDTO::class,
-            'method' => 'POST',
-			'attr' => ['class' => 'd-flex align-items-center position-relative']
-          ]);
-    }
-    
+	
+	public function buildForm(FormBuilderInterface $builder, array $options)
+	{
+		/* TextType */
+		$builder->add('query', TextType::class, [
+			'attr' => [
+				'class' => 'w-100',
+				/*'onfocus' => "this.value=''",*/
+				'placeholder' => 'Search',
+			],
+			'label' => false,
+			'required' => false,
+		]);
+	}
+	
+	public function configureOptions(OptionsResolver $resolver)
+	{
+		$resolver->setDefaults
+		(
+			[
+				'translation_domain' => 'core.search',
+				'data_class' => SearchDTO::class,
+				'method' => 'POST',
+				'attr' => ['class' => 'd-flex align-items-center position-relative'],
+			]
+		);
+	}
+	
 }
