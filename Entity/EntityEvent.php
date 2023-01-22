@@ -18,15 +18,11 @@
 
 namespace BaksDev\Core\Entity;
 
-use App\Module\Menu\Admin\Entity\Section\MenuAdminSection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Id as OrmAttributeId;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\PersistentCollection;
-use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\String\Inflector\EnglishInflector;
@@ -45,14 +41,11 @@ abstract class EntityEvent implements EntityEventInterface
 			$propertyName = $property->getName();
 			
 			
-			
-			
 			/* Пропускаем свойства, которых нет в сущности */
 			if(!property_exists($this, $propertyName))
 			{
 				continue;
 			}
-			
 			
 			
 			$dtoReflectionPropertyByName = new ReflectionProperty($dto, $propertyName);

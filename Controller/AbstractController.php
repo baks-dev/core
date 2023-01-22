@@ -18,8 +18,7 @@
 
 namespace BaksDev\Core\Controller;
 
-//use BaksDev\Settings\Main\Repository\SettingsMain\SettingsMainInterface;
-//use App\Module\Users\Profile\UserProfile\Repository\MenuUserProfileByUser\MenuUserProfileByUserInterface;
+
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\User\Entity\User;
 
@@ -27,6 +26,7 @@ use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Repository\UserProfilesByUser\UserProfilesByCurrentUserInterface;
 use BaksDev\Core\Type\Locale\Locale;
 //use Fresh\CentrifugoBundle\Service\Credentials\CredentialsGenerator;
+use BaksDev\Users\User\Repository\UserDecorator\UserDecoratorInterface;
 use LogicException;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -70,6 +70,7 @@ abstract class AbstractController
 	
 	private string $device = 'pc';
 	private string $user = 'guest';
+	//private UserDecoratorInterface $userDecorator;
 	
 	public function __construct(
 		//KernelInterface $appKernel,
@@ -85,7 +86,10 @@ abstract class AbstractController
 		SettingsMainInterface $getSettingsMain,
 		//UserProfilesByCurrentUserInterface $userProfilesByCurrentUser,
 		
-		//CredentialsGenerator $credentialsGenerator
+		//CredentialsGenerator $credentialsGenerator,
+		
+		
+		//UserDecoratorInterface $userDecorator
 		
 	)
 	{
@@ -103,6 +107,7 @@ abstract class AbstractController
 		//$this->appKernel = $appKernel;
 		//$this->credentialsGenerator = $credentialsGenerator;
 		
+		//$this->userDecorator = $userDecorator;
 	}
 	
 	
@@ -172,11 +177,15 @@ abstract class AbstractController
 			
 		}
 		
+		
+		//dump($this->userDecorator->getProfile());
+		
 //		/* Если не задан наблон - присваиваем из настроек */
 //		if(!$template)
 //		{
 //			$template = $parameters['settings']['template'];
 //		}
+		
 		
 		
 		$routingName = (explode(':', $route))[1];

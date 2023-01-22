@@ -2,13 +2,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use BaksDev\Core\Twig\RouteExists\RouteExistsExtension;
-use BaksDev\Core\Type\Field\FieldExtension;
 use BaksDev\Core\Type\Ip\IpExtension;
-use BaksDev\Core\Type\Measurement\MeasurementExtension;
 use BaksDev\Core\Type\Modify\ModifyExtension;
-use BaksDev\Core\Type\Money\MoneyExtension;
-use BaksDev\Core\Type\Reference\ReferenceExtension;
+
 use Symfony\Config\TwigConfig;
 
 return static function (ContainerConfigurator $configurator, TwigConfig $config)
@@ -20,13 +16,7 @@ return static function (ContainerConfigurator $configurator, TwigConfig $config)
       ->autoconfigure() // Automatically registers your services as commands, event subscribers, etc.
     ;
 	
-	/** Функция проверяет, существует ли указанный роун по имени */
-//	$services->set('route.exist.twig.extension')
-//		->class(RouteExistsExtension::class)
-//		->tag('twig.extension');
-	
-
-    /** Twig Extension */
+    /** IpExtension */
     $services->set('user.ip.type.twig.extension')
       ->class(IpExtension::class)
       ->tag('twig.extension');
@@ -39,9 +29,8 @@ return static function (ContainerConfigurator $configurator, TwigConfig $config)
       ->tag('twig.extension');
 	
 	
-	
+	/** Path View */
     $config->path(__DIR__.'/../view/', 'Core');
-
 	$config->path('%kernel.project_dir%/templates', 'Template');
 	
 };
