@@ -101,7 +101,7 @@ function readGeoMaps($idCity, $idCityHelp) {
         }
     }
 
-    $profileCity.addEventListener('input', getCountry.debounce(500));
+    //$profileCity.addEventListener('input', getCountry.debounce(500));
 
 }
 

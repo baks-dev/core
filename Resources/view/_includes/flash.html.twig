@@ -1,49 +1,41 @@
+{% trans_default_domain('core.flash') %}
+
 <div class="toast-container position-fixed top-0 end-0 p-3 w-auto" id="toast" style="z-index: 1060;">
 
-	{% for label, messages in app.flashes %}
+    {% for label, messages in app.flashes %}
 
-		{% set shadow = null %}
+        {% set shadow = null %}
 
-		{# {% set danger_uid = null %} #}
+        {% if label == 'success' %}
+            {% set shadow = '--toast-shadow: rgba(25, 135, 84, .075)' %}
+        {% elseif label == 'danger' %}
+            {% set shadow = '--toast-shadow: rgba(255, 0, 0, .075)' %}
+        {% elseif label == 'warning' %}
+            {% set shadow = '--toast-shadow: rgba(255, 193, 7, .075)' %}
+        {% endif %}
 
-		{% if label == 'success' or label == 'danger' or label == 'warning' %}
-			{% set header = 'app.'~label %}
-		{% else %}
-			{% set header = label %}
-		{% endif %}
+        {% for message in messages %}
+            <div class="toast" role="alert"
+                 aria-live="assertive"
+                 aria-atomic="true"
+                 data-kt-docs-toast="stack"
+                 style="{{ shadow }}"
+            >
+                <div class="toast-header">
+                    {# <span class="toast-icon bg-{{ label }}"></span> #}
+                    <strong class="w-100">
+                        {{ label|trans }}
+                    </strong>
+                    {# <small>11 mins ago</small> #}
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{ message|trans }}
+                </div>
+            </div>
+        {% endfor %}
 
-
-		{% if label == 'success' %}
-			{% set shadow = '--toast-shadow: rgba(25, 135, 84, .075)' %}
-		{% elseif label == 'danger' %}
-			{% set shadow = '--toast-shadow: rgba(255, 0, 0, .075)' %}
-		{% elseif label == 'warning' %}
-			{% set shadow = '--toast-shadow: rgba(255, 193, 7, .075)' %}
-		{% endif %}
-
-
-		{% for message in messages %}
-			<div class="toast" role="alert"
-				 aria-live="assertive"
-				 aria-atomic="true"
-				 data-kt-docs-toast="stack"
-				 style="{{ shadow }}"
-			>
-				<div class="toast-header">
-					{# <span class="toast-icon bg-{{ label }}"></span> #}
-					<strong class="w-100">
-						{{ header|trans }}
-					</strong>
-					{# <small>11 mins ago</small> #}
-					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-				</div>
-				<div class="toast-body">
-					{{ message|trans }}
-				</div>
-			</div>
-		{% endfor %}
-
-		{# <script>
+        {# <script>
             document.addEventListener('DOMContentLoaded', function () {
                 var toastElList = [].slice.call(document.querySelectorAll('.toast'));
                 toastElList.map(function (toastEl) {
@@ -52,7 +44,7 @@
             });
 		</script> #}
 
-	{% endfor %}
+    {% endfor %}
 </div>
 
 
