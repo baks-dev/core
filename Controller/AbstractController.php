@@ -57,40 +57,28 @@ abstract class AbstractController
 	private Environment $environment;
 	private RequestStack $requestStack;
 	private CacheInterface $cache;
-	//private ContainerBagInterface $containerBag;
 	private TokenStorageInterface $tokenStorage;
 	private FormFactoryInterface $formFactory;
 	private TranslatorInterface $translator;
 	
 	private SettingsMainInterface $getSettingsMain;
 	
-	//private UserProfilesByCurrentUserInterface $userProfilesByCurrentUser;
-	//private KernelInterface $appKernel;
-	//private CredentialsGenerator $credentialsGenerator;
-	
 	private string $device = 'pc';
 	private string $user = 'guest';
-	//private UserDecoratorInterface $userDecorator;
+	private string $content;
+	private string $route;
 	
 	public function __construct(
-		//KernelInterface $appKernel,
 		RouterInterface $router,
 		AuthorizationCheckerInterface $authorizationChecker,
 		Environment $environment,
 		RequestStack $requestStack,
 		CacheInterface $cache,
-		//ContainerBagInterface $containerBag,
 		FormFactoryInterface $formFactory,
 		TranslatorInterface $translator,
 		TokenStorageInterface $tokenStorage,
 		SettingsMainInterface $getSettingsMain,
-		//UserProfilesByCurrentUserInterface $userProfilesByCurrentUser,
-		
-		//CredentialsGenerator $credentialsGenerator,
-		
-		
-		//UserDecoratorInterface $userDecorator
-		
+
 	)
 	{
 		$this->router = $router;
@@ -98,16 +86,11 @@ abstract class AbstractController
 		$this->environment = $environment;
 		$this->requestStack = $requestStack;
 		$this->cache = $cache;
-		//$this->containerBag = $containerBag;
 		$this->tokenStorage = $tokenStorage;
 		$this->formFactory = $formFactory;
 		$this->translator = $translator;
 		$this->getSettingsMain = $getSettingsMain;
-		//$this->userProfilesByCurrentUser = $userProfilesByCurrentUser;
-		//$this->appKernel = $appKernel;
-		//$this->credentialsGenerator = $credentialsGenerator;
-		
-		//$this->userDecorator = $userDecorator;
+
 	}
 	
 	
@@ -119,29 +102,8 @@ abstract class AbstractController
 	}
 	
 	
-	//    /**
-	//     * Returns a rendered view.
-	//     */
-	//    protected function renderView(string $view, array $parameters = []): string
-	//    {
-	//        if(!$this->container->has('twig'))
-	//        {
-	//            throw new \LogicException(
-	//              'You cannot use the "renderView" method if the Twig Bundle is not available. Try running "composer require symfony/twig-bundle".'
-	//            );
-	//        }
-	//
-	//        return $this->container->get('twig')->render($view, $parameters);
-	//    }
 	
-	/**
-	 * Renders a view.
-	 */
-	
-	private $content;
-	private $route;
-	
-	
+	/** Отображает шаблон */
 	protected function render(
 		array $parameters = [],
 		string $fileName = null,
@@ -155,7 +117,7 @@ abstract class AbstractController
 		
 		$request = $this->requestStack;
 		
-		$route = $request->getCurrentRequest()->attributes->get('_route');
+		$this->route = $request->getCurrentRequest()->attributes->get('_route');
 		
 		/* Определяем браузер пользователя */
 		$userAgent = $request->getCurrentRequest()->headers->get('User-Agent');
@@ -172,23 +134,13 @@ abstract class AbstractController
 		/* Если не задан модуль - присваиваем из префикса роутинга */
 		if(!$moduleTemplateName)
 		{
-			$moduleName = (explode(':', $route))[0];
+			$moduleName = (explode(':', $this->route))[0];
 			$moduleTemplateName = '@'.$moduleName;
 			
 		}
 		
-		
-		//dump($this->userDecorator->getProfile());
-		
-//		/* Если не задан наблон - присваиваем из настроек */
-//		if(!$template)
-//		{
-//			$template = $parameters['settings']['template'];
-//		}
-		
-		
-		
-		$routingName = (explode(':', $route))[1];
+
+		$routingName = (explode(':', $this->route))[1];
 		
 		/* Если не задан файл - присваиваем из имени роутинга */
 		if(!$fileName)
@@ -224,8 +176,6 @@ abstract class AbstractController
 				{
 					$view = str_replace($file, 'tablet/'.$file, $view);
 					$this->device = 'tablet';
-					
-					
 				}
 				
 				/* Если девайс Мобильный - подключаем кастомный шаблон @Template/mobile */
@@ -237,7 +187,6 @@ abstract class AbstractController
 			}
 			
 			//dd($view);
-			
 	
 			$parameters['settings']['device'] = $this->device;
 			$content = $this->environment->render($view, $parameters);
@@ -289,12 +238,12 @@ abstract class AbstractController
 		}
 		
 		$this->content = $content;
-		$this->route = $route;
+		//$this->route = $route;
 		
 		/* Не применяем стили к AJAX запросам */
 		if('XMLHttpRequest' !== $request->getCurrentRequest()->headers->get('X-Requested-With'))
 		{
-			$content = $this->assets_css($content, $route);
+			$content = $this->assets_css($content);
 		}
 		
 		$response->setContent($content);
@@ -308,10 +257,10 @@ abstract class AbstractController
 	{
 		$cache = $this->cache;
 		$cache->delete($this->user.$this->device.'-'.$this->route);
-		$this->assets_css($this->content, $this->route);
+		$this->assets_css($this->content);
 	}
 	
-	public function assets_css($content, $route) : string
+	public function assets_css($content) : string
 	{
 		
 		$cache = $this->cache;
@@ -322,22 +271,14 @@ abstract class AbstractController
 		{
 			register_shutdown_function([$this, 'resetCacheCss'], 'throw');
 		}
-		
-		//dump($cache_key);
-		
+
 		/* Кешируем по названию роутинга - результат компиляции файлов */
 		$styles = $cache->get($cache_key, function(ItemInterface $item) use ($content)
 		{
 			$item->expiresAfter(3600 * 24 * 31); // 3600 = 1 час
-			
-			// class&#x3D;&quot;
-			// &quot;
-			
-			//  //"|class=(\"\&#x3D;\&quot;)(.*)(\"\&quot;)|si",
-			
+
 			/* Ищем все теги class="..." */
 			\preg_match_all(
-				
 				"|class=\"(.*)\"|U",
 				$content,
 				$out,
@@ -362,7 +303,6 @@ abstract class AbstractController
 				return '';
 			}
 			
-			
 			\preg_match_all(
 				
 				"|class&#x3D;&quot;(.*)&quot;|U",
@@ -386,8 +326,6 @@ abstract class AbstractController
 			}
 			
 			$styles = '';
-			
-			//$file = $this->appKernel->getProjectDir().'/src/System/Resources/assets/css/original.min.css';
 			
 			$file = __DIR__.'/..//Resources/assets/css/original.min.css';
 			
@@ -478,16 +416,6 @@ abstract class AbstractController
 	
 	public function settings() : ?array
 	{
-		
-		//        dd(array_filter(
-		//             get_declared_classes(),
-		//             function ($className) {
-		//                 return in_array(GetSettingsMainInterface::class, class_implements($className));
-		//             }
-		//           ));
-		
-		//dd(in_array('GetSettingsMainInterface', class_implements('className')));
-		
 		$request = $this->requestStack;
 		
 		$host = $request->getCurrentRequest()?->getHost();
@@ -501,22 +429,8 @@ abstract class AbstractController
 			return $this->getSettingsMain->getSettingsMainAssociative() ?: [];
 		});
 		
-		
-		//dd($this->getSettingsMain->getQuery());
-		
-		$cache->delete($host.'cache.settings.'.$lang);
-		
-//		if(empty($data))
-//		{
-//
-//
-//			$data['meta_title'] = 'Добро пожаловать';
-//			$data['description'] = 'Более 150 000 товаров по низким ценам';
-//			$data['keywords'] = 'интернет, магазин, купить';
-//			$data['tags'] = 'интернет, магазин, купить';
-//		}
-		
-		//$data['template'] = 'default'; /* шаблон по умолчанию */
+		/* Очистить кеш */
+		//$cache->delete($host.'cache.settings.'.$lang);
 		
 		return $data;
 	}
@@ -541,6 +455,7 @@ abstract class AbstractController
 	{
 		
 		$profiles = $this->getUser()?->getProfile();
+		
 		return isset($profiles['user_profile_id']) ? new UserProfileUid(
 			$profiles['user_profile_id'],
 			$profiles['username']
@@ -713,17 +628,3 @@ abstract class AbstractController
 		return $data;
 	}
 }
-
-
-
-//class Shutdown
-//{
-//    public static function Method ()
-//    {
-//        sleep(15);
-//        mkdir("/home/bundles.baks.dev/public/assets/".time(), 0700);
-//    }
-//}
-//
-//// 3. Throw an exception
-//register_shutdown_function (array (Shutdown::class, 'Method'), 'throw');

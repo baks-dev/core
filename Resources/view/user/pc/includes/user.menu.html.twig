@@ -13,29 +13,12 @@
 >
 
 
-    {% if app.user.profile %}
-
-        {% set img_path = app.user.profile.avatar_cdn == true ? cdn_host : '' %}
-        {% set img_min = app.user.profile.avatar_cdn == true ? 'small.' : '' %}
-
         <span class="icon rounded-2 bg-contain lazy p-1"
               style="width: 43px; height: 43px;"
-              data-bg="{{ app.user.profile.avatar_name ? img_path ~ profile_avatar_dir ~ app.user.profile.avatar_dir ~'/'~ app.user.profile.avatar_name ~'.'~ img_min ~ app.user.profile.avatar_ext : '/assets/img/blank.svg' }}"
+              data-bg="{{ app.user.profile.image ? app.user.profile.image : '/assets/img/blank.svg' }}"
         ></span>
 
-    {% else %}
-
-        <span class="icon rounded-2 ">
-             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
-                  class="text-muted" viewBox="0 0 16 16">
-              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
-            </svg>
-	</span>
-    {% endif %}
-
 </button>
-
-
 
 
 {# title: function() {
@@ -46,7 +29,7 @@ return $('.select_box').html();
 <div id="user-menu-title" class="d-none">
 
     <div class="dropdown">
-    {% if app.user.profile %}
+
 
             <a class="btn btn-link dropdown-toggle w-100 text-dark text-decoration-none" href="#"
                role="button" data-bs-toggle="dropdown"
@@ -56,15 +39,18 @@ return $('.select_box').html();
                     {{ app.user.profile.username }}
 
                     {# Тип профиля пользователя #}
-                    {% if app.user.profile.profile_type is defined %}
-                        <span class="badge bg-light text-dark fw-bolder fs-8 px-2 py-1 ms-2">
-								{{ app.user.profile.profile_type }}
+
+                    <span class="badge bg-light text-dark fw-bolder px-2 py-1">
+								{{ app.user.profile.type }}
 							</span>
+
+
+                    {% if app.user.profile.contact %}
+                        <div class="text-muted small">
+                            {{ app.user.profile.contact }}
+                        </div>
                     {% endif %}
 
-                    <div class="text-muted small">
-                        {{ app.user.profile.email }}
-                    </div>
                 </div>
 
 
@@ -86,12 +72,12 @@ return $('.select_box').html();
                     </a>
                 </li>
 
-                <li>
+                {#<li>
                     <hr class="dropdown-divider">
-                </li>
+                </li>#}
 
 
-                {% if user_profiles|length > 1 %}
+               {# {% if user_profiles|length > 1 %}
 
                     <li class="dropdown-header small">
                         Применить профиль
@@ -109,40 +95,14 @@ return $('.select_box').html();
                             </a>
                         </li>
                     {% endif %}
-                {% endfor %}
+                {% endfor %}#}
 
             </ul>
 
-    {% else %}
 
 
-        <a class="btn btn-link  w-100 text-dark text-decoration-none"
-           href="#"
-           role="button"
-           aria-expanded="false"
-        >
-            <div class="w-100 float-start text-start">
 
-
-                {# Тип профиля пользователя #}
-
-                    <span class="badge bg-light text-dark fw-bolder fs-8 px-2 py-1 ms-2">
-								Пользователь
-							</span>
-
-
-                <div class="text-muted small">
-                    3333333333333
-                </div>
-            </div>
-
-
-        </a>
-
-    {% endif %}
-
-
-        </div>
+    </div>
 
     <ul class="leader list-group list-group-flush w-250px small">
         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 text-truncate rounded-5">
