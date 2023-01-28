@@ -72,9 +72,31 @@ return $('.select_box').html();
                     </a>
                 </li>
 
-                {#<li>
-                    <hr class="dropdown-divider">
-                </li>#}
+
+               {# {{ dd(app.user.profile.profiles|length) }}#}
+
+                {% if app.user.profile.profiles is defined and app.user.profile.profiles|length > 1 %}
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+
+                    {% for profil in app.user.profile.profiles %}
+
+                        {% if app.user.profile and app.user.profile.username != profil.user_profile_username %}
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{{ path('UserProfile:user.activate', { id: profil.user_profile_event }) }}">
+                                    {{ profil.user_profile_username }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                {% endif %}
+
+
+
 
 
                {# {% if user_profiles|length > 1 %}
@@ -104,7 +126,7 @@ return $('.select_box').html();
 
     </div>
 
-    <ul class="leader list-group list-group-flush w-250px small">
+    <ul class="leader list-group list-group-flush w-100 small">
         <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 text-truncate rounded-5">
 
             <a href="{# {{ path('Orders:user.orders') }} #}"
@@ -122,6 +144,8 @@ return $('.select_box').html();
 
 
 <div id="user-menu-content" class="d-none">
+
+
 
     {# {% if app.user.profile %}
 
@@ -163,7 +187,7 @@ return $('.select_box').html();
 
 {% endif %} #}
 
-    <ul class="leader list-group list-group-flush w-250px">
+    <ul class="leader list-group list-group-flush w-100">
 
 
         <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">

@@ -20,6 +20,7 @@ namespace BaksDev\Core\Controller;
 
 
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Core\Twig\CSPNonce\CSPNonceGenerator;
 use BaksDev\Users\User\Entity\User;
 
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
@@ -67,6 +68,7 @@ abstract class AbstractController
 	private string $user = 'guest';
 	private string $content;
 	private string $route;
+	private CSPNonceGenerator $CSPNonceGenerator;
 	
 	public function __construct(
 		RouterInterface $router,
@@ -78,7 +80,8 @@ abstract class AbstractController
 		TranslatorInterface $translator,
 		TokenStorageInterface $tokenStorage,
 		SettingsMainInterface $getSettingsMain,
-
+		CSPNonceGenerator $CSPNonceGenerator
+	
 	)
 	{
 		$this->router = $router;
@@ -90,7 +93,8 @@ abstract class AbstractController
 		$this->formFactory = $formFactory;
 		$this->translator = $translator;
 		$this->getSettingsMain = $getSettingsMain;
-
+		
+		$this->CSPNonceGenerator = $CSPNonceGenerator;
 	}
 	
 	
@@ -348,7 +352,7 @@ abstract class AbstractController
 		});
 		
 		
-		$content = str_replace('<style></style>', '<style>'.$styles.'</style>', $content);
+		$content = str_replace('<style></style>', '<style nonce="'.$this->CSPNonceGenerator->getNonce().'">'.$styles.'</style>', $content);
 		$content = $this->contentMinify($content);
 		
 		return $content;

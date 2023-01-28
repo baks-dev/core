@@ -12,8 +12,8 @@ use Symfony\Component\Uid\UuidV4;
 
 class UidType extends StringType
 {
-    
-    public function convertToDatabaseValue($value, AbstractPlatform $platform) : mixed
+	
+	public function convertToDatabaseValue($value, AbstractPlatform $platform) : mixed
     {
         $classType = $this->getClassType();
         

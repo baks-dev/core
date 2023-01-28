@@ -34,7 +34,7 @@ use Symfony\Component\Routing\RouterInterface;
  * File | Settings | PHP | Symfony | Routing
  */
 #[AsCommand(
-  name: 'app:router.phpstorm',
+  name: 'baks:router.phpstorm',
   description: 'Генерирует массив роутингов для интеграции PhpStorm')
 ]
 class RouterPhpstormCommand extends Command

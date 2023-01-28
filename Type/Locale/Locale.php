@@ -15,7 +15,7 @@ final class Locale
     private LocaleEnum $locale;
     
 
-    public function __construct(string|LocaleEnum $locale)
+    public function __construct(string|LocaleEnum|Locale $locale)
     {
         if($locale instanceof LocaleEnum)
         {

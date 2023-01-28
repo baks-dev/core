@@ -12,10 +12,10 @@ return static function (ContainerConfigurator $configurator) {
     ;
 	
 	$namespace = 'BaksDev\Core';
-    
-    $services->load($namespace.'\Controller\\', __DIR__.'/../../Controller')
+
+    $services->load($namespace.'\Controller\\', __DIR__.'/../../Controller/*')
       ->tag('controller.service_arguments');
-    
+
     $services->load($namespace.'\Twig\\', __DIR__.'/../../Twig');
 	
     $services->load($namespace.'\Form\\', __DIR__.'/../../Form')
@@ -25,5 +25,4 @@ return static function (ContainerConfigurator $configurator) {
 	
 	$services->load($namespace.'\Repository\\', __DIR__.'/../../Repository/*');
 	
-
 };

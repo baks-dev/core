@@ -23,6 +23,7 @@
 
 namespace BaksDev\Core\Entity;
 
+use BaksDev\Products\Category\Entity\Offers\ProductCategoryOffersInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Id as OrmAttributeId;
@@ -161,9 +162,14 @@ abstract class EntityState implements EntityEventInterface
 										$entityCollection
 									);
 									
-									if(is_object($getPropertyValue) && !method_exists($getPropertyValue , '__toString'))
+									if(is_object($getPropertyValue) && !method_exists($getPropertyValue, '__toString'))
 									{
-										throw new \RuntimeException(sprintf('Отсутствует метод __toString в классе %s возвращающая свойство с атрибутом #[ORM\Id]', $getPropertyValue::class));
+										throw new \RuntimeException(
+											sprintf(
+												'Отсутствует метод __toString в классе %s возвращающая свойство с атрибутом #[ORM\Id]',
+												$getPropertyValue::class
+											)
+										);
 									}
 									
 									$stdEntity->{$collPropsEntity->name} = (string) $this->getPropertyValue(
@@ -275,7 +281,8 @@ abstract class EntityState implements EntityEventInterface
 						
 						$thisProperty = $this->getPropertyValue($propertyName, $this);
 						
-						if(method_exists($thisProperty, 'setEntity'))
+						
+						if($thisProperty && method_exists($thisProperty, 'setEntity'))
 						{
 							$return = $thisProperty->setEntity($dto->$getDtoMethod());
 							
@@ -298,7 +305,9 @@ abstract class EntityState implements EntityEventInterface
 			if(property_exists($this, $propertyName))
 			{
 				/* Если свойство сущности ReadOnly и оно уже инициировано - не присваиваем */
-				if($entityReflectionPropertyByName->isReadOnly() && $entityReflectionPropertyByName->isInitialized($this))
+				if($entityReflectionPropertyByName->isReadOnly() && $entityReflectionPropertyByName->isInitialized(
+						$this
+					))
 				{
 					continue;
 				}
@@ -325,6 +334,8 @@ abstract class EntityState implements EntityEventInterface
 	
 	public function getDto($dto) : mixed
 	{
+		
+		
 		$dtoReflectionClass = new ReflectionClass($dto);
 		$inflector = new EnglishInflector();
 		
@@ -338,6 +349,7 @@ abstract class EntityState implements EntityEventInterface
 			{
 				continue;
 			}
+			
 			
 			//dump($propertyName);
 			//dump($dto->$propertyName);
@@ -386,6 +398,7 @@ abstract class EntityState implements EntityEventInterface
 				continue;
 			}
 			
+			
 			/* Если тип свойства - класс */
 			//if($type !== false)
 			if(!$property->getType()?->isBuiltin())
@@ -419,24 +432,25 @@ abstract class EntityState implements EntityEventInterface
 					{
 						/* Получаем значение свойства сущности */
 						$getEntityProperty = $this->getPropertyValue($propertyName, $this);
-						
-						
-						//dump($this::class);
-						//dump($propertyTypeName);
-						
-						
-						/* Присваиваем значение свойству сущности */
-						$dataOneToOneDto = $getEntityProperty->getDto($oneToOne);
-						$this->setPropertyValue($propertyName, $dataOneToOneDto, $dto);
+	
+						if($getEntityProperty && $getEntityProperty !== 'not_initialized')
+						{
+							/* Присваиваем значение свойству сущности */
+							$dataOneToOneDto = $getEntityProperty->getDto($oneToOne);
+							$this->setPropertyValue($propertyName, $dataOneToOneDto, $dto);
+						}
 						
 						continue;
 					}
 				}
+				
 			}
+			
 			
 			/** Если свойство скалярное или ManyToOne */
 			$getEntityProperty = $this->getPropertyValue($propertyName, $this);
 			$this->setPropertyValue($propertyName, $getEntityProperty, $dto);
+			
 			
 		}
 		
@@ -462,6 +476,7 @@ abstract class EntityState implements EntityEventInterface
 	/** Получаем через рефлексию значение свойства */
 	private function getPropertyValue(string $property, object $object)
 	{
+		
 		
 		$modifiers = new ReflectionProperty($object, $property);
 		

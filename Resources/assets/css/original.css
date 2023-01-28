@@ -638,12 +638,12 @@
 
 .form-control::-moz-placeholder {
     color: #6c757d;
-    opacity: 1;
+    opacity: 0.5;
 }
 
 .form-control::placeholder {
     color: #6c757d;
-    opacity: 1;
+    opacity: 0.5;
 }
 
 .form-control:disabled {
@@ -3774,8 +3774,8 @@ textarea.form-control-lg {
 }
 
 .popover {
-    --bs-popover-zindex: 1070;
-    --bs-popover-max-width: 276px;
+    --bs-popover-zindex: 1050;
+    --bs-popover-max-width: auto;
     --bs-popover-font-size: 0.875rem;
     --bs-popover-bg: #fff;
     --bs-popover-border-width: 1px;

@@ -1,7 +1,7 @@
 {{ form_start(search) }}
 
 <div class="w-100">
-    {{ form_widget(search.query) }}
+    {{ form_widget(search.query, { attr: { class : 'border-light' } }) }}
 </div>
 
 <button class="btn position-absolute top-0 end-0" type="submit" aria-label="Поиск">

@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 #[AsCommand(
-  name       : 'app:assets:install',
+  name       : 'baks:assets:install',
   description: 'Устанавливает файлы ресурсов в публичную директорию',
 )]
 class AssetsInstallCommand extends Command
@@ -142,6 +142,9 @@ class AssetsInstallCommand extends Command
         // удаляем ресурсы, которых больше не существуют
         if(!$input->getOption('no-cleanup') && is_dir($bundlesDir))
         {
+			
+		
+			
             $validAssetDirs[] = 'images';
             $validAssetDirs[] = 'video';
             $validAssetDirs[] = 'files';

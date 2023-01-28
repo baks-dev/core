@@ -78,7 +78,6 @@ setTimeout(function initBootstrap() {
         popoverTriggerList.map(function (popoverTriggerEl) {
 
 
-
             popoverTriggerEl.addEventListener('shown.bs.popover', function (event) {
 
 
@@ -89,11 +88,12 @@ setTimeout(function initBootstrap() {
 
                     let elementDescribedby = document.getElementById(describedby);
 
-                    document.addEventListener( 'click', HidePopover);
+                    document.addEventListener('click', HidePopover);
+
                     function HidePopover(e) {
                         const withinBoundaries = e.composedPath().includes(elementDescribedby);
 
-                        if ( ! withinBoundaries ) {
+                        if (!withinBoundaries) {
                             document.removeEventListener("click", HidePopover);
                             pops.toggle();
                         }
@@ -114,12 +114,12 @@ setTimeout(function initBootstrap() {
                     });
 
 
-                   /* document.getElementById(describedby).querySelectorAll('.dropdown-toggle').forEach(function (item, i, arr) {
-                        /!* Добавляем атрибуты модального окна *!/
-                        console.log(465465465);
+                    /* document.getElementById(describedby).querySelectorAll('.dropdown-toggle').forEach(function (item, i, arr) {
+                         /!* Добавляем атрибуты модального окна *!/
+                         console.log(465465465);
 
-                        new bootstrap.Dropdown(item);
-                    });*/
+                         new bootstrap.Dropdown(item);
+                     });*/
 
 
                     //const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
@@ -129,18 +129,17 @@ setTimeout(function initBootstrap() {
                 }
             })
 
-             const pops = new bootstrap.Popover(popoverTriggerEl, {
+            const pops = new bootstrap.Popover(popoverTriggerEl, {
                 html: true,
                 content: function () {
                     return document.getElementById(this.id + '-content').innerHTML;
                 },
 
-                title: function() {
+                title: function () {
 
-                    let title = document.getElementById(this.id+'-title');
-                    if (title)
-                    {
-                        return document.getElementById(this.id+'-title').innerHTML;
+                    let title = document.getElementById(this.id + '-title');
+                    if (title) {
+                        return document.getElementById(this.id + '-title').innerHTML;
                     }
 
                 }
@@ -170,6 +169,17 @@ setTimeout(function initBootstrap() {
 
 }, 100);
 
+
+/*setTimeout(function initBootstrap() {
+
+    /!*console.log(bootstrap);*!/
+
+    if (bootstrap) {
+        return;
+    }
+    setTimeout(initBootstrap, 100);
+
+}, 100);*/
 
 function modaHidden() {
     /* Скрываем модальное окно */
@@ -298,7 +308,6 @@ function modalLink(item) {
 async function submitModalForm(forms) {
 
     const data = new FormData(forms);
-
 
     // /* показываем индикатор */
     let indicator = forms.querySelector('.spinner-border');
@@ -620,15 +629,69 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
             /* Если спнер в форме - проверяем валидацию */
             let spinnerForm = this.closest('form')
 
-            if (spinnerForm) {
+            if (spinnerForm) 
+            {
                 let frm = document.forms[spinnerForm.name];
                 if (frm) {
-                    Array.from(frm.elements).forEach((input) => {
-                        if (input.validity.valid === false) {
+
+
+
+
+                    Array.from(frm.elements).forEach((input) =>
+                    {
+                        let $errorFormHandler = false;
+
+                        if (input.validity.valid === false)
+                        {
                             closeProgress();
+
+                            /* Поиск полей по LABEL */
+                            $label = document.querySelector('label[for="'+input.id+'"]');
+                            let $labelText = $label ? $label.innerHTML : false;
+
+                            if ($labelText) {
+
+                                $errorFormHandler = '{ "type":"danger" , ' +
+                                    '"header":"' + $labelText + '"  , ' +
+                                    '"message" : "Ошибка заполнения" }';
+
+                                if ($errorFormHandler !== false)
+                                {
+                                    createToast(JSON.parse($errorFormHandler));
+                                }
+
+                                return false;
+                            }
+
+
+                            /* Поиск полей по Placeholder */
+                            $placeholderInput = document.querySelector('#'+input.id+'');
+                            $placeholder = $placeholderInput.getAttribute('placeholder');
+                            let $placeholderText = $placeholder ? $placeholder : false;
+
+                            if ($placeholderText)
+                            {
+                                $errorFormHandler = '{ "type":"danger" , ' +
+                                    '"header":"' + $placeholderText + '"  , ' +
+                                    '"message" : "Ошибка заполнения" }';
+
+                                if ($errorFormHandler !== false)
+                                {
+                                    createToast(JSON.parse($errorFormHandler));
+                                }
+
+                                return false;
+                            }
+
                             return false;
                         }
+
                     });
+
+
+
+
+
                 }
             }
         });

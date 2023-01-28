@@ -7,7 +7,7 @@ use Twig\TwigFunction;
 
 final class CSPNonceGenerator  extends AbstractExtension
 {
-    /** @var String|null */
+
     private ?string $nonce = null;
     
     public function getFunctions() : array
@@ -17,6 +17,7 @@ final class CSPNonceGenerator  extends AbstractExtension
         ];
     }
     
+	/** генерирует значение nonce для Content-Security-Policy Header */
     public function getNonce() : string
     {
         if ($this->nonce === null) {

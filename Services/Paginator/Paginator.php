@@ -37,8 +37,8 @@ final class Paginator implements PaginatorInterface
 	private ?Request $request;
 	private Connection $connection;
 	
-	private int $page = 0;
-	private int $next = 0;
+	private int $page;
+	private int $next;
 	private ?int $previous = null;
 	private bool $pagination;
 	private int $limit;
@@ -81,8 +81,8 @@ final class Paginator implements PaginatorInterface
 		
 		$namespace = explode(':', $this->path);
 		$this->namespace = current($namespace);
-		
-		$this->cacheFilesystem = new FilesystemAdapter($this->namespace);
+
+		$this->cacheFilesystem = new FilesystemAdapter('Cache'.$this->namespace);
 		$this->cacheAcpu = new ApcuAdapter($this->namespace);
 
 	}
@@ -93,8 +93,7 @@ final class Paginator implements PaginatorInterface
 		
 		$namespace = explode(':', $this->path);
 		$this->namespace = current($namespace);
-		//$this->cacheFilesystem = new ApcuAdapter($this->namespace);
-		
+	
 		/* Указываем адаптер кеша для подключения */
 		$config = $this->connection->getConfiguration();
 		$config->setResultCache($this->cacheFilesystem);
@@ -110,7 +109,6 @@ final class Paginator implements PaginatorInterface
 			$item->expiresAfter($resetLifetime);
 			return time() + $resetLifetime;
 		});
-		
 		
 		if($this->request->getSession()->get('statusCode') === 302)
 		{

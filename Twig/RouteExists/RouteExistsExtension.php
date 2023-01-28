@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Twig\RouteExists;
 
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -30,7 +31,14 @@ final class RouteExistsExtension extends AbstractExtension
 	
 	public function exist(string $name): bool
 	{
-		return $this->route->getRouteCollection()->get($name) ? true : false;
+		try {
+			$this->route->generate($name);
+			return true;
+		} catch (RouteNotFoundException $e) {
+			return false;
+		}
+		
+		//return $this->route->getRouteCollection()->get($name) ? true : false;
 	}
 	
 	
