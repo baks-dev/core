@@ -33,7 +33,6 @@ final class EntityDTO
 	public const ENTITY_INT = 102;
 	public const ENTITY_STRING = '56jBD36pLl';
 	
-	
 	/** ID / ValueObject */
 	private UserUid $id;
 	
@@ -52,11 +51,14 @@ final class EntityDTO
 	/** String */
 	private string $string;
 	
-	public function __construct(){
+	
+	public function __construct()
+	{
 		
 		$this->o2m = new ArrayCollection();
 		$this->o2o = new EntityOneToOneDTO();
 	}
+	
 	
 	public function __clone() : void
 	{
@@ -73,6 +75,7 @@ final class EntityDTO
 		$cloneO2o = clone $this->o2o;
 		$this->o2o = $cloneO2o;
 	}
+	
 	
 	/**
 	 * @return UserUid
@@ -91,6 +94,7 @@ final class EntityDTO
 		return $this->o2m;
 	}
 	
+	
 	/**
 	 * @param ArrayCollection $o2m
 	 */
@@ -98,6 +102,7 @@ final class EntityDTO
 	{
 		$this->o2m->add($o2m);
 	}
+	
 	
 	/**
 	 * @return EntityOneToOneDTO
@@ -107,6 +112,7 @@ final class EntityDTO
 		return $this->o2o;
 	}
 	
+	
 	/**
 	 * @return UserUid
 	 */
@@ -114,6 +120,7 @@ final class EntityDTO
 	{
 		return $this->readonly;
 	}
+	
 	
 	/**
 	 * @return int
@@ -123,6 +130,7 @@ final class EntityDTO
 		return $this->int;
 	}
 	
+	
 	/**
 	 * @return string
 	 */
@@ -130,5 +138,5 @@ final class EntityDTO
 	{
 		return $this->string;
 	}
-
+	
 }

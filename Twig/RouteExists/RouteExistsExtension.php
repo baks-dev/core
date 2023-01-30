@@ -16,12 +16,14 @@ final class RouteExistsExtension extends AbstractExtension
 	
 	private RouterInterface $route;
 	
+	
 	public function __construct(RouterInterface $route)
 	{
 		$this->route = $route;
 	}
 	
-	public function getFunctions(): array
+	
+	public function getFunctions() : array
 	{
 		return [
 			new TwigFunction('exist_path', $this->exist(...)),
@@ -29,17 +31,21 @@ final class RouteExistsExtension extends AbstractExtension
 		];
 	}
 	
-	public function exist(string $name): bool
+	
+	public function exist(string $name) : bool
 	{
-		try {
+		try
+		{
 			$this->route->generate($name);
+			
 			return true;
-		} catch (RouteNotFoundException $e) {
+		}
+		catch(RouteNotFoundException $e)
+		{
 			return false;
 		}
 		
 		//return $this->route->getRouteCollection()->get($name) ? true : false;
 	}
-	
 	
 }

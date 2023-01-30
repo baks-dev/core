@@ -302,7 +302,6 @@ var KTFeedback = function (e) {
 "undefined" != typeof module && void 0 !== module.exports && (module.exports = KTFeedback);
 
 
-
 var KTImageInput = function (e, t) {
     var n = this;
     if (null != e) {
@@ -348,7 +347,6 @@ KTImageInput.getInstance = function (e) {
 }, KTImageInput.init = function () {
     KTImageInput.createInstances()
 }, "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", KTImageInput.init) : KTImageInput.init(), "undefined" != typeof module && void 0 !== module.exports && (module.exports = KTImageInput);
-
 
 
 var KTMenu = function (e, t) {
@@ -596,12 +594,6 @@ KTMenu.getInstance = function (e) {
 }, KTMenu.init = function () {
     KTMenu.initGlobalHandlers(), KTMenu.createInstances()
 }, "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", KTMenu.init) : KTMenu.init(), "undefined" != typeof module && void 0 !== module.exports && (module.exports = KTMenu);
-
-
-
-
-
-
 
 
 var KTScroll = function (e, t) {
@@ -1165,7 +1157,6 @@ KTToggle.getInstance = function (e) {
     for (var e = this.attributes, t = e.length, n = new Array(t), i = 0; i < t; i++) n[i] = e[i].name;
     return n
 }), window.KTUtilElementDataStore = {}, window.KTUtilElementDataStoreID = 0, window.KTUtilDelegatedEventHandlers = {};
-
 
 
 var KTUtil = function () {

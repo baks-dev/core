@@ -28,6 +28,7 @@ class Uid implements ValueResolverInterface
 {
 	private Uuid $value;
 	
+	
 	public function __construct(AbstractUid|string|null $value = null)
 	{
 		if($value === null)
@@ -43,20 +44,24 @@ class Uid implements ValueResolverInterface
 		$this->value = $value;
 	}
 	
+	
 	public function __toString() : string
 	{
 		return $this->value;
 	}
+	
 	
 	public function getValue() : Uuid
 	{
 		return $this->value;
 	}
 	
+	
 	public function equals($value) : bool
 	{
 		return (string) $this->value === (string) $value->value;
 	}
+	
 	
 	public function resolve(Request $request, ArgumentMetadata $argument) : iterable
 	{
@@ -79,4 +84,5 @@ class Uid implements ValueResolverInterface
 		
 		return [new $this($value)];
 	}
+	
 }

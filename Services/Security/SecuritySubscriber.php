@@ -40,10 +40,12 @@ final class SecuritySubscriber implements EventSubscriberInterface
 	
 	private TokenStorageInterface $storage;
 	
+	
 	public function __construct(TokenStorageInterface $storage)
 	{
 		$this->storage = $storage;
 	}
+	
 	
 	public static function getSubscribedEvents()
 	{
@@ -51,6 +53,7 @@ final class SecuritySubscriber implements EventSubscriberInterface
 			KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments'],
 		];
 	}
+	
 	
 	public function onKernelControllerArguments(ControllerArgumentsEvent $event)
 	{
@@ -79,7 +82,7 @@ final class SecuritySubscriber implements EventSubscriberInterface
 		{
 			throw new AccessDeniedException();
 		}
-
+		
 		$granted = current($attributes)->getRoles();
 		
 		$commonRoles = array_intersect(
@@ -87,8 +90,10 @@ final class SecuritySubscriber implements EventSubscriberInterface
 			$granted
 		);
 		
-		if(empty($commonRoles)) {
+		if(empty($commonRoles))
+		{
 			throw new AccessDeniedException();
 		}
 	}
+	
 }

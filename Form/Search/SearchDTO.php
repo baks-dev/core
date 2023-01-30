@@ -19,11 +19,12 @@ namespace BaksDev\Core\Form\Search;
 
 class SearchDTO
 {
-    /**
-     * Строка поиска
-     * @var ?string
-     */
-    public ?string $query = null;
+	/**
+	 * Строка поиска
+	 *
+	 * @var ?string
+	 */
+	public ?string $query = null;
 	
 }
 

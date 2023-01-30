@@ -19,8 +19,7 @@ TUtil = false;
 
 setTimeout(function initMenu() {
 
-    if(TUtil)
-    {
+    if (TUtil) {
 
 
         var KTMenu = function (e, t) {
@@ -271,7 +270,6 @@ setTimeout(function initMenu() {
         }, KTMenu.init = function () {
             KTMenu.initGlobalHandlers(), KTMenu.createInstances()
         }, "loading" === document.readyState ? document.addEventListener("DOMContentLoaded", KTMenu.init) : KTMenu.init(), "undefined" != typeof module && void 0 !== module.exports && (module.exports = KTMenu);
-
 
 
         return;

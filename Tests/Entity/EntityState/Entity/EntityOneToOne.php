@@ -21,14 +21,13 @@ use BaksDev\Users\User\Type\Id\UserUid;
 use BaksDev\Core\Entity\EntityState;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+
 final class EntityOneToOne extends EntityState
 {
 	public const VO_UID = '01854a14-5448-7f0b-9b17-0663e29fe856';
 	public const ENTITY_ONE_TO_ONE_READONLY_UID = '01854a15-86a2-7948-b031-1db1c35562fa';
 	public const ENTITY_ONE_TO_ONE_INT = 641;
 	public const ENTITY_ONE_TO_ONE_STRING = 'Q3x0C6i1jD';
-	
-	
 	
 	/** ID Entity */
 	#[ORM\Id]
@@ -52,6 +51,7 @@ final class EntityOneToOne extends EntityState
 	#[ORM\Column(type: Types::STRING)]
 	private string $string;
 	
+	
 	public function __construct(Entity $entity)
 	{
 		$this->entity = $entity;
@@ -61,15 +61,18 @@ final class EntityOneToOne extends EntityState
 		$this->string = self::ENTITY_ONE_TO_ONE_STRING;
 	}
 	
+	
 	public function getDto($dto) : mixed
 	{
 		return parent::getDto($dto);
 	}
 	
+	
 	public function setEntity($dto) : mixed
 	{
 		return parent::setEntity($dto);
 	}
+	
 	
 	/**
 	 * @return Entity
@@ -79,6 +82,7 @@ final class EntityOneToOne extends EntityState
 		return $this->entity;
 	}
 	
+	
 	/**
 	 * @return UserUid
 	 */
@@ -86,6 +90,7 @@ final class EntityOneToOne extends EntityState
 	{
 		return $this->vo;
 	}
+	
 	
 	/**
 	 * @return UserUid
@@ -95,6 +100,7 @@ final class EntityOneToOne extends EntityState
 		return $this->readonly;
 	}
 	
+	
 	/**
 	 * @return int
 	 */
@@ -103,6 +109,7 @@ final class EntityOneToOne extends EntityState
 		return $this->int;
 	}
 	
+	
 	/**
 	 * @return string
 	 */
@@ -110,6 +117,5 @@ final class EntityOneToOne extends EntityState
 	{
 		return $this->string;
 	}
-	
 	
 }

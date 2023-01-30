@@ -23,25 +23,37 @@ interface PaginatorInterface
 {
 	public function fetchAllAssociativeIndexed(QueryBuilder $qb) : self;
 	
+	
 	public function fetchAllAssociative(QueryBuilder $qb) : self;
+	
 	
 	public function getData() : array;
 	
+	
 	public function getLimit() : int;
+	
 	
 	public function getDefaultLimit() : int;
 	
+	
 	public function getPage() : int;
+	
 	
 	public function getNext() : int;
 	
+	
 	public function getPrevious() : ?int;
+	
 	
 	public function getPagination() : bool;
 	
+	
 	public function getPath() : string;
+	
 	
 	public function getOptions() : array;
 	
+	
 	public function getId() : mixed;
+	
 }

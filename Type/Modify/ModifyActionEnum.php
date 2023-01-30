@@ -18,14 +18,15 @@
 
 namespace BaksDev\Core\Type\Modify;
 
-enum ModifyActionEnum: string
+enum ModifyActionEnum : string
 {
-    case NEW = 'new'; // Новый
-    case UPDATE = 'upd'; // Обновлен
-    case DELETE = 'del'; // Удален
-    //case DELETED = 'dlt'; //
-    case RESTORE = 'res'; // Восстановлен
-    case ROLLBACK = 'rlb'; // Откат
-    //case TRUNCATE = 'tru';
-    
+	case NEW = 'new'; // Новый
+	case UPDATE = 'upd'; // Обновлен
+	case DELETE = 'del'; // Удален
+	//case DELETED = 'dlt'; //
+	case RESTORE = 'res'; // Восстановлен
+	case ROLLBACK = 'rlb'; // Откат
+	
+	//case TRUNCATE = 'tru';
+	
 }

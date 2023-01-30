@@ -34,8 +34,6 @@ final class Entity extends EntityEvent
 	public const ENTITY_INT = 667;
 	public const ENTITY_STRING = '4RU1oDlFts';
 	
-	
-	
 	/** ID / ValueObject */
 	#[ORM\Id]
 	#[ORM\Column(type: UserUid::TYPE)]
@@ -89,11 +87,11 @@ final class Entity extends EntityEvent
 		return parent::getDto($dto);
 	}
 	
+	
 	public function setEntity($dto) : mixed
 	{
 		return parent::setEntity($dto);
 	}
-	
 	
 	
 	/**
@@ -113,6 +111,7 @@ final class Entity extends EntityEvent
 		return $this->o2m;
 	}
 	
+	
 	/**
 	 * @return EntityOneToOne
 	 */
@@ -121,7 +120,7 @@ final class Entity extends EntityEvent
 		return $this->o2o;
 	}
 	
-
+	
 	/**
 	 * @return int
 	 */
@@ -130,7 +129,7 @@ final class Entity extends EntityEvent
 		return $this->int;
 	}
 	
-
+	
 	/**
 	 * @return string
 	 */
@@ -139,6 +138,7 @@ final class Entity extends EntityEvent
 		return $this->string;
 	}
 	
+	
 	/**
 	 * @return UserUid
 	 */
@@ -146,10 +146,5 @@ final class Entity extends EntityEvent
 	{
 		return $this->readonly;
 	}
-	
-
-	
-	
-	
 	
 }

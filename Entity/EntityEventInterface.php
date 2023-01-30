@@ -22,13 +22,10 @@ use Exception;
 
 interface EntityEventInterface
 {
-    /**
-     * @throws Exception
-     */
-    public function getDto($dto) : mixed;
-    
-    /**
-     * @throws Exception
-     */
-    public function setEntity($dto) : mixed;
+	
+	public function getDto($dto) : mixed;
+	
+	
+	public function setEntity($dto) : mixed;
+	
 }

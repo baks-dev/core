@@ -26,28 +26,34 @@ class ParamConverter implements ArgumentInterface
 {
 	public array $values;
 	
+	
 	public function __construct($values)
 	{
 		$this->values = $values;
 	}
+	
 	
 	public function getValues() : array
 	{
 		return $this->values;
 	}
 	
+	
 	public function setValues(array $values)
 	{
 		$this->values = $values;
 	}
+	
 	
 	public function fromParameter() : string
 	{
 		return key($this->values);
 	}
 	
+	
 	public function toParameter() : string
 	{
 		return current($this->values);
 	}
+	
 }

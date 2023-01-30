@@ -29,7 +29,6 @@ final class EntityOneToManyDTO
 	public const ENTITY_ONE_TO_MANY_INT = 934;
 	public const ENTITY_ONE_TO_MANY_STRING = '6wxwXXH8gg';
 	
-	
 	/** ID / ValueObject */
 	private UserUid $id;
 	
@@ -49,11 +48,12 @@ final class EntityOneToManyDTO
 	public function __clone() : void
 	{
 		$this->id = new UserUid(self::ENTITY_CLONE_ONE_TO_MANY_UID);
-
+		
 		$this->readonly = new UserUid(self::ENTITY_ONE_TO_MANY_READONLY_UID);
 		$this->int = self::ENTITY_ONE_TO_MANY_INT;
 		$this->string = self::ENTITY_ONE_TO_MANY_STRING;
 	}
+	
 	
 	/**
 	 * @return UserUid
@@ -63,6 +63,7 @@ final class EntityOneToManyDTO
 		return $this->id;
 	}
 	
+	
 	/**
 	 * @return int
 	 */
@@ -71,6 +72,7 @@ final class EntityOneToManyDTO
 		return $this->int;
 	}
 	
+	
 	/**
 	 * @return string
 	 */
@@ -78,7 +80,8 @@ final class EntityOneToManyDTO
 	{
 		return $this->string;
 	}
-
+	
+	
 	/**
 	 * @return UserUid
 	 */
@@ -86,4 +89,5 @@ final class EntityOneToManyDTO
 	{
 		return $this->readonly;
 	}
+	
 }

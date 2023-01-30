@@ -629,24 +629,19 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
             /* Если спнер в форме - проверяем валидацию */
             let spinnerForm = this.closest('form')
 
-            if (spinnerForm) 
-            {
+            if (spinnerForm) {
                 let frm = document.forms[spinnerForm.name];
                 if (frm) {
 
 
-
-
-                    Array.from(frm.elements).forEach((input) =>
-                    {
+                    Array.from(frm.elements).forEach((input) => {
                         let $errorFormHandler = false;
 
-                        if (input.validity.valid === false)
-                        {
+                        if (input.validity.valid === false) {
                             closeProgress();
 
                             /* Поиск полей по LABEL */
-                            $label = document.querySelector('label[for="'+input.id+'"]');
+                            $label = document.querySelector('label[for="' + input.id + '"]');
                             let $labelText = $label ? $label.innerHTML : false;
 
                             if ($labelText) {
@@ -655,8 +650,7 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                                     '"header":"' + $labelText + '"  , ' +
                                     '"message" : "Ошибка заполнения" }';
 
-                                if ($errorFormHandler !== false)
-                                {
+                                if ($errorFormHandler !== false) {
                                     createToast(JSON.parse($errorFormHandler));
                                 }
 
@@ -665,18 +659,16 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
 
 
                             /* Поиск полей по Placeholder */
-                            $placeholderInput = document.querySelector('#'+input.id+'');
+                            $placeholderInput = document.querySelector('#' + input.id + '');
                             $placeholder = $placeholderInput.getAttribute('placeholder');
                             let $placeholderText = $placeholder ? $placeholder : false;
 
-                            if ($placeholderText)
-                            {
+                            if ($placeholderText) {
                                 $errorFormHandler = '{ "type":"danger" , ' +
                                     '"header":"' + $placeholderText + '"  , ' +
                                     '"message" : "Ошибка заполнения" }';
 
-                                if ($errorFormHandler !== false)
-                                {
+                                if ($errorFormHandler !== false) {
                                     createToast(JSON.parse($errorFormHandler));
                                 }
 
@@ -687,9 +679,6 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                         }
 
                     });
-
-
-
 
 
                 }

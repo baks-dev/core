@@ -40,13 +40,11 @@ abstract class EntityEvent implements EntityEventInterface
 			/* Проверяем, имеется ли метод маппинга */
 			$propertyName = $property->getName();
 			
-			
 			/* Пропускаем свойства, которых нет в сущности */
 			if(!property_exists($this, $propertyName))
 			{
 				continue;
 			}
-			
 			
 			$dtoReflectionPropertyByName = new ReflectionProperty($dto, $propertyName);
 			
@@ -55,9 +53,6 @@ abstract class EntityEvent implements EntityEventInterface
 			{
 				continue;
 			}
-			
-			
-		
 			
 			$entityReflectionPropertyByName = new ReflectionProperty($this, $propertyName);
 			
@@ -71,12 +66,10 @@ abstract class EntityEvent implements EntityEventInterface
 				$dto->$getDtoMethod();
 			}
 			
-		
 			//dump($propertyName);
 			//dump($propertyMethodName);
 			
 			$type = null;
-			
 			
 			/* Если тайпхинт свойства - класс */
 			if(class_exists($property->getType()?->getName()))
@@ -93,7 +86,6 @@ abstract class EntityEvent implements EntityEventInterface
 					$type = $instanceClass->newInstanceWithoutConstructor();
 				}
 			}
-			
 			
 			if($type instanceof Collection)
 			{
@@ -138,9 +130,6 @@ abstract class EntityEvent implements EntityEventInterface
 				}
 			}
 			
-			
-			
-			
 			/*
 				Если односторонняя связь на сущность или кастомный тип
 				в дто должны объявлены методы get{Property}Class и set{Property}
@@ -171,7 +160,6 @@ abstract class EntityEvent implements EntityEventInterface
 							
 							$thisProperty = $this->getPropertyValue($propertyName, $this);
 							
-							
 							if($thisProperty && method_exists($thisProperty, 'setEntity'))
 							{
 								$return = $thisProperty->setEntity($dto->$getDtoMethod());
@@ -189,15 +177,16 @@ abstract class EntityEvent implements EntityEventInterface
 				
 			}
 			
-			
-			
-			
 			/* Если обычное свойство */
 			if(property_exists($this, $propertyName) && method_exists($dto, $getDtoMethod))
 			{
 				
 				/* Если свойство сущности ReadOnly и оно уже инициировано - не присваиваем */
-				if($entityReflectionPropertyByName->isReadOnly() && $entityReflectionPropertyByName->isInitialized($this))
+				if(
+					$entityReflectionPropertyByName->isReadOnly(
+					) && $entityReflectionPropertyByName->isInitialized($this
+					)
+				)
 				{
 					continue;
 				}
@@ -218,21 +207,19 @@ abstract class EntityEvent implements EntityEventInterface
 		return $this;
 	}
 	
+	
 	public function cloneEntity($entity = null)
 	{
-
+		
 		$clone = clone $this;
 		$oReflectionClass = new ReflectionClass($clone);
 		
 		foreach($oReflectionClass->getProperties() as $property)
 		{
 			
-			
 			$propertyName = $property->getName();
 			$entityReflectionPropertyByName = new ReflectionProperty($clone, $propertyName);
 			$type = null;
-			
-			
 			
 			$instanceClassCollection = $property->getType()?->getName();
 			
@@ -244,10 +231,7 @@ abstract class EntityEvent implements EntityEventInterface
 			{
 				$newColl = new ArrayCollection();
 				
-				
-				
 				$cloneCollection = $this->getPropertyValue($propertyName, $clone);
-				
 				
 				foreach($cloneCollection as $coll)
 				{
@@ -262,7 +246,6 @@ abstract class EntityEvent implements EntityEventInterface
 			
 			/* Если O2O */
 			
-			
 			$reference = $entityReflectionPropertyByName->getAttributes(OneToMany::class);
 			
 			if(!$reference)
@@ -272,7 +255,6 @@ abstract class EntityEvent implements EntityEventInterface
 			
 			if($reference)
 			{
-				
 				
 				$cloneProperty = $this->getPropertyValue($propertyName, $clone);
 				
@@ -325,7 +307,6 @@ abstract class EntityEvent implements EntityEventInterface
 	public function getDto($dto) : mixed
 	{
 		
-		
 		$dtoReflectionClass = new ReflectionClass($dto);
 		$inflector = new EnglishInflector();
 		
@@ -343,7 +324,6 @@ abstract class EntityEvent implements EntityEventInterface
 				continue;
 			}
 			
-
 			//dump($propertyName);
 			//dump($dto->$propertyName);
 			//dump($dto->$propertyName->isReadOnly());
@@ -351,8 +331,6 @@ abstract class EntityEvent implements EntityEventInterface
 			
 			/* Инстанс класса без конструктора для получения типа свойства */
 			$type = $this->newClassTypeWithoutConstructor($propertyTypeName);
-			
-			
 			
 			/** Если тип свойства коллекция */
 			if($type instanceof Collection)
@@ -370,7 +348,7 @@ abstract class EntityEvent implements EntityEventInterface
 					/* Получаем значение свойств сущности */
 					/** @var PersistentCollection $getEntityProperty */
 					$getEntityProperty = $this->getPropertyValue($propertyName, $this);
-		
+					
 					/* Проходимся по всей коллекции сущности и заполняем DTO */
 					foreach($getEntityProperty as $entityCollection)
 					{
@@ -389,13 +367,10 @@ abstract class EntityEvent implements EntityEventInterface
 						}
 					}
 					
-					
-					
 				}
 				
 				continue;
 			}
-
 			
 			/* Если тип свойства - класс */
 			if($type !== false)
@@ -413,8 +388,6 @@ abstract class EntityEvent implements EntityEventInterface
 					
 					continue;
 				}
-				
-				
 				
 				/* Если связь OneToOne */
 				$modifiers = new ReflectionProperty($this, $propertyName);
@@ -443,8 +416,6 @@ abstract class EntityEvent implements EntityEventInterface
 				}
 			}
 			
-
-			
 			/** Если свойство скалярное или ManyToOne */
 			$getEntityProperty = $this->getPropertyValue($propertyName, $this);
 			if($getEntityProperty !== 'not_initialized')
@@ -452,12 +423,7 @@ abstract class EntityEvent implements EntityEventInterface
 				$this->setPropertyValue($propertyName, $getEntityProperty, $dto);
 			}
 			
-			
 		}
-		
-		
-		
-		
 		
 		return $dto;
 	}
@@ -474,7 +440,7 @@ abstract class EntityEvent implements EntityEventInterface
 			return 'not_initialized';
 		}
 		
-		$getPropertyEntity = \Closure::bind(function($object, $property){
+		$getPropertyEntity = \Closure::bind(function($object, $property) {
 			
 			return $object->{$property};
 			
@@ -482,6 +448,7 @@ abstract class EntityEvent implements EntityEventInterface
 		
 		return $getPropertyEntity($object, $property);
 	}
+	
 	
 	/** Присваиваем через рефлексию значение свойству */
 	private function setPropertyValue(string $property, mixed $value, object $object) : void
@@ -500,7 +467,7 @@ abstract class EntityEvent implements EntityEventInterface
 			return;
 		}
 		
-		$setPropertyDto = \Closure::bind(function(object $object, string $property, mixed $value){
+		$setPropertyDto = \Closure::bind(function(object $object, string $property, mixed $value) {
 			return $object->{$property} = $value;
 		}, null, $object);
 		
@@ -524,6 +491,5 @@ abstract class EntityEvent implements EntityEventInterface
 		
 		return false;
 	}
-	
 	
 }

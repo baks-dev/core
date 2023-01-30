@@ -39,14 +39,15 @@ final class EntityStateTest extends KernelTestCase
 		$this->assertEquals($EntityOneToManyDTO->getId(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_UID));
 		
 		$this->assertEquals($EntityOneToManyDTO->getReadonly(), $EntityOneToMany->getReadonly());
-		$this->assertEquals($EntityOneToManyDTO->getReadonly(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID));
+		$this->assertEquals($EntityOneToManyDTO->getReadonly(),
+			new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID)
+		);
 		
 		$this->assertEquals($EntityOneToManyDTO->getInt(), $EntityOneToMany->getInt());
 		$this->assertEquals($EntityOneToManyDTO->getInt(), $EntityOneToMany::ENTITY_ONE_TO_MANY_INT);
 		
 		$this->assertEquals($EntityOneToManyDTO->getString(), $EntityOneToMany->getString());
 		$this->assertEquals($EntityOneToManyDTO->getString(), $EntityOneToMany::ENTITY_ONE_TO_MANY_STRING);
-		
 		
 		/** @var $EntityOneToOneDTO DTO\EntityOneToOneDTO */
 		$EntityOneToOneDTO = $DTO->getO2o();
@@ -68,7 +69,7 @@ final class EntityStateTest extends KernelTestCase
 	public function testEntityStateEdit() : void
 	{
 		$Entity = new Entity\Entity();
-
+		
 		$TempDTO = new DTO\EntityDTO();
 		$Entity->getDto($TempDTO);
 		
@@ -90,13 +91,11 @@ final class EntityStateTest extends KernelTestCase
 		$this->assertEquals($Entity->getString(), $DTO->getString());
 		$this->assertEquals($Entity->getString(), $DTO::ENTITY_STRING);
 		
-		
 		/** @var $EntityOneToManyDTO DTO\EntityOneToManyDTO
 		 * @var $EntityOneToMany Entity\EntityOneToMany
 		 */
 		$EntityOneToManyDTO = $DTO->getO2m()[0];
 		$EntityOneToMany = $Entity->getO2m()[1];
-		
 		
 		/* Идентификаторы в статических сущностях неизменны   */
 		$this->assertNotEquals($EntityOneToMany->getId(), $EntityOneToManyDTO->getId());
@@ -104,24 +103,27 @@ final class EntityStateTest extends KernelTestCase
 		
 		/* Неизменяемое свойство Readonly */
 		$this->assertNotEquals($EntityOneToMany->getReadonly(), $EntityOneToManyDTO->getReadonly());
-		$this->assertEquals($EntityOneToMany->getReadonly(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID));
+		$this->assertEquals($EntityOneToMany->getReadonly(),
+			new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID)
+		);
 		
 		$this->assertEquals($EntityOneToMany->getInt(), $EntityOneToManyDTO->getInt());
 		$this->assertEquals($EntityOneToMany->getInt(), $EntityOneToManyDTO::ENTITY_ONE_TO_MANY_INT);
-
+		
 		$this->assertEquals($EntityOneToMany->getString(), $EntityOneToManyDTO->getString());
 		$this->assertEquals($EntityOneToMany->getString(), $EntityOneToManyDTO::ENTITY_ONE_TO_MANY_STRING);
 		
-		
 		/** @var $EntityOneToOneDTO DTO\EntityOneToOneDTO
-		 *  @var $EntityOneToOneDTO Entity\EntityOneToOne
+		 * @var $EntityOneToOneDTO Entity\EntityOneToOne
 		 */
 		$EntityOneToOneDTO = $DTO->getO2o();
 		$EntityOneToOne = $Entity->getO2o();
 		
 		/* Неизменяемое свойство Readonly */
 		$this->assertNotEquals($EntityOneToOne->getReadonly(), $EntityOneToOneDTO->getReadonly());
-		$this->assertEquals($EntityOneToOne->getReadonly(), new UserUid($EntityOneToOne::ENTITY_ONE_TO_ONE_READONLY_UID));
+		$this->assertEquals($EntityOneToOne->getReadonly(),
+			new UserUid($EntityOneToOne::ENTITY_ONE_TO_ONE_READONLY_UID)
+		);
 		
 		$this->assertEquals($EntityOneToOne->getInt(), $EntityOneToOneDTO->getInt());
 		$this->assertEquals($EntityOneToOne->getInt(), $EntityOneToOneDTO::ENTITY_ONE_TO_ONE_INT);
@@ -132,10 +134,10 @@ final class EntityStateTest extends KernelTestCase
 		$this->assertEquals($EntityOneToOne->getVo(), $EntityOneToOneDTO->getVo());
 		$this->assertEquals($EntityOneToOne->getVo(), new UserUid($EntityOneToOneDTO::VO_UID));
 		
-		
 		$this->assertInstanceOf(ArrayCollection::class, $Entity->getRemoveEntity());
 		$this->assertEquals(1, $Entity->getRemoveEntity()->count());
 		$this->assertInstanceOf(Entity\EntityOneToMany::class, $Entity->getRemoveEntity()->get(0));
-
+		
 	}
+	
 }

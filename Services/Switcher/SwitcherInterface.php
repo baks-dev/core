@@ -20,8 +20,9 @@ namespace BaksDev\Core\Services\Switcher;
 
 interface SwitcherInterface
 {
-    public function toRus(string $text, bool $lower = true) : string;
-    
-    public function toEng(string $text, bool $lower = true) : string;
-
+	public function toRus(string $text, bool $lower = true) : string;
+	
+	
+	public function toEng(string $text, bool $lower = true) : string;
+	
 }

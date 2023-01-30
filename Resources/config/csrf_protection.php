@@ -5,8 +5,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Config\FrameworkConfig;
 
-return static function (FrameworkConfig $framework)
-{
+return static function(FrameworkConfig $framework) {
 	$framework->csrfProtection()
 		->enabled(true)
 	;

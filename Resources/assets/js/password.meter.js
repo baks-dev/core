@@ -75,9 +75,11 @@ var KTPasswordMeter = function (e, t) {
 
 
 let passwordMeter = document.body.querySelectorAll('[data-password-meter="true"]');
-if (passwordMeter && passwordMeter.length > 0) { for (let n = 0, i = passwordMeter.length; n < i; n++) {
-    new KTPasswordMeter(passwordMeter[n])
-} }
+if (passwordMeter && passwordMeter.length > 0) {
+    for (let n = 0, i = passwordMeter.length; n < i; n++) {
+        new KTPasswordMeter(passwordMeter[n])
+    }
+}
 
 
 // KTPasswordMeter.getInstance = function (e) {

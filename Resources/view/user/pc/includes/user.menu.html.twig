@@ -1,22 +1,22 @@
 <button
-
-        class="btn btn-link  text-decoration-none"
-        id="user-menu"
-
-        data-bs-container="body"
-        data-bs-toggle="popover"
-        data-bs-placement="bottom"
-        data-bs-trigger_="onfocus"
-        data-bs-trigger="click"
-        {# data-bs-content="Bottom popover" #}
-        style="width: 100px;"
+		
+		class="btn btn-link  text-decoration-none"
+		id="user-menu"
+		
+		data-bs-container="body"
+		data-bs-toggle="popover"
+		data-bs-placement="bottom"
+		data-bs-trigger_="onfocus"
+		data-bs-trigger="click"
+		{# data-bs-content="Bottom popover" #}
+		style="width: 100px;"
 >
 
 
         <span class="icon rounded-2 bg-contain lazy p-1"
-              style="width: 43px; height: 43px;"
-              data-bg="{{ app.user.profile.image ? app.user.profile.image : '/assets/img/blank.svg' }}"
-        ></span>
+				style="width: 43px; height: 43px;"
+				data-bg="{{ app.user.profile.image ? app.user.profile.image : '/assets/img/blank.svg' }}"
+		></span>
 
 </button>
 
@@ -27,79 +27,79 @@ return $('.select_box').html();
 
 
 <div id="user-menu-title" class="d-none">
-
-    <div class="dropdown">
-
-
-            <a class="btn btn-link dropdown-toggle w-100 text-dark text-decoration-none" href="#"
-               role="button" data-bs-toggle="dropdown"
-               aria-expanded="false"
-            >
-                <div class="w-100 float-start text-start">
-                    {{ app.user.profile.username }}
-
-                    {# Тип профиля пользователя #}
-
-                    <span class="badge bg-light text-dark fw-bolder px-2 py-1">
+	
+	<div class="dropdown">
+		
+		
+		<a class="btn btn-link dropdown-toggle w-100 text-dark text-decoration-none" href="#"
+				role="button" data-bs-toggle="dropdown"
+				aria-expanded="false"
+		>
+			<div class="w-100 float-start text-start">
+				{{ app.user.profile.username }}
+				
+				{# Тип профиля пользователя #}
+				
+				<span class="badge bg-light text-dark fw-bolder px-2 py-1">
 								{{ app.user.profile.type }}
 							</span>
-
-
-                    {% if app.user.profile.contact %}
-                        <div class="text-muted small">
-                            {{ app.user.profile.contact }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-
-            </a>
-
-            <ul class="dropdown-menu w-100">
-
-
-                <li class="dropdown-item small">
-                    <a href="#" class="text-decoration-none text-dark w-100"
-                       title="{{ 'user.page'|trans({}, 'user.account') }}">
-                        {{ 'user.page'|trans({}, 'user.account') }}
-                </li>
-
-                <li class="dropdown-item small">
-                    <a class="text-decoration-none text-dark w-100"
-                       href="{{ path('UserProfile:user.index') }}">
-                        Профили
-                    </a>
-                </li>
-
-
-               {# {{ dd(app.user.profile.profiles|length) }}#}
-
-                {% if app.user.profile.profiles is defined and app.user.profile.profiles|length > 1 %}
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-
-
-                    {% for profil in app.user.profile.profiles %}
-
-                        {% if app.user.profile and app.user.profile.username != profil.user_profile_username %}
-                            <li>
-                                <a class="dropdown-item"
-                                   href="{{ path('UserProfile:user.activate', { id: profil.user_profile_event }) }}">
-                                    {{ profil.user_profile_username }}
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-
-                {% endif %}
-
-
-
-
-
-               {# {% if user_profiles|length > 1 %}
+				
+				
+				{% if app.user.profile.contact %}
+					<div class="text-muted small">
+						{{ app.user.profile.contact }}
+					</div>
+				{% endif %}
+			
+			</div>
+		
+		
+		</a>
+		
+		<ul class="dropdown-menu w-100">
+			
+			
+			<li class="dropdown-item small">
+				<a href="#" class="text-decoration-none text-dark w-100"
+						title="{{ 'user.page'|trans({}, 'user.account') }}">
+					{{ 'user.page'|trans({}, 'user.account') }}
+			</li>
+			
+			<li class="dropdown-item small">
+				<a class="text-decoration-none text-dark w-100"
+						href="{{ path('UserProfile:user.index') }}">
+					Профили
+				</a>
+			</li>
+			
+			
+			{# {{ dd(app.user.profile.profiles|length) }} #}
+			
+			{% if app.user.profile.profiles is defined and app.user.profile.profiles|length > 1 %}
+				<li>
+					<hr class="dropdown-divider">
+				</li>
+				
+				
+				{% for profil in app.user.profile.profiles %}
+					
+					{% if app.user.profile and app.user.profile.username != profil.user_profile_username %}
+						<li>
+							<a class="dropdown-item"
+									href="{{ path('UserProfile:user.activate', { id: profil.user_profile_event }) }}">
+								{{ profil.user_profile_username }}
+							</a>
+						</li>
+					{% endif %}
+				{% endfor %}
+			
+			{% endif %}
+			
+			
+			
+			
+			
+			{# {% if user_profiles|length > 1 %}
 
                     <li class="dropdown-header small">
                         Применить профиль
@@ -117,37 +117,34 @@ return $('.select_box').html();
                             </a>
                         </li>
                     {% endif %}
-                {% endfor %}#}
-
-            </ul>
-
-
-
-
-    </div>
-
-    <ul class="leader list-group list-group-flush w-100 small">
-        <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 text-truncate rounded-5">
-
-            <a href="{# {{ path('Orders:user.orders') }} #}"
-               class="text-decoration-none text-dark w-100 fw-normal lh-normal"
-               title="Корзина">
-                Корзина
-            </a>
-
-            <span class="badge bg-primary rounded-pill lh-normal">24</span>
-        </li>
-    </ul>
+                {% endfor %} #}
+		
+		</ul>
+	
+	
+	</div>
+	
+	<ul class="leader list-group list-group-flush w-100 small">
+		<li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 text-truncate rounded-5">
+			
+			<a href="{# {{ path('Orders:user.orders') }} #}"
+					class="text-decoration-none text-dark w-100 fw-normal lh-normal"
+					title="Корзина">
+				Корзина
+			</a>
+			
+			<span class="badge bg-primary rounded-pill lh-normal">24</span>
+		</li>
+	</ul>
 
 
 </div>
 
 
 <div id="user-menu-content" class="d-none">
-
-
-
-    {# {% if app.user.profile %}
+	
+	
+	{# {% if app.user.profile %}
 
         <div class="menu-content d-flex align-items-center px-3 mb-3">
 
@@ -166,16 +163,16 @@ return $('.select_box').html();
                             {{ app.user.profile.user_email }}
                         </a>
                     {% endif %}
-    #}{# Тип профиля пользователя #}{#
-    {% if app.user.profile.profile_type is defined %}
-        <span class="badge bg-light text-dark fw-bolder fs-8 px-2 py-1 ms-2">
-                {{ app.user.profile.profile_type }}
-            </span>
-    {% endif %}
+	#}{# Тип профиля пользователя #}{#
+	{% if app.user.profile.profile_type is defined %}
+		<span class="badge bg-light text-dark fw-bolder fs-8 px-2 py-1 ms-2">
+				{{ app.user.profile.profile_type }}
+			</span>
+	{% endif %}
 
 </div>
 <span class="text-muted small">
-    {{ app.user.profile.email }}
+	{{ app.user.profile.email }}
 </span>
 
 
@@ -186,60 +183,60 @@ return $('.select_box').html();
 </div>
 
 {% endif %} #}
-
-    <ul class="leader list-group list-group-flush w-100">
-
-
-        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-            <a href="/detail" class="text-decoration-none text-dark w-100"
-               title="Избранные товары">
-                Избранные товары</a>
-
-            <span class="badge bg-primary rounded-pill lh-normal">5</span>
-        </li>
-
-        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-            <a href="/detail" class="text-decoration-none text-dark w-100"
-               title="Просмотренные">
-                Просмотренные</a>
-
-            <span class="badge bg-primary rounded-pill lh-normal">7</span>
-        </li>
-
-        {# ******************************* #}
-        <li class="list-group">
-            <hr>
-        </li>
-
-
-        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-            <a href="/detail" class="text-decoration-none text-dark w-100"
-               title="История покупок">
-                История покупок</a>
-        </li>
-
-        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-            <a href="/detail" class="text-decoration-none text-dark w-100"
-               title="Отзывы">
-                Отзывы</a>
-        </li>
-
-
-        {# ******************************* #}
-        <li class="list-group">
-            <hr>
-        </li>
-
-        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-            <a href="{{ path('AuthEmail:user.logout') }}" class="text-decoration-none text-dark w-100"
-               title="Выход">
-                Выход</a>
-        </li>
-
-        {# <li class="list-group-item d-flex justify-content-between align-items-center">
+	
+	<ul class="leader list-group list-group-flush w-100">
+		
+		
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="/detail" class="text-decoration-none text-dark w-100"
+					title="Избранные товары">
+				Избранные товары</a>
+			
+			<span class="badge bg-primary rounded-pill lh-normal">5</span>
+		</li>
+		
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="/detail" class="text-decoration-none text-dark w-100"
+					title="Просмотренные">
+				Просмотренные</a>
+			
+			<span class="badge bg-primary rounded-pill lh-normal">7</span>
+		</li>
+		
+		{# ******************************* #}
+		<li class="list-group">
+			<hr>
+		</li>
+		
+		
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="/detail" class="text-decoration-none text-dark w-100"
+					title="История покупок">
+				История покупок</a>
+		</li>
+		
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="/detail" class="text-decoration-none text-dark w-100"
+					title="Отзывы">
+				Отзывы</a>
+		</li>
+		
+		
+		{# ******************************* #}
+		<li class="list-group">
+			<hr>
+		</li>
+		
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="{{ path('AuthEmail:user.logout') }}" class="text-decoration-none text-dark w-100"
+					title="Выход">
+				Выход</a>
+		</li>
+		
+		{# <li class="list-group-item d-flex justify-content-between align-items-center">
                                     A list item
                                     <span class="badge bg-primary rounded-pill">14</span>
                                 </li> #}
-
-    </ul>
+	
+	</ul>
 </div>

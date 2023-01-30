@@ -18,16 +18,16 @@
 
 namespace BaksDev\Core\Type\Locale;
 
-enum LocaleEnum: string
+enum LocaleEnum : string
 {
-    final const DEFAULT_LOCALE = 'ru';
-    
-    case RUS = 'ru';
-    case ENG = 'en';
-   
-//    final const LOCALES_ROUTING = [
-//      'ru' => '',
-//      'en' => '/en',
-//    ];
-    
+	final const DEFAULT_LOCALE = 'ru';
+	
+	case RUS = 'ru';
+	case ENG = 'en';
+	
+	//    final const LOCALES_ROUTING = [
+	//      'ru' => '',
+	//      'en' => '/en',
+	//    ];
+	
 }

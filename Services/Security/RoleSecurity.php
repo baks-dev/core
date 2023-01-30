@@ -32,15 +32,17 @@ final class RoleSecurity
 	/** Роли доступа */
 	private readonly array $roles;
 	
-	public function __construct(array|string $roles){
-		$this->roles = is_array($roles) ? $roles : [$roles] ;
+	
+	public function __construct(array|string $roles)
+	{
+		$this->roles = is_array($roles) ? $roles : [$roles];
 	}
+	
 	
 	/** Возвращает массив ролей, пользователи которых имеют доступ к ресурсу */
 	public function getRoles() : array
 	{
 		return $this->roles;
 	}
-	
 	
 }

@@ -11,4 +11,5 @@ final class UserProfilesByCurrentUser implements UserProfilesByCurrentUserInterf
 	{
 		return [];
 	}
+	
 }

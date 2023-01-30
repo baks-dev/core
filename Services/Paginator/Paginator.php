@@ -35,29 +35,34 @@ final class Paginator implements PaginatorInterface
 	public const LIMIT_ARRAY = [1, 10, 50, 100, 200, 500];
 	
 	private ?Request $request;
+	
 	private Connection $connection;
 	
 	private int $page;
-	private int $next;
-	private ?int $previous = null;
-	private bool $pagination;
-	private int $limit;
-	private mixed $id;
-	private array $data;
 	
+	private int $next;
+	
+	private ?int $previous = null;
+	
+	private bool $pagination;
+	
+	private int $limit;
+	
+	private mixed $id;
+	
+	private array $data;
 	
 	/** Cache  */
 	private CacheInterface $cacheFilesystem;
 	
 	private CacheInterface $cacheAcpu;
 	
-	
 	const LIFETIME = 60 * 60 * 30; // 30 ней
 	
 	private QueryBuilder $stmt;
 	
-	
 	private string $path;
+	
 	private string|false $namespace;
 	
 	private string $cacheKey;
@@ -73,7 +78,6 @@ final class Paginator implements PaginatorInterface
 		$this->id = $this->request->attributes->get('id') ?: $this->request->get('id');
 		$this->path = $this->request->get('_route');
 		
-		
 		$this->page = $this->request->attributes->get('page') ?: $this->request->get('page');
 		$this->next = $this->page + 1;
 		$previous = $this->page - 1;
@@ -81,11 +85,12 @@ final class Paginator implements PaginatorInterface
 		
 		$namespace = explode(':', $this->path);
 		$this->namespace = current($namespace);
-
+		
 		$this->cacheFilesystem = new FilesystemAdapter('Cache'.$this->namespace);
 		$this->cacheAcpu = new ApcuAdapter($this->namespace);
-
+		
 	}
+	
 	
 	/** Шастройки кеширования запроса */
 	private function setTtlCache(QueryBuilder $qb) : void
@@ -93,7 +98,7 @@ final class Paginator implements PaginatorInterface
 		
 		$namespace = explode(':', $this->path);
 		$this->namespace = current($namespace);
-	
+		
 		/* Указываем адаптер кеша для подключения */
 		$config = $this->connection->getConfiguration();
 		$config->setResultCache($this->cacheFilesystem);
@@ -107,6 +112,7 @@ final class Paginator implements PaginatorInterface
 		$ttl = $this->cacheAcpu->get($this->cacheKey.'_date', function(ItemInterface $item) {
 			$resetLifetime = 5; // секунд
 			$item->expiresAfter($resetLifetime);
+			
 			return time() + $resetLifetime;
 		});
 		
@@ -154,6 +160,7 @@ final class Paginator implements PaginatorInterface
 		return $this;
 	}
 	
+	
 	/** Возвращает кешированный результат запроса  */
 	private function executeCacheQuery(QueryBuilder $qb)
 	{
@@ -166,6 +173,7 @@ final class Paginator implements PaginatorInterface
 			$this->profile
 		);
 	}
+	
 	
 	/** Сбрасываем кеш результата запроса  */
 	public function resetCache()
@@ -181,11 +189,13 @@ final class Paginator implements PaginatorInterface
 		return $this->data;
 	}
 	
+	
 	/** Возвращает переданное значение лимита */
 	public function getLimit() : int
 	{
 		return $this->limit;
 	}
+	
 	
 	/** Возвращает дефолное значение LIMIT */
 	public function getDefaultLimit() : int
@@ -193,11 +203,13 @@ final class Paginator implements PaginatorInterface
 		return self::LIMIT;
 	}
 	
+	
 	/** Возвращает номер текущей страницы  */
 	public function getPage() : int
 	{
 		return $this->page + 1;
 	}
+	
 	
 	/** Возвращает номер следующей страницы относительно текущей  */
 	public function getNext() : int
@@ -205,23 +217,25 @@ final class Paginator implements PaginatorInterface
 		return $this->next;
 	}
 	
+	
 	/** Возвращает номер предыдущей страницы относительно текущей  */
 	public function getPrevious() : ?int
 	{
 		return $this->previous;
 	}
 	
-
+	
 	public function getPagination() : bool
 	{
 		return $this->pagination;
 	}
 	
-
+	
 	public function getPath() : string
 	{
 		return $this->path;
 	}
+	
 	
 	/** Возвращает массив доступных лимитов (для селекта) */
 	public function getOptions() : array
@@ -229,9 +243,11 @@ final class Paginator implements PaginatorInterface
 		return self::LIMIT_ARRAY;
 	}
 	
+	
 	/** Возвращает идентификатор, пеереданный атрибутом или параметром GET */
 	public function getId() : mixed
 	{
 		return $this->id;
 	}
+	
 }

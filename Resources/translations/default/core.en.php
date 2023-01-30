@@ -28,8 +28,9 @@ return [
 	'sort' => 'Sorting',
 	
 	'admin' =>
-		['page' =>
-			 ['index' => 'Administration'],
+		[
+			'page' =>
+				['index' => 'Administration'],
 		],
 	'breadcrumb' =>
 		[

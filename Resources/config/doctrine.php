@@ -11,11 +11,10 @@ use BaksDev\Core\Type\Modify\ModifyAction;
 use BaksDev\Core\Type\Modify\ModifyActionType;
 use Symfony\Config\DoctrineConfig;
 
-return static function (ContainerConfigurator $container, DoctrineConfig $doctrine)
-{
-
-    $doctrine->dbal()->type(ModifyAction::TYPE)->class(ModifyActionType::class);
-    $doctrine->dbal()->type(IpAddress::TYPE)->class(IpAddressType::class);
-    $doctrine->dbal()->type(Locale::TYPE)->class(LocaleType::class);
+return static function(ContainerConfigurator $container, DoctrineConfig $doctrine) {
+	
+	$doctrine->dbal()->type(ModifyAction::TYPE)->class(ModifyActionType::class);
+	$doctrine->dbal()->type(IpAddress::TYPE)->class(IpAddressType::class);
+	$doctrine->dbal()->type(Locale::TYPE)->class(LocaleType::class);
 	
 };

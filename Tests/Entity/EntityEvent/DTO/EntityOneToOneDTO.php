@@ -28,9 +28,6 @@ final class EntityOneToOneDTO
 	public const ENTITY_ONE_TO_ONE_INT = 329;
 	public const ENTITY_ONE_TO_ONE_STRING = 'UOzwKxuImS';
 	
-	
-
-	
 	/** ID Entity */
 	//private Entity $entity;
 	
@@ -55,6 +52,7 @@ final class EntityOneToOneDTO
 		$this->string = self::ENTITY_ONE_TO_ONE_STRING;
 	}
 	
+	
 	/**
 	 * @return UserUid
 	 */
@@ -62,6 +60,7 @@ final class EntityOneToOneDTO
 	{
 		return $this->vo;
 	}
+	
 	
 	/**
 	 * @return int
@@ -80,6 +79,7 @@ final class EntityOneToOneDTO
 		return $this->string;
 	}
 	
+	
 	/**
 	 * @return UserUid
 	 */
@@ -87,6 +87,5 @@ final class EntityOneToOneDTO
 	{
 		return $this->readonly;
 	}
-	
 	
 }

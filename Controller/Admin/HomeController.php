@@ -31,9 +31,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-    #[Route('/admin', name: 'admin.homepage')]
-    public function index() : Response
-    {
-        return $this->render([]);
-    }
+	#[Route('/admin', name: 'admin.homepage')]
+	public function index() : Response
+	{
+		return $this->render([]);
+	}
+	
 }

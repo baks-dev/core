@@ -18,7 +18,6 @@
 
 namespace BaksDev\Core\Controller;
 
-
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Core\Twig\CSPNonce\CSPNonceGenerator;
 use BaksDev\Users\User\Entity\User;
@@ -26,6 +25,7 @@ use BaksDev\Users\User\Entity\User;
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Repository\UserProfilesByUser\UserProfilesByCurrentUserInterface;
 use BaksDev\Core\Type\Locale\Locale;
+
 //use Fresh\CentrifugoBundle\Service\Credentials\CredentialsGenerator;
 use BaksDev\Users\User\Repository\UserDecorator\UserDecoratorInterface;
 use LogicException;
@@ -54,21 +54,33 @@ use Twig\Environment;
 abstract class AbstractController
 {
 	private RouterInterface $router;
+	
 	private AuthorizationCheckerInterface $authorizationChecker;
+	
 	private Environment $environment;
+	
 	private RequestStack $requestStack;
+	
 	private CacheInterface $cache;
+	
 	private TokenStorageInterface $tokenStorage;
+	
 	private FormFactoryInterface $formFactory;
+	
 	private TranslatorInterface $translator;
 	
 	private SettingsMainInterface $getSettingsMain;
 	
 	private string $device = 'pc';
+	
 	private string $user = 'guest';
+	
 	private string $content;
+	
 	private string $route;
+	
 	private CSPNonceGenerator $CSPNonceGenerator;
+	
 	
 	public function __construct(
 		RouterInterface $router,
@@ -80,7 +92,7 @@ abstract class AbstractController
 		TranslatorInterface $translator,
 		TokenStorageInterface $tokenStorage,
 		SettingsMainInterface $getSettingsMain,
-		CSPNonceGenerator $CSPNonceGenerator
+		CSPNonceGenerator $CSPNonceGenerator,
 	
 	)
 	{
@@ -106,17 +118,16 @@ abstract class AbstractController
 	}
 	
 	
-	
 	/** Отображает шаблон */
 	protected function render(
 		array $parameters = [],
 		string $fileName = null,
 		string $moduleTemplateName = null,
 		string $template = null,
-		Response $response = null
+		Response $response = null,
 	) : Response
 	{
-
+		
 		$this->user = $this->tokenStorage->getToken() ? 'user' : 'guest';
 		
 		$request = $this->requestStack;
@@ -130,11 +141,6 @@ abstract class AbstractController
 		/* Добавляем настройки в параметры */
 		$parameters['settings'] = $this->settings();
 		
-		/* Список профилей пользователя */
-		//$parameters['user_profiles'] = $this->userProfilesByCurrentUser->fetchAllUserProfilesAssociative();
-		
-		//$parameters['jwt_token'] = $this->jwt();
-		
 		/* Если не задан модуль - присваиваем из префикса роутинга */
 		if(!$moduleTemplateName)
 		{
@@ -143,7 +149,6 @@ abstract class AbstractController
 			
 		}
 		
-
 		$routingName = (explode(':', $this->route))[1];
 		
 		/* Если не задан файл - присваиваем из имени роутинга */
@@ -159,7 +164,8 @@ abstract class AbstractController
 			
 			$fileName = str_replace('.', '/', $routingName).'/'.$file;
 			
-		} else
+		}
+		else
 		{
 			$fileName = str_replace('.', '/', $routingName).'/'.$fileName;
 		}
@@ -171,8 +177,6 @@ abstract class AbstractController
 			
 			$view = $ModuleTemlate.'/'.$moduleName.'/'.$fileName;
 			
-			
-	
 			if($device->ismobiledevice)
 			{
 				/* Если девайс Планшет - подключаем кастомный шаблон @Template/tablet */
@@ -191,34 +195,33 @@ abstract class AbstractController
 			}
 			
 			//dd($view);
-	
+			
 			$parameters['settings']['device'] = $this->device;
 			$content = $this->environment->render($view, $parameters);
 		}
-		
-		/* Если при подключении кастомного шаблона возникло исключение - подключаем дефолтные шаблоны модуля */
+			
+			/* Если при подключении кастомного шаблона возникло исключение - подключаем дефолтные шаблоны модуля */
 		catch(\Exception $exception)
 		{
 			try
 			{
-
+				
 				$view = $moduleTemplateName.'/'.$fileName;
 				
-				
-
 				if($device->ismobiledevice)
 				{
 					if($device->istablet)
 					{
 						$view = str_replace($file, 'tablet/'.$file, $view);
 						$this->device = 'tablet';
-					} else
+					}
+					else
 					{
 						$view = str_replace($file, 'mobile/'.$file, $view);
 						$this->device = 'mobile';
 					}
 				}
-
+				
 				$parameters['settings']['device'] = $this->device;
 				$content = $this->environment->render($view, $parameters);
 				
@@ -229,7 +232,6 @@ abstract class AbstractController
 				$this->device = 'pc';
 				$parameters['settings']['device'] = $this->device;
 				$view = $moduleTemplateName.'/'.$fileName;
-			
 				
 				//$content = $this->renderView($view, $parameters);
 				$content = $this->environment->render($view, $parameters);
@@ -256,13 +258,13 @@ abstract class AbstractController
 	}
 	
 	
-	
 	public function resetCacheCss() : void
 	{
 		$cache = $this->cache;
 		$cache->delete($this->user.$this->device.'-'.$this->route);
 		$this->assets_css($this->content);
 	}
+	
 	
 	public function assets_css($content) : string
 	{
@@ -271,19 +273,19 @@ abstract class AbstractController
 		$cache_key = $this->user.$this->device.'-'.$this->route;
 		
 		$hash = $cache->hasItem($cache_key);
+		
 		if($hash)
 		{
 			register_shutdown_function([$this, 'resetCacheCss'], 'throw');
 		}
-
+		
 		/* Кешируем по названию роутинга - результат компиляции файлов */
-		$styles = $cache->get($cache_key, function(ItemInterface $item) use ($content)
-		{
+		$styles = $cache->get($cache_key, function(ItemInterface $item) use ($content) {
 			$item->expiresAfter(3600 * 24 * 31); // 3600 = 1 час
-
+			
 			/* Ищем все теги class="..." */
 			\preg_match_all(
-				"|class=\"(.*)\"|U",
+				"|class=['\"](.*)['\"]|U",
 				$content,
 				$out,
 				PREG_PATTERN_ORDER
@@ -293,6 +295,7 @@ abstract class AbstractController
 			
 			foreach($out[1] as $class)
 			{
+				
 				foreach(explode(' ', $class) as $css_class)
 				{
 					if(!empty($css_class))
@@ -351,12 +354,15 @@ abstract class AbstractController
 			return $styles;
 		});
 		
-		
-		$content = str_replace('<style></style>', '<style nonce="'.$this->CSPNonceGenerator->getNonce().'">'.$styles.'</style>', $content);
+		$content = str_replace('<style></style>',
+			'<style nonce="'.$this->CSPNonceGenerator->getNonce().'">'.$styles.'</style>',
+			$content
+		);
 		$content = $this->contentMinify($content);
 		
 		return $content;
 	}
+	
 	
 	public function contentMinify(string $body)
 	{
@@ -416,8 +422,6 @@ abstract class AbstractController
 	}
 	
 	
-	
-	
 	public function settings() : ?array
 	{
 		$request = $this->requestStack;
@@ -427,14 +431,16 @@ abstract class AbstractController
 		
 		$cache = new ApcuAdapter();
 		
-		$data = $cache->get($host.'cache.settings.'.$lang, function(ItemInterface $item){
+		$data = $cache->get($host.'cache.settings.'.$lang, function(ItemInterface $item) {
 			/* Время кешировния настроек 31536000 = 1 год */
 			$item->expiresAfter(31536000);
+			
 			return $this->getSettingsMain->getSettingsMainAssociative() ?: [];
 		});
 		
 		/* Очистить кеш */
 		//$cache->delete($host.'cache.settings.'.$lang);
+		//dd($data);
 		
 		return $data;
 	}
@@ -481,7 +487,7 @@ abstract class AbstractController
 		string $type,
 		mixed $message,
 		string $domain = 'messages',
-		array|string $arguments = null
+		array|string $arguments = null,
 	)
 	{
 		if($message)
@@ -500,7 +506,8 @@ abstract class AbstractController
 							{
 								$message = sprintf($message, $argument);
 							}
-						} else
+						}
+						else
 						{
 							$message = sprintf($message, $arguments);
 						}
@@ -522,6 +529,7 @@ abstract class AbstractController
 			}
 		}
 	}
+	
 	
 	/**
 	 * Редирект на указаннй нейм роута
@@ -591,44 +599,16 @@ abstract class AbstractController
 	protected function generateUrl(
 		string $route,
 		array $parameters = [],
-		int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+		int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
 	) : string
 	{
 		return $this->router->generate($route, $parameters, $referenceType);
 	}
+	
 	
 	public function getLocale() : Locale
 	{
 		return new Locale($this->translator->getLocale());
 	}
 	
-	
-	/* также в конфиге зменить время ttl */
-	public const JWT_CACHE_KEY = 'cache.jwt';
-	public const JWT_CACHE_EXP = 86400;  # 1 день
-	
-	public function jwt() : ?string
-	{
-		$data = null;
-		//$cacheNotice = $this->container->get('cache.adapter.array');
-		
-		$cacheNotice = new ApcuAdapter();
-		
-		$user = $this->getUser();
-		$profile = $this->getProfileUid();
-		
-		if($user && $profile)
-		{
-			
-			$data = $cacheNotice->get(
-				self::JWT_CACHE_KEY.'.'.$profile->getValue(),
-				function(ItemInterface $item) use ($profile){
-					$item->expiresAfter(self::JWT_CACHE_EXP);
-					return $this->credentialsGenerator->generateJwtTokenForUser($profile);
-				}
-			);
-		}
-		
-		return $data;
-	}
 }

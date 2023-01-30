@@ -23,20 +23,23 @@ use Symfony\Component\Security\Core\Security;
 
 final class DatabaseSessionTtl
 {
-    private AuthorizationCheckerInterface $security;
-
-    public function __construct(AuthorizationCheckerInterface $security)
-    {
-        $this->security = $security;
-    }
-    
-    public function __invoke() : int
-    {
-        if($this->security->isGranted('ROLE_ADMIN'))
-        {
-            return 604800; // 7 дней
-        }
-        
-        return 54000; // 15 часов
-    }
+	private AuthorizationCheckerInterface $security;
+	
+	
+	public function __construct(AuthorizationCheckerInterface $security)
+	{
+		$this->security = $security;
+	}
+	
+	
+	public function __invoke() : int
+	{
+		if($this->security->isGranted('ROLE_ADMIN'))
+		{
+			return 604800; // 7 дней
+		}
+		
+		return 54000; // 15 часов
+	}
+	
 }

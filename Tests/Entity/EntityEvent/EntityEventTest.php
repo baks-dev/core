@@ -37,14 +37,15 @@ final class EntityEventTest extends KernelTestCase
 		$this->assertEquals($EntityOneToManyDTO->getEvent(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_UID));
 		
 		$this->assertEquals($EntityOneToManyDTO->getReadonly(), $EntityOneToMany->getReadonly());
-		$this->assertEquals($EntityOneToManyDTO->getReadonly(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID));
+		$this->assertEquals($EntityOneToManyDTO->getReadonly(),
+			new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID)
+		);
 		
 		$this->assertEquals($EntityOneToManyDTO->getInt(), $EntityOneToMany->getInt());
 		$this->assertEquals($EntityOneToManyDTO->getInt(), $EntityOneToMany::ENTITY_ONE_TO_MANY_INT);
 		
 		$this->assertEquals($EntityOneToManyDTO->getString(), $EntityOneToMany->getString());
 		$this->assertEquals($EntityOneToManyDTO->getString(), $EntityOneToMany::ENTITY_ONE_TO_MANY_STRING);
-		
 		
 		/** @var $EntityOneToOneDTO DTO\EntityOneToOneDTO */
 		$EntityOneToOneDTO = $DTO->getO2o();
@@ -58,7 +59,6 @@ final class EntityEventTest extends KernelTestCase
 		
 		$this->assertEquals($EntityOneToOneDTO->getVo(), $EntityOneToOne->getVo());
 		$this->assertEquals($EntityOneToOneDTO->getVo(), new UserUid($EntityOneToOne::VO_UID));
-		
 		
 		//$this->assertEmpty($Entity->getRemoveEntity());
 		
@@ -86,7 +86,6 @@ final class EntityEventTest extends KernelTestCase
 		$this->assertEquals($Entity->getString(), $TempEntity->getString());
 		$this->assertEquals($Entity->getString(), $TempEntity::ENTITY_STRING);
 		
-		
 		/** @var $EntityOneToMany Entity\EntityOneToMany
 		 * @var $EntityOneToManyClone Entity\EntityOneToMany
 		 */
@@ -98,15 +97,15 @@ final class EntityEventTest extends KernelTestCase
 		$this->assertEquals($EntityOneToManyClone->getId(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_UID));
 		
 		$this->assertEquals($EntityOneToManyClone->getReadonly(), $EntityOneToMany->getReadonly());
-		$this->assertEquals($EntityOneToManyClone->getReadonly(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID));
+		$this->assertEquals($EntityOneToManyClone->getReadonly(),
+			new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID)
+		);
 		
 		$this->assertEquals($EntityOneToManyClone->getInt(), $EntityOneToMany->getInt());
 		$this->assertEquals($EntityOneToManyClone->getInt(), $EntityOneToMany::ENTITY_ONE_TO_MANY_INT);
 		
 		$this->assertEquals($EntityOneToManyClone->getString(), $EntityOneToMany->getString());
 		$this->assertEquals($EntityOneToManyClone->getString(), $EntityOneToMany::ENTITY_ONE_TO_MANY_STRING);
-		
-		
 		
 		/** @var $EntityOneToOneDTO DTO\EntityOneToOneDTO */
 		$EntityOneToOne = $TempEntity->getO2o();
@@ -120,22 +119,18 @@ final class EntityEventTest extends KernelTestCase
 		
 		$this->assertEquals($EntityOneToOneClone->getVo(), $EntityOneToOne->getVo());
 		$this->assertEquals($EntityOneToOneClone->getVo(), new UserUid($EntityOneToOne::VO_UID));
-
+		
 	}
-	
-	
 	
 	
 	public function testEntityEventCloneEdit() : void
 	{
 		$TempEntity = new Entity\Entity();
 		
-		
-		
 		/* Мапим DTO */
 		$TempDTO = new DTO\EntityDTO();
 		$TempEntity->getDto($TempDTO);
-	
+		
 		/* клонируем DTO и мапим сущность */
 		/* @var  $Entity Entity\Entity */
 		$Entity = $TempEntity->cloneEntity();
@@ -144,16 +139,12 @@ final class EntityEventTest extends KernelTestCase
 		/* Мапим на сущность */
 		$Entity->setEntity($DTO);
 		
-
 		/* отсутствует геттер в DTO - идентификатор неизменен */
 		$this->assertNotEquals($Entity->getId(), $DTO->getEvent());
 		/* После клонирвоания идентификатор всегда меняется */
 		$this->assertNotEquals($Entity->getId(), $TempEntity->getId());
 		/* При мапинге DTO на сущность идентификатор неизменен и равен клонируемому */
 		$this->assertEquals($Entity->getId(), new UserUid($Entity::ENTITY_CLONE_UID));
-		
-		
-		
 		
 		/* свойство Readonly всегда неизменно */
 		$this->assertNotEquals($Entity->getReadonly(), $DTO->getReadonly());
@@ -173,9 +164,6 @@ final class EntityEventTest extends KernelTestCase
 		$EntityOneToManyDTO = $DTO->getO2m()[0];
 		$EntityOneToMany = $Entity->getO2m()[0];
 		
-		
-		
-		
 		/* отсутствует геттер в DTO - идентификатор неизменен */
 		$this->assertNotEquals($EntityOneToMany->getid(), $EntityOneToManyDTO->getEvent());
 		/* После клонирвоания идентификатор всегда меняется */
@@ -185,14 +173,15 @@ final class EntityEventTest extends KernelTestCase
 		
 		/* Readonly всегда неизменен, если инициирован */
 		$this->assertNotEquals($EntityOneToMany->getReadonly(), $EntityOneToManyDTO->getReadonly());
-		$this->assertEquals($EntityOneToMany->getReadonly(), new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID));
+		$this->assertEquals($EntityOneToMany->getReadonly(),
+			new UserUid($EntityOneToMany::ENTITY_ONE_TO_MANY_READONLY_UID)
+		);
 		
 		$this->assertEquals($EntityOneToMany->getInt(), $EntityOneToManyDTO->getInt());
 		$this->assertEquals($EntityOneToMany->getInt(), $EntityOneToManyDTO::ENTITY_ONE_TO_MANY_INT);
 		
 		$this->assertEquals($EntityOneToMany->getString(), $EntityOneToManyDTO->getString());
 		$this->assertEquals($EntityOneToMany->getString(), $EntityOneToManyDTO::ENTITY_ONE_TO_MANY_STRING);
-		
 		
 		/** @var $EntityOneToOneDTO DTO\EntityOneToOneDTO */
 		$EntityOneToOneDTO = $DTO->getO2o();
@@ -208,4 +197,5 @@ final class EntityEventTest extends KernelTestCase
 		$this->assertEquals($EntityOneToOne->getVo(), new UserUid($EntityOneToOneDTO::VO_UID));
 		
 	}
+	
 }

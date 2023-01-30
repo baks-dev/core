@@ -16,12 +16,6 @@
  */
 
 
-
-
-
-
-
-
 //centrifuge.connect();
 
 
@@ -53,7 +47,7 @@ function createToast(ctx) {
         toastSpan.classList.add('symbol');
         toastSpan.classList.add('symbol-circle');
         toastSpan.classList.add('toast-icon');
-        toastSpan.classList.add('bg-'+$type);
+        toastSpan.classList.add('bg-' + $type);
         toastSpan.classList.add('me-3');
 
         tostHeader.append(toastSpan);

@@ -24,9 +24,12 @@ final class SettingsMain implements SettingsMainInterface
 {
 	private readonly TranslatorInterface $translator;
 	
-	public function __construct(TranslatorInterface $translator){
+	
+	public function __construct(TranslatorInterface $translator)
+	{
 		$this->translator = $translator;
 	}
+	
 	
 	public function getSettingsMainAssociative() : array
 	{
@@ -37,4 +40,5 @@ final class SettingsMain implements SettingsMainInterface
 		
 		return $data;
 	}
+	
 }

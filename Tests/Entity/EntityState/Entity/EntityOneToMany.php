@@ -30,9 +30,6 @@ final class EntityOneToMany extends EntityState
 	public const ENTITY_ONE_TO_MANY_INT = 856;
 	public const ENTITY_ONE_TO_MANY_STRING = '278ll6xC8n';
 	
-	
-	
-	
 	/** ID / ValueObject */
 	#[ORM\Id]
 	#[ORM\Column(type: UserUid::TYPE)]
@@ -42,7 +39,6 @@ final class EntityOneToMany extends EntityState
 	#[ORM\ManyToOne(targetEntity: Entity::class, inversedBy: "o2m")]
 	#[ORM\JoinColumn(name: 'entity', referencedColumnName: "id", nullable: true)]
 	private ?Entity $entity;
-	
 	
 	/** Readonly */
 	#[ORM\Column(type: UserUid::TYPE)]
@@ -55,6 +51,7 @@ final class EntityOneToMany extends EntityState
 	/** String */
 	#[ORM\Column(type: Types::STRING)]
 	private string $string;
+	
 	
 	public function __construct(Entity $entity)
 	{
@@ -73,10 +70,12 @@ final class EntityOneToMany extends EntityState
 		return parent::getDto($dto);
 	}
 	
+	
 	public function setEntity($dto) : mixed
 	{
 		return parent::setEntity($dto);
 	}
+	
 	
 	/**
 	 * @return UserUid
@@ -86,6 +85,7 @@ final class EntityOneToMany extends EntityState
 		return $this->id;
 	}
 	
+	
 	/**
 	 * @return Entity|null
 	 */
@@ -93,6 +93,7 @@ final class EntityOneToMany extends EntityState
 	{
 		return $this->entity;
 	}
+	
 	
 	/**
 	 * @return UserUid
@@ -102,6 +103,7 @@ final class EntityOneToMany extends EntityState
 		return $this->readonly;
 	}
 	
+	
 	/**
 	 * @return int
 	 */
@@ -110,6 +112,7 @@ final class EntityOneToMany extends EntityState
 		return $this->int;
 	}
 	
+	
 	/**
 	 * @return string
 	 */
@@ -117,8 +120,5 @@ final class EntityOneToMany extends EntityState
 	{
 		return $this->string;
 	}
-	
-	
-	
 	
 }

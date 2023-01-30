@@ -34,10 +34,11 @@ final class JsonDecodeExtension extends AbstractExtension
 	public function getFilters()
 	{
 		return [
-			new TwigFilter('json_decode', [$this, 'jsonDecode'])
+			new TwigFilter('json_decode', [$this, 'jsonDecode']),
 		];
 	}
-
+	
+	
 	public function jsonDecode($string) : array
 	{
 		return json_decode($string, false, 512, JSON_THROW_ON_ERROR);
