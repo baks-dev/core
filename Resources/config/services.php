@@ -2,6 +2,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use BaksDev\Core\Services\Reference\ReferenceChoice;
+use BaksDev\Core\Services\Reference\ReferenceChoiceColor;
+use BaksDev\Core\Services\Reference\ReferenceChoiceInterface;
+use BaksDev\Core\Services\Reference\ReferenceChoiceSize;
+
 return static function(ContainerConfigurator $configurator) {
 	
 	$services = $configurator->services()
@@ -26,4 +31,12 @@ return static function(ContainerConfigurator $configurator) {
 	
 	$services->load($namespace.'\Repository\\', __DIR__.'/../../Repository/*');
 	
+	
+	$services->set(ReferenceChoiceSize::class)
+		->tag('baks.reference.choice')
+	;
+	
+	$services->set(ReferenceChoice::class)
+		->args([tagged_iterator('baks.reference.choice')])
+	;
 };
