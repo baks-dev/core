@@ -29,7 +29,6 @@ class AssetsInstallCommand extends Command
 	
 	private string $projectDir;
 	
-	
 	public function __construct(Filesystem $filesystem, string $projectDir)
 	{
 		parent::__construct();
@@ -74,7 +73,7 @@ class AssetsInstallCommand extends Command
 		$bundlesDir = $publicDir.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR;
 		
 		/* Получаем все имеющиеся папки с ресурсами ASSET */
-		$ModuleAssets = $this->searchResources($kernel->getProjectDir().DIRECTORY_SEPARATOR.'src');
+		$ModuleAssets = $this->searchResources($kernel->getProjectDir().DIRECTORY_SEPARATOR.'src') ?: [];
 		$ModuleAssets = array_merge($ModuleAssets,
 			$this->searchResources($kernel->getProjectDir().DIRECTORY_SEPARATOR.'vendor/baks-dev')
 		);

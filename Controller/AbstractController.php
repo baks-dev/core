@@ -21,17 +21,10 @@ namespace BaksDev\Core\Controller;
 use App\Module\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Core\Twig\CSPNonce\CSPNonceGenerator;
 use BaksDev\Users\User\Entity\User;
-
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
-use BaksDev\Core\Repository\UserProfilesByUser\UserProfilesByCurrentUserInterface;
 use BaksDev\Core\Type\Locale\Locale;
-
-//use Fresh\CentrifugoBundle\Service\Credentials\CredentialsGenerator;
-use BaksDev\Users\User\Repository\UserDecorator\UserDecoratorInterface;
 use LogicException;
-use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
@@ -40,7 +33,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -136,7 +128,10 @@ abstract class AbstractController
 		
 		/* Определяем браузер пользователя */
 		$userAgent = $request->getCurrentRequest()->headers->get('User-Agent');
-		$device = get_browser($userAgent);
+		
+	
+		$device = ini_get('get_browser') ? get_browser($userAgent) : null;
+		
 		
 		/* Добавляем настройки в параметры */
 		$parameters['settings'] = $this->settings();
@@ -268,7 +263,6 @@ abstract class AbstractController
 	
 	public function assets_css($content) : string
 	{
-		
 		$cache = $this->cache;
 		$cache_key = $this->user.$this->device.'-'.$this->route;
 		
@@ -358,6 +352,7 @@ abstract class AbstractController
 			'<style nonce="'.$this->CSPNonceGenerator->getNonce().'">'.$styles.'</style>',
 			$content
 		);
+		
 		$content = $this->contentMinify($content);
 		
 		return $content;

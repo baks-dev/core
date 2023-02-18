@@ -33,12 +33,11 @@ final class SettingsMain implements SettingsMainInterface
 	
 	public function getSettingsMainAssociative() : array
 	{
-		$data['title'] = $this->translator->trans('user.title', domain: 'settings.main');
-		$data['description'] = $this->translator->trans('user.description', domain: 'settings.main');
-		$data['keywords'] = $this->translator->trans('user.keywords', domain: 'settings.main');;
-		$data['tags'] = $this->translator->trans('user.tags', domain: 'settings.main');;
+		$data['title'] = $this->translator->trans('user.title', domain: 'default.header');
+		$data['description'] = $this->translator->trans('user.description', domain: 'default.header');
+		$data['keywords'] = $this->translator->trans('user.keywords', domain: 'default.header');
+		$data['tags'] = $this->translator->trans('user.tags', domain: 'default.header');
 		
 		return $data;
 	}
-	
 }

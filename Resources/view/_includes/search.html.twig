@@ -11,4 +11,6 @@
 	</svg>
 </button>
 
+<input type="hidden" name="token" value="{{ csrf_token('search') }}"/>
+
 {{ form_end(search) }}

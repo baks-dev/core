@@ -6,11 +6,12 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Config\FrameworkConfig;
 
 return static function(FrameworkConfig $framework) {
+	
 	$framework->csrfProtection()
 		->enabled(true)
 	;
 	
-	$framework->session()
+/*	$framework->session()
 		->enabled(true)
 		// ID of the service used for session storage
 		// NULL means that Symfony uses PHP default session mechanism
@@ -20,6 +21,6 @@ return static function(FrameworkConfig $framework) {
 		->cookieSecure('auto')
 		->cookieSamesite(Cookie::SAMESITE_LAX)
 		->storageFactoryId('session.storage.factory.native')
-	;
+	;*/
 	
 };
