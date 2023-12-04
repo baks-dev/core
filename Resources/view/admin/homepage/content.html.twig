@@ -1,0 +1,9 @@
+{# Тюлбар #}
+<div class="toolbar">
+	<div id="kt_toolbar_container" class="container-xxl d-flex flex-stack flex-wrap">
+		{# Хлебные крошки #}
+		{{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
+	</div>
+</div>
+
+Core

@@ -1,0 +1,15 @@
+modify:
+  new: добавлен
+  upd: обновление
+  del: удален
+  res: восстановлен
+  rlb: откат
+  tru: очищен
+  dlt: удален
+
+new: добавлен
+update: обновление
+delete: удален
+restore: восстановлен
+rollback: откат
+truncate: очищен

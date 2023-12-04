@@ -1,0 +1,15 @@
+modify:
+  new: added
+  upd: update
+  del: deleted
+  res: restored
+  rlb: rollback
+  tru: truncate
+  dlt: deleted
+
+new: new
+update: update
+delete: deleted
+restore: restored
+rollback: rollback
+truncate: cleared

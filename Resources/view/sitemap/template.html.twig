@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <sitemap>
+        <loc>{{ absolute_url(path('core:sitemap.urls')) }}</loc>
+    </sitemap>
+
+    {% for sitemap in sitemaps %}
+        <sitemap>
+            <loc>{{ absolute_url(path(sitemap.loc)) }}</loc>
+        </sitemap>
+    {% endfor %}
+
+</sitemapindex>
+
+

@@ -1,0 +1,17 @@
+{% trans_default_domain 'user.userprofile' %}
+
+<div class="page-title d-flex flex-column me-3">
+	
+	<h1 class="d-flex text-dark fw-bolder my-1 fs-3">
+		{# Название раздела #}
+		Главная
+	</h1>
+	
+	<ul class="breadcrumb breadcrumb-dot fw-bold text-gray-600 fs-7 my-1">
+		
+		<li class="breadcrumb-item text-gray-600">
+			<a href="{{ path('core:user.homepage') }}"
+					class="text-gray-600 text-hover-primary">{{ 'breadcrumb.home'|trans({}, 'messages') }}</a>
+		</li>
+	</ul>
+</div>

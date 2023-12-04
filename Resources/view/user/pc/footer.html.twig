@@ -1,0 +1,7 @@
+<footer class="py-5">
+
+</footer>
+
+{% if app.user == null and route != 'auth-email:user.login' %}
+	{{ include(_self|replace({ "footer.html.twig": "modal/autotization.html.twig" })) }}
+{% endif %}
