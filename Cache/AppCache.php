@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class AppCache implements AppCacheInterface
 {
+    private string $type = FilesystemAdapter::class;
+
     private string $HOST;
 
     public function __construct(
@@ -54,5 +56,10 @@ final class AppCache implements AppCacheInterface
             0,
             $marshaller
         );
+    }
+
+    public function getCacheType(): string
+    {
+        return $this->type;
     }
 }

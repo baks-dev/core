@@ -32,4 +32,7 @@ interface AppCacheInterface
         int $defaultLifetime = 0,
         MarshallerInterface $marshaller = null
     ): mixed;
+
+
+    public function getCacheType() : string;
 }

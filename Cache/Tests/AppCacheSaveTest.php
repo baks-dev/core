@@ -44,7 +44,7 @@ final class AppCacheSaveTest extends KernelTestCase
         $cache = $AppCache->init('Namespace');
 
         $item = $cache->getItem('test_cache');
-        $item->expiresAfter(DateInterval::createFromDateString('1 hours'));
+        $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
 
         $item->set('test_data_cache');
