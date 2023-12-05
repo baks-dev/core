@@ -57,9 +57,6 @@ class CacheClear extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 
-        dd(45456);
-
-
         $path = $this->project_dir.'/vendor/baks-dev';
 
         /** @var DirectoryIterator $module */
