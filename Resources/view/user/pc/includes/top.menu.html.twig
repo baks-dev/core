@@ -54,14 +54,10 @@
 						
 						
 						<li class="list-group-item bg-transparent border-0 text-truncate rounded-5 {{ menu_active }}"
-								
 								id="{{ key }}-tab"
 								data-bs-target="#v-pills-{{ key }}"
-								aria-controls="v-pills-{{ key }}"
-								aria-selected="{{ loop.first ? 'true' : 'false' }}"
 								title="{{ menu.category_name }}"
 								style='margin-top: 0 !important;'
-						
 						>
 							
 							<a href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}"
@@ -100,7 +96,6 @@
 					
 					<div class="tab-pane {{ parent_active ?  (menu.category_url == parent_active ? 'show active') : loop.first ? 'show active' }}"
 							id="v-pills-{{ key }}"
-							{#aria-labelledby="v-pills-{{ key }}-tab"#}
 							tabindex="0">
 						
 						<div class='d-flex w-100 flex-wrap gap-3'>

@@ -3,7 +3,7 @@
 		<div class="row justify-content-between">
 
 			<div class="col align-self-center">
-				<a href="{{ path('core:user.homepage') }}" aria-label="Главная">
+				<a href="{{ path('core:user.homepage') }}" title="Главная">
 
 					<img data-src="/logo.webp" src="/assets/img/empty.png"
 							width="432" height="100"
@@ -17,7 +17,7 @@
 
 					<div class="w-100 pe-3 border-end border-2" style="height: 60px;">
 						<a href="tel:88005508844"
-								aria-label="Контактный номер телефона"
+								title="Контактный номер телефона"
 								class="text-uppercase text-center text-decoration-none h4 fw-bolder text-dark text-nowrap">
 							8 (800) 550-88-44
 						</a>
@@ -25,7 +25,7 @@
 
 					<div class="header-contacts__description d-flex flex-column align-self-center gap-1 w-100 ps-3">
 						<span>(Звонок бесплатный)</span>
-						<a href="#" class="small" title="График работы" aria-label="График работы">График работы</a>
+						<a href="#" class="small" title="График работы" title="График работы">График работы</a>
 					</div>
 				</div>#}
 			</div>
@@ -68,7 +68,7 @@
 								data-bs-target="#modal"
 								style="width: 150px;"
 								title="{{ 'user.link.breadcrumb.page'|trans({}, 'user.login') }}"
-								aria-label="{{ 'user.link.breadcrumb.page'|trans({}, 'user.login') }}"
+
 						>
 
 						<span class="icon rounded-circle mb-2 ">
@@ -110,7 +110,7 @@
 
 
 						<a href="{{ path('orders-order:user.basket') }}"
-								aria-label="Корзина"
+								title="Корзина"
 								class="btn btn-link btn-sm h-25 lh-1 position-relative text-decoration-none w-50"
 								style="width: 95px;">
 

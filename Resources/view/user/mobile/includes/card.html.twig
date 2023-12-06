@@ -14,7 +14,7 @@
 
                 <div class="flex-grow-1">
                     <button class="btn btn-link p-0 card-favorites"
-                            aria-label="Добавить в избранное"
+                            title="Добавить в избранное"
                             data-id="{{ card.id }}"
                     >
                         <img data-src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiNCMUI2QkIiIHZpZXdCb3g9IjAgMCAxNiAxNiI+PHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNOCAxLjMxNEMxMi40MzgtMy4yNDggMjMuNTM0IDQuNzM1IDggMTUtNy41MzQgNC43MzYgMy41NjItMy4yNDggOCAxLjMxNHoiPjwvcGF0aD48L3N2Zz4K"
@@ -84,7 +84,7 @@
                         {% endif %}
                     </small>
 
-                     {#<button class="btn btn-sm btn-danger py-0 pb-1 rounded-3" role="button" aria-label="Купить">
+                     {#<button class="btn btn-sm btn-danger py-0 pb-1 rounded-3" role="button" title="Купить">
 
 						<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
 							 class="bi bi-cart3" viewBox="0 0 16 16">
@@ -134,7 +134,7 @@
 			<div class="d-flex gap-1 align-items-center">
             #}{# {{ include(_self|replace({ "content.html.twig": "rating.html.twig" })) }} #}{#
             #}{# {% include '@Template/default/user/mobile/includes/rating.html.twig' %} #}{#
-            #}{# <a href="#reviews" class="small ms-2" aria-label="Отзывы" title="Отзывы">9 отзывов</a> #}{#
+            #}{# <a href="#reviews" class="small ms-2" title="Отзывы">9 отзывов</a> #}{#
             </div>
 
             <div>
@@ -162,7 +162,6 @@
                    data-bs-toggle="modal"
                    data-bs-target="#modal"
                    title="Купить"
-                   aria-label="Купить"
                 >
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"

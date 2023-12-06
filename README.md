@@ -8,7 +8,7 @@
 
 ``` bash
 $ composer require baks-dev/core
-```
+```скь
 
 Тесты
 

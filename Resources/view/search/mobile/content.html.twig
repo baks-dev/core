@@ -49,9 +49,12 @@
                 <li class="nav-item" role="presentation">
                     <button class="btn nav-link fw-bolder rounded-4 px-3 active" id="pills-all-tab"
                             data-bs-toggle="pill"
-                            data-bs-target="#pills-all" type="button" role="tab"
-                            aria-controls="pills-all"
-                            aria-selected="true">Все
+                            data-bs-target="#pills-all"
+                            type="button"
+                            role="tab"
+                            title="Все"
+                    >
+                        Все
                     </button>
                 </li>
 
@@ -62,8 +65,9 @@
                                 id="pills-{{ key|md5 }}-tab"
                                 data-bs-toggle="pill"
                                 data-bs-target="#pills-{{ key|md5 }}"
-                                type="button" role="tab"
-                                aria-controls="pills-{{ key|md5 }}"
+                                type="button"
+                                role="tab"
+                                title="R{{ key }}"
                         >
                             <span class="text-uppercase px-3">R{{ key }}</span>
                         </button>

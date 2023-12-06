@@ -57,14 +57,10 @@
 
 
                         <li class="list-group-item bg-transparent border-0 text-truncate rounded-5 {{ menu_active }}"
-
                             id="{{ key }}-tab"
                             data-bs-target="#v-pills-{{ key }}"
-                            aria-controls="v-pills-{{ key }}"
-                            aria-selected="{{ loop.first ? 'true' : 'false' }}"
                             title="{{ menu.category_name }}"
                             style='margin-top: 0 !important;'
-
                         >
                             {# Обложка  #}
                             {% set image_path = '/assets/img/blank.svg' %}

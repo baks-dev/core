@@ -12,7 +12,7 @@
 		
 		<div class="row">
 			<div class="col-8" style="height: 38px;">
-				<a href="{{ path('core:user.homepage') }}" aria-label="Главная">
+				<a href="{{ path('core:user.homepage') }}" title="Главная">
 					<img data-src="/logo.webp" src="/assets/img/empty.png"
 						 width="432" height="100"
 						 alt="..."
@@ -30,8 +30,7 @@
 				<button class="btn btn-primary rounded-circle shadow mt-3 mx-3"
 						data-bs-toggle="offcanvas"
 						data-bs-target="#offcanvasNavbar"
-						aria-controls="offcanvasNavbar"
-						aria-label="Меню пользователя"
+						title="Меню пользователя"
 						style="width: 50px; height: 50px">
 
 					<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
@@ -69,14 +68,13 @@
 			
 			
 			
-			<div class="offcanvas text-bg-dark offcanvas-end w-75 bg-primary" tabindex="-1" id="offcanvasNavbar"
-				 {#aria-labelledby="offcanvasNavbarLabel"#}>
+			<div class="offcanvas text-bg-dark offcanvas-end w-75 bg-primary" tabindex="-1" id="offcanvasNavbar">
 
 				<div class="offcanvas-header py-0">
 					<div></div>
 
 					<button type="button" class="btn btn-close rounded-circle shadow m-3 pt-2 bg-white"
-							data-bs-dismiss="offcanvas" aria-label="Close"
+							data-bs-dismiss="offcanvas" title="Close"
 							style="width: 30px; height: 30px">
 					</button>
 				</div>
@@ -93,7 +91,7 @@
 							<li class="nav-item">
 							<a href="{{ path('auth-email:user.login') }}"
 							   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="Войти в кабинет"
+							   title="Войти в кабинет"
 							>
 								
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -112,7 +110,7 @@
 						<li class="nav-item">
 							<a href="{{ path('core:user.homepage') }}"
 							   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="Главная"
+							   title="Главная"
 							>
 
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -135,7 +133,7 @@
 									<li class="nav-item">
 										<a href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}"
 										   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-										   aria-label="Продукция"
+										   title="Продукция"
 										>
 
 											<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +172,7 @@
 						<li class="nav-item">
 							{#<a href="{{ path('pages:user.about') }}"
 							   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="О компании"
+							   title="О компании"
 							>
 								
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -190,7 +188,7 @@
 
 						<li class="nav-item">
 							<a href="{{ path('delivery:user.delivery') }}" class="btn nav-link btn-primary active rounded-4 px-2  text-start w-100"
-							   aria-label="Доставка"
+							   title="Доставка"
 							  >
 								
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -205,7 +203,7 @@
 						<li class="nav-item">
 							{#<a href="{{ path('pages:user.wholesale') }}"
 							   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="Опт"
+							   title="Опт"
 							   >
 
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -220,7 +218,7 @@
 						<li class="nav-item">
 							{#<a href="{{ path('pages:user.guaranty') }}"
 							   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="Гарантия" >
+							   title="Гарантия" >
 
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
 										 class="bi bi-shield-check" viewBox="0 0 16 16">
@@ -234,7 +232,7 @@
 
 						<li class="nav-item">
 							{#<a href="{{ path('pages:user.calc') }}" class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="Шинный калькулятор"
+							   title="Шинный калькулятор"
 							   >
 
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -248,9 +246,7 @@
 						</li>
 
 						<li class="nav-item">
-							<a href="{{ path('contacts-region:user.contact') }}" class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-							   aria-label="Контакты"
-							   >
+							<a href="{{ path('contacts-region:user.contact') }}" class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100" title="Контакты">
 
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
 										 class="bi bi-geo-alt" viewBox="0 0 16 16">
@@ -266,9 +262,7 @@
 						{% if app.user %}
 							<li class="nav-item">
 								
-								<a href="{{ path('auth-email:user.logout') }}" class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
-										aria-label="Контакты"
-								>
+								<a href="{{ path('auth-email:user.logout') }}" class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100" title="Контакты">
 	
 									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-escape" viewBox="0 0 16 16">
 										<path d="M8.538 1.02a.5.5 0 1 0-.076.998 6 6 0 1 1-6.445 6.444.5.5 0 0 0-.997.076A7 7 0 1 0 8.538 1.02Z"/>
@@ -279,12 +273,7 @@
 								</a>
 							</li>
 						{% endif %}
-
 					</ul>
-					{# <form class="d-flex mt-3" role="search">
-						<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-						<button class="btn btn-outline-success" type="submit">Search</button>
-					</form> #}
 				</div>
 			</div>
 
