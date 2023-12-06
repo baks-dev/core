@@ -29,7 +29,7 @@
             Каталог
         </a>#}
 
-        <div class="dropdown-menu w-100 rounded-3 p-4" aria-labelledby="dropdownMenu2">
+        <div class="dropdown-menu w-100 rounded-3 p-4" {#aria-labelledby="dropdownMenu2"#}>
 
             <div class="d-flex align-items-start">
 
@@ -97,14 +97,13 @@
 
                 </ul>
 
-                <div class="tab-content ms-5 w-100 id=" v-pills-tabContent
-                ">
+                <div class="tab-content ms-5 w-100" id="v-pills-tabContent">
 
                 {% for key, menu in baks_user_menu %}
 
                     <div class="tab-pane {{ parent_active ?  (menu.category_url == parent_active ? 'show active') : loop.first ? 'show active' }}"
                          id="v-pills-{{ key }}"
-                         aria-labelledby="v-pills-{{ key }}-tab"
+                         {#aria-labelledby="v-pills-{{ key }}-tab"#}
                          tabindex="0">
 
                         <div class='d-flex w-100 flex-wrap gap-3'>
