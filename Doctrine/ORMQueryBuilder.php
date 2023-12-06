@@ -188,6 +188,10 @@ final class ORMQueryBuilder extends QueryBuilder
         return $this->getQuery()->getResult() ?: null;
     }
 
+    public function flush(): void
+    {
+        $this->entityManager->flush();
+    }
 
     /**
      * Перезаписываем кеш
