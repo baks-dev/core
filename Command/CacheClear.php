@@ -72,7 +72,9 @@ class CacheClear extends Command
                 $appCache = $this->appCache->init($module->getFilename());
                 $appCache->clear();
 
-                if(function_exists('apcu_enabled') && apcu_enabled())
+                $apcuAvailabe = function_exists('apcu_enabled') && apcu_enabled();
+
+                if($apcuAvailabe)
                 {
                     $apcuCache = new ApcuAdapter($module->getFilename());
                     $apcuCache->clear();
@@ -105,15 +107,7 @@ class CacheClear extends Command
             }
         }
 
-
         return Command::SUCCESS;
 
-        // or return this if some error happened during the execution
-        // (it's equivalent to returning int(1))
-        // return Command::FAILURE;
-
-        // or return this to indicate incorrect command usage; e.g. invalid options
-        // or missing arguments (it's equivalent to returning int(2))
-        // return Command::INVALID
     }
 }
