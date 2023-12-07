@@ -42,6 +42,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use ReflectionAttribute;
 use ReflectionClass;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -138,7 +139,7 @@ final class DBALQueryBuilder extends QueryBuilder
             }, $this->getParameters()));
 
 
-        $DatetimeCache = new ApcuAdapter();
+        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
 
         $lastDatetimeCache = $DatetimeCache->getItem('date.'.$this->cacheKey);
         $lastDatetime = $lastDatetimeCache->get();
@@ -315,7 +316,7 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $counterKey = 'counter.'.$this->cacheKey;
 
-        $DatetimeCache = new ApcuAdapter();
+        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
 
 
         $lastDatetimeCache = $DatetimeCache->getItem($counterKey);

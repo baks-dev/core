@@ -33,6 +33,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -121,7 +122,7 @@ final class ORMQueryBuilder extends QueryBuilder
 
 
         /** Сохраняем метку времени в APCU */
-        $DatetimeCache = new ApcuAdapter();
+        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
 
         $lastDatetimeCache = $DatetimeCache->getItem('date.'.$this->cacheKey);
         $lastDatetime = $lastDatetimeCache->get();

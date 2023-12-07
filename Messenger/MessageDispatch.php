@@ -33,6 +33,7 @@ use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -212,7 +213,7 @@ final class MessageDispatch implements MessageDispatchInterface
     {
         if(!$this->transport) { return false; }
 
-        $cache = new ApcuAdapter();
+        $cache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
         $cacheConsume = $cache->getItem('consume-'.$this->transport);
 
         if($cacheConsume->isHit())
