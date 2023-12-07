@@ -72,8 +72,11 @@ class CacheClear extends Command
                 $appCache = $this->appCache->init($module->getFilename());
                 $appCache->clear();
 
-                $apcuCache = new ApcuAdapter($module->getFilename());
-                $apcuCache->clear();
+                if(function_exists('apcu_enabled') && apcu_enabled())
+                {
+                    $apcuCache = new ApcuAdapter($module->getFilename());
+                    $apcuCache->clear();
+                }
 
                 $fileCache = new FilesystemAdapter($module->getFilename());
                 $fileCache->clear();
