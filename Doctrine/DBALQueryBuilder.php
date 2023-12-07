@@ -459,6 +459,8 @@ final class DBALQueryBuilder extends QueryBuilder
                 continue;
             }
 
+
+
             $this->addGroupBy($field);
         }
 
@@ -486,24 +488,30 @@ final class DBALQueryBuilder extends QueryBuilder
         $join,
         $alias,
         $condition,
-        $sort = 'id',
+        $identifier = 'id',
+        $sort = null,
         $desc = 'DESC'
     )
     {
+
+
         $leftOneJoin = new QueryBuilder($this->connection);
 
         $leftOneJoin
-            ->select('tmp_'.$alias.'.id')
+            ->select('tmp_'.$alias.'.'.$identifier)
             ->from($join, 'tmp_'.$alias)
             ->where('tmp_'.trim($condition))
-            ->orderBy('tmp_'.$alias.'.'.$sort, $desc)
+            ->orderBy('tmp_'.$alias.'.'.($sort ?: $identifier), $desc)
             ->setMaxResults(1);
+
+
+        //dd($leftOneJoin->getSQL());
 
         $this->leftJoin(
             $fromAlias,
             $join,
             $alias,
-            $alias.'.id = ('.$leftOneJoin->getSQL().')'
+            $alias.'.'.$identifier.' = ('.$leftOneJoin->getSQL().')'
         );
 
         return $this;
