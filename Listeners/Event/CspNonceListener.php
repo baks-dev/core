@@ -57,8 +57,8 @@ final class CspNonceListener
 
         $cspHeader = "
             connect-src 'self' *.yandex.ru *.googleapis.com ws:;
-            script-src 'self' 'nonce-".$nonce."' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' *.yandex.ru https:;
-            object-src 'none';
+            script-src 'self' 'nonce-".$nonce."' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' *.yandex.ru *.google.com https:;
+            object-src 'self';
             frame-src 'self' blob: https:;
             base-uri 'none';
         ";

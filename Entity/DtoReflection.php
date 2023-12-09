@@ -170,6 +170,21 @@ final class DtoReflection
         return $setDtoMethod;
     }
 
+
+    public function getMethodWither(): bool|string
+    {
+        $propertyName = $this->getPropertyMethodName();
+
+        $setDtoMethod = 'with'.$propertyName;
+
+        if(!method_exists($this->dto, $setDtoMethod))
+        {
+            return false;
+        }
+
+        return $setDtoMethod;
+    }
+
     public function getMethodGetter(): bool|string
     {
         $propertyName = $this->getPropertyMethodName();

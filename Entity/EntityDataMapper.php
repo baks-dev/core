@@ -76,7 +76,6 @@ abstract class EntityDataMapper
                 continue;
             }
 
-
             $propertyTypeName = $dtoReflectionClass->getPropertyTypeName();
             $propertyMethodName = $dtoReflectionClass->getPropertyMethodName();
             $type = $dtoReflectionClass->getPropertyInstanceType();
@@ -131,6 +130,9 @@ abstract class EntityDataMapper
                     continue;
                 }
 
+
+
+
                 /** Если связь OneToOne */
                 $modifiers = new ReflectionProperty($this, $propertyName);
                 $attr = $modifiers->getAttributes(OneToOne::class);
@@ -153,6 +155,8 @@ abstract class EntityDataMapper
                         continue;
                     }
                 }
+
+
             }
 
 
@@ -163,27 +167,32 @@ abstract class EntityDataMapper
             $getEntityPropertyValue = $this->getPropertyValue($propertyName, $this);
 
 
-            if($setterDtoMethod = $dtoReflectionClass->getMethodSetter())
+            /** Если имеется WITH - присваиваем через метод */
+            if($withDtoMethod = $dtoReflectionClass->getMethodWither())
             {
 
+                $dto->{$withDtoMethod}($getEntityPropertyValue);
+            }
 
-                if(
-                    (is_object($getEntityPropertyValue) && $getEntityPropertyValue instanceof ($dtoReflectionClass->getPropertyInstanceType()::class)) ||
-                    !is_object($getEntityPropertyValue)
-                )
-                {
-                    /* Если в ДТО имеется сеттер - присваиваем через сеттер */
-                    $dto->{$setterDtoMethod}($getEntityPropertyValue);
-                }
-
-                //dd(($dtoReflectionClass->getPropertyInstanceType())::class);
-
-
-
+            /** Если имеется сеттер - присваиваем через метод */
+            elseif($setterDtoMethod = $dtoReflectionClass->getMethodSetter())
+            {
+                $dto->{$setterDtoMethod}($getEntityPropertyValue);
+//                if(
+//                    (is_object($getEntityPropertyValue) && $getEntityPropertyValue instanceof ($dtoReflectionClass->getPropertyInstanceType()::class)) ||
+//                    (is_object($getEntityPropertyValue) && $getEntityPropertyValue->getId() instanceof ($dtoReflectionClass->getPropertyInstanceType()::class)) ||
+//                    !is_object($getEntityPropertyValue)
+//                )
+//                {
+//                    /* Если в ДТО имеется сеттер - присваиваем через сеттер */
+//                    $dto->{$setterDtoMethod}($getEntityPropertyValue);
+//                }
 
             }
             else
             {
+
+
                 /* Присваиваем значение через замыкание */
                 $this->setPropertyValue($propertyName, $getEntityPropertyValue, $dto);
             }
@@ -195,6 +204,8 @@ abstract class EntityDataMapper
 
     public function setEntity($dto): mixed
     {
+
+
 
         //        if($this->remove === null)
         //        {
@@ -323,6 +334,7 @@ abstract class EntityDataMapper
                         else
                         {
 
+
                             $currentCollections = $entityCollections->current();
 
                             /** Получаем идентификаторы сущности для обновления */
@@ -339,13 +351,13 @@ abstract class EntityDataMapper
                                 {
                                     $identifier[] = $propertyCollection->getName();
                                 }
+
+
                             }
 
                             $countIdentifier = count($identifier);
 
-
                             /** Удаляем сущности, которые были удалены из коллекции */
-
 
                             /** @var PersistentCollection $entityCollections */
                             foreach($entityCollections as $entityCollection)
@@ -387,6 +399,7 @@ abstract class EntityDataMapper
 
                                     foreach($identifier as $propertyEqual)
                                     {
+
                                         if((string) $this->getPropertyValue($propertyEqual, $entityCollection) !== (string) $this->getPropertyValue($propertyEqual, $value))
                                         {
                                             $isEqual = false;
@@ -397,6 +410,9 @@ abstract class EntityDataMapper
                                     /** Обновляем найденную сущность */
                                     if($isEqual)
                                     {
+                                        //dd($entityCollection);
+
+
                                         $entityCollection->setEntityManager($this->entityManager);
                                         $entityCollection->setEntity($value);
                                     }
@@ -419,6 +435,7 @@ abstract class EntityDataMapper
                                             ++$countNew;
                                         }
                                     }
+
 
                                     if($countNew === $countIdentifier)
                                     {
