@@ -103,7 +103,6 @@ final class OneToManyEntityStateTest extends KernelTestCase
         $Entity->setEntity($EditDto);
         self::assertTrue($Entity->getCollection()->count() === 0);
 
-
     }
 
     public function testEntityStateDeleteAndNewCollection(): void

@@ -333,8 +333,6 @@ abstract class EntityDataMapper
                         /** Если сущность статическая */
                         else
                         {
-
-
                             $currentCollections = $entityCollections->current();
 
                             /** Получаем идентификаторы сущности для обновления */
@@ -376,13 +374,17 @@ abstract class EntityDataMapper
                                 }
 
                                 /** Удаляем сущность из коллекции */
-                                if($isRemove)
+                                if($isRemove || $collectionDTO->isEmpty())
                                 {
                                     $this->entityManager?->remove($entityCollection);
                                     $entityCollections->removeElement($entityCollection);
                                     //dd($o2oTargetEntity);
                                 }
                             }
+
+
+
+
 
                             /** ОБНОВЛЯЕМ СУЩЕСТВУЮЩИЕ */
 
@@ -391,7 +393,6 @@ abstract class EntityDataMapper
                             {
                                 foreach($entityCollections as $entityCollection)
                                 {
-
                                     $isEqual = true;
 
                                     foreach($identifier as $propertyEqual)
@@ -407,9 +408,6 @@ abstract class EntityDataMapper
                                     /** Обновляем найденную сущность */
                                     if($isEqual)
                                     {
-                                        //dd($entityCollection);
-
-
                                         $entityCollection->setEntityManager($this->entityManager);
                                         $entityCollection->setEntity($value);
                                     }
@@ -420,8 +418,6 @@ abstract class EntityDataMapper
                             /** Добавляем новые объекты в коллекцию */
                             foreach($collectionDTO as $value)
                             {
-
-
                                 $isNew = true;
                                 $countNew = 0;
 
