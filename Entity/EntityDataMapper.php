@@ -351,8 +351,6 @@ abstract class EntityDataMapper
                                 {
                                     $identifier[] = $propertyCollection->getName();
                                 }
-
-
                             }
 
                             $countIdentifier = count($identifier);
@@ -362,8 +360,7 @@ abstract class EntityDataMapper
                             /** @var PersistentCollection $entityCollections */
                             foreach($entityCollections as $entityCollection)
                             {
-
-                                $isRemove = true;
+                                $isRemove = false;
 
                                 foreach($collectionDTO as $value)
                                 {
@@ -371,9 +368,10 @@ abstract class EntityDataMapper
                                     {
                                         if((string) $this->getPropertyValue($propertyEqual, $entityCollection) === (string) $this->getPropertyValue($propertyEqual, $value))
                                         {
-                                            $isRemove = false;
-                                            break;
+                                            continue;
                                         }
+
+                                        $isRemove = true;
                                     }
                                 }
 
@@ -385,7 +383,6 @@ abstract class EntityDataMapper
                                     //dd($o2oTargetEntity);
                                 }
                             }
-
 
                             /** ОБНОВЛЯЕМ СУЩЕСТВУЮЩИЕ */
 
@@ -423,6 +420,8 @@ abstract class EntityDataMapper
                             /** Добавляем новые объекты в коллекцию */
                             foreach($collectionDTO as $value)
                             {
+
+
                                 $isNew = true;
                                 $countNew = 0;
 
@@ -445,6 +444,8 @@ abstract class EntityDataMapper
 
                                 if($isNew)
                                 {
+
+
                                     $obj = new $o2oTargetEntity($this);
                                     $obj->setEntityManager($this->entityManager);
                                     $obj->setEntity($value);
