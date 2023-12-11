@@ -31,8 +31,13 @@
 
     let isBot = false;
 
+
     var rules = [
+
         () => runningOnBrowser && !("onscroll" in window),
+
+        () => typeof navigator !== "undefined" && /(gle|ing|ro|dex|ya)bot|crawl|spider|lighthouse/i.test(navigator.userAgent),
+
         //Phantomjs как правило, не имеет внутри себя браузерных плагинов
         () => typeof navigator !== "undefined" && (navigator.plugins instanceof PluginArray) === false,
         //PhantomJs 1.x прокидывает 2 свойства в глобальный объект, проверим их
@@ -53,14 +58,16 @@
         //WARNING: эту проверку не пройдут IOS 8 и ниже, а также sailfish webview
         () => window.outerWidth === 0 && window.outerHeight === 0,
         //Множество ботов не заботится проставлении navigator.online и ходят по сайту в оффлайн режиме
-        () => window.navigator.onLine === false || isBot === true
+        () => window.navigator.onLine === false
     ];
 
     //Проверяем правила
     for (let i = 0; i < rules.length; i++) {
-        if (rules[i]() === true) isBot = true;
+        if (rules[i]() === true) {
+            isBot = true;
+            break;
+        }
     }
-
 
     var defaultSettings = {
         elements_selector: ".lazy",
@@ -427,7 +434,6 @@
 
     var restoreOriginalAttributesImg = function restoreOriginalAttributesImg(element) {
 
-
         forEachPictureSource(element, function (sourceTag) {
             restoreOriginalImageAttributes(sourceTag);
         });
@@ -481,7 +487,6 @@
 
     var setBackground = function setBackground(element, settings, instance) {
 
-
         var bg1xValue = getData(element, settings.data_bg);
         var bgHiDpiValue = getData(element, settings.data_bg_hidpi);
         var bgDataValue = isHiDpi && bgHiDpiValue ? bgHiDpiValue : bg1xValue;
@@ -489,6 +494,10 @@
         element.style.backgroundImage = "url(\"".concat(bgDataValue, "\")");
         getTempImage(element).setAttribute("src", bgDataValue);
         manageLoading(element, settings, instance);
+
+
+
+
     }; // NOTE: THE TEMP IMAGE TRICK CANNOT BE DONE WITH data-multi-bg
     // BECAUSE INSIDE ITS VALUES MUST BE WRAPPED WITH URL() AND ONE OF THEM
     // COULD BE A GRADIENT BACKGROUND IMAGE
@@ -543,7 +552,7 @@
             elem.setAttribute('href', element.dataset.href);
         }
 
-        if (element.tagName === 'SCRIPT')
+        if (!isBot && element.tagName === 'SCRIPT')
         {
             elem = document.createElement('SCRIPT');
             elem.setAttribute('src', element.dataset.src);
@@ -551,6 +560,7 @@
 
         if (elem)
         {
+            /** переопределяем аттрибуты */
             element.getAttributeNames().forEach((function (e) {
 
                 if (e != 'data-src' && e != 'data-href' && e != 'class' ) {
@@ -563,16 +573,8 @@
                     {
                         elem.setAttribute(e.toString(), element.getAttribute(e));
                     }
-
-                    //console.log(elem);
-
-                    // console.log(element);
-                    // console.log(e.toString());
-                    // console.log(element.getAttribute(e));
-                    //elem.setAttribute(e.toString(), element.getAttribute(e));
                 }
             }));
-
 
             element.remove();
 
@@ -595,6 +597,11 @@
         addClass(element, settings.class_loading);
         setStatus(element, statusLoading);
         safeCallback(settings.callback_loading, element, instance);
+
+        element.removeAttribute('data-'+settings.data_bg);
+        element.removeAttribute('data-'+settings.data_bg_hidpi);
+        element.removeAttribute('data-'+settings.data_src);
+
     };
 
     var elementsWithLoadEvent = ["IMG", "IFRAME", "VIDEO", "SCRIPT"];

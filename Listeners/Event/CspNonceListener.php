@@ -56,11 +56,13 @@ final class CspNonceListener
         $nonce = $this->CspNonceGenerator->getNonce();
 
         $cspHeader = "
-            connect-src 'self' *.yandex.ru *.googleapis.com ws:;
-            script-src 'self' 'nonce-".$nonce."' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' *.yandex.ru *.google.com https:;
-            object-src 'self';
-            frame-src 'self' blob: https:;
+            connect-src 'self' https://mc.yandex.ru https://mc.yandex.com ws:;
+            script-src https://mc.yandex.ru https://yastatic.net 'self' 'nonce-".$nonce."' 'unsafe-inline' 'unsafe-eval' 'strict-dynamic' https:;
+            object-src 'none';
+            frame-src 'self' blob: https://mc.yandex.ru https://yandex.ru;
             base-uri 'none';
+            img-src 'self' data: https:;
+            child-src blob: https://mc.yandex.ru;
         ";
 
         $response->headers->set('Content-Security-Policy', str_replace(PHP_EOL, '', $cspHeader));
