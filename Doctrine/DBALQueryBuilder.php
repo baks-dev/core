@@ -121,7 +121,7 @@ final class DBALQueryBuilder extends QueryBuilder
      * Кешируем результат DBAL
      */
 
-    public function enableCache(string $namespace = null, int $ttl = 86400): self
+    public function enableCache(string $namespace = null, int $ttl = 86400, $refresh = true): self
     {
         $this->isCache = true;
         $this->ttl = $ttl + random_int(0, $ttl); // разбрасываем время кеша
@@ -139,25 +139,29 @@ final class DBALQueryBuilder extends QueryBuilder
             }, $this->getParameters()));
 
 
-        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
-
-        $lastDatetimeCache = $DatetimeCache->getItem('date.'.$this->cacheKey);
-        $lastDatetime = $lastDatetimeCache->get();
-
-        if($lastDatetime === null || time() > $lastDatetime)
+        if($refresh)
         {
-            /* Перезаписываем метку времени запроса */
-            $lastDatetimeCache->set(time() + random_int(3, 10));
-            $lastDatetimeCache->expiresAfter($this->ttl);
-            $DatetimeCache->save($lastDatetimeCache);
+            $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
 
-            if($lastDatetime)
+            $lastDatetimeCache = $DatetimeCache->getItem('date.'.$this->cacheKey);
+            $lastDatetime = $lastDatetimeCache->get();
+
+            if($lastDatetime === null || time() > $lastDatetime)
             {
-                /* Сбрасываем кеш для последующего запроса */
-                register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
-                register_shutdown_function([$this, 'resetCounter'], 'throw');
+                /* Перезаписываем метку времени запроса */
+                $lastDatetimeCache->set(time() + random_int(3, 10));
+                $lastDatetimeCache->expiresAfter($this->ttl);
+                $DatetimeCache->save($lastDatetimeCache);
+
+                if($lastDatetime)
+                {
+                    /* Сбрасываем кеш для последующего запроса */
+                    register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
+                    register_shutdown_function([$this, 'resetCounter'], 'throw');
+                }
             }
         }
+
 
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
 

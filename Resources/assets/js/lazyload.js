@@ -536,19 +536,28 @@
 
     let invokeScript = function scriptLoading(element) {
 
-        if (element.tagName === 'SCRIPT') {
+        let elem = null;
 
-            var elem = document.createElement('SCRIPT');
+        if (element.tagName === 'LINK') {
+            elem = document.createElement('LINK');
+            elem.setAttribute('href', element.dataset.href);
+        }
 
+        if (element.tagName === 'SCRIPT')
+        {
+            elem = document.createElement('SCRIPT');
+            elem.setAttribute('src', element.dataset.src);
+        }
+
+        if (elem)
+        {
             element.getAttributeNames().forEach((function (e) {
 
-                if (e != 'data-src' && e != 'class') {
+                if (e != 'data-src' && e != 'data-href' && e != 'class' ) {
 
                     if (e == 'data-nonce')
                     {
                         elem.setAttribute('nonce', element.getAttribute(e));
-
-
                     }
                     else
                     {
@@ -560,13 +569,11 @@
                     // console.log(element);
                     // console.log(e.toString());
                     // console.log(element.getAttribute(e));
-
                     //elem.setAttribute(e.toString(), element.getAttribute(e));
                 }
             }));
 
-            //elem.type = element.type;
-            elem.setAttribute('src', element.dataset.src);
+
             element.remove();
 
             if (typeof callback == "function") {
@@ -577,6 +584,7 @@
                 document.head.appendChild(elem);
             }, 100);
         }
+
     }
 
 
