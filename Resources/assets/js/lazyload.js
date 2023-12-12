@@ -36,10 +36,13 @@
 
         () => runningOnBrowser && !("onscroll" in window),
 
-        () => typeof navigator !== "undefined" && /(gle|ing|ro|dex|ya)bot|crawl|spider|lighthouse/i.test(navigator.userAgent),
+        () => typeof navigator !== "undefined" && /(gle|ing|ro|dex|ya)bot|crawl|spider/i.test(navigator.userAgent),
 
         //Phantomjs как правило, не имеет внутри себя браузерных плагинов
-        () => typeof navigator !== "undefined" && (navigator.plugins instanceof PluginArray) === false,
+        () => typeof navigator !== "undefined" && navigator.plugins instanceof PluginArray === false,
+
+        () => typeof navigator.userAgentData !== "undefined" && navigator.userAgentData.mobile === false && navigator.plugins.length === 0,
+
         //PhantomJs 1.x прокидывает 2 свойства в глобальный объект, проверим их
         () => (window.callPhantom || window._phantom),
         //PhantomJs и многие другие боты не
@@ -68,6 +71,7 @@
             break;
         }
     }
+
 
     var defaultSettings = {
         elements_selector: ".lazy",
@@ -545,6 +549,14 @@
 
     let invokeScript = function scriptLoading(element) {
 
+
+        if (isBot)
+        {
+            console.error('Только для пользователей');
+            return;
+        }
+
+
         let elem = null;
 
         if (element.tagName === 'LINK') {
@@ -552,7 +564,7 @@
             elem.setAttribute('href', element.dataset.href);
         }
 
-        if (!isBot && element.tagName === 'SCRIPT')
+        if (element.tagName === 'SCRIPT')
         {
             elem = document.createElement('SCRIPT');
             elem.setAttribute('src', element.dataset.src);
@@ -560,6 +572,31 @@
 
         if (elem)
         {
+
+            // console.error('Количество плагинов ' + navigator.plugins.length);
+            // // console.error('cookieEnabled ' + navigator.cookieEnabled);
+            // console.error('userAgentData mobile' + navigator.userAgentData.mobile);
+            // console.error('userAgentData platform' + navigator.userAgentData.platform);
+
+            // for (let i = 0; i < navigator.plugins.length; i++) {
+            //
+            //
+            //
+            //     let plg = navigator.plugins[i].name + ' < = >' +
+            //     navigator.plugins[i].filename + ' < = >' +
+            //      navigator.plugins[i].description + ' < = >' +
+            //      navigator.plugins[i].version ?? "version undefened";
+            //
+            //     console.error(plg);
+            //
+            // }
+
+            // console.error(navigator.plugins);
+            // console.error(navigator.appCodeName);
+            // console.error(navigator.appName);
+            // console.error(navigator.connection);
+            // console.error(/(gle|ing|ro|dex|ya)bot|crawl|spider|lighthouse/i.test(navigator.userAgent));
+
             /** переопределяем аттрибуты */
             element.getAttributeNames().forEach((function (e) {
 
@@ -586,7 +623,6 @@
                 document.head.appendChild(elem);
             }, 100);
         }
-
     }
 
 
@@ -631,7 +667,7 @@
     };
 
     var hasEventListeners = function hasEventListeners(element) {
-        
+
         return !!element.llEvLisnrs;
     };
 

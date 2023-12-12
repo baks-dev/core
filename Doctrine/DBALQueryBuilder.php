@@ -30,6 +30,7 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use BaksDev\Core\Type\Locale\Locale;
+use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use DateInterval;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
@@ -279,8 +280,13 @@ final class DBALQueryBuilder extends QueryBuilder
         $exist->select(($not ? 'NOT ' : '').' EXISTS('.$this->getSQL().')');
         $exist->setParameters($this->getParameters());
 
-        return (bool) $exist->executeQuery()->fetchOne();
+        $result = $this->isCache ?
+            $this->executeCacheQuery()->fetchOne() :
+            $this->executeQuery()->fetchOne();
+
+        return (bool) $result;
     }
+
 
     private function executeCacheQuery(): Result
     {
@@ -464,7 +470,6 @@ final class DBALQueryBuilder extends QueryBuilder
             }
 
 
-
             $this->addGroupBy($field);
         }
 
@@ -624,13 +629,27 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
+
+    public function exists($fromAlias, $existClass, $alias, $condition = null): DBALQueryBuilder
+    {
+        $exist = $this->createQueryBuilder(self::class);
+
+        $exist->select('1');
+        $exist->from($this->getTableNameFromClass($existClass), $alias);
+        $exist->where($condition);
+
+        $this->andWhere('EXISTS('.$exist->getSQL().')');
+
+        return $exist;
+    }
+
     public function leftJoin($fromAlias, $join, $alias, $condition = null): self
     {
         $this->add('join', [
             $fromAlias => [
-                'joinType'      => 'left',
-                'joinTable'     => $this->getTableNameFromClass($join),
-                'joinAlias'     => $alias,
+                'joinType' => 'left',
+                'joinTable' => $this->getTableNameFromClass($join),
+                'joinAlias' => $alias,
                 'joinCondition' => $condition,
             ],
         ], true);
@@ -648,6 +667,13 @@ final class DBALQueryBuilder extends QueryBuilder
         );
 
         return $this;
+    }
+
+
+    public function analyze(): void
+    {
+        $analyze = $this->connection->prepare('EXPLAIN (ANALYZE)  '.$this->getSQL())->executeQuery($this->getParameters())->fetchAllAssociativeIndexed();
+        dd($analyze);
     }
 
     private function getTableNameFromClass(string $class): string
