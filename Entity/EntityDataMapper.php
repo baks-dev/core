@@ -131,8 +131,6 @@ abstract class EntityDataMapper
                 }
 
 
-
-
                 /** Если связь OneToOne */
                 $modifiers = new ReflectionProperty($this, $propertyName);
                 $attr = $modifiers->getAttributes(OneToOne::class);
@@ -155,8 +153,6 @@ abstract class EntityDataMapper
                         continue;
                     }
                 }
-
-
             }
 
 
@@ -202,10 +198,11 @@ abstract class EntityDataMapper
         return $dto;
     }
 
+
+
+
     public function setEntity($dto): mixed
     {
-
-
 
         //        if($this->remove === null)
         //        {
@@ -563,7 +560,12 @@ abstract class EntityDataMapper
 
                 if($Attr)
                 {
-                    $hash[$property->getName()] = (string) $this->getPropertyValue($property->getName(), $this);
+                    $keyHashName =  $this->getPropertyValue($property->getName(), $this);
+
+                    if($keyHashName !== 'not_initialized')
+                    {
+                        $hash[$property->getName()] = (string) $keyHashName;
+                    }
                 }
             }
 

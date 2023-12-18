@@ -529,13 +529,13 @@ async function submitModalForm(forms) {
 
             setTimeout(function initResolve() {
                 if (typeof resolve == 'function') {
-                    resolve(forms, data.arguments);
+                    resolve(data);
                     return;
                 }
                 console.log('resolve not found');
 
                 if (resolved > 1000) { return; }
-                resolved += 100;
+                resolved = resolved * 2;
                 setTimeout(initResolve, resolved);
 
             }, 100);
@@ -552,6 +552,8 @@ async function submitModalForm(forms) {
 
 /** Отправка по ссылке */
 async function submitLink(href, id = null) {
+
+    let resolved = 100;
 
     // /* показываем индикатор */
     //let indicator = forms.querySelector('.spinner-border');
@@ -588,7 +590,6 @@ async function submitLink(href, id = null) {
 
         .then((data) => {
 
-
             if (data === undefined) {
 
                 return false;
@@ -604,6 +605,25 @@ async function submitLink(href, id = null) {
                 window.location.href = data.redirect;
                 return false;
             }
+
+            setTimeout(function HunLIOPGlZ() {
+
+                console.log(typeof resolve);
+
+                if (typeof resolve == 'function') {
+                    resolve(data);
+                    return;
+                }
+
+                console.log('resolve not found');
+
+                if (resolved > 1000) { return; }
+                resolved = resolved * 2;
+                setTimeout(HunLIOPGlZ, resolved);
+
+            }, 100);
+
+
 
             createToast(data);
 

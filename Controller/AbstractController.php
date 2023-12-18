@@ -18,6 +18,7 @@
 
 namespace BaksDev\Core\Controller;
 
+use BaksDev\Core\Cache\CacheCss\CacheCssInterface;
 use BaksDev\Core\Type\Locale\Locale;
 use BaksDev\Settings\Main\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -62,6 +63,7 @@ abstract class AbstractController
     private SettingsMainInterface $getSettingsMain;
 
     private string $project_dir;
+    private CacheCssInterface $cacheCss;
 
 
     public function __construct(
@@ -74,6 +76,7 @@ abstract class AbstractController
         TranslatorInterface $translator,
         TokenStorageInterface $tokenStorage,
         SettingsMainInterface $getSettingsMain,
+        CacheCssInterface $cacheCss
     )
     {
         $this->authorizationChecker = $authorizationChecker;
@@ -85,6 +88,7 @@ abstract class AbstractController
         $this->getSettingsMain = $getSettingsMain;
         $this->router = $router;
         $this->project_dir = $project_dir;
+        $this->cacheCss = $cacheCss;
     }
 
 
@@ -333,7 +337,6 @@ abstract class AbstractController
         }
 
 
-
         /**
          * Подключаем шаблон в директории @App
          */
@@ -354,23 +357,33 @@ abstract class AbstractController
          */
         if($content === null)
         {
-
             $view = $moduleTemplateName.'/'.$fileName;
             $content = $this->environment->render($view, $parameters);
-
-
         }
-
-
 
         if($response === null)
         {
             $response = new Response();
         }
 
+        $content = $this->cacheCss->getStyle(
+            $fileName,
+            $content,
+            $module,
+            $route,
+            $this->requestStack->getCurrentRequest()->headers->get('x-device'),
+            (bool) $this->getUsr()
+        );
+
+
         $content = $this->contentMinify($content);
 
         $response->setContent($content);
+
+
+        //dump($response->getContent());
+
+
 
         return $response;
     }

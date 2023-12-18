@@ -60,15 +60,13 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
 
     <link rel="preload" as="style" href="/assets/css/base.min.css"/>
-    <link rel="preload" as="style" href="/assets/css/original.min.css"/>
+    {#<link rel="preload" as="style" href="/assets/css/original.min.css"/>#}
 
     <link rel="preload" as="image" href="/logo.webp"/>
 
+    <style></style>
 
     <link href="/assets/css/base.min.css" rel="stylesheet">
-    <link href="/assets/css/original.min.css" rel="stylesheet">
-
-    {# <link href="/assets/css/original.min.css" rel="stylesheet"> #}
 
     {# БЛОК ДЛЯ ВСТАВКИ CSS #}
     {% block stylesheets %}
@@ -91,7 +89,6 @@
 {% block footer %}
     {{ include(_self|replace({ "base.html.twig":baks_settings.device~"/footer.html.twig" })) }}
 {% endblock %}
-
 
 <script nonce="{{ csp_nonce() }}">
     const $lang = '{{ app.request.getLocale() }}';

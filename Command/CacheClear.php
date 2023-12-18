@@ -31,8 +31,10 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Process\Process;
 
@@ -54,33 +56,49 @@ class CacheClear extends Command
     }
 
 
+
+    protected function configure(): void
+    {
+        $this->addArgument('module', InputArgument::OPTIONAL, 'Модуль');
+    }
+
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $module = $input->getArgument('module');
 
         $path = $this->project_dir.'/vendor/baks-dev';
 
-        /** @var DirectoryIterator $module */
-        foreach(new DirectoryIterator($path) as $module)
+        if($module)
         {
-            if($module->isDot())
+            $io = new SymfonyStyle($input, $output);
+
+            if(is_dir($path.'/'.$module))
             {
-                continue;
+                $this->clearModule($module);
+                $io->success(sprintf('Кеш модуля %s успешно удален', mb_strtoupper($module)));
+
+                return Command::SUCCESS;
             }
 
-            if($module->isDir())
-            {
-                $appCache = $this->appCache->init($module->getFilename());
-                $appCache->clear();
+            $io->error(sprintf('Невозможно определить кеш модуля %s', mb_strtoupper($module)));
+            return Command::FAILURE;
 
-                if(function_exists('apcu_enabled') && apcu_enabled())
+        }
+        else
+        {
+            /** @var DirectoryIterator $module */
+            foreach(new DirectoryIterator($path) as $module)
+            {
+                if($module->isDot())
                 {
-                    $apcuCache = new ApcuAdapter($module->getFilename());
-                    $apcuCache->clear();
+                    continue;
                 }
 
-                $fileCache = new FilesystemAdapter($module->getFilename());
-                $fileCache->clear();
-
+                if($module->isDir())
+                {
+                    $this->clearModule($module->getFilename());
+                }
             }
         }
 
@@ -108,4 +126,21 @@ class CacheClear extends Command
         return Command::SUCCESS;
 
     }
+
+
+    public function clearModule(string $module): void
+    {
+            $appCache = $this->appCache->init($module);
+            $appCache->clear();
+
+            if(function_exists('apcu_enabled') && apcu_enabled())
+            {
+                $apcuCache = new ApcuAdapter($module);
+                $apcuCache->clear();
+            }
+
+            $fileCache = new FilesystemAdapter($module);
+            $fileCache->clear();
+    }
+
 }

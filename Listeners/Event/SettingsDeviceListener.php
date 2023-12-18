@@ -81,6 +81,8 @@ final class SettingsDeviceListener
             $device = 'pc';
         }
 
+        $event->getRequest()->headers->set('x-device', $device);
+
         $globals = $this->twig->getGlobals();
         $baks_settings = $globals['baks_settings'] ?? [];
         $this->twig->addGlobal('baks_settings', array_replace_recursive($baks_settings, ['device' => $device]));

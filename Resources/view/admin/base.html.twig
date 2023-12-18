@@ -51,14 +51,14 @@
 		<meta name="twitter:description" content="{{ baks_settings.description is defined ? baks_settings.description : null }}">
 		<meta name="twitter:image:src" content="{{ absolute_url('/img/logo.webp') }}">
 	{% endblock %} #}
-	
-	<link href="/assets/css/base.min.css" rel="stylesheet">
-	<link href="/assets/css/original.min.css" rel="stylesheet">
-	{# <link href="/assets/css/original.min.css" rel="stylesheet"> #}
-	
-	{# БЛОК ДЛЯ ВСТАВКИ CSS #}
+
+
+	{# БЛОК ДЛЯ ВСТАВКИ CSS COMPRESS #}
+
 	<style></style>
-	
+
+	<link href="/assets/css/base.min.css" rel="stylesheet">
+
 	{% block stylesheets %}
 	
 	{% endblock %}
@@ -73,6 +73,7 @@
 {% endblock %}
 
 {% block content %}{% endblock %}
+
 
 <script nonce="{{ csp_nonce() }}">
     const $lang = '{{ app.request.getLocale() }}';
