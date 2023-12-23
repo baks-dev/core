@@ -114,11 +114,11 @@ function NiceSelect(element, options, reset = false) {
         this.create();
     }
 
-
 }
 
 NiceSelect.prototype.create = function () {
-    this.el.style.display = "none";
+    this.el.style.setProperty("display", "none", "important")
+
     if (this.data) {
         this.processData(this.data);
     } else {

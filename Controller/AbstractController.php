@@ -366,6 +366,8 @@ abstract class AbstractController
             $response = new Response();
         }
 
+        $content = $this->contentMinify($content);
+
         $content = $this->cacheCss->getStyle(
             $fileName,
             $content,
@@ -375,15 +377,7 @@ abstract class AbstractController
             (bool) $this->getUsr()
         );
 
-
-        $content = $this->contentMinify($content);
-
         $response->setContent($content);
-
-
-        //dump($response->getContent());
-
-
 
         return $response;
     }
