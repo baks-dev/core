@@ -6,6 +6,9 @@
     'use strict';
 
     function _extends() {
+
+        // console.log('START _extends');
+
         _extends = Object.assign || function (target) {
             for (var i = 1; i < arguments.length; i++) {
                 var source = arguments[i];
@@ -20,16 +23,21 @@
             return target;
         };
 
+        // console.log('END _extends');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+
         return _extends.apply(this, arguments);
     }
 
     var runningOnBrowser = typeof window !== "undefined";
-    //var isBot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro)bot|crawl|spider/i.test(navigator.userAgent);
+    //var isRobot = runningOnBrowser && !("onscroll" in window) || typeof navigator !== "undefined" && /(gle|ing|ro)bot|crawl|spider/i.test(navigator.userAgent);
     var supportsIntersectionObserver = runningOnBrowser && "IntersectionObserver" in window;
     var supportsClassList = runningOnBrowser && "classList" in document.createElement("p");
     var isHiDpi = runningOnBrowser && window.devicePixelRatio > 1;
 
-    let isBot = false;
+    var isRobot = false;
 
 
     var rules = [
@@ -67,15 +75,18 @@
     //Проверяем правила
     for (let i = 0; i < rules.length; i++) {
         if (rules[i]() === true) {
-            isBot = true;
+            isRobot = true;
             break;
         }
     }
 
+    // // console.log('isRobot');
+    // // console.log(isRobot);
+
 
     var defaultSettings = {
         elements_selector: ".lazy",
-        container: isBot || runningOnBrowser ? document : null,
+        container: isRobot || runningOnBrowser ? document : null,
         threshold: 300,
         thresholds: null,
         data_src: "src",
@@ -105,6 +116,8 @@
         callback_cancel: null,
         use_native: false
     };
+
+
     var getExtendedSettings = function getExtendedSettings(customSettings) {
         return _extends({}, defaultSettings, customSettings);
     };
@@ -113,18 +126,23 @@
     var createInstance = function createInstance(classObj, options) {
 
 
+        // console.log('STATR createInstance');
+
         var event;
         var eventString = "LazyLoad::Initialized";
         var instance = new classObj(options);
 
         try {
+
             // Works in modern browsers
             event = new CustomEvent(eventString, {
                 detail: {
                     instance: instance
                 }
             });
+
         } catch (err) {
+
             // Works in Internet Explorer (all versions)
             event = document.createEvent("CustomEvent");
             event.initCustomEvent(eventString, false, false, {
@@ -133,6 +151,12 @@
         }
 
         window.dispatchEvent(event);
+
+        // console.log('END createInstance *****************************');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+
     };
 
 
@@ -141,20 +165,24 @@
 
 
     var autoInitialize = function autoInitialize(classObj, options) {
+
         if (!options) {
             return;
         }
 
         if (!options.length) {
+
             // Plain object
             createInstance(classObj, options);
         } else {
+
             // Array of objects
             for (var i = 0, optionsItem; optionsItem = options[i]; i += 1) {
                 createInstance(classObj, optionsItem);
             }
         }
     };
+
 
     var statusLoading = "loading";
     var statusLoaded = "loaded";
@@ -165,11 +193,30 @@
 
     var dataPrefix = "data-";
     var statusDataName = "ll-status";
+
+
     var getData = function getData(element, attribute) {
+
+        // console.log('START getData');
+
+        // console.log(element);
+
+        // console.log('END getData **************************');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+
+
 
         return element.getAttribute(dataPrefix + attribute);
     };
+
+
     var setData = function setData(element, attribute, value) {
+
+        // console.log('START setData');
+        // console.log(element);
+
         var attrName = dataPrefix + attribute;
 
         if (value === null) {
@@ -177,13 +224,18 @@
             return;
         }
 
-        if (value === 'error')
-        {
+        if (value === 'error') {
             element.classList.add('border');
             element.classList.add('border-danger');
         }
 
         element.setAttribute(attrName, value);
+
+        // console.log('END setData ******************');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+
     };
 
     var getStatus = function getStatus(element) {
@@ -228,26 +280,54 @@
         return statusesAfterLoading.indexOf(getStatus(element)) >= 0;
     };
 
+
     var safeCallback = function safeCallback(callback, arg1, arg2, arg3) {
 
+        // console.log('START safeCallback');
+
+
         if (!callback) {
+
+            // console.log('START safeCallback 1 ***********************');
+            // console.log('*');
+            // console.log('*');
+            // console.log('*');
+
             return;
         }
 
         if (arg3 !== undefined) {
+
+            // console.log('START safeCallback 2 ***********************');
+            // console.log('*');
+            // console.log('*');
+            // console.log('*');
+
             callback(arg1, arg2, arg3);
             return;
         }
 
         if (arg2 !== undefined) {
+
+            // console.log('START safeCallback 3 ***********************');
+            // console.log('*');
+            // console.log('*');
+            // console.log('*');
+
             callback(arg1, arg2);
             return;
         }
+
+        // console.log('START safeCallback 1 ***********************');
 
         callback(arg1);
     };
 
     var addClass = function addClass(element, className) {
+
+        // console.log('START addClass');
+        // console.log(element);
+
 
         if (supportsClassList) {
             element.classList.add(className);
@@ -255,10 +335,16 @@
         }
 
         element.className += (element.className ? " " : "") + className;
+
+        // console.log('END addClass');
+        // console.log('*');
+        // console.log('*');
+
     };
 
     var removeClass = function removeClass(element, className) {
 
+        // console.log('START removeClass');
 
         if (supportsClassList) {
             element.classList.remove(className);
@@ -266,19 +352,24 @@
         }
 
         element.className = element.className.replace(new RegExp("(^|\\s+)" + className + "(\\s+|$)"), " ").replace(/^\s+/, "").replace(/\s+$/, "");
+
+        // console.log('END removeClass');
+        // console.log('*');
+        // console.log('*');
     };
 
     var addTempImage = function addTempImage(element) {
-
+        // console.log('START addTempImage');
         element.llTempImage = document.createElement("IMG");
     };
 
     var deleteTempImage = function deleteTempImage(element) {
-
+        // console.log('START deleteTempImage');
         delete element.llTempImage;
     };
-    var getTempImage = function getTempImage(element) {
 
+    var getTempImage = function getTempImage(element) {
+        // console.log('START getTempImage');
         return element.llTempImage;
     };
 
@@ -297,38 +388,72 @@
 
     var unobserve = function unobserve(element, instance) {
 
+        // console.log('START unobserve');
 
         if (!instance) return;
         var observer = instance._observer;
         if (!observer) return;
         observer.unobserve(element);
+
+        // console.log('END unobserve');
+        // console.log('*');
+        // console.log('*');
     };
 
     var resetObserver = function resetObserver(observer) {
+
+        // console.log('START resetObserver');
+
         observer.disconnect();
+
+        // console.log('END resetObserver');
+        // console.log('*');
+        // console.log('*');
     };
 
     var unobserveEntered = function unobserveEntered(element, settings, instance) {
+        // console.log('START unobserveEntered');
 
         if (settings.unobserve_entered) unobserve(element, instance);
+
+        // console.log('END unobserveEntered');
+        // console.log('*');
+        // console.log('*');
     };
 
     var updateLoadingCount = function updateLoadingCount(instance, delta) {
+        // console.log('START updateLoadingCount');
 
         if (!instance) return;
         instance.loadingCount += delta;
+
+        // console.log('END updateLoadingCount');
+        // console.log('*');
+        // console.log('*');
     };
 
     var decreaseToLoadCount = function decreaseToLoadCount(instance) {
 
+        // console.log('START decreaseToLoadCount');
+
         if (!instance) return;
         instance.toLoadCount -= 1;
+
+        // console.log('END decreaseToLoadCount');
+        // console.log('*');
+        // console.log('*');
     };
 
     var setToLoadCount = function setToLoadCount(instance, value) {
 
+        // console.log('START decreaseToLoadCount');
+
         if (!instance) return;
         instance.toLoadCount = value;
+
+        // console.log('END decreaseToLoadCount');
+        // console.log('*');
+        // console.log('*');
     };
 
     var isSomethingLoading = function isSomethingLoading(instance) {
@@ -341,8 +466,12 @@
         return instance.toLoadCount > 0;
     };
 
+
+
     var getSourceTags = function getSourceTags(parentTag) {
 
+        // console.log('START getSourceTags');
+        // console.log(parentTag);
 
         var sourceTags = [];
 
@@ -352,17 +481,29 @@
             }
         }
 
+        // console.log('END getSourceTags');
+        // console.log('*');
+        // console.log('*');
+
         return sourceTags;
     };
 
+
+
     var setAttributeIfValue = function setAttributeIfValue(element, attrName, value) {
 
+        // console.log('START setAttributeIfValue');
+        // console.log(element);
 
         if (!value) {
             return;
         }
 
         element.setAttribute(attrName, value);
+
+        // console.log('END setAttributeIfValue');
+        // console.log('*');
+        // console.log('*');
     };
 
     var resetAttribute = function resetAttribute(element, attrName) {
@@ -374,6 +515,9 @@
 
         return !!element.llOriginalAttrs;
     };
+
+
+    /** ИЗОБРАЖЕНИЯ */
 
     var saveOriginalImageAttributes = function saveOriginalImageAttributes(element) {
 
@@ -430,11 +574,26 @@
     };
 
 
+    /** ВИДЕО */
+
     var forEachVideoSource = function forEachVideoSource(element, fn) {
 
         var sourceTags = getSourceTags(element);
         sourceTags.forEach(fn);
     };
+
+    var setSourcesVideo = function setSourcesVideo(element, settings) {
+        forEachVideoSource(element, function (sourceTag) {
+            setAttributeIfValue(sourceTag, "src", getData(sourceTag, settings.data_src));
+        });
+
+        setAttributeIfValue(element, "poster", getData(element, settings.data_poster));
+        setAttributeIfValue(element, "src", getData(element, settings.data_src));
+        element.load();
+    };
+
+
+    /** IMG */
 
     var restoreOriginalAttributesImg = function restoreOriginalAttributesImg(element) {
 
@@ -446,7 +605,6 @@
 
 
     var setSourcesImg = function setSourcesImg(element, settings) {
-
 
         forEachPictureSource(element, function (sourceTag) {
             saveOriginalImageAttributes(sourceTag);
@@ -466,19 +624,10 @@
     };
 
 
+    /** IFRAME */
+
     var setSourcesIframe = function setSourcesIframe(element, settings) {
-
         setAttributeIfValue(element, "src", getData(element, settings.data_src));
-    };
-
-
-    var setSourcesVideo = function setSourcesVideo(element, settings) {
-        forEachVideoSource(element, function (sourceTag) {
-            setAttributeIfValue(sourceTag, "src", getData(sourceTag, settings.data_src));
-        });
-        setAttributeIfValue(element, "poster", getData(element, settings.data_poster));
-        setAttributeIfValue(element, "src", getData(element, settings.data_src));
-        element.load();
     };
 
 
@@ -498,8 +647,6 @@
         element.style.backgroundImage = "url(\"".concat(bgDataValue, "\")");
         getTempImage(element).setAttribute("src", bgDataValue);
         manageLoading(element, settings, instance);
-
-
 
 
     }; // NOTE: THE TEMP IMAGE TRICK CANNOT BE DONE WITH data-multi-bg
@@ -523,6 +670,9 @@
 
     var setSources = function setSources(element, settings) {
 
+        // console.log('STAR setSources');
+
+        // console.log(element);
 
         var setSourcesFunction = setSourcesFunctions[element.tagName];
 
@@ -531,30 +681,45 @@
         }
 
         setSourcesFunction(element, settings);
+
+        // console.log('END setSources');
+        // console.log('*');
+        // console.log('*');
     };
 
 
     var manageApplied = function manageApplied(element, settings, instance) {
 
+        // console.log('START manageApplied');
+
         addClass(element, settings.class_applied);
         setStatus(element, statusApplied);
 
         if (settings.unobserve_completed) {
-            // Unobserve now because we can't do it on load
+            // console.log(settings.unobserve_completed);
+            // Отменить наблюдение сейчас, потому что мы не можем сделать это при загрузке
             unobserve(element, settings);
         }
 
+        // console.log('bind safeCallback');
         safeCallback(settings.callback_applied, element, instance);
+
+
+        // console.log('END manageApplied');
+        // console.log('*');
+        // console.log('*');
     };
+
 
     let invokeScript = function scriptLoading(element) {
 
 
-        if (isBot)
-        {
-            console.error('Только для пользователей');
-            return;
-        }
+        // console.log('invokeScript '+element.tagName);
+
+        // if (isRobot) {
+        //     console.error('Только для пользователей');
+        //     return;
+        // }
 
 
         let elem = null;
@@ -562,16 +727,19 @@
         if (element.tagName === 'LINK') {
             elem = document.createElement('LINK');
             elem.setAttribute('href', element.dataset.href);
+
+            // console.log(element.dataset.href);
         }
 
-        if (element.tagName === 'SCRIPT')
-        {
+        if (element.tagName === 'SCRIPT') {
             elem = document.createElement('SCRIPT');
             elem.setAttribute('src', element.dataset.src);
+
+            // console.log(element.dataset.src);
         }
 
-        if (elem)
-        {
+
+        if (elem) {
 
             // console.error('Количество плагинов ' + navigator.plugins.length);
             // // console.error('cookieEnabled ' + navigator.cookieEnabled);
@@ -597,21 +765,24 @@
             // console.error(navigator.connection);
             // console.error(/(gle|ing|ro|dex|ya)bot|crawl|spider|lighthouse/i.test(navigator.userAgent));
 
+
             /** переопределяем аттрибуты */
-            element.getAttributeNames().forEach((function (e) {
 
-                if (e != 'data-src' && e != 'data-href' && e != 'class' ) {
 
-                    if (e == 'data-nonce')
-                    {
-                        elem.setAttribute('nonce', element.getAttribute(e));
+            if (element instanceof Element && typeof element.getAttributeNames == 'function') {
+                element.getAttributeNames().forEach((function (e) {
+
+                    if (e != 'data-src' && e != 'data-href' && e != 'class') {
+
+                        if (e == 'data-nonce') {
+                            elem.setAttribute('nonce', element.getAttribute(e));
+                        } else {
+                            elem.setAttribute(e.toString(), element.getAttribute(e));
+                        }
                     }
-                    else
-                    {
-                        elem.setAttribute(e.toString(), element.getAttribute(e));
-                    }
-                }
-            }));
+                }));
+            }
+
 
             element.remove();
 
@@ -621,29 +792,65 @@
 
             setTimeout(function () {
                 document.head.appendChild(elem);
+
+                // console.log('appendChild SCRIPT');
             }, 100);
         }
+
+        // console.log('END invokeScript');
+        // console.log(element);
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
     }
 
 
     var manageLoading = function manageLoading(element, settings, instance) {
 
-        invokeScript(element);
+        // console.log('START manageLoading');
+        // console.log(element);
+
         updateLoadingCount(instance, +1);
         addClass(element, settings.class_loading);
         setStatus(element, statusLoading);
         safeCallback(settings.callback_loading, element, instance);
 
-        element.removeAttribute('data-'+settings.data_bg);
-        element.removeAttribute('data-'+settings.data_bg_hidpi);
-        element.removeAttribute('data-'+settings.data_src);
+        element.removeAttribute('data-' + settings.data_bg);
+        element.removeAttribute('data-' + settings.data_bg_hidpi);
+        element.removeAttribute('data-' + settings.data_src);
+
+        // console.log('END manageLoading');
+
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
 
     };
 
-    var elementsWithLoadEvent = ["IMG", "IFRAME", "VIDEO", "SCRIPT"];
+    var elementsWithLoadEvent = ["IMG", "IFRAME", "VIDEO"];
     var hasLoadEvent = function hasLoadEvent(element) {
-
-
         return elementsWithLoadEvent.indexOf(element.tagName) > -1;
     };
 
@@ -764,6 +971,9 @@
 
     var loadRegular = function loadRegular(element, settings, instance) {
 
+        // console.log('loadRegular');
+        // console.log(element);
+
         addOneShotEventListeners(element, settings, instance);
         setSources(element, settings);
         manageLoading(element, settings, instance);
@@ -772,7 +982,13 @@
 
     var load = function load(element, settings, instance) {
 
+
+        // console.log('load');
+        // console.log(element);
+
         if (hasLoadEvent(element)) {
+
+
             loadRegular(element, settings, instance);
         } else {
             loadBackground(element, settings, instance);
@@ -781,6 +997,9 @@
 
 
     var loadNative = function loadNative(element, settings, instance) {
+
+        // console.log('loadNative');
+
         addOneShotEventListeners(element, settings, instance);
         setSources(element, settings);
         setStatus(element, statusNative);
@@ -805,6 +1024,10 @@
 
 
     var onEnter = function onEnter(element, entry, settings, instance) {
+
+        // console.log('onEnter');
+        // console.log(element);
+
         setStatus(element, statusEntered);
         addClass(element, settings.class_entered);
         removeClass(element, settings.class_exited);
@@ -818,13 +1041,20 @@
 
     var onExit = function onExit(element, entry, settings, instance) {
 
-        invokeScript(element);
+        // console.log('START onExit');
+        // console.log(element);
+
+
 
         if (hasEmptyStatus(element)) return; //Игнорировать первый проход при посадке
 
         addClass(element, settings.class_exited);
         cancelLoading(element, entry, settings, instance);
         safeCallback(settings.callback_exit, element, entry, instance);
+
+        // console.log('END onExit');
+        // console.log('*');
+        // console.log('*');
     };
 
     var tagsWithNativeLazy = ["IMG", "IFRAME", "SCRIPT"];
@@ -838,7 +1068,13 @@
 
     var loadAllNative = function loadAllNative(elements, settings, instance) {
 
+
+        // console.log('loadAllNative');
+
         elements.forEach(function (element) {
+
+
+            // console.log(elements);
 
             if (tagsWithNativeLazy.indexOf(element.tagName) === -1) {
                 return;
@@ -849,8 +1085,14 @@
             loadNative(element, settings, instance);
         });
 
+
         setToLoadCount(instance, 0);
+
+
+        // console.log('*************');
+
     };
+
 
     var isIntersecting = function isIntersecting(entry) {
         return entry.isIntersecting || entry.intersectionRatio > 0;
@@ -867,11 +1109,25 @@
     var intersectionHandler = function intersectionHandler(entries, settings, instance) {
 
         entries.forEach(function (entry) {
+
+            invokeScript(entry.target);
+
+            // console.log('intersectionHandler');
+            // console.log(entry.target);
+
             return isIntersecting(entry) ? onEnter(entry.target, entry, settings, instance) : onExit(entry.target, entry, settings, instance);
         });
     };
 
     var observeElements = function observeElements(observer, elements) {
+
+        // console.log('observeElements');
+        //elements.forEach(function (element) {
+            // console.log(element);
+        //});
+
+        // console.log('*************');
+
 
         elements.forEach(function (element) {
             observer.observe(element);
@@ -880,19 +1136,57 @@
 
     var updateObserver = function updateObserver(observer, elementsToObserve) {
 
+        // console.log('START updateObserver');
+
+        //elementsToObserve.forEach(function (element) {
+            // console.log(element);
+       // });
+
+        // console.log('bind resetObserver');
         resetObserver(observer);
+
+
+        // console.log('bind observeElements');
         observeElements(observer, elementsToObserve);
+
+
+        // console.log('END updateObserver');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+
     };
 
     var setObserver = function setObserver(settings, instance) {
+
+        // console.log('START setObserver');
 
         if (!supportsIntersectionObserver || shouldUseNative(settings)) {
             return;
         }
 
         instance._observer = new IntersectionObserver(function (entries) {
+
+
+            // console.log('START IntersectionObserver');
+
+            //entries.forEach(function (element) {
+                // console.log(element.target);
+            //});
+
             intersectionHandler(entries, settings, instance);
+
+            // console.log('END IntersectionObserver');
+
+
         }, getObserverSettings(settings));
+
+
+        // console.log('END setObserver ******************************');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
+
     };
 
 
@@ -902,37 +1196,47 @@
 
 
     var queryElements = function queryElements(settings) {
+
         return settings.container.querySelectorAll(settings.elements_selector);
     };
 
 
     var excludeManagedElements = function excludeManagedElements(elements) {
+
         return toArray(elements).filter(hasEmptyStatus);
     };
 
 
     var hasError = function hasError(element) {
+
         return hasStatusError(element);
     };
 
 
     var filterErrorElements = function filterErrorElements(elements) {
+
         return toArray(elements).filter(hasError);
     };
 
     var getElementsToLoad = function getElementsToLoad(elements, settings) {
+
         return excludeManagedElements(elements || queryElements(settings));
     };
+
+
 
     var retryLazyLoad = function retryLazyLoad(settings, instance) {
 
         var errorElements = filterErrorElements(queryElements(settings));
+
         errorElements.forEach(function (element) {
             removeClass(element, settings.class_error);
             resetStatus(element);
         });
+
         instance.update();
     };
+
 
     var setOnlineCheck = function setOnlineCheck(settings, instance) {
 
@@ -945,15 +1249,30 @@
         });
     };
 
+
     var LazyLoad = function LazyLoad(customSettings, elements) {
 
+        // console.log('START LazyLoad');
+        // console.log(elements);
+
         var settings = getExtendedSettings(customSettings);
+
         this._settings = settings;
         this.loadingCount = 0;
+
+        // console.log('bind setObserver');
         setObserver(settings, this);
+
+        // console.log('bind setOnlineCheck');
         setOnlineCheck(settings, this);
+
         this.update(elements);
 
+
+        // console.log('END LazyLoad **************************');
+        // console.log('*');
+        // console.log('*');
+        // console.log('*');
 
     };
 
@@ -961,27 +1280,43 @@
 
 
         update: function update(givenNodeset) {
+            LazyLoad.prototype
+
+            // console.log('START LazyLoad.prototype');
 
             var settings = this._settings;
+
             var elementsToLoad = getElementsToLoad(givenNodeset, settings);
 
             setToLoadCount(this, elementsToLoad.length);
 
 
-            if (isBot || !supportsIntersectionObserver) {
+            if (isRobot || !supportsIntersectionObserver) {
+
+
                 this.loadAll(elementsToLoad);
                 return;
             }
 
             if (shouldUseNative(settings)) {
+
+
                 loadAllNative(elementsToLoad, settings, this);
                 return;
             }
 
             updateObserver(this._observer, elementsToLoad);
+
+
+            // console.log('END LazyLoad.prototype *****************');
+            // console.log('*');
+            // console.log('*');
+            // console.log('*');
+
         },
 
         destroy: function destroy() {
+
 
             // Observer
             if (this._observer) {
@@ -991,7 +1326,7 @@
 
             queryElements(this._settings).forEach(function (element) {
                 delete element.llOriginalAttrs;
-            }); // Delete all internal props
+            }); //Удалить все внутренние реквизиты
 
             delete this._observer;
             delete this._settings;
@@ -1001,17 +1336,15 @@
 
         loadAll: function loadAll(elements) {
 
-            if (isBot) {
-                elements = elements.filter(v => (v.tagName !== 'SCRIPT' && v.tagName !== 'IFRAME'))
-            }
-
             var _this = this;
 
             var settings = this._settings;
             var elementsToLoad = getElementsToLoad(elements, settings);
 
-
             elementsToLoad.forEach(function (element) {
+
+                // console.log(element);
+
                 unobserve(element, _this);
                 load(element, settings, _this);
             });
@@ -1019,20 +1352,25 @@
     };
 
     LazyLoad.load = function (element, customSettings) {
+
         var settings = getExtendedSettings(customSettings);
         load(element, settings);
     };
 
     LazyLoad.resetStatus = function (element) {
 
+
         resetStatus(element);
     }; // Automatic instances creation if required (useful for async script loading)
 
 
     if (runningOnBrowser) {
+
         autoInitialize(LazyLoad, window.lazyLoadOptions);
     }
 
     return LazyLoad;
 
 })));
+
+//  invokeScript(element);

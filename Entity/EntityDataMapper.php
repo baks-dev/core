@@ -112,6 +112,7 @@ abstract class EntityDataMapper
                 continue;
             }
 
+
             // Если тип свойства - класс
             if($type !== false)
             {
@@ -173,16 +174,14 @@ abstract class EntityDataMapper
             /** Если имеется сеттер - присваиваем через метод */
             elseif($setterDtoMethod = $dtoReflectionClass->getMethodSetter())
             {
+                /** Проверяем, что сеттер принимает тип
+                Если свойство является объектом, сеттер принимает класс, но их типы не равны - пропускаем  */
+                if(is_object($getEntityPropertyValue) && class_exists($dtoReflectionClass->getPropertyTypeName()) && !$getEntityPropertyValue instanceof $type)
+                {
+                    continue;
+                }
+
                 $dto->{$setterDtoMethod}($getEntityPropertyValue);
-//                if(
-//                    (is_object($getEntityPropertyValue) && $getEntityPropertyValue instanceof ($dtoReflectionClass->getPropertyInstanceType()::class)) ||
-//                    (is_object($getEntityPropertyValue) && $getEntityPropertyValue->getId() instanceof ($dtoReflectionClass->getPropertyInstanceType()::class)) ||
-//                    !is_object($getEntityPropertyValue)
-//                )
-//                {
-//                    /* Если в ДТО имеется сеттер - присваиваем через сеттер */
-//                    $dto->{$setterDtoMethod}($getEntityPropertyValue);
-//                }
 
             }
             else
@@ -197,8 +196,6 @@ abstract class EntityDataMapper
 
         return $dto;
     }
-
-
 
 
     public function setEntity($dto): mixed
@@ -380,9 +377,6 @@ abstract class EntityDataMapper
                             }
 
 
-
-
-
                             /** ОБНОВЛЯЕМ СУЩЕСТВУЮЩИЕ */
 
                             /** @var EntityState $entityCollection */
@@ -560,7 +554,7 @@ abstract class EntityDataMapper
 
                 if($Attr)
                 {
-                    $keyHashName =  $this->getPropertyValue($property->getName(), $this);
+                    $keyHashName = $this->getPropertyValue($property->getName(), $this);
 
                     if($keyHashName !== 'not_initialized')
                     {

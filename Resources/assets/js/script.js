@@ -1,4 +1,4 @@
-eventEmitter = new EventTarget();
+//eventEmitter = new EventTarget();
 $html = false;
 
 /* определяем язык системы по тегу HTML */
@@ -91,16 +91,22 @@ setTimeout(function initBootstrap() {
             })
         })
 
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+
+
+
+
+
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+
+
+
 
         popoverTriggerList.map(function (popoverTriggerEl) {
 
 
             popoverTriggerEl.addEventListener('shown.bs.popover', function (event) {
 
-
                 let describedby = this.getAttribute('aria-describedby');
-
 
                 if (describedby) {
 
@@ -147,22 +153,34 @@ setTimeout(function initBootstrap() {
                 }
             })
 
+
             const pops = new bootstrap.Popover(popoverTriggerEl, {
                 html: true,
+
                 content: function () {
-                    return document.getElementById(this.id + '-content').innerHTML;
+
+                    if (popoverTriggerEl.id)
+                    {
+                        let content = document.getElementById(popoverTriggerEl.id + '-content');
+
+                        if (content) {
+                            return content.innerHTML;
+                        }
+                    }
                 },
 
                 title: function () {
 
-                    let title = document.getElementById(this.id + '-title');
-                    if (title) {
-                        return document.getElementById(this.id + '-title').innerHTML;
+                    if (popoverTriggerEl.id)
+                    {
+                        let title = document.getElementById(popoverTriggerEl.id + '-title');
+                        if (title) {
+                            return title.innerHTML;
+                        }
                     }
 
                 }
             });
-
 
             return pops;
         });
@@ -366,7 +384,7 @@ function modalLink(item) {
                 modal.innerHTML = request.responseText;
 
                 /* делаем глобальную отметку о завершении запроса */
-                eventEmitter.dispatchEvent(new Event('complete'));
+                //eventEmitter.dispatchEvent(new Event('complete'));
 
                 /* Сбрасываем содержимое модального окна при закрытии */
                 modal.addEventListener('hidden.bs.modal', function (event) {
@@ -769,8 +787,8 @@ function scrollFunction() {
 //window.addEventListener('load', function () {
 
 
-let mybutton = document.getElementById("btn-back-to-top");
-let mybuttonEnd = document.getElementById("btn-back-to-end");
+mybutton = document.getElementById("btn-back-to-top");
+mybuttonEnd = document.getElementById("btn-back-to-end");
 
 /* Когда пользователь прокручивает вниз 20 пикселей от верха документа, показываем кнопку */
 if (mybutton || mybuttonEnd) {

@@ -52,6 +52,8 @@ final class SettingsDeviceListener
     {
         $agent = $event->getRequest()->headers->get('User-Agent');
 
+        //dump($agent);
+
         if ($agent)
         {
             $AppCache = $this->cache->init('core');

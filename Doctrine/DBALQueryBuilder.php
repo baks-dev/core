@@ -508,7 +508,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $leftOneJoin
             ->select('tmp_'.$alias.'.'.$identifier)
-            ->from($join, 'tmp_'.$alias)
+            ->from($this->getTableNameFromClass($join), 'tmp_'.$alias)
             ->where('tmp_'.trim($condition))
             ->orderBy('tmp_'.$alias.'.'.($sort ?: $identifier), $desc)
             ->setMaxResults(1);
