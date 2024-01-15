@@ -49,7 +49,8 @@
         //Phantomjs как правило, не имеет внутри себя браузерных плагинов
         () => typeof navigator !== "undefined" && navigator.plugins instanceof PluginArray === false,
 
-        () => typeof navigator.userAgentData !== "undefined" && navigator.userAgentData.mobile === false && navigator.plugins.length === 0,
+        // Влияет на консоль (мобильный девайс не определяет)
+        //() => typeof navigator.userAgentData !== "undefined" && navigator.userAgentData.mobile === false && navigator.plugins.length === 0,
 
         //PhantomJs 1.x прокидывает 2 свойства в глобальный объект, проверим их
         () => (window.callPhantom || window._phantom),
@@ -75,13 +76,14 @@
     //Проверяем правила
     for (let i = 0; i < rules.length; i++) {
         if (rules[i]() === true) {
+
             isRobot = true;
             break;
         }
     }
 
     // // console.log('isRobot');
-    // // console.log(isRobot);
+    // console.log(isRobot);
 
 
     var defaultSettings = {
