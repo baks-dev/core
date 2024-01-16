@@ -1,6 +1,6 @@
 # BaksDev Core
 
-![Version](https://img.shields.io/badge/version-7.0.16-blue) ![php 8.2+](https://img.shields.io/badge/php-min%208.1-red.svg)
+![Version](https://img.shields.io/badge/version-7.0.17-blue) ![php 8.2+](https://img.shields.io/badge/php-min%208.1-red.svg)
 
 Модуль Core
 
@@ -19,4 +19,3 @@ $ php bin/phpunit --group=core
 ## Лицензия ![License](https://img.shields.io/badge/MIT-green)
 
 The MIT License (MIT). Обратитесь к [Файлу лицензии](LICENSE.md) за дополнительной информацией.
-
