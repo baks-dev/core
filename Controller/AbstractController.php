@@ -19,8 +19,8 @@
 namespace BaksDev\Core\Controller;
 
 use BaksDev\Core\Cache\CacheCss\CacheCssInterface;
+use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Type\Locale\Locale;
-use BaksDev\Settings\Main\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\User\Entity\User;
 use BaksDev\Users\User\Type\Id\UserUid;
@@ -60,9 +60,10 @@ abstract class AbstractController
 
     private TranslatorInterface $translator;
 
-    private SettingsMainInterface $getSettingsMain;
+    private SettingsMainInterface $settingsMain;
 
     private string $project_dir;
+
     private CacheCssInterface $cacheCss;
 
 
@@ -75,7 +76,7 @@ abstract class AbstractController
         FormFactoryInterface $formFactory,
         TranslatorInterface $translator,
         TokenStorageInterface $tokenStorage,
-        SettingsMainInterface $getSettingsMain,
+        SettingsMainInterface $settingsMain,
         CacheCssInterface $cacheCss
     )
     {
@@ -85,7 +86,7 @@ abstract class AbstractController
         $this->tokenStorage = $tokenStorage;
         $this->formFactory = $formFactory;
         $this->translator = $translator;
-        $this->getSettingsMain = $getSettingsMain;
+        $this->settingsMain = $settingsMain;
         $this->router = $router;
         $this->project_dir = $project_dir;
         $this->cacheCss = $cacheCss;
@@ -163,7 +164,11 @@ abstract class AbstractController
         $lang = $request->getCurrentRequest()
             ?->getLocale(); // присваиваем локаль
 
-        return $this->getSettingsMain->getSettingsMainAssociative($host, $lang);
+        $settings = $this->settingsMain->getSettingsMainAssociative($host, $lang);
+
+        dump($settings);
+
+        return $settings;
     }
 
 

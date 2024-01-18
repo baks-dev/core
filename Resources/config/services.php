@@ -2,6 +2,9 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
+use BaksDev\Core\Repository\SettingsMain\SettingsMainRepository;
+
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -22,5 +25,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     $services->load($NAMESPACE.'Type\Modify\Modify\\', $MODULE.'Type/Modify/Modify');
 
+
+    $services->alias(SettingsMainInterface::class, SettingsMainRepository::class);
 
 };
