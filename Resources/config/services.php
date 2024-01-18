@@ -26,6 +26,7 @@ return static function (ContainerConfigurator $configurator): void {
     $services->load($NAMESPACE.'Type\Modify\Modify\\', $MODULE.'Type/Modify/Modify');
 
 
+    /** @see https://symfony.com/doc/current/service_container/autowiring.html#dealing-with-multiple-implementations-of-the-same-type */
     $services->alias(SettingsMainInterface::class, SettingsMainRepository::class);
 
 };
