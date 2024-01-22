@@ -1037,6 +1037,8 @@ document.querySelectorAll('.js-datepicker').forEach((datepicker) => {
     const [day, month, year] = $elementDate.split('.');
     $selectedDate = new Date(+year, month - 1, +day);
 
+    console.log($elementDate);
+
 
     MCDatepicker.create({
         el: '#' + datepicker.id,

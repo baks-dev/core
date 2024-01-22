@@ -1,19 +1,82 @@
 <div class="container mt-3">
-	<header class="py-1" id="site-header">
-		<div class="row justify-content-between">
+    <header class="py-1" id="site-header">
+        <div class="row justify-content-between">
 
-			<div class="col align-self-center">
-				<a href="{{ path('core:user.homepage') }}" title="Главная">
+            <div class="col align-self-center">
+                <a href="{{ path('core:user.homepage') }}" title="Главная">
 
-					<img data-src="/logo.webp" src="/assets/img/empty.png"
-							width="432" height="100"
-							alt="..."
-							class="lazy w-auto" style="max-height: 60px;">
-				</a>
-			</div>
+                    <img data-src="/logo.webp" src="/assets/img/empty.png"
+                         width="432" height="100"
+                         alt="..."
+                         class="lazy w-auto" style="max-height: 60px;">
+                </a>
+            </div>
 
-			<div class="col">
-				{#<div class="d-flex justify-content-between mt-3">
+            <div class="col">
+
+
+                <div class="d-flex align-items-center justify-content-between my-2 ">
+
+
+                    <div>
+                        <a href="tel:+7(495)260-17-17"
+                           title="Контактный номер телефона"
+                           class="text-uppercase text-center text-decoration-none h4 fw-bolder text-dark text-nowrap">
+                            +7 (123) 456-78-90
+                        </a>
+                    </div>
+
+                    <div><span>(Звонок бесплатный)</span></div>
+                    <div class="vr"></div>
+                    <div><a href="#" class="small" title="График работы">График
+                            работы</a></div>
+
+                </div>
+
+
+                {% if all_search is defined %}
+
+                    {{ form_start(all_search) }}
+
+                    <div class="w-100 d-flex">
+
+                        {{ form_widget(all_search.query, { attr: {
+                            class : 'border-light w-100',
+                            style : 'min-width: 100%; box-shadow: none;',
+                            autocomplete : 'off'
+                        } }) }}
+
+                        <div class="w-100 position-relative">
+                            <button class="btn position-absolute top-0 end-0" type="button" aria-label="Поиск">
+
+                                <svg id="search_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-search text-secondary" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"></path>
+                                </svg>
+
+                                <div id="search_spiner" class="spinner-border text-secondary d-none" style="width: 16px; height: 16px;" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+
+                            </button>
+                        </div>
+
+                        <input type="hidden" name="token" value="{{ csrf_token('search') }}"/>
+
+                    </div>
+
+                    <div class="dropdown mt-1">
+                        <ul id="search_result" class="dropdown-menu border-light w-100 p-1">
+                            <div class="badge bg-secondary"></div>
+                        </ul>
+                    </div>
+
+
+                    {{ form_end(all_search) }}
+
+                {% endif %}
+
+                {# <div class="d-flex justify-content-between mt-3">
 
 					<div class="w-100 pe-3 border-end border-2" style="height: 60px;">
 						<a href="tel:88005508844"
@@ -27,27 +90,27 @@
 						<span>(Звонок бесплатный)</span>
 						<a href="#" class="small" title="График работы" title="График работы">График работы</a>
 					</div>
-				</div>#}
-			</div>
+				</div> #}
+            </div>
 
-			<div class="col-2">
-				<div class="header-buttons d-flex justify-content-end">
+            <div class="col-2">
+                <div class="header-buttons d-flex justify-content-end">
 
-					{# href="#autorizationModal" class="link-block" data-bs-toggle="modal" #}
+                    {# href="#autorizationModal" class="link-block" data-bs-toggle="modal" #}
 
 
-					{# <a href="{{ path('auth-email:user.login') }}"
+                    {# <a href="{{ path('auth-email:user.login') }}"
 					   class="btn btn-primary modal-link"
 					   data-bs-toggle="modal"
 					   data-bs-target="#modal"
 					   title="Добавить приход">
 						ЛОГИН
 					</a>
-					#}
+                    #}
 
-					{% if app.user %}
+                    {% if app.user %}
 
-						{# <button type="button" class="btn btn-secondary"
+                        {# <button type="button" class="btn btn-secondary"
 								data-bs-container="body"
 								data-bs-toggle="popover"
 								data-bs-placement="bottom"
@@ -57,38 +120,38 @@
 						</button> #}
 
 
-						{# МЕНЮ ПОЛЬЗОВТАЕЛЯ #}
-						{{ include(_self|replace({ "header.html.twig": "includes/user.menu.html.twig" })) }}
+                        {# МЕНЮ ПОЛЬЗОВТАЕЛЯ #}
+                        {{ include(_self|replace({ "header.html.twig": "includes/user.menu.html.twig" })) }}
 
-					{% else %}
+                    {% else %}
 
-						<a href="{{ path('auth-email:user.login') }}"
-								class="btn btn-link btn-sm h-25 lh-1 text-decoration-none modal-link w-75"
-								data-bs-toggle="modal"
-								data-bs-target="#modal"
-								style="width: 150px;"
-								title="{{ 'user.link.breadcrumb.page'|trans({}, 'user.login') }}"
+                        <a href="{{ path('auth-email:user.login') }}"
+                           class="btn btn-link btn-sm h-25 lh-1 text-decoration-none modal-link w-75"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modal"
+                           style="width: 150px;"
+                           title="{{ 'user.link.breadcrumb.page'|trans({}, 'user.login') }}"
 
-						>
+                        >
 
 						<span class="icon rounded-circle mb-2 ">
 							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-									class="bi bi-lock text-muted"
-									viewBox="0 0 16 16">
+                                 class="bi bi-lock text-muted"
+                                 viewBox="0 0 16 16">
 								<path
-										d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                                        d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
 							</svg>
 						</span>
 
-							<span class="small text-dark">Вход в личный кабинет</span>
+                            <span class="small text-dark">Вход в личный кабинет</span>
 
-						</a>
+                        </a>
 
-					{% endif %}
+                    {% endif %}
 
 
 
-					{# <button
+                    {# <button
 							data-bs-toggle="modal"
 							data-bs-target="#autorizationModal"
 							class="btn btn-link btn-sm h-25 lh-1 text-decoration-none"
@@ -106,7 +169,7 @@
 						<span class="small text-dark">Вход в личный кабинет</span>
 					</button> #}
 
-					{#{% if baks_basket is defined %}
+                    {# {% if baks_basket is defined %}
 
 
 						<a href="{{ path('orders-order:user.basket') }}"
@@ -122,34 +185,32 @@
 									<path
 											d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
 								</svg>
-
-								#}{# <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                    #}{# <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
 								<span class="visually-hidden">New alerts</span>
 							</span> #}{#
+                    <div id='user_basket' class="position-absolute top-0 bg-danger rounded-circle text-white ms-4 small-sm d-flex align-items-center justify-content-center {{ baks_basket.counter > 0 ?:'d-none' }}"
+                            style="width: 16px; height: 16px;">
+                        {{ baks_basket.counter }}
+                    </div>
+            </div>
 
-									<div id='user_basket' class="position-absolute top-0 bg-danger rounded-circle text-white ms-4 small-sm d-flex align-items-center justify-content-center {{ baks_basket.counter > 0 ?:'d-none' }}"
-											style="width: 16px; height: 16px;">
-										{{ baks_basket.counter }}
-									</div>
-							</div>
+            <span class="small text-dark word-br">Ваша корзина</span>
 
-							<span class="small text-dark word-br">Ваша корзина</span>
+        </a>
 
-						</a>
+    {% endif %} #}
 
-					{% endif %}#}
+                </div>
+            </div>
+        </div>
 
-				</div>
-			</div>
-		</div>
-	
-	</header>
+    </header>
 
 
 </div>
 
 <div class="w-100 bg-primary">
-	<div class="container">
-		{{ include(_self|replace({ "header.html.twig": "includes/top.menu.html.twig" })) }}
-	</div>
+    <div class="container">
+        {{ include(_self|replace({ "header.html.twig": "includes/top.menu.html.twig" })) }}
+    </div>
 </div>

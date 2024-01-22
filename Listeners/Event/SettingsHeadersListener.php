@@ -54,6 +54,11 @@ final class SettingsHeadersListener
 
     public function onKernelRequest(RequestEvent $event): void
     {
+
+        //dump($event);
+
+        //dump($_ENV);
+
         $AppCache = $this->cache->init('core');
 
         $data = $AppCache->get('b8oUi9K01Hd', function (ItemInterface $item) {

@@ -10,7 +10,8 @@
 
 
     {{ form_start(search) }}
-    <div class="w-100 d-flex ">
+
+    <div class="w-100 d-flex mb-3">
 
         {{ form_widget(search.query, { attr: { class : 'border-light w-100', style : 'min-width: 100%;' } }) }}
 
@@ -34,23 +35,27 @@
 
         <input type="hidden" name="token" value="{{ csrf_token('search') }}"/>
 
-        {#<button type="submit" class="btn btn-primary btn-lg round-ignore has-ripple">Найти</button>#}
+        {# <button type="submit" class="btn btn-primary btn-lg round-ignore has-ripple">Найти</button> #}
 
     </div>
 
-
-
     {{ form_end(search) }}
 
-    {# {{ form_start(search) }}
+    {% if modification %}
+        <ul class="dropdown-menu show border-light container p-1 position-relative mb-3 z-index-1">
+            {% set result = modification %}
+            {{ include(_self|replace({ "content.html.twig": "modification.html.twig" })) }}
 
+        </ul>
+    {% endif %}
 
+    {% if products %}
+        <ul class="dropdown-menu show border-light container p-1 position-relative mb-3 z-index-1">
+            {% set result = products %}
+            {{ include(_self|replace({ "content.html.twig": "products.html.twig" })) }}
+        </ul>
+    {% endif %}
 
-
-
-
-
-    {{ form_end(search) }} #}
 
 </main>
 
