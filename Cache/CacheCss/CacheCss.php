@@ -68,6 +68,8 @@ final class CacheCss implements CacheCssInterface
     ): string
     {
 
+        dd(4654654);
+
         $cache = $this->cache->init($module);
         $key = $route.$file.$device.($user ? '.user' : '');
 
@@ -82,7 +84,7 @@ final class CacheCss implements CacheCssInterface
 
             $classes = $this->getHtmlClass($content);
 
-            $path = __DIR__.'/../../Resources/assets/css/original.min.css';
+            $path = __DIR__.'/../../Resources/assets/css/style.min.css';
 
             $file = realpath($path);
 
