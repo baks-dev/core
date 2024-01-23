@@ -61,7 +61,7 @@ class SearchDTO
                 $this->request->getSession()->remove($this->session);
             }
 
-            if(time() - $session->getMetadataBag()->getLastUsed() > 60)
+            if(time() - $session->getMetadataBag()->getLastUsed() > 5)
             {
                 $session->remove($this->session);
             }

@@ -25,50 +25,37 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Messenger;
 
+use App\Kernel;
 use BaksDev\Core\Cache\AppCacheInterface;
 use Closure;
 use DateInterval;
-use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Process\Process;
 
 final class MessageDispatch implements MessageDispatchInterface
 {
-    private string $HOST;
-
     private ?string $transport = null;
 
     private MessageBusInterface $messageBus;
 
     private LoggerInterface $logger;
 
-    private HttpClientInterface $httpClient;
-
     private AppCacheInterface $cache;
 
-
-
     public function __construct(
-        #[Autowire(env: 'HOST')] string $HOST,
         MessageBusInterface $messageBus,
         LoggerInterface $messageDispatchLogger,
-        HttpClientInterface $httpClient,
         AppCacheInterface $cache
     )
     {
-        $this->HOST = $HOST;
         $this->messageBus = $messageBus;
         $this->logger = $messageDispatchLogger;
-        $this->httpClient = $httpClient;
         $this->cache = $cache;
     }
 
@@ -84,12 +71,15 @@ final class MessageDispatch implements MessageDispatchInterface
         }
 
         /** Логируем данные  */
-        $data = $this->objectToArray($message);
+        if(!Kernel::isTestEnvironment())
+        {
+            $data = $this->objectToArray($message);
 
-        $this->logger->info('MessageDispatch', [
-            'message' => $message::class,
-            'data' => sprintf('%s', json_encode($data, JSON_UNESCAPED_UNICODE))
-        ]);
+            $this->logger->info('MessageDispatch', [
+                'message' => $message::class,
+                'data' => sprintf('%s', json_encode($data, JSON_UNESCAPED_UNICODE))
+            ]);
+        }
 
         /**
          * Если указан транспорт - пробуем отправить в очередь
@@ -233,6 +223,5 @@ final class MessageDispatch implements MessageDispatchInterface
         $cache->save($cacheConsume);
 
         return $isRunning;
-
     }
 }

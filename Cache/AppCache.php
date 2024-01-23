@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Cache;
 
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -50,12 +51,12 @@ final class AppCache implements AppCacheInterface
     {
         $namespace = $namespace ? $this->HOST.'.'.$namespace : $this->HOST;
 
-        return new FilesystemAdapter
-        (
-            $namespace,
-            0,
-            $marshaller
-        );
+        $cache = (function_exists('apcu_enabled') && apcu_enabled()) ? ApcuAdapter::class : FilesystemAdapter::class;
+
+        // (string $namespace = '', int $defaultLifetime = 0, string $version = null, MarshallerInterface $marshaller = null)
+        // (string $namespace = '', int $defaultLifetime = 0, string $directory = null, MarshallerInterface $marshaller = null)
+
+        return new $cache ($namespace, 0, marshaller: $marshaller);
     }
 
     public function getCacheType(): string

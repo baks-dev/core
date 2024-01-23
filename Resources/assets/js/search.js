@@ -36,23 +36,35 @@ if (search_form) {
             event.preventDefault();
         });
 
-        if (input.value.length > 2) {
-            search_form.addEventListener("mouseover", (event) => {
+        /** При фокусе на поле поиска отправляем запрос если результата нет */
+        input.addEventListener("focus", (event) => {
+            if (input.value.length > 2 && !search_result.innerText) {
+                submitSearch();
+            }
+        });
 
-                if (search_result.innerText) {
-                    search_result.classList.add('show');
-                }
-            });
 
-            input.addEventListener("focus", (event) => {
-                if (!search_result.innerText) {
-                    submitSearch();
-                }
-            });
-        }
+        /** Показать результат поиска при наведение курсора мыши курсора на форму поиска */
+        search_form.addEventListener("mouseover", (event) => {
+            if (input.value.length > 2 && search_result.innerText) {
+                search_result.classList.add('show');
+            }
+        });
 
+        /** Скрываем результат поиска при выходе курсора с результата */
         search_result.addEventListener("mouseout", (event) => {
             search_result.classList.remove('show');
+        });
+
+        /** Скрываем результат поиска при клике все формы поиска */
+        document.addEventListener("click", function (event) {
+
+            var isClickInsideBlock1 = input.contains(event.target);
+            var isClickInsideBlock2 = search_result.contains(event.target);
+
+            if (!isClickInsideBlock1 && !isClickInsideBlock2) {
+                search_result.classList.remove('show');
+            }
         });
 
 
@@ -83,6 +95,7 @@ async function submitSearch() {
     const search_icon = document.getElementById('search_icon');
     const search_spiner = document.getElementById('search_spiner');
     const search_result = document.getElementById('search_result');
+    const input = document.getElementById('search_form_query');
     const data = new FormData(search_form);
 
     search_spiner.classList.remove('d-none');
