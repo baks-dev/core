@@ -29,6 +29,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
 
 final class AppCache implements AppCacheInterface
 {
@@ -47,7 +48,7 @@ final class AppCache implements AppCacheInterface
         string $namespace = null,
         int $defaultLifetime = 0,
         MarshallerInterface $marshaller = null
-    ): FilesystemAdapter
+    ): CacheInterface
     {
         $namespace = $namespace ? $this->HOST.'.'.$namespace : $this->HOST;
 
