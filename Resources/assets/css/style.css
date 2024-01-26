@@ -143,7 +143,6 @@ body {
 }
 
 
-
 .selection-box .accordion-button:after {
     width: 35px;
     height: 35px;
@@ -367,6 +366,7 @@ input:checked + .icon {
     background-size: cover !important;
     border: 0;
 }
+
 .bg-contain {
     background-repeat: no-repeat;
     /*background-color: #f8fbff;*/
@@ -390,11 +390,13 @@ input:checked + .icon {
     --bs-modal-margin: 1.75rem;
     --bs-modal-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
+
 .modal-dialog {
     max-width: var(--bs-modal-width);
     margin-right: auto;
     margin-left: auto;
 }
+
 .modal-sm {
     --bs-modal-width: 300px;
 }
@@ -418,13 +420,10 @@ input:checked + .icon {
     background-color: rgba(255, 255, 255, .85);
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, .1);
-    box-shadow: 0 .5rem 1.5rem .5rem var(--toast-shadow) ;
-    border-radius: .475rem
-
-    /*box-shadow: red
+    box-shadow: 0 .5rem 1.5rem .5rem var(--toast-shadow);
+    border-radius: .475rem /*box-shadow: red
     rgba(255, 0, 0, .075)
-    */
-;
+    */;
 }
 
 .toast.showing {
@@ -475,14 +474,9 @@ input:checked + .icon {
 }
 
 
-
-
-
-
-
-
-
-.vertical-middle { vertical-align: middle; }
+.vertical-middle {
+    vertical-align: middle;
+}
 
 .dropleft:before {
     position: absolute;
@@ -527,18 +521,17 @@ input:checked + .icon {
 }
 
 
-.spinner-border-sm {
-    --bs-spinner-width: 0.8rem;
-    --bs-spinner-height: 0.8rem;
-    --bs-spinner-border-width: 0.1em;
-    margin: .25rem !important;
+.pointer {
+    cursor: pointer;
 }
 
-.pointer { cursor: pointer; }
+.w-250px {
+    width: 250px;
+}
 
-.w-250px { width: 250px; }
-
-.word-br {  word-spacing: 99999px; }
+.word-br {
+    word-spacing: 99999px;
+}
 
 
 img.lazy, div.lazy {
@@ -546,6 +539,7 @@ img.lazy, div.lazy {
     opacity: 0;
     transition: visibility 0s, opacity 0.1s linear;
 }
+
 img.loaded, div.loaded {
     visibility: visible;
     opacity: 1;
@@ -562,7 +556,6 @@ img.loaded, div.loaded {
     animation: var(--bs-spinner-animation-speed) linear infinite var(--bs-spinner-animation-name);
 }
 
-
 .spinner-border {
     --bs-spinner-width: 2rem;
     --bs-spinner-height: 2rem;
@@ -572,4 +565,12 @@ img.loaded, div.loaded {
     --bs-spinner-animation-name: spinner-border;
     border: var(--bs-spinner-border-width) solid currentcolor;
     border-right-color: transparent;
+}
+
+.spinner-border-sm {
+    --bs-spinner-width: 16px;
+    --bs-spinner-height: 16px;
+    --bs-spinner-border-width: 0.1em;
+    margin: .25rem !important;
+    vertical-align: middle;
 }

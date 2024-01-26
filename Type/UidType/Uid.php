@@ -43,7 +43,7 @@ abstract class Uid implements ValueResolverInterface
         {
             $this->value = Uuid::v7();
 
-            if(method_exists(Kernel::class, 'isTestEnvironment'))
+            if(method_exists(Kernel::class, 'isTestEnvironment') && Kernel::isTestEnvironment())
             {
                 $this->value = new Uuid(static::TEST);
             }
