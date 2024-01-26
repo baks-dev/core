@@ -388,7 +388,9 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function allGroupByExclude(string|array $exclude = null): void
     {
-        $array = array("MIN", "MAX", "COUNT", "SUM", "JSON_AGG", "EXISTS");
+        $array = array("MIN", "MAX", "COUNT", "SUM", "JSON_AGG", "EXISTS", "FALSE", "TRUE");
+
+
 
         foreach($this->getQueryPart('select') as $field)
         {
@@ -402,50 +404,51 @@ final class DBALQueryBuilder extends QueryBuilder
 
             $case = stripos($field, "CASE");
 
-
             if($case)
             {
                 $arrWhen = explode('WHEN', $field);
 
                 foreach($arrWhen as $item)
                 {
-                    $field = trim($item);
+                    $fieldWhen = trim($item);
 
-                    if($field === 'CASE')
+                    if($fieldWhen === 'CASE')
                     {
                         continue;
                     }
 
-                    //                    $else = stripos($field, "ELSE");
-                    //
-                    //                    if($else)
-                    //                    {
-                    //
-                    //                        $else = trim(substr(strstr($field, 'ELSE'), strlen('ELSE')));
-                    //                        $else = substr($else, 0, strpos($else, ' '));
-                    //
-                    //
-                    //                        dd($else);
-                    //
-                    //
-                    ////                        dump($field);
-                    //                        dump('$else');
-                    //                        dd($field);
-                    //                    }
+                    $fieldWhen = substr($fieldWhen, 0, strpos($fieldWhen, ' '));
+                    $this->addGroupBy(trim($fieldWhen));
+                }
 
 
-                    $field = substr($field, 0, strpos($field, ' '));
+                $arrThen = explode('THEN', $field);
 
+                foreach($arrThen as $item)
+                {
+                    $stripos = strpos($item, ' ');
 
-                    $this->addGroupBy($field);
+                    if(!$stripos)
+                    {
+                        continue;
+                    }
 
+                    $fieldThen = substr($item, 0, $stripos);
 
+                    $fieldThen = trim($fieldThen);
+
+                    if($fieldThen === 'CASE' || $fieldThen === 'CONCAT')
+                    {
+                        continue;
+                    }
+
+                    if($fieldThen)
+                    {
+                        $this->addGroupBy($fieldThen);
+                    }
                 }
 
                 continue;
-
-                //$field = substr($field, strpos($field, "END") + 3);
-                // $field = trim(str_ireplace(' AS', '', $field));
             }
 
 
@@ -469,11 +472,8 @@ final class DBALQueryBuilder extends QueryBuilder
                 continue;
             }
 
-
             $this->addGroupBy($field);
         }
-
-
     }
 
 

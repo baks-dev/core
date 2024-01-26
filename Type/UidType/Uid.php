@@ -34,24 +34,24 @@ abstract class Uid implements ValueResolverInterface
     public function __construct(AbstractUid|Uid|string|null $value = null)
     {
         /* Применяем фильтр UID */
-        if ($value !== null && self::isUid($value) === false)
+        if($value !== null && self::isUid($value) === false)
         {
             throw new InvalidArgumentException(sprintf('Invalid Argument Uid: %s', $value));
         }
 
-        if ($value === null)
+        if($value === null)
         {
-            $this->value = Kernel::isTestEnvironment() ? new Uuid(static::TEST) : Uuid::v7();
+            $this->value = Uuid::v7();
+
+            if(method_exists(Kernel::class, 'isTestEnvironment'))
+            {
+                $this->value = new Uuid(static::TEST);
+            }
+
             return;
         }
 
-        //if (is_string($value))
-       // {
-            $this->value = new Uuid((string) $value);
-        //    return;
-       // }
-
-        //$this->value = $value;
+        $this->value = new Uuid((string) $value);
     }
 
     public function __clone(): void
@@ -72,13 +72,12 @@ abstract class Uid implements ValueResolverInterface
     public function md5(string $md5): self
     {
         $md5 =
-            substr($md5, 0, 8 ) .'-'.
-            substr($md5, 8, 4) .'-'.
-            '7'.substr($md5, 12, 3) .'-'.
+            substr($md5, 0, 8).'-'.
+            substr($md5, 8, 4).'-'.
+            '7'.substr($md5, 12, 3).'-'.
             '9cb9' //substr($md5, 16, 4)
             .'-'.
-            substr($md5, 20)
-        ;
+            substr($md5, 20);
 
         $this->value = new Uuid($md5);
 
@@ -106,20 +105,21 @@ abstract class Uid implements ValueResolverInterface
         return preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $value);
     }
 
+
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
 
         $attr = $argument->getAttributes(ParamConverter::class);
         $ParamConverter = current($attr);
 
-        if (!$ParamConverter)
+        if(!$ParamConverter)
         {
             return [];
         }
 
         $Resolver = $ParamConverter->resolver;
 
-        if ($Resolver !== $this::class)
+        if($Resolver !== $this::class)
         {
             return [];
         }
@@ -132,7 +132,7 @@ abstract class Uid implements ValueResolverInterface
                     $request->get($argument->getName()) ?: // ищем в request по названию переменной
                         $request->get($key); // ищем в request ключ 'id'
 
-        if (empty($value))
+        if(empty($value))
         {
             return [null];
         }
