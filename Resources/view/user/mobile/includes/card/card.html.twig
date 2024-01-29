@@ -58,7 +58,9 @@
 
             {% if isProduct %}
 
-            <a href="{{ path('products-product:user.detail', { url: card.url,
+            <a href="{{ path('products-product:user.detail', {
+                category: card.category_url,
+                url: card.url,
                 offer : product_offer.offer_value,
                 variation : product_offer.variation_value,
                 modification : product_offer.modification_value
@@ -66,7 +68,11 @@
 
                 {% else %}
 
-                <a href="{{ path('products-product:user.model', { url: card.url }) }}" class="text-decoration-none text-dark">
+
+                <a href="{{ path('products-product:user.model', {
+                    category: category.category_url,
+                    url: card.url
+                }) }}" class="text-decoration-none text-dark">
                     {% endif %}
 
 
@@ -125,7 +131,9 @@
                 {% else %}
 
 
-                    <a href="{{ path('products-product:user.model', { url: card.url
+                    <a href="{{ path('products-product:user.model', {
+                        category: category.category_url,
+                        url: card.url
                     }) }}" class="text-decoration-none text-dark">
 
 

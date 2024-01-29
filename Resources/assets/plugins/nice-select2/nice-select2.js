@@ -84,17 +84,25 @@ var defaultOptions = {
 };
 
 function NiceSelect(element, options, reset = false) {
+
+    let isExistSelec = document.getElementById(element.id+'_select2');
+
+    if (isExistSelec)
+    {
+        isExistSelec.remove();
+    }
+
     this.el = element;
     this.config = Object.assign({}, defaultOptions, options || {});
     this.data = this.config.data;
     this.selectedOptions = [];
 
-    if (this.el.tagName != 'SELECT')
+    if (this.el.tagName !== 'SELECT')
     {
         return;
     }
 
-    if (this.el.options[0] != undefined && !this.el.options[0].value) {
+    if (this.el.options[0] !== undefined && !this.el.options[0].value) {
         this.placeholder = this.el.options[0].text
     } else {
         this.placeholder =
@@ -303,7 +311,9 @@ NiceSelect.prototype._renderItem = function (option) {
 };
 
 NiceSelect.prototype.update = function () {
+
     this.extractData();
+
     if (this.dropdown) {
         var open = hasClass(this.dropdown, "open");
         this.dropdown.parentNode.removeChild(this.dropdown);
@@ -313,6 +323,7 @@ NiceSelect.prototype.update = function () {
             triggerClick(this.dropdown);
         }
     }
+
 };
 
 NiceSelect.prototype.disable = function () {

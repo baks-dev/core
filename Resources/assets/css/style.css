@@ -568,9 +568,14 @@ img.loaded, div.loaded {
 }
 
 .spinner-border-sm {
-    --bs-spinner-width: 16px;
-    --bs-spinner-height: 16px;
+    --bs-spinner-width: 15px;
+    --bs-spinner-height: 15px;
     --bs-spinner-border-width: 0.1em;
     margin: .25rem !important;
     vertical-align: middle;
+}
+
+.form-control::placeholder, .form-control:disabled {
+    color: #6c757d;
+    opacity: 0.5;
 }

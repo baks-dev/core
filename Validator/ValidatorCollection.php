@@ -31,14 +31,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class ValidatorCollection extends ArrayObject implements ValidatorCollectionInterface
 {
-
     private string $uniqid;
 
     private bool $validate = false;
 
     private ValidatorInterface $validator;
 
-    private LoggerInterface $validatorLogger;
+    private LoggerInterface $logger;
 
     private ArrayObject $errors;
 
@@ -49,7 +48,7 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
     {
         parent::__construct();
         $this->validator = $validator;
-        $this->validatorLogger = $validatorLogger;
+        $this->logger = $validatorLogger;
         $this->uniqid = uniqid('', false);
         $this->errors = new ArrayObject();
 
@@ -104,11 +103,8 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
 
     public function error($message, ?array $context = []): void
     {
-
-
         $this->errors->offsetSet($this->uniqid, (string) $message);
-        $this->validatorLogger->error($this->uniqid.': '.$message, $context ?: []);
-
+        $this->logger->error($this->uniqid.': '.$message, $context ?: []);
     }
 
     /**

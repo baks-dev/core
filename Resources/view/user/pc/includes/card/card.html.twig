@@ -1,5 +1,5 @@
 {% if card %}
-	
+
 	
 	{% set arr_property = card.category_section_field | json_decode %}
 
@@ -54,7 +54,13 @@
 					modification : product_offer.modification_value
 				}) }}" >
 			{% else  %}
-					<a href="{{ path('products-product:user.model', { url: card.url }) }}">
+
+
+
+					<a href="{{ path('products-product:user.model', {
+						category: category.category_url,
+						url: card.url
+					}) }}">
 			{% endif %}
 
 
@@ -106,9 +112,10 @@
 					</a>
 				
 				{% else %}
-					
-					
-					<a href="{{ path('products-product:user.model', { url: card.url
+
+					<a href="{{ path('products-product:user.model', {
+						category: category.category_url,
+						url: card.url
 					}) }}" class="text-decoration-none text-dark">
 
 
