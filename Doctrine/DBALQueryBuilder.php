@@ -32,6 +32,7 @@ use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use BaksDev\Core\Type\Locale\Locale;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use DateInterval;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -388,9 +389,9 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function allGroupByExclude(string|array $exclude = null): void
     {
-        $array = array("MIN", "MAX", "COUNT", "SUM", "JSON_AGG", "EXISTS", "FALSE", "TRUE");
+        $array = array("MIN", "MAX", "COUNT", "SUM", "JSON_AGG", "ARRAY_AGG", "EXISTS", "FALSE", "TRUE");
 
-
+        $addGroupBy = null;
 
         foreach($this->getQueryPart('select') as $field)
         {
@@ -402,11 +403,17 @@ final class DBALQueryBuilder extends QueryBuilder
                 }
             }
 
+            $field = str_replace(array(PHP_EOL, "\t"), ' ', $field);
+            $field = trim($field);
             $case = stripos($field, "CASE");
 
-            if($case)
+
+
+            if($case !== false)
             {
                 $arrWhen = explode('WHEN', $field);
+
+
 
                 foreach($arrWhen as $item)
                 {
@@ -418,7 +425,10 @@ final class DBALQueryBuilder extends QueryBuilder
                     }
 
                     $fieldWhen = substr($fieldWhen, 0, strpos($fieldWhen, ' '));
-                    $this->addGroupBy(trim($fieldWhen));
+
+                    //$this->addGroupBy(trim($fieldWhen));
+
+                    $addGroupBy[] = trim($fieldWhen);
                 }
 
 
@@ -426,6 +436,16 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 foreach($arrThen as $item)
                 {
+                    $item = trim($item);
+
+                    $CONCAT = stripos($item, "CONCAT");
+
+                    if($CONCAT)
+                    {
+                        continue;
+                    }
+
+                    $item = trim(str_replace(array(PHP_EOL, "(", ")"), ' ', $item));
                     $stripos = strpos($item, ' ');
 
                     if(!$stripos)
@@ -444,7 +464,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
                     if($fieldThen)
                     {
-                        $this->addGroupBy($fieldThen);
+                        $addGroupBy[] = $fieldThen;
+                        //$this->addGroupBy($fieldThen);
                     }
                 }
 
@@ -458,6 +479,14 @@ final class DBALQueryBuilder extends QueryBuilder
             {
                 $field = substr($field, strpos($field, "END") + 3);
                 $field = trim(str_ireplace(' AS', '', $field));
+
+                $dot = stripos($field, '.');
+
+                if(!$dot)
+                {
+                    continue;
+                }
+
             }
 
             $as = stripos($field, " AS ");
@@ -472,8 +501,15 @@ final class DBALQueryBuilder extends QueryBuilder
                 continue;
             }
 
-            $this->addGroupBy($field);
+            $addGroupBy[] = $field;
+            //$this->addGroupBy($field);
         }
+
+        //dd($addGroupBy);
+
+        $this->addGroupBy(array_unique($addGroupBy));
+
+
     }
 
 
@@ -558,6 +594,35 @@ final class DBALQueryBuilder extends QueryBuilder
         {
             $this->search->orWhere($field.' = :equal');
         }
+
+        return $this;
+    }
+
+    /**
+     * Добавляет к поиску идентификатор UID
+     */
+    public function addSearchInArray(string $field, array $search): self
+    {
+        if(!$this->search)
+        {
+            throw new InvalidArgumentException('Необходимо вызвать createSearchQueryBuilder с параметром SearchDTO');
+        }
+
+        $this->search->where($field.' IN(:search)');
+        $this->setParameter('search', $search, ArrayParameterType::STRING);
+
+        /** Сортируем в порядке релевантности*/
+        $orderString = "CASE ".$field;
+
+        foreach($search as $key => $value)
+        {
+            $orderString .= " WHEN '$value' THEN $key ";
+        }
+
+        $orderString .= "END";
+
+        $this->orderBy($orderString);
+
 
         return $this;
     }

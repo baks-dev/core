@@ -131,7 +131,9 @@
 								{% for menu in baks_user_menu %}
 
 									<li class="nav-item">
-										<a href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}"
+										<a href="{{ path('products-product:user.catalog.category', {
+											category : menu.category_url
+										}) }}"
 										   class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
 										   title="Продукция"
 										>

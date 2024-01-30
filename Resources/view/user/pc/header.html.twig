@@ -2,7 +2,7 @@
     <header class="py-1" id="site-header">
         <div class="row justify-content-between">
 
-            <div class="col align-self-center">
+            <div class="col-3 align-self-center">
                 <a href="{{ path('core:user.homepage') }}" title="Главная">
 
                     <img data-src="/logo.webp" src="/assets/img/empty.png"
@@ -12,11 +12,9 @@
                 </a>
             </div>
 
-            <div class="col">
+            <div class="col-auto">
 
-
-                <div class="d-flex align-items-center justify-content-between my-2 ">
-
+                <div class="d-flex gap-3 align-items-center justify-content-between my-2 ">
 
                     <div>
                         <a href="tel:+7(495)260-17-17"
@@ -27,9 +25,32 @@
                     </div>
 
                     <div><span>(Звонок бесплатный)</span></div>
+
                     <div class="vr"></div>
-                    <div><a href="#" class="small" title="График работы">График
-                            работы</a></div>
+
+                    <div>
+                        <a tabindex="0"
+                           id="schedule"
+                           class="small text-decoration-none"
+                           role="button"
+                           data-bs-container="body"
+                           data-bs-toggle="popover"
+                           data-bs-trigger="click"
+                           data-bs-placement="right"
+                        >
+                            График работы
+                        </a>
+
+                        <div id="schedule-content" class="d-none mt-5">
+                            <div class="d-flex gap-3 align-items-center mb-1">
+                                <span>
+                                    Пн-Пт: 10:00 - 19:00<br>
+                                    Сб-Вс: 10:00 - 18:00
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -149,6 +170,40 @@
 
                     {% endif %}
 
+
+                    {% if baks_basket is defined %}
+
+
+                        <a href="{{ path('orders-order:user.basket') }}"
+                           title="Корзина"
+                           class="btn btn-link btn-sm h-25 lh-1 position-relative text-decoration-none w-50"
+                           style="width: 95px;">
+
+                            <div class="icon rounded-circle mb-2">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                                     class="bi bi-cart3 text-muted"
+                                     viewBox="0 0 16 16">
+                                    <path
+                                            d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                </svg>
+
+                                {# <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+								<span class="visually-hidden">New alerts</span>
+							</span> #}
+
+                                <div id='user_basket'
+                                     class="position-absolute top-0 bg-danger rounded-circle text-white ms-4 small-sm d-flex align-items-center justify-content-center {{ baks_basket.counter > 0 ?:'d-none' }}"
+                                     style="width: 16px; height: 16px;">
+                                    {{ baks_basket.counter }}
+                                </div>
+                            </div>
+
+                            <span class="small text-dark word-br">Ваша корзина</span>
+
+                        </a>
+
+                    {% endif %}
 
 
                     {# <button

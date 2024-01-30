@@ -19,7 +19,10 @@
     {% endif %}
 
     <li>
-        <a href="{{ path('products-product:user.model', { url: item.search_url }) }}"
+        <a href="{{ path('products-product:user.model', {
+            category: item.category_url,
+            url: item.search_url
+        }) }}"
            class="d-flex gap-3 align-items-center w-100 text-decoration-none dropdown-item rounded-3 p-2 pb-1 ">
             <div>
                 <div class="icon rounded-4 mb-2 {{ item.product_image_ext ? 'bg-contain' : 'bg-cover' }} p-1"

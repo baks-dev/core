@@ -211,6 +211,14 @@
     line-height: 22px
 }
 
+.nice-select span.current {
+    z-index: 0;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .nice-select .has-multiple span.current {
     border: 1px solid #ccc;
     background: #eee;
@@ -220,7 +228,7 @@
     line-height: 24px;
     font-size: 14px;
     margin-bottom: 3px;
-    margin-right: 3px
+    margin-right: 3px;
 }
 
 .nice-select .has-multiple .multiple-options {
