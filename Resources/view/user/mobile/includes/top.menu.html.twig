@@ -65,7 +65,7 @@
 
                         >
 
-                            <a href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}"
+                            <a href="{{ path('products-product:user.catalog.category', { category : menu.category_url }) }}"
                                class="text-decoration-none text-dark d-flex gap-3 align-items-center w-100 justify-content-start">
 
                                 {# Обложка  #}
@@ -112,7 +112,7 @@
                             {% for parent in parent_category %}
 
                                 {% if parent.parent_category_counter %}
-                                    <a href="{{ path('products-product:user.catalog.category', { url : parent.parent_category_url }) }}"
+                                    <a href="{{ path('products-product:user.catalog.category', { category : parent.parent_category_url }) }}"
                                        class="text-decoration-none text-dark justify-content-start small text-decoration-none"
                                        style='width: 23%;'>
                                         {{ parent.parent_category_name }}
