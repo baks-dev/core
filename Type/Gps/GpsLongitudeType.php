@@ -4,17 +4,18 @@ namespace BaksDev\Core\Type\Gps;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 
-final class GpsLongitudeType extends StringType
+final class GpsLongitudeType extends Type
 {
 	
-	public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+	public function convertToDatabaseValue($value, AbstractPlatform $platform): string
 	{
-		return $value instanceof GpsLongitude ? $value->getValue() : $value;
+		return (string) $value;
 	}
 	
 	
-	public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+	public function convertToPHPValue($value, AbstractPlatform $platform): ?GpsLongitude
 	{
 		return !empty($value) ? new GpsLongitude($value) : null;
 	}
@@ -30,5 +31,10 @@ final class GpsLongitudeType extends StringType
 	{
 		return true;
 	}
+
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $platform->getStringTypeDeclarationSQL($column);
+    }
 	
 }

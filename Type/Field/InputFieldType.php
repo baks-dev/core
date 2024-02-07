@@ -3,16 +3,16 @@
 namespace BaksDev\Core\Type\Field;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 
-final class InputFieldType extends StringType
+final class InputFieldType extends Type
 {
-	public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+	public function convertToDatabaseValue($value, AbstractPlatform $platform): string
 	{
 		return (string) $value;
 	}
 	
-	public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+	public function convertToPHPValue($value, AbstractPlatform $platform): ?InputField
 	{
         return !empty($value) ? new InputField($value) : null;
 	}
@@ -28,5 +28,10 @@ final class InputFieldType extends StringType
 	{
 		return true;
 	}
+
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $platform->getStringTypeDeclarationSQL($column);
+    }
 	
 }

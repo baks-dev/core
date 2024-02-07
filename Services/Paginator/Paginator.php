@@ -128,7 +128,9 @@ final class Paginator implements PaginatorInterface
                 /** Сбрасываем кеш ключа запроса */
                 $qb->select('COUNT(*)');
                 $qb->setMaxResults(null);
-                $qb->resetQueryParts(['orderBy', 'groupBy']);
+
+                $qb->resetGroupBy();
+                $qb->resetOrderBy();
 
                 $this->counter = $qb->fetchOne();
             }

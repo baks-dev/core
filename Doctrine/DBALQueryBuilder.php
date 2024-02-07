@@ -35,7 +35,9 @@ use DateInterval;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Query\QueryType;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\Mapping\Table;
 use Generator;
@@ -51,6 +53,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DBALQueryBuilder extends QueryBuilder
 {
+
+    private array $select = [];
+
+    private string|CompositeExpression|null $where = null;
+
+
+
     private Connection $connection;
 
     private CacheItemPoolInterface $cacheQueries;
@@ -110,7 +119,12 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->env
         );
 
-        $newInstance->resetQueryParts();
+        //$newInstance->resetQueryParts();
+
+        $newInstance->resetOrderBy();
+        $newInstance->resetGroupBy();
+        $newInstance->resetWhere();
+
         $newInstance->setParameters([]);
 
         $newInstance->cacheKey = str_replace('\\', '.', is_object($class) ? $class::class : $class);
@@ -277,7 +291,14 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->select('1');
 
         $exist = $this->connection->createQueryBuilder();
-        $exist->resetQueryParts();
+
+        //$exist->resetQueryParts();
+
+        $exist->resetOrderBy();
+        $exist->resetGroupBy();
+        $exist->resetHaving();
+        $exist->resetWhere();
+
         $exist->select(($not ? 'NOT ' : '').' EXISTS('.$this->getSQL().')');
         $exist->setParameters($this->getParameters());
 
@@ -294,6 +315,8 @@ final class DBALQueryBuilder extends QueryBuilder
         if($this->search)
         {
             $this->andWhere('('.$this->search->getQueryPart('where').')');
+
+
             $this->search = null;
         }
 
@@ -337,7 +360,12 @@ final class DBALQueryBuilder extends QueryBuilder
         {
             $this->select('COUNT(*)');
             $this->setMaxResults(null);
-            $this->resetQueryParts(['orderBy', 'groupBy']);
+
+            //$this->resetQueryParts(['orderBy', 'groupBy']);
+            $this->resetOrderBy();
+            $this->resetGroupBy();
+
+
 
             $counterCache = $this->cacheQueries->getItem($counterKey);
             $counterCache->set($this->fetchOne());
@@ -387,13 +415,36 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
+    public function select(string ...$expressions): self
+    {
+        $this->select = $expressions;
+        parent::select(...$expressions);
+
+        return $this;
+    }
+
+    public function addSelect(string $expression, string ...$expressions): self
+    {
+        $this->select = array_merge($this->select, [$expression], $expressions);
+
+        parent::addSelect($expression, ...$expressions);
+
+        return $this;
+    }
+
+
     public function allGroupByExclude(string|array $exclude = null): void
     {
         $array = array("MIN", "MAX", "COUNT", "SUM", "JSON_AGG", "ARRAY_AGG", "EXISTS", "FALSE", "TRUE");
 
         $addGroupBy = null;
 
-        foreach($this->getQueryPart('select') as $field)
+
+//            $ref  = new \ReflectionProperty($this, 'select');
+
+        //dd($this->select);
+
+        foreach($this->select as $field)
         {
             foreach($array as $value)
             {
@@ -408,11 +459,9 @@ final class DBALQueryBuilder extends QueryBuilder
             $case = stripos($field, "CASE");
 
 
-
             if($case !== false)
             {
                 $arrWhen = explode('WHEN', $field);
-
 
 
                 foreach($arrWhen as $item)
@@ -505,10 +554,8 @@ final class DBALQueryBuilder extends QueryBuilder
             //$this->addGroupBy($field);
         }
 
-        //dd($addGroupBy);
-
-        $this->addGroupBy(array_unique($addGroupBy));
-
+        $addGroupBy = array_unique($addGroupBy);
+        $this->addGroupBy(...$addGroupBy);
 
     }
 
@@ -684,12 +731,11 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this->cacheKey;
     }
 
-    public function from($from, $alias = null): self
+    public function from(string $table, $alias = null): self
     {
-        $this->add('from', [
-            'table' => $this->getTableNameFromClass($from),
-            'alias' => $alias,
-        ], true);
+        $from = $this->getTableNameFromClass($table);
+
+        parent::from($from, $alias);
 
         return $this;
     }
@@ -710,14 +756,14 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function leftJoin($fromAlias, $join, $alias, $condition = null): self
     {
-        $this->add('join', [
-            $fromAlias => [
-                'joinType' => 'left',
-                'joinTable' => $this->getTableNameFromClass($join),
-                'joinAlias' => $alias,
-                'joinCondition' => $condition,
-            ],
-        ], true);
+        $table = $this->getTableNameFromClass($join);
+
+        parent::leftJoin(
+            $fromAlias,
+            $table,
+            $alias,
+            $condition
+        );
 
         return $this;
     }
@@ -753,4 +799,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $class;
     }
+
+
+
 }

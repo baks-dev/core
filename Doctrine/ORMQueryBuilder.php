@@ -28,6 +28,7 @@ namespace BaksDev\Core\Doctrine;
 
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Type\Locale\Locale;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -84,7 +85,7 @@ final class ORMQueryBuilder extends QueryBuilder
         );
 
         $newInstance->resetDQLParts();
-        $newInstance->setParameters([]);
+        $newInstance->setParameters(new ArrayCollection());
 
         //$this->isCache = false;
         $newInstance->cacheKey = str_replace('\\', '.', is_object($class) ? $class::class : $class);

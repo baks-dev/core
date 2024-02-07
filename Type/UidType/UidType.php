@@ -84,4 +84,6 @@ class UidType extends StringType
     {
         return $platform->getGuidTypeDeclarationSQL($column);
     }
+
+
 }

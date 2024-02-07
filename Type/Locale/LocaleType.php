@@ -4,18 +4,19 @@ namespace BaksDev\Core\Type\Locale;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 
-final class LocaleType extends StringType
+final class LocaleType extends Type
 {
 	public const NAME = 'locale';
 	
 	
-	public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
+	public function convertToDatabaseValue($value, AbstractPlatform $platform): string
 	{
 		return (string) $value;
 	}
 	
-	public function convertToPHPValue($value, AbstractPlatform $platform): mixed
+	public function convertToPHPValue($value, AbstractPlatform $platform): ?Locale
 	{
         return !empty($value) ? new Locale($value) : null;
 	}
@@ -31,5 +32,10 @@ final class LocaleType extends StringType
 	{
 		return true;
 	}
+
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $platform->getStringTypeDeclarationSQL($column);
+    }
 	
 }
