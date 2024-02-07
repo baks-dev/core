@@ -222,7 +222,7 @@ final class DBALQueryBuilder extends QueryBuilder
     }
 
 
-    public function fetchAssociative(): ?array
+    public function fetchAssociative(): array|false
     {
         $this->setMaxResults(1);
 
@@ -230,7 +230,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->executeCacheQuery()->fetchAssociative() :
             $this->executeQuery()->fetchAssociative();
 
-        return $result ?: null;
+        return $result ?: false;
     }
 
     public function fetchAllAssociativeIndexed(?string $class = null): array
