@@ -110,7 +110,7 @@ final class MessageDispatch implements MessageDispatchInterface
             /** Если транспорт не определяется и он является UID (обязательным) */
             if($isRunning === false && $transportRequire)
             {
-                $this->logger->critical(sprintf('Транспорт %s не найден', $this->transport));
+                $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport));
                 return false;
             }
         }

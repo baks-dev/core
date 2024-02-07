@@ -193,11 +193,7 @@ abstract class AbstractController
             {
                 if($domain)
                 {
-
-
                     $message = $this->translator->trans($message, [], $domain);
-
-
 
                     if($arguments !== null)
                     {
@@ -373,14 +369,14 @@ abstract class AbstractController
 
         $content = $this->contentMinify($content);
 
-//        $content = $this->cacheCss->getStyle(
-//            $fileName,
-//            $content,
-//            $module,
-//            $route,
-//            $this->requestStack->getCurrentRequest()->headers->get('x-device'),
-//            (bool) $this->getUsr()
-//        );
+        //        $content = $this->cacheCss->getStyle(
+        //            $fileName,
+        //            $content,
+        //            $module,
+        //            $route,
+        //            $this->requestStack->getCurrentRequest()->headers->get('x-device'),
+        //            (bool) $this->getUsr()
+        //        );
 
         $response->setContent($content);
 
