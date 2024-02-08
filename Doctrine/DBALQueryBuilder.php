@@ -205,9 +205,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociative(): array
     {
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->fetchAllAssociative() :
-            $this->executeQuery()->fetchAllAssociative();
+        $result = $this->executeDBALQuery()->fetchAllAssociative();
 
         return $result ?: [];
     }
@@ -215,9 +213,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllHydrate(string $class): Generator
     {
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->iterateAssociative() :
-            $this->executeQuery()->iterateAssociative();
+        $result = $this->executeDBALQuery()->iterateAssociative();
 
         foreach($result as $item)
         {
@@ -227,9 +223,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchHydrate(string $class): mixed
     {
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->fetchAssociative() :
-            $this->executeQuery()->fetchAssociative();
+        $result = $this->executeDBALQuery()->fetchAssociative();
 
         return new $class(...$result);
 
@@ -240,9 +234,7 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $this->setMaxResults(1);
 
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->fetchAssociative() :
-            $this->executeQuery()->fetchAssociative();
+        $result = $this->executeDBALQuery()->fetchAssociative();
 
         return $result ?: false;
     }
@@ -250,9 +242,7 @@ final class DBALQueryBuilder extends QueryBuilder
     public function fetchAllAssociativeIndexed(?string $class = null): array
     {
 
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->fetchAllAssociative() :
-            $this->executeQuery()->fetchAllAssociative();
+        $result = $this->executeDBALQuery()->fetchAllAssociative();
 
         $data = [];
 
@@ -279,9 +269,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchOne(): mixed
     {
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->fetchOne() :
-            $this->executeQuery()->fetchOne();
+        $result = $this->executeDBALQuery()->fetchOne();
 
         return $result ?: null;
     }
@@ -302,24 +290,24 @@ final class DBALQueryBuilder extends QueryBuilder
         $exist->select(($not ? 'NOT ' : '').' EXISTS('.$this->getSQL().')');
         $exist->setParameters($this->getParameters());
 
-        $result = $this->isCache ?
-            $this->executeCacheQuery()->fetchOne() :
-            $this->executeQuery()->fetchOne();
+        $result = $this->executeDBALQuery()->fetchOne();
 
         return (bool) $result;
     }
 
-
-    private function executeCacheQuery(): Result
+    private function executeDBALQuery(): Result
     {
         if($this->search)
         {
-            $this->andWhere('('.$this->search->getQueryPart('where').')');
-
-
-            $this->search = null;
+            $WHERE = str_replace('SELECT NULL WHERE', '(', $this->search->getSQL()).')';
+            $this->andWhere($WHERE);
         }
 
+        return $this->isCache && !$this->search ? $this->executeCacheQuery() : $this->executeQuery();
+    }
+
+    private function executeCacheQuery(): Result
+    {
         return $this->connection->executeCacheQuery(
             $this->getSQL(),
             $this->getParameters(),
@@ -411,6 +399,8 @@ final class DBALQueryBuilder extends QueryBuilder
         //}
 
         $this->search = new QueryBuilder($this->connection);
+
+        $this->search->select('NULL');
 
         return $this;
     }
@@ -622,6 +612,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $this->search->orWhere('LOWER('.$field.') LIKE :query');
         $this->search->orWhere('LOWER('.$field.') LIKE :switcher');
+
+
 
 
         return $this;
