@@ -309,8 +309,8 @@ final class EntityTestGenerator
                 continue;
             }
 
-            dump('$property->getType()');
-            dd($property->getType());
+            //dump('$property->getType()');
+            //dd($property->getType());
 
         }
 

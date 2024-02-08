@@ -166,7 +166,7 @@ abstract class AbstractController
 
         $settings = $this->settingsMain->getSettingsMainAssociative($host, $lang);
 
-        dump($settings);
+        //dump($settings);
 
         return $settings;
     }
