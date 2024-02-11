@@ -1,5 +1,6 @@
+<?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +21,12 @@
  *  THE SOFTWARE.
  */
 
-const copyId = document.querySelectorAll('.copy');
+namespace BaksDev\Core\Type\Crypt;
 
-copyId.forEach(el => {
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-    el.addEventListener('click', event => {
-
-        navigator.clipboard.writeText(el.dataset.copy)
-            .then(() => {
-
-                $successSupplyToast = '{ "type":"success" , ' +
-                    '"header":"Копирование"  , ' +
-                    '"message" : "Результат успешно скопирован в буфер обмена" }';
-
-                createToast(JSON.parse($successSupplyToast));
-
-                el.classList.add('opacity-25');
-
-                setTimeout(() => {
-                    el.classList.remove('opacity-25');
-                }, 500);
-
-            })
-            .catch(err => {
-                console.log('Something went wrong', err);
-            });
-    });
-});
+#[AutoconfigureTag('baks.crypt.key')]
+interface CryptKeyInterface
+{
+    public function getCryptKey(): string;
+}

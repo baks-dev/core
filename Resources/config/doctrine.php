@@ -2,6 +2,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use BaksDev\Core\Type\Crypt\Crypt;
+use BaksDev\Core\Type\Crypt\CryptType;
 use BaksDev\Core\Type\Device\Device;
 use BaksDev\Core\Type\Device\DeviceType;
 use BaksDev\Core\Type\Field\InputField;
@@ -19,6 +21,7 @@ use BaksDev\Core\Type\Modify\ModifyActionType;
 use Symfony\Config\DoctrineConfig;
 
 return static function (ContainerConfigurator $container, DoctrineConfig $doctrine) {
+    $doctrine->dbal()->type(Crypt::TYPE)->class(CryptType::class);
     $doctrine->dbal()->type(ModifyAction::TYPE)->class(ModifyActionType::class);
     $doctrine->dbal()->type(IpAddress::TYPE)->class(IpAddressType::class);
     $doctrine->dbal()->type(Locale::TYPE)->class(LocaleType::class);

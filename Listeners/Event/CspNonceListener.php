@@ -65,7 +65,7 @@ final class CspNonceListener
             child-src blob: https://mc.yandex.ru;
         ";
 
-        //$response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Content-Security-Policy', str_replace(PHP_EOL, '', $cspHeader));
     }
 }

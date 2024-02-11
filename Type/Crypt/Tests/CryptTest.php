@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2023.  Baks.dev <admin@baks.dev>
  *
@@ -20,30 +21,22 @@
  *  THE SOFTWARE.
  */
 
-const copyId = document.querySelectorAll('.copy');
+declare(strict_types=1);
 
-copyId.forEach(el => {
+namespace BaksDev\Core\Type\Crypt\Tests;
 
-    el.addEventListener('click', event => {
+use BaksDev\Core\Type\Crypt\CryptType;
+use BaksDev\Core\Type\Ip\IpAddress;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-        navigator.clipboard.writeText(el.dataset.copy)
-            .then(() => {
-
-                $successSupplyToast = '{ "type":"success" , ' +
-                    '"header":"Копирование"  , ' +
-                    '"message" : "Результат успешно скопирован в буфер обмена" }';
-
-                createToast(JSON.parse($successSupplyToast));
-
-                el.classList.add('opacity-25');
-
-                setTimeout(() => {
-                    el.classList.remove('opacity-25');
-                }, 500);
-
-            })
-            .catch(err => {
-                console.log('Something went wrong', err);
-            });
-    });
-});
+/**
+ * @group core
+ */
+final class CryptTest extends TestCase
+{
+    public function testCryptKey()
+    {
+        self::assertNotFalse(CryptType::getCryptKey());
+    }
+}

@@ -4,6 +4,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Repository\SettingsMain\SettingsMainRepository;
+use BaksDev\Core\Type\Crypt\CryptKeyInterface;
 
 return static function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -30,6 +31,7 @@ return static function (ContainerConfigurator $configurator): void {
 
     $services->load($NAMESPACE.'Type\Modify\Modify\\', $MODULE.'Type/Modify/Modify');
 
+    $services->set(CryptKeyInterface::class);
 
     /** @see https://symfony.com/doc/current/service_container/autowiring.html#dealing-with-multiple-implementations-of-the-same-type */
     $services->alias(SettingsMainInterface::class, SettingsMainRepository::class);

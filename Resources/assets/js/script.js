@@ -388,7 +388,7 @@ function modalLink(item) {
 
                 /* Сбрасываем содержимое модального окна при закрытии */
                 modal.addEventListener('hidden.bs.modal', function (event) {
-                    this.innerHTML = '';
+                    this.innerHTML = '<div class="modal-dialog modal-dialog-centered"><div class="d-flex justify-content-center w-100"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div></div>';
                 })
 
                 /* Если в модальном окне присутствует select2 */
