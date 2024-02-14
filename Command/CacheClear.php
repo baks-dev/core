@@ -130,6 +130,7 @@ class CacheClear extends Command
 
     public function clearModule(string $module): void
     {
+            /** Сбрасываем кеш адаптера AppCache */
             $appCache = $this->appCache->init($module);
             $appCache->clear();
 

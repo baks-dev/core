@@ -785,7 +785,6 @@
                 }));
             }
 
-
             element.remove();
 
             if (typeof callback == "function") {
@@ -794,9 +793,10 @@
 
             setTimeout(function () {
                 document.head.appendChild(elem);
-
-                // console.log('appendChild SCRIPT');
             }, 100);
+
+
+
         }
 
         // console.log('END invokeScript');
@@ -1111,13 +1111,12 @@
     var intersectionHandler = function intersectionHandler(entries, settings, instance) {
 
         entries.forEach(function (entry) {
-
             invokeScript(entry.target);
-
-            // console.log('intersectionHandler');
-            // console.log(entry.target);
-
             return isIntersecting(entry) ? onEnter(entry.target, entry, settings, instance) : onExit(entry.target, entry, settings, instance);
+        });
+
+        document.querySelectorAll('.modal-link').forEach(function(el) {
+            el.classList.remove('disabled');
         });
     };
 

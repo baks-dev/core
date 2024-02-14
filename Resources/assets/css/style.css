@@ -579,3 +579,9 @@ img.loaded, div.loaded {
     color: #6c757d;
     opacity: 0.5;
 }
+
+.clearfix {
+    display: block;
+    clear: both;
+    content: "";
+}

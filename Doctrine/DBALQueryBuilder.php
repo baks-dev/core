@@ -225,8 +225,11 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $result = $this->executeDBALQuery()->fetchAssociative();
 
-        return new $class(...$result);
+        if(empty($result)) {
+            return null;
+        }
 
+        return new $class(...$result);
     }
 
 

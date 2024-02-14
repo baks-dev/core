@@ -190,9 +190,18 @@ final class ORMQueryBuilder extends QueryBuilder
         return $this->getQuery()->getResult() ?: null;
     }
 
+//    public function join($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
+//    {
+//        parent::join($join, $alias, $conditionType, $condition, $indexBy);
+//
+//        return $this;
+//    }
+
+
     public function flush(): void
     {
         $this->entityManager->flush();
+        $this->entityManager->clear();
     }
 
     /**
