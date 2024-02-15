@@ -59,7 +59,6 @@ final class DBALQueryBuilder extends QueryBuilder
     private string|CompositeExpression|null $where = null;
 
 
-
     private Connection $connection;
 
     private CacheItemPoolInterface $cacheQueries;
@@ -225,7 +224,8 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $result = $this->executeDBALQuery()->fetchAssociative();
 
-        if(empty($result)) {
+        if(empty($result))
+        {
             return null;
         }
 
@@ -357,7 +357,6 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->resetGroupBy();
 
 
-
             $counterCache = $this->cacheQueries->getItem($counterKey);
             $counterCache->set($this->fetchOne());
             $counterCache->expiresAfter(DateInterval::createFromDateString('1 day'));
@@ -433,7 +432,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $addGroupBy = null;
 
 
-//            $ref  = new \ReflectionProperty($this, 'select');
+        //            $ref  = new \ReflectionProperty($this, 'select');
 
         //dd($this->select);
 
@@ -617,8 +616,6 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->search->orWhere('LOWER('.$field.') LIKE :switcher');
 
 
-
-
         return $this;
     }
 
@@ -736,7 +733,7 @@ final class DBALQueryBuilder extends QueryBuilder
     }
 
 
-    public function exists($fromAlias, $existClass, $alias, $condition = null): DBALQueryBuilder
+    private function buildExist($existClass, $alias, $condition): string
     {
         $exist = $this->createQueryBuilder(self::class);
 
@@ -744,9 +741,19 @@ final class DBALQueryBuilder extends QueryBuilder
         $exist->from($this->getTableNameFromClass($existClass), $alias);
         $exist->where($condition);
 
-        $this->andWhere('EXISTS('.$exist->getSQL().')');
+        return $exist->getSQL();
+    }
 
-        return $exist;
+    public function andWhereExists($existClass, $alias, $condition): DBALQueryBuilder
+    {
+        $this->andWhere('EXISTS('.$this->buildExist($existClass, $alias, $condition).')');
+        return $this;
+    }
+
+    public function andWhereNotExists($existClass, $alias, $condition = null): DBALQueryBuilder
+    {
+        $this->andWhere('NOT EXISTS('.$this->buildExist($existClass, $alias, $condition).')');
+        return $this;
     }
 
     public function leftJoin($fromAlias, $join, $alias, $condition = null): self
@@ -794,7 +801,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $class;
     }
-
 
 
 }
