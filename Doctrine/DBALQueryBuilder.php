@@ -431,11 +431,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $addGroupBy = null;
 
-
-        //            $ref  = new \ReflectionProperty($this, 'select');
-
-        //dd($this->select);
-
         foreach($this->select as $field)
         {
             foreach($array as $value)
@@ -577,8 +572,6 @@ final class DBALQueryBuilder extends QueryBuilder
         $desc = 'DESC'
     )
     {
-
-
         $leftOneJoin = new QueryBuilder($this->connection);
 
         $leftOneJoin
@@ -587,9 +580,6 @@ final class DBALQueryBuilder extends QueryBuilder
             ->where('tmp_'.trim($condition))
             ->orderBy('tmp_'.$alias.'.'.($sort ?: $identifier), $desc)
             ->setMaxResults(1);
-
-
-        //dd($leftOneJoin->getSQL());
 
         $this->leftJoin(
             $fromAlias,

@@ -1,8 +1,5 @@
 {% if card %}
 
-	{#{{ dd(card) }}#}
-
-	
 	{% set arr_property = card.category_section_field | json_decode %}
 
 	{% set product_offers = card.product_offers | json_decode %}
@@ -143,24 +140,7 @@
 					</a>
 				
 				{% endif %}
-				
-				{# <a href="{{ path('products-product:user.detail', { url: card.url,
-						offer : card.product_offer_value,
-						variation : card.product_variation_value,
-						modification : card.product_modification_value
-					}) }}" class="text-decoration-none text-dark"> #}
-				
-				
-				{# Значение торгового предложения #}
-				{# {{ card.product_offer_value|call_twig_func(card.product_offer_reference) }} #}
-				
-				{# Значение множественного варианта ТП #}
-				{# {{ card.product_variation_value|call_twig_func(card.product_variation_reference) }} #}
-				
-				{# Значение модификации множественного варианта ТП #}
-				{# {{ card.product_modification_value|call_twig_func(card.product_modification_reference) }} #}
-				
-				
+
 				
 				{# Свойства, учавствующие в названии #}
 				{% for name_property in arr_property | filter(props => props.field_name == true) %}
@@ -175,19 +155,7 @@
 				{# Цена продукта  #}
 				{{ include(_self|replace({ "card.html.twig": "price/price.html.twig" })) }}
 			{% else %}
-
-				{# {% if filter.vars.data.modification %}
-				
-				{% elseif filter.vars.data.variation %}
-					{{ include(_self|replace({ "card.html.twig": "price/modification.html.twig" })) }}
-				{% elseif filter.vars.data.offer %}
-					{{ include(_self|replace({ "card.html.twig": "price/variation.html.twig" })) }}
-				{% else %}
-					{{ include(_self|replace({ "card.html.twig": "price/offer.html.twig" })) }}
-				{% endif %} #}
-				
 				{{ include(_self|replace({ "card.html.twig": "price/offer.html.twig" })) }}
-			
 			{% endif %}
 			
 			

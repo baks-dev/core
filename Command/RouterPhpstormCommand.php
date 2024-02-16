@@ -75,20 +75,7 @@ class RouterPhpstormCommand extends Command
 		
 		$this->filesystem->dumpFile($fileName, "<?php \r\n");
 		$this->filesystem->appendToFile($fileName, "return [ \r\n");
-		
-		//        return [
-		//
-		//          'delivery:admin.delivery.index' => [
-		//            [],
-		//            ['_controller' => 'App\\Module\\Delivery\\Controller\\Admin\\Delivery\\IndexController::index']
-		//          ],
-		//
-		//        ];
-		
-		//$fileSystem->appendToFile('logs.txt', 'Email sent to user@example.com');
-		
-		//dd($this->kernel->getProjectDir());
-		
+
 		foreach($routes as $route)
 		{
 			$def = $route->getDefaults();

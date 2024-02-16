@@ -37,14 +37,5 @@ final class UserAgentTest extends KernelTestCase
         $userAgent = new UserAgentGenerator();
         $desktop = $userAgent->genDesktop();
         self::assertNotNull($desktop);
-
-        //dd( $desktop );
-
-//        $browscap = ini_get('browscap') ? get_browser($desktop) : null;
-//        dump($desktop);
-//        dd($browscap);
-
-        //dd();
-
     }
 }
