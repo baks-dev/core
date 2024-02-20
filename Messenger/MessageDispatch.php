@@ -203,7 +203,7 @@ final class MessageDispatch implements MessageDispatchInterface
     {
         if(!$this->transport) { return false; }
 
-        $cache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
+        $cache = $this->cache->init('core');
         $cacheConsume = $cache->getItem('consume-'.$this->transport);
 
         if($cacheConsume->isHit())

@@ -24,6 +24,7 @@
 namespace BaksDev\Core\Cache;
 
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 interface AppCacheInterface
 {
@@ -31,7 +32,7 @@ interface AppCacheInterface
         string $namespace = '',
         int $defaultLifetime = 0,
         MarshallerInterface $marshaller = null
-    ): mixed;
+    ): CacheInterface;
 
 
     public function getCacheType() : string;

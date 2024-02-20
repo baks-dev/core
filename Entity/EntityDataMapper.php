@@ -528,6 +528,8 @@ abstract class EntityDataMapper
         return $this;
     }
 
+
+
     public function cloneEntity($entity = null)
     {
         if($this instanceof EntityState)
@@ -537,6 +539,7 @@ abstract class EntityDataMapper
 
 
         $clone = clone $this;
+
         $oReflectionClass = new ReflectionClass($clone);
 
         if($this->entityManager)

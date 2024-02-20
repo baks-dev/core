@@ -30,7 +30,6 @@ abstract class Uid implements ValueResolverInterface
 {
     private Uuid $value;
 
-
     public function __construct(AbstractUid|Uid|string|null $value = null)
     {
         /* Применяем фильтр UID */

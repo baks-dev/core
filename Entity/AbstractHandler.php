@@ -35,7 +35,6 @@ use LogicException;
 
 abstract class AbstractHandler
 {
-
     protected ?object $event = null;
 
     protected ?object $main = null;
@@ -78,7 +77,6 @@ abstract class AbstractHandler
             throw new LogicException(static::class.': Не объявлено свойство main');
         }
 
-
         //$this->entityManager->clear();
 
         /** Получаем активное событие */
@@ -86,7 +84,7 @@ abstract class AbstractHandler
             ->getRepository($this->event::class)
             ->find($command->getEvent());
 
-        if(false === $this->validatorCollection->add($EventRepo, context: [__FILE__.':'.__LINE__]))
+        if(!$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [__FILE__.':'.__LINE__]))
         {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
@@ -103,6 +101,7 @@ abstract class AbstractHandler
         {
             $this->event = $EventRepo;
         }
+
         
         /**
          * Получаем корень после clear (для контроля объекта UOW)
@@ -142,8 +141,8 @@ abstract class AbstractHandler
         /** Перелинкуем корень и событие */
         $this->event->setMain($this->main);
         $this->event->setEntity($command);
-        $this->main->setEvent($this->event);
 
+        $this->main->setEvent($this->event);
         $this->entityManager->clear();
 
         /** Добавляем объекты в UOW */
@@ -176,7 +175,7 @@ abstract class AbstractHandler
             ->getRepository($this->event::class)
             ->find($command->getEvent());
 
-        if(false === $this->validatorCollection->add($EventRepo, context: [__FILE__.':'.__LINE__]))
+        if(!$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [__FILE__.':'.__LINE__]))
         {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }

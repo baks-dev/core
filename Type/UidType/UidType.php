@@ -12,37 +12,33 @@ use function is_string;
 
 class UidType extends StringType
 {
-
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         $classType = $this->getClassType();
 
-        if($value instanceof $classType && empty($value->getValue()))
+        if($value === null || ($value instanceof $classType && empty($value->getValue())))
         {
             return null;
         }
 
-        /* Применяем фильтр UID */
-        if($value == null || !preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $value))
+        if($value instanceof $classType)
         {
-            return $value;
+            return $value->getValue()->toRfc4122();
         }
 
-        //$toString = $platform->hasNativeGuidType() ? 'toRfc4122' : 'toBinary';
-
-        if(!($value instanceof $classType))
+        /* Применяем фильтр UID */
+        if(is_string($value) && Uid::isUid($value) === true)
         {
             $value = new $classType($value);
+            return $value->getValue()->toRfc4122();
         }
 
-        //return $value->getValue()->$toString();
-        return $value->getValue()->toRfc4122();
+        throw new InvalidArgumentException(sprintf('Invalid Uid class %s', $classType));
     }
 
 
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
-
         $classType = $this->getClassType();
 
         if(null === $value)
@@ -55,22 +51,12 @@ class UidType extends StringType
             return new $classType($value);
         }
 
-        if(!is_string($value))
-        {
-            throw ConversionException::conversionFailedInvalidType(
-                $value,
-                $value::TYPE,
-                ['null', 'string', AbstractUid::class],
-            );
-        }
-
-        try
+        if(is_string($value))
         {
             return new $classType(Uuid::fromString($value));
-        } catch(InvalidArgumentException $e)
-        {
-            throw ConversionException::conversionFailed($value, $this->getName(), $e);
         }
+
+        throw new InvalidArgumentException('Invalid Uid Convert To PHP');
     }
 
 
