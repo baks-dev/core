@@ -396,8 +396,20 @@ function modalLink(item) {
                     new NiceSelect(item, {searchable: true});
                 });
 
-                modal.querySelectorAll('form').forEach(function (forms) {
 
+                /* Если в модальном окне присутствует select2 */
+                modal.querySelectorAll('.modal-link').forEach(function (item, i, arr) {
+                    modalLink(item);
+
+                    //modalToggle = document.getElementById('modal');
+                    //bootstrap.Modal.getInstance(modalToggle).show();
+
+                });
+
+
+
+
+                modal.querySelectorAll('form').forEach(function (forms) {
 
                     //console.log(forms);
 

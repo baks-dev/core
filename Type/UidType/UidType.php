@@ -33,7 +33,18 @@ class UidType extends StringType
             return $value->getValue()->toRfc4122();
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid Uid class %s', $classType));
+        $className = explode('\\', $classType);
+        $className = end($className);
+
+        if(is_object($value))
+        {
+            $objectClassname = explode('\\', $value::class);
+            $objectClassname = end($objectClassname);
+
+            throw new InvalidArgumentException(sprintf('Invalid %s: (%s %s)', $className, $objectClassname, $value));
+        }
+
+        throw new InvalidArgumentException(sprintf('Invalid %s: %s', $className, $value));
     }
 
 

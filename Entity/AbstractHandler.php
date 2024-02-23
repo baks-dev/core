@@ -80,11 +80,18 @@ abstract class AbstractHandler
         //$this->entityManager->clear();
 
         /** Получаем активное событие */
+        $EventClass = $this->event::class;
         $EventRepo = $this->entityManager
-            ->getRepository($this->event::class)
+            ->getRepository($EventClass)
             ->find($command->getEvent());
 
-        if(!$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [__FILE__.':'.__LINE__]))
+        if(
+            !$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [
+                __FILE__.':'.__LINE__,
+                'class' => $EventClass,
+                'id' => $command->getEvent(),
+            ])
+        )
         {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
@@ -102,15 +109,22 @@ abstract class AbstractHandler
             $this->event = $EventRepo;
         }
 
-        
+
         /**
          * Получаем корень после clear (для контроля объекта UOW)
          */
+        $MainClass = $this->main::class;
         $this->main = $this->entityManager
-            ->getRepository($this->main::class)
+            ->getRepository($MainClass)
             ->findOneBy(['event' => $command->getEvent()]);
 
-        if(false === $this->validatorCollection->add($this->main, context: [__FILE__.':'.__LINE__]))
+        if(
+            false === $this->validatorCollection->add($this->main, context: [
+                __FILE__.':'.__LINE__,
+                'class' => $MainClass,
+                'event' => $command->getEvent(),
+            ])
+        )
         {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
@@ -171,11 +185,18 @@ abstract class AbstractHandler
         $this->entityManager->clear();
 
         /** Получаем активное событие */
+        $EventClass = $this->event::class;
         $EventRepo = $this->entityManager
-            ->getRepository($this->event::class)
+            ->getRepository($EventClass)
             ->find($command->getEvent());
 
-        if(!$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [__FILE__.':'.__LINE__]))
+        if(
+            !$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [
+                __FILE__.':'.__LINE__,
+                'class' => $EventClass,
+                'id' => $command->getEvent(),
+            ])
+        )
         {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
@@ -187,13 +208,21 @@ abstract class AbstractHandler
         /**
          * Получаем корень после clear (для контроля объекта UOW)
          */
+
+        $MainClass = $this->main::class;
         $this->main = $this->entityManager
-            ->getRepository($this->main::class)
+            ->getRepository($MainClass)
             ->findOneBy(['event' => $command->getEvent()]);
 
-        if(false === $this->validatorCollection->add($this->main, context: [__FILE__.':'.__LINE__]))
+        if(
+            false === $this->validatorCollection->add($this->main, context: [
+                __FILE__.':'.__LINE__,
+                'class' => $MainClass,
+                'event' => $command->getEvent(),
+            ])
+        )
         {
-            throw new DomainException($this->validatorCollection->getErrorUniqid());
+            throw new DomainException($this->validatorCollection->getErrorUniqid().': '.$command->getEvent());
         }
 
         $this->entityManager->remove($this->main);

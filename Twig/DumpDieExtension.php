@@ -23,22 +23,34 @@
 
 namespace BaksDev\Core\Twig;
 
-use Twig\Environment;
+use App\Kernel;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /** Функция применяет в значение Dump And Die */
 final class DumpDieExtension extends AbstractExtension
 {
-	public function getFunctions() : array
+    public function getFunctions() : array
 	{
 		return [
-			new TwigFunction('dd', $this->toArray(...)),
+			new TwigFunction('dump', $this->dump(...)),
+			new TwigFunction('dd', $this->dd(...)),
 		];
 	}
 	
-	public function toArray($action = null)
+	public function dd($action = null)
 	{
-		dd($action);
+        if(!Kernel::isProdEnvironment())
+        {
+            dd($action);
+        }
 	}
+
+    public function dump($action = null)
+    {
+        if(!Kernel::isProdEnvironment())
+        {
+            dump($action);
+        }
+    }
 }

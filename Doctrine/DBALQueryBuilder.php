@@ -576,7 +576,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $leftOneJoin
             ->select('tmp_'.$alias.'.'.$identifier)
-            ->from($this->getTableNameFromClass($join), 'tmp_'.$alias)
+            ->from($this->table($join), 'tmp_'.$alias)
             ->where('tmp_'.trim($condition))
             ->orderBy('tmp_'.$alias.'.'.($sort ?: $identifier), $desc)
             ->setMaxResults(1);
@@ -715,9 +715,18 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function from(string $table, $alias = null): self
     {
-        $from = $this->getTableNameFromClass($table);
+        $from = $this->table($table);
 
         parent::from($from, $alias);
+
+        return $this;
+    }
+
+    public function update(string $table): self
+    {
+        $from = $this->table($table);
+
+        parent::update($from);
 
         return $this;
     }
@@ -728,7 +737,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $exist = $this->createQueryBuilder(self::class);
 
         $exist->select('1');
-        $exist->from($this->getTableNameFromClass($existClass), $alias);
+        $exist->from($this->table($existClass), $alias);
         $exist->where($condition);
 
         return $exist->getSQL();
@@ -748,7 +757,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function leftJoin($fromAlias, $join, $alias, $condition = null): self
     {
-        $table = $this->getTableNameFromClass($join);
+        $table = $this->table($join);
 
         parent::leftJoin(
             $fromAlias,
@@ -764,7 +773,7 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $this->innerJoin(
             $fromAlias,
-            $this->getTableNameFromClass($join),
+            $this->table($join),
             $alias,
             $condition
         );
@@ -779,7 +788,7 @@ final class DBALQueryBuilder extends QueryBuilder
         dd($analyze);
     }
 
-    private function getTableNameFromClass(string $class): string
+    public function table(string $class): string
     {
         if(class_exists($class))
         {

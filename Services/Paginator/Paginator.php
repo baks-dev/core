@@ -51,7 +51,7 @@ final class Paginator implements PaginatorInterface
      */
     private mixed $id;
 
-    private array $data;
+    private array $data = [];
 
     private string $path;
 
@@ -63,6 +63,12 @@ final class Paginator implements PaginatorInterface
     public function __construct(RequestStack $request)
     {
         $this->request = $request->getCurrentRequest();
+
+        if(!$this->request)
+        {
+            return;
+        }
+
         $this->path = $this->request->get('_route');
         $this->namespace = substr($this->path, 0, strpos($this->path, ':'));
 
@@ -93,6 +99,11 @@ final class Paginator implements PaginatorInterface
 
     public function fetchAllAssociative(DBALQueryBuilder $qb, string $namespace = null): self
     {
+        if(!$this->request)
+        {
+            return $this;
+        }
+
         $qb->enableCache($namespace ?: $this->namespace, 3600);
 
         if($this->request->getSession()->get('statusCode') === 302)
@@ -166,6 +177,11 @@ final class Paginator implements PaginatorInterface
 
     public function fetchAllAssociativeIndexed(DBALQueryBuilder $qb, string $namespace = null): self
     {
+        if(!$this->request)
+        {
+            return $this;
+        }
+
         $qb->enableCache($namespace ?: $this->namespace, 3600);
 
         if($this->request->getSession()->get('statusCode') === 302)
