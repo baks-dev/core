@@ -92,13 +92,7 @@ setTimeout(function initBootstrap() {
         })
 
 
-
-
-
-
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-
-
 
 
         popoverTriggerList.map(function (popoverTriggerEl) {
@@ -159,8 +153,7 @@ setTimeout(function initBootstrap() {
 
                 content: function () {
 
-                    if (popoverTriggerEl.id)
-                    {
+                    if (popoverTriggerEl.id) {
                         let content = document.getElementById(popoverTriggerEl.id + '-content');
 
                         if (content) {
@@ -171,8 +164,7 @@ setTimeout(function initBootstrap() {
 
                 title: function () {
 
-                    if (popoverTriggerEl.id)
-                    {
+                    if (popoverTriggerEl.id) {
                         let title = document.getElementById(popoverTriggerEl.id + '-title');
                         if (title) {
                             return title.innerHTML;
@@ -407,8 +399,6 @@ function modalLink(item) {
                 });
 
 
-
-
                 modal.querySelectorAll('form').forEach(function (forms) {
 
                     //console.log(forms);
@@ -436,17 +426,15 @@ function modalLink(item) {
             } else {
 
 
-                if (request.status === 302)
-                {
+                if (request.status === 302) {
                     let requestJson = JSON.parse(request.response);
-                    if (requestJson.redirect)
-                    {
+                    if (requestJson.redirect) {
                         window.location.href = requestJson.redirect;
                     }
                 }
 
 
-               // console.log(request.responseText);
+                // console.log(request.responseText);
 
                 /* Закрываем модальное окно */
                 //let myModalEl = document.querySelector('#modal')
@@ -512,6 +500,7 @@ async function submitModalForm(forms) {
             btn.type = 'submit';
 
             const contentType = response.headers.get('content-type');
+
             if (!contentType || !contentType.includes('application/json')) {
 
                 $errorFormHandler = '{ "type":"danger" , ' +
@@ -564,7 +553,9 @@ async function submitModalForm(forms) {
                 }
                 console.log('resolve not found');
 
-                if (resolved > 1000) { return; }
+                if (resolved > 1000) {
+                    return;
+                }
                 resolved = resolved * 2;
                 setTimeout(initResolve, resolved);
 
@@ -647,12 +638,13 @@ async function submitLink(href, id = null) {
 
                 console.log('resolve not found');
 
-                if (resolved > 1000) { return; }
+                if (resolved > 1000) {
+                    return;
+                }
                 resolved = resolved * 2;
                 setTimeout(HunLIOPGlZ, resolved);
 
             }, 100);
-
 
 
             createToast(data);
@@ -843,8 +835,8 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                 });
 
                 if (frm) {
-                    let formSubmit = true;
 
+                    let formSubmit = true;
 
                     Array.from(frm.elements).forEach((input) => {
                         let $errorFormHandler = false;
@@ -852,39 +844,40 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                         if (input.validity.valid === false) {
 
                             formSubmit = false;
-                            closeProgress();
+
+                            let $placeholderText = false;
+
+                            setTimeout(closeProgress, 1000);
 
                             /* Поиск полей по LABEL */
                             $label = document.querySelector('label[for="' + input.id + '"]');
-                            let $labelText = $label ? $label.innerHTML : false;
+                            $placeholderText = $label ? $label.innerHTML : false;
 
-                            if ($labelText) {
-                                $errorFormHandler = '{ "type":"danger" , ' +
-                                    '"header":"' + $labelText + '"  , ' +
-                                    '"message" : "Ошибка заполнения" }';
+                            if (!$placeholderText) {
+                                /* Поиск полей по Placeholder */
+                                $placeholderInput = document.querySelector('#' + input.id + '');
 
-                                if ($errorFormHandler !== false) {
-                                    createToast(JSON.parse($errorFormHandler));
+                                if ($placeholderInput.tagName === 'SELECT') {
+                                    /* если элемент SELECT - получаем placeholder по первому элементу списка в empty value  */
+                                    const firstOption = $placeholderInput.options[0];
+                                    $placeholderText = firstOption.value === '' ? firstOption.textContent : false;
+                                } else {
+                                    $placeholder = $placeholderInput.getAttribute('placeholder');
+                                    $placeholderText = $placeholder ? $placeholder : false;
                                 }
                             }
 
-
-                            /* Поиск полей по Placeholder */
-                            $placeholderInput = document.querySelector('#' + input.id + '');
-
-                            $placeholder = $placeholderInput.getAttribute('placeholder');
-                            let $placeholderText = $placeholder ? $placeholder : false;
-
                             if ($placeholderText) {
                                 $errorFormHandler = '{ "type":"danger" , ' +
-                                    '"header":"' + $placeholderText + '"  , ' +
-                                    '"message" : "Ошибка заполнения" }';
+                                    '"header":"Ошибка заполнения"   , ' +
+                                    '"message" : "' + $placeholderText + '"}';
 
                                 if ($errorFormHandler !== false) {
                                     createToast(JSON.parse($errorFormHandler));
                                 }
                             }
                         }
+
                     });
 
                     /** Если форма добавления в корзину */
@@ -895,11 +888,10 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                     if (formSubmit) {
                         frm.submit()
                     }
-
                 }
             }
 
-            /** Максимально крутим спинер - 3 сек */
+            ///** Максимально крутим спинер - 3 сек */
             setTimeout(closeProgress, 3000);
         });
     }
@@ -908,13 +900,15 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
 
 function closeProgress() {
     document.querySelectorAll('.spinner-border').forEach(function (indicator) {
-        //setTimeout(function () {
+
         indicator.classList.add('d-none');
+
         let btn = indicator.closest('.btn');
+
         if (btn) {
             btn.disabled = false;
+            btn.removeAttribute('disabled');
         }
-        // }, 300);
     });
 }
 

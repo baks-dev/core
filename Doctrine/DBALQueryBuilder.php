@@ -427,7 +427,11 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function allGroupByExclude(string|array $exclude = null): void
     {
-        $array = array("MIN", "MAX", "COUNT", "SUM", "JSON_AGG", "ARRAY_AGG", "EXISTS", "FALSE", "TRUE");
+        $array = [
+            "MIN", "MAX", "COUNT", "SUM",
+            "JSON_AGG", "ARRAY_AGG", "STRING_AGG",
+            "EXISTS", "FALSE", "TRUE"
+        ];
 
         $addGroupBy = null;
 
