@@ -33,9 +33,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 // the name of the command is what users type after "php bin/console"
@@ -68,10 +70,10 @@ class CacheClear extends Command
 
         $path = $this->project_dir.'/vendor/baks-dev';
 
+        $io = new SymfonyStyle($input, $output);
+
         if($module)
         {
-            $io = new SymfonyStyle($input, $output);
-
             if(is_dir($path.'/'.$module))
             {
                 $this->clearModule($module);
@@ -102,11 +104,7 @@ class CacheClear extends Command
         }
 
         $command = ($this->getApplication())->get('cache:clear');
-        $command->run($input, $output);
-
-        /** Прогреваем кеш */
-        $warmup = ($this->getApplication())->get('cache:warmup');
-        $warmup->run($input, $output);
+        $command->run($input, new NullOutput());
 
 
         $path = $this->project_dir.'/var/cache';
@@ -119,15 +117,12 @@ class CacheClear extends Command
                 continue;
             }
 
-            if($cache->isDir() && $cache->getFilename() !== 'prod')
-            {
-
-                $process = Process::fromShellCommandline('rm -rf '.$cache->getRealPath());
-                $process->setTimeout(5);
-                $process->run();
-
-            }
+            $process = Process::fromShellCommandline('rm -rf '.$cache->getRealPath());
+            $process->setTimeout(5);
+            $process->run();
         }
+
+        $io->warning('Рекомендуется выполнить комманду sudo -u unit php bin/console cache:warmup');
 
         return Command::SUCCESS;
     }
