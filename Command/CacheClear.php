@@ -56,7 +56,6 @@ class CacheClear extends Command
     }
 
 
-
     protected function configure(): void
     {
         $this->addArgument('module', InputArgument::OPTIONAL, 'Модуль');
@@ -105,6 +104,11 @@ class CacheClear extends Command
         $command = ($this->getApplication())->get('cache:clear');
         $command->run($input, $output);
 
+        /** Прогреваем кеш */
+        $warmup = ($this->getApplication())->get('cache:warmup');
+        $warmup->run($input, $output);
+
+
         $path = $this->project_dir.'/var/cache';
 
         /** @var DirectoryIterator $cache */
@@ -115,33 +119,34 @@ class CacheClear extends Command
                 continue;
             }
 
-            if($cache->isDir())
+            if($cache->isDir() && $cache->getFilename() !== 'prod')
             {
+
                 $process = Process::fromShellCommandline('rm -rf '.$cache->getRealPath());
                 $process->setTimeout(5);
                 $process->run();
+
             }
         }
 
         return Command::SUCCESS;
-
     }
 
 
     public function clearModule(string $module): void
     {
-            /** Сбрасываем кеш адаптера AppCache */
-            $appCache = $this->appCache->init($module);
-            $appCache->clear();
+        /** Сбрасываем кеш адаптера AppCache */
+        $appCache = $this->appCache->init($module);
+        $appCache->clear();
 
-            if(function_exists('apcu_enabled') && apcu_enabled())
-            {
-                $apcuCache = new ApcuAdapter($module);
-                $apcuCache->clear();
-            }
+        if(function_exists('apcu_enabled') && apcu_enabled())
+        {
+            $apcuCache = new ApcuAdapter($module);
+            $apcuCache->clear();
+        }
 
-            $fileCache = new FilesystemAdapter($module);
-            $fileCache->clear();
+        $fileCache = new FilesystemAdapter($module);
+        $fileCache->clear();
     }
 
 }
