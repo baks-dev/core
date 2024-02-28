@@ -25,7 +25,9 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Command;
 
+use BaksDev\Centrifugo\BaksDevCentrifugoBundle;
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Nginx\Unit\BaksDevNginxUnitBundle;
 use DirectoryIterator;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -122,7 +124,21 @@ class CacheClear extends Command
             $process->run();
         }
 
-        $io->warning('Рекомендуется выполнить комманду sudo -u unit php bin/console cache:warmup');
+        $io->warning('Рекомендуется выполнить комманду:');
+
+        $io->text('sudo -u unit php bin/console cache:warmup');
+
+
+        if(class_exists(BaksDevNginxUnitBundle::class))
+        {
+            $io->text('sudo service unit restart');
+        }
+
+        if(class_exists(BaksDevCentrifugoBundle::class))
+        {
+            $io->text('sudo service centrifugo restart');
+            $io->text('');
+        }
 
         return Command::SUCCESS;
     }
