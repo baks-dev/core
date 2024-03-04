@@ -1037,9 +1037,6 @@ document.querySelectorAll('.js-datepicker').forEach((datepicker) => {
     const [day, month, year] = $elementDate.split('.');
     $selectedDate = new Date(+year, month - 1, +day);
 
-    console.log($elementDate);
-
-
     MCDatepicker.create({
         el: '#' + datepicker.id,
         bodyType: 'modal', // ‘modal’, ‘inline’, or ‘permanent’.
@@ -1053,6 +1050,6 @@ document.querySelectorAll('.js-datepicker').forEach((datepicker) => {
         dateFormat: 'DD.MM.YYYY',
         customWeekDays: datapickerLang[$lang].customWeekDays,
         customMonths: datapickerLang[$lang].customMonths,
-        selectedDate:  $selectedDate == 'Invalid Date' ? new Date() : $selectedDate,
+        selectedDate:  $selectedDate === 'Invalid Date' ? new Date() : $selectedDate,
     });
 });

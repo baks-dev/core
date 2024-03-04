@@ -40,7 +40,7 @@ final class DumpDieExtension extends AbstractExtension
 	
 	public function dd($action = null)
 	{
-        if(!Kernel::isProdEnvironment())
+        if(Kernel::isDump())
         {
             dd($action);
         }
@@ -48,7 +48,7 @@ final class DumpDieExtension extends AbstractExtension
 
     public function dump($action = null)
     {
-        if(!Kernel::isProdEnvironment())
+        if(Kernel::isDump())
         {
             dump($action);
         }

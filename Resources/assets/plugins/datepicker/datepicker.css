@@ -844,8 +844,9 @@
 }
 
 .mc-date--inactive.mc-date--picked {
-    box-shadow: 0 0 0 1px rgba(14, 131, 125, .5803921568627451);
-    color: rgba(14, 131, 125, .5803921568627451)
+    box-shadow: 0 0.125rem 0.25rem var(--bs-primary);
+    color: var(--bs-primary);
+    opacity: 0.5;
 }
 
 .mc-date--marked {

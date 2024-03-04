@@ -32,6 +32,7 @@ use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use BaksDev\Core\Type\Locale\Locale;
 use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use DateInterval;
+use DateTimeImmutable;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
@@ -150,7 +151,16 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
 
         $this->cacheKey .= '.'.implode('.', array_map(function($value) {
+
+
+                if($value instanceof DateTimeImmutable)
+                {
+                    $value = $value->getTimestamp();
+                }
+
                 return is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : $value;
+
+
             }, $this->getParameters()));
 
 
