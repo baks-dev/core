@@ -1,0 +1,25 @@
+# bash
+
+# systemctl daemon-reload
+
+# systemctl enable baks-scheduler@1.service
+# systemctl disable baks-scheduler@1.service
+
+# systemctl start baks-scheduler@1.service
+# systemctl restart baks-scheduler@1.service
+# systemctl stop baks-scheduler@1.service
+
+[Unit]
+Description=Symfony messenger scheduler_default %i
+StartLimitBurst=5
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=php /.....PATH_TO_PROJECT..../bin/console messenger:consume scheduler_default --memory-limit=128m --time-limit=3600 --limit=100
+Restart=always
+
+User=unit
+Group=unit
+
+[Install]
+WantedBy=default.target
