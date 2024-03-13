@@ -43,7 +43,6 @@ $html = false;
     }
 }*/
 
-
 setTimeout(function initBootstrap() {
 
     /*console.log(bootstrap);*/
@@ -96,6 +95,9 @@ setTimeout(function initBootstrap() {
 
 
         popoverTriggerList.map(function (popoverTriggerEl) {
+
+
+
 
 
             popoverTriggerEl.addEventListener('shown.bs.popover', function (event) {

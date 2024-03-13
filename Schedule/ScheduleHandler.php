@@ -32,17 +32,21 @@ use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 
 #[AsSchedule('default')]
 final class ScheduleHandler implements ScheduleProviderInterface
 {
     private iterable $schedule;
+    private CacheInterface $cache;
 
     public function __construct(
-        #[TaggedIterator('baks.schedule')] iterable $schedule
+        #[TaggedIterator('baks.schedule')] iterable $schedule,
+        CacheInterface $cache
     ) {
         $this->schedule = $schedule;
+        $this->cache = $cache;
     }
 
     /**
@@ -55,7 +59,10 @@ final class ScheduleHandler implements ScheduleProviderInterface
         /** @var ScheduleInterface $message */
         foreach($this->schedule as $message)
         {
-            $Schedule->add(RecurringMessage::every($message->getInterval(), $message->getMessage()));
+            $Schedule
+                ->add(RecurringMessage::every($message->getInterval(), $message->getMessage()))
+                ->stateful($this->cache)
+            ;
         }
 
         return $Schedule;

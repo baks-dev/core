@@ -1,20 +1,27 @@
-(function (global, factory) {
+(function(global, factory)
+{
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
         typeof define === 'function' && define.amd ? define(factory) :
             (global = global || self, global.LazyLoad = factory());
-}(this, (function () {
+}(this, (function()
+{
     'use strict';
 
-    function _extends() {
+    function _extends()
+    {
 
         // console.log('START _extends');
 
-        _extends = Object.assign || function (target) {
-            for (var i = 1; i < arguments.length; i++) {
+        _extends = Object.assign || function(target)
+        {
+            for(var i = 1; i < arguments.length; i++)
+            {
                 var source = arguments[i];
 
-                for (var key in source) {
-                    if (Object.prototype.hasOwnProperty.call(source, key)) {
+                for(var key in source)
+                {
+                    if(Object.prototype.hasOwnProperty.call(source, key))
+                    {
                         target[key] = source[key];
                     }
                 }
@@ -74,8 +81,10 @@
     ];
 
     //Проверяем правила
-    for (let i = 0; i < rules.length; i++) {
-        if (rules[i]() === true) {
+    for(let i = 0; i < rules.length; i++)
+    {
+        if(rules[i]() === true)
+        {
 
             isRobot = true;
             break;
@@ -120,12 +129,14 @@
     };
 
 
-    var getExtendedSettings = function getExtendedSettings(customSettings) {
+    var getExtendedSettings = function getExtendedSettings(customSettings)
+    {
         return _extends({}, defaultSettings, customSettings);
     };
 
     /* Creates instance and notifies it through the window element */
-    var createInstance = function createInstance(classObj, options) {
+    var createInstance = function createInstance(classObj, options)
+    {
 
 
         // console.log('STATR createInstance');
@@ -134,7 +145,8 @@
         var eventString = "LazyLoad::Initialized";
         var instance = new classObj(options);
 
-        try {
+        try
+        {
 
             // Works in modern browsers
             event = new CustomEvent(eventString, {
@@ -143,7 +155,8 @@
                 }
             });
 
-        } catch (err) {
+        } catch(err)
+        {
 
             // Works in Internet Explorer (all versions)
             event = document.createEvent("CustomEvent");
@@ -163,23 +176,28 @@
 
 
     /* Auto initialization of one or more instances of lazyload, depending on the
-        options passed in (plain object or an array) */
+     options passed in (plain object or an array) */
 
 
-    var autoInitialize = function autoInitialize(classObj, options) {
+    var autoInitialize = function autoInitialize(classObj, options)
+    {
 
-        if (!options) {
+        if(!options)
+        {
             return;
         }
 
-        if (!options.length) {
+        if(!options.length)
+        {
 
             // Plain object
             createInstance(classObj, options);
-        } else {
+        } else
+        {
 
             // Array of objects
-            for (var i = 0, optionsItem; optionsItem = options[i]; i += 1) {
+            for(var i = 0, optionsItem; optionsItem = options[i]; i += 1)
+            {
                 createInstance(classObj, optionsItem);
             }
         }
@@ -197,7 +215,8 @@
     var statusDataName = "ll-status";
 
 
-    var getData = function getData(element, attribute) {
+    var getData = function getData(element, attribute)
+    {
 
         // console.log('START getData');
 
@@ -209,24 +228,26 @@
         // console.log('*');
 
 
-
         return element.getAttribute(dataPrefix + attribute);
     };
 
 
-    var setData = function setData(element, attribute, value) {
+    var setData = function setData(element, attribute, value)
+    {
 
         // console.log('START setData');
         // console.log(element);
 
         var attrName = dataPrefix + attribute;
 
-        if (value === null) {
+        if(value === null)
+        {
             element.removeAttribute(attrName);
             return;
         }
 
-        if (value === 'error') {
+        if(value === 'error')
+        {
             element.classList.add('border');
             element.classList.add('border-danger');
         }
@@ -240,55 +261,65 @@
 
     };
 
-    var getStatus = function getStatus(element) {
+    var getStatus = function getStatus(element)
+    {
 
         return getData(element, statusDataName);
     };
 
-    var setStatus = function setStatus(element, status) {
+    var setStatus = function setStatus(element, status)
+    {
 
         return setData(element, statusDataName, status);
     };
 
-    var resetStatus = function resetStatus(element) {
+    var resetStatus = function resetStatus(element)
+    {
 
         return setStatus(element, null);
     };
 
-    var hasEmptyStatus = function hasEmptyStatus(element) {
+    var hasEmptyStatus = function hasEmptyStatus(element)
+    {
 
         return getStatus(element) === null;
     };
 
-    var hasStatusLoading = function hasStatusLoading(element) {
+    var hasStatusLoading = function hasStatusLoading(element)
+    {
 
         return getStatus(element) === statusLoading;
     };
 
-    var hasStatusError = function hasStatusError(element) {
+    var hasStatusError = function hasStatusError(element)
+    {
 
         return getStatus(element) === statusError;
     };
 
-    var hasStatusNative = function hasStatusNative(element) {
+    var hasStatusNative = function hasStatusNative(element)
+    {
 
         return getStatus(element) === statusNative;
     };
 
     var statusesAfterLoading = [statusLoading, statusLoaded, statusApplied, statusError];
 
-    var hadStartedLoading = function hadStartedLoading(element) {
+    var hadStartedLoading = function hadStartedLoading(element)
+    {
 
         return statusesAfterLoading.indexOf(getStatus(element)) >= 0;
     };
 
 
-    var safeCallback = function safeCallback(callback, arg1, arg2, arg3) {
+    var safeCallback = function safeCallback(callback, arg1, arg2, arg3)
+    {
 
         // console.log('START safeCallback');
 
 
-        if (!callback) {
+        if(!callback)
+        {
 
             // console.log('START safeCallback 1 ***********************');
             // console.log('*');
@@ -298,7 +329,8 @@
             return;
         }
 
-        if (arg3 !== undefined) {
+        if(arg3 !== undefined)
+        {
 
             // console.log('START safeCallback 2 ***********************');
             // console.log('*');
@@ -309,7 +341,8 @@
             return;
         }
 
-        if (arg2 !== undefined) {
+        if(arg2 !== undefined)
+        {
 
             // console.log('START safeCallback 3 ***********************');
             // console.log('*');
@@ -325,13 +358,15 @@
         callback(arg1);
     };
 
-    var addClass = function addClass(element, className) {
+    var addClass = function addClass(element, className)
+    {
 
         // console.log('START addClass');
         // console.log(element);
 
 
-        if (supportsClassList) {
+        if(supportsClassList)
+        {
             element.classList.add(className);
             return;
         }
@@ -344,11 +379,13 @@
 
     };
 
-    var removeClass = function removeClass(element, className) {
+    var removeClass = function removeClass(element, className)
+    {
 
         // console.log('START removeClass');
 
-        if (supportsClassList) {
+        if(supportsClassList)
+        {
             element.classList.remove(className);
             return;
         }
@@ -360,41 +397,51 @@
         // console.log('*');
     };
 
-    var addTempImage = function addTempImage(element) {
+    var addTempImage = function addTempImage(element)
+    {
         // console.log('START addTempImage');
         element.llTempImage = document.createElement("IMG");
     };
 
-    var deleteTempImage = function deleteTempImage(element) {
+    var deleteTempImage = function deleteTempImage(element)
+    {
         // console.log('START deleteTempImage');
         delete element.llTempImage;
     };
 
-    var getTempImage = function getTempImage(element) {
+    var getTempImage = function getTempImage(element)
+    {
         // console.log('START getTempImage');
         return element.llTempImage;
     };
 
 
     /*    var addTempScript = function addTempScript(element) {
-            element.llTempScript = document.createElement("SCRIPT");
-        };
+     element.llTempScript = document.createElement("SCRIPT");
+     };
 
-        var deleteTempScript = function deleteTempScript(element) {
-            delete element.llTempScript;
-        };
-        var getTempScript = function getTempScript(element) {
-            return element.llTempScript;
-        };*/
+     var deleteTempScript = function deleteTempScript(element) {
+     delete element.llTempScript;
+     };
+     var getTempScript = function getTempScript(element) {
+     return element.llTempScript;
+     };*/
 
 
-    var unobserve = function unobserve(element, instance) {
+    var unobserve = function unobserve(element, instance)
+    {
 
         // console.log('START unobserve');
 
-        if (!instance) return;
+        if(!instance)
+        {
+            return;
+        }
         var observer = instance._observer;
-        if (!observer) return;
+        if(!observer)
+        {
+            return;
+        }
         observer.unobserve(element);
 
         // console.log('END unobserve');
@@ -402,7 +449,8 @@
         // console.log('*');
     };
 
-    var resetObserver = function resetObserver(observer) {
+    var resetObserver = function resetObserver(observer)
+    {
 
         // console.log('START resetObserver');
 
@@ -413,20 +461,28 @@
         // console.log('*');
     };
 
-    var unobserveEntered = function unobserveEntered(element, settings, instance) {
+    var unobserveEntered = function unobserveEntered(element, settings, instance)
+    {
         // console.log('START unobserveEntered');
 
-        if (settings.unobserve_entered) unobserve(element, instance);
+        if(settings.unobserve_entered)
+        {
+            unobserve(element, instance);
+        }
 
         // console.log('END unobserveEntered');
         // console.log('*');
         // console.log('*');
     };
 
-    var updateLoadingCount = function updateLoadingCount(instance, delta) {
+    var updateLoadingCount = function updateLoadingCount(instance, delta)
+    {
         // console.log('START updateLoadingCount');
 
-        if (!instance) return;
+        if(!instance)
+        {
+            return;
+        }
         instance.loadingCount += delta;
 
         // console.log('END updateLoadingCount');
@@ -434,11 +490,15 @@
         // console.log('*');
     };
 
-    var decreaseToLoadCount = function decreaseToLoadCount(instance) {
+    var decreaseToLoadCount = function decreaseToLoadCount(instance)
+    {
 
         // console.log('START decreaseToLoadCount');
 
-        if (!instance) return;
+        if(!instance)
+        {
+            return;
+        }
         instance.toLoadCount -= 1;
 
         // console.log('END decreaseToLoadCount');
@@ -446,11 +506,15 @@
         // console.log('*');
     };
 
-    var setToLoadCount = function setToLoadCount(instance, value) {
+    var setToLoadCount = function setToLoadCount(instance, value)
+    {
 
         // console.log('START decreaseToLoadCount');
 
-        if (!instance) return;
+        if(!instance)
+        {
+            return;
+        }
         instance.toLoadCount = value;
 
         // console.log('END decreaseToLoadCount');
@@ -458,27 +522,31 @@
         // console.log('*');
     };
 
-    var isSomethingLoading = function isSomethingLoading(instance) {
+    var isSomethingLoading = function isSomethingLoading(instance)
+    {
 
         return instance.loadingCount > 0;
     };
 
-    var haveElementsToLoad = function haveElementsToLoad(instance) {
+    var haveElementsToLoad = function haveElementsToLoad(instance)
+    {
 
         return instance.toLoadCount > 0;
     };
 
 
-
-    var getSourceTags = function getSourceTags(parentTag) {
+    var getSourceTags = function getSourceTags(parentTag)
+    {
 
         // console.log('START getSourceTags');
         // console.log(parentTag);
 
         var sourceTags = [];
 
-        for (var i = 0, childTag; childTag = parentTag.children[i]; i += 1) {
-            if (childTag.tagName === "SOURCE") {
+        for(var i = 0, childTag; childTag = parentTag.children[i]; i += 1)
+        {
+            if(childTag.tagName === "SOURCE")
+            {
                 sourceTags.push(childTag);
             }
         }
@@ -491,13 +559,14 @@
     };
 
 
-
-    var setAttributeIfValue = function setAttributeIfValue(element, attrName, value) {
+    var setAttributeIfValue = function setAttributeIfValue(element, attrName, value)
+    {
 
         // console.log('START setAttributeIfValue');
         // console.log(element);
 
-        if (!value) {
+        if(!value)
+        {
             return;
         }
 
@@ -508,12 +577,14 @@
         // console.log('*');
     };
 
-    var resetAttribute = function resetAttribute(element, attrName) {
+    var resetAttribute = function resetAttribute(element, attrName)
+    {
 
         element.removeAttribute(attrName);
     };
 
-    var hasOriginalAttributes = function hasOriginalAttributes(element) {
+    var hasOriginalAttributes = function hasOriginalAttributes(element)
+    {
 
         return !!element.llOriginalAttrs;
     };
@@ -521,10 +592,12 @@
 
     /** ИЗОБРАЖЕНИЯ */
 
-    var saveOriginalImageAttributes = function saveOriginalImageAttributes(element) {
+    var saveOriginalImageAttributes = function saveOriginalImageAttributes(element)
+    {
 
 
-        if (hasOriginalAttributes(element)) {
+        if(hasOriginalAttributes(element))
+        {
             return;
         }
 
@@ -535,10 +608,12 @@
         element.llOriginalAttrs = originalAttributes;
     };
 
-    var restoreOriginalImageAttributes = function restoreOriginalImageAttributes(element) {
+    var restoreOriginalImageAttributes = function restoreOriginalImageAttributes(element)
+    {
 
 
-        if (!hasOriginalAttributes(element)) {
+        if(!hasOriginalAttributes(element))
+        {
             return;
         }
 
@@ -548,26 +623,30 @@
         setAttributeIfValue(element, "sizes", originalAttributes["sizes"]);
     };
 
-    var setImageAttributes = function setImageAttributes(element, settings) {
+    var setImageAttributes = function setImageAttributes(element, settings)
+    {
 
         setAttributeIfValue(element, "sizes", getData(element, settings.data_sizes));
         setAttributeIfValue(element, "srcset", getData(element, settings.data_srcset));
         setAttributeIfValue(element, "src", getData(element, settings.data_src));
     };
 
-    var resetImageAttributes = function resetImageAttributes(element) {
+    var resetImageAttributes = function resetImageAttributes(element)
+    {
 
         resetAttribute(element, "src");
         resetAttribute(element, "srcset");
         resetAttribute(element, "sizes");
     };
 
-    var forEachPictureSource = function forEachPictureSource(element, fn) {
+    var forEachPictureSource = function forEachPictureSource(element, fn)
+    {
 
 
         var parent = element.parentNode;
 
-        if (!parent || parent.tagName !== "PICTURE") {
+        if(!parent || parent.tagName !== "PICTURE")
+        {
             return;
         }
 
@@ -578,14 +657,17 @@
 
     /** ВИДЕО */
 
-    var forEachVideoSource = function forEachVideoSource(element, fn) {
+    var forEachVideoSource = function forEachVideoSource(element, fn)
+    {
 
         var sourceTags = getSourceTags(element);
         sourceTags.forEach(fn);
     };
 
-    var setSourcesVideo = function setSourcesVideo(element, settings) {
-        forEachVideoSource(element, function (sourceTag) {
+    var setSourcesVideo = function setSourcesVideo(element, settings)
+    {
+        forEachVideoSource(element, function(sourceTag)
+        {
             setAttributeIfValue(sourceTag, "src", getData(sourceTag, settings.data_src));
         });
 
@@ -597,18 +679,22 @@
 
     /** IMG */
 
-    var restoreOriginalAttributesImg = function restoreOriginalAttributesImg(element) {
+    var restoreOriginalAttributesImg = function restoreOriginalAttributesImg(element)
+    {
 
-        forEachPictureSource(element, function (sourceTag) {
+        forEachPictureSource(element, function(sourceTag)
+        {
             restoreOriginalImageAttributes(sourceTag);
         });
         restoreOriginalImageAttributes(element);
     };
 
 
-    var setSourcesImg = function setSourcesImg(element, settings) {
+    var setSourcesImg = function setSourcesImg(element, settings)
+    {
 
-        forEachPictureSource(element, function (sourceTag) {
+        forEachPictureSource(element, function(sourceTag)
+        {
             saveOriginalImageAttributes(sourceTag);
             setImageAttributes(sourceTag, settings);
         });
@@ -616,10 +702,12 @@
         setImageAttributes(element, settings);
     };
 
-    var resetSourcesImg = function resetSourcesImg(element) {
+    var resetSourcesImg = function resetSourcesImg(element)
+    {
 
 
-        forEachPictureSource(element, function (sourceTag) {
+        forEachPictureSource(element, function(sourceTag)
+        {
             resetImageAttributes(sourceTag);
         });
         resetImageAttributes(element);
@@ -628,7 +716,8 @@
 
     /** IFRAME */
 
-    var setSourcesIframe = function setSourcesIframe(element, settings) {
+    var setSourcesIframe = function setSourcesIframe(element, settings)
+    {
         setAttributeIfValue(element, "src", getData(element, settings.data_src));
     };
 
@@ -640,12 +729,16 @@
     };
 
 
-    var setBackground = function setBackground(element, settings, instance) {
+    var setBackground = function setBackground(element, settings, instance)
+    {
 
         var bg1xValue = getData(element, settings.data_bg);
         var bgHiDpiValue = getData(element, settings.data_bg_hidpi);
         var bgDataValue = isHiDpi && bgHiDpiValue ? bgHiDpiValue : bg1xValue;
-        if (!bgDataValue) return;
+        if(!bgDataValue)
+        {
+            return;
+        }
         element.style.backgroundImage = "url(\"".concat(bgDataValue, "\")");
         getTempImage(element).setAttribute("src", bgDataValue);
         manageLoading(element, settings, instance);
@@ -655,14 +748,16 @@
     // BECAUSE INSIDE ITS VALUES MUST BE WRAPPED WITH URL() AND ONE OF THEM
     // COULD BE A GRADIENT BACKGROUND IMAGE
 
-    var setMultiBackground = function setMultiBackground(element, settings, instance) {
+    var setMultiBackground = function setMultiBackground(element, settings, instance)
+    {
 
 
         var bg1xValue = getData(element, settings.data_bg_multi);
         var bgHiDpiValue = getData(element, settings.data_bg_multi_hidpi);
         var bgDataValue = isHiDpi && bgHiDpiValue ? bgHiDpiValue : bg1xValue;
 
-        if (!bgDataValue) {
+        if(!bgDataValue)
+        {
             return;
         }
 
@@ -670,7 +765,8 @@
         manageApplied(element, settings, instance);
     };
 
-    var setSources = function setSources(element, settings) {
+    var setSources = function setSources(element, settings)
+    {
 
         // console.log('STAR setSources');
 
@@ -678,7 +774,8 @@
 
         var setSourcesFunction = setSourcesFunctions[element.tagName];
 
-        if (!setSourcesFunction) {
+        if(!setSourcesFunction)
+        {
             return;
         }
 
@@ -690,14 +787,16 @@
     };
 
 
-    var manageApplied = function manageApplied(element, settings, instance) {
+    var manageApplied = function manageApplied(element, settings, instance)
+    {
 
         // console.log('START manageApplied');
 
         addClass(element, settings.class_applied);
         setStatus(element, statusApplied);
 
-        if (settings.unobserve_completed) {
+        if(settings.unobserve_completed)
+        {
             // console.log(settings.unobserve_completed);
             // Отменить наблюдение сейчас, потому что мы не можем сделать это при загрузке
             unobserve(element, settings);
@@ -713,7 +812,8 @@
     };
 
 
-    let invokeScript = function scriptLoading(element) {
+    let invokeScript = function scriptLoading(element)
+    {
 
 
         // console.log('invokeScript '+element.tagName);
@@ -726,14 +826,16 @@
 
         let elem = null;
 
-        if (element.tagName === 'LINK') {
+        if(element.tagName === 'LINK')
+        {
             elem = document.createElement('LINK');
             elem.setAttribute('href', element.dataset.href);
 
             // console.log(element.dataset.href);
         }
 
-        if (element.tagName === 'SCRIPT') {
+        if(element.tagName === 'SCRIPT')
+        {
             elem = document.createElement('SCRIPT');
             elem.setAttribute('src', element.dataset.src);
 
@@ -741,7 +843,8 @@
         }
 
 
-        if (elem) {
+        if(elem)
+        {
 
             // console.error('Количество плагинов ' + navigator.plugins.length);
             // // console.error('cookieEnabled ' + navigator.cookieEnabled);
@@ -771,14 +874,19 @@
             /** переопределяем аттрибуты */
 
 
-            if (element instanceof Element && typeof element.getAttributeNames == 'function') {
-                element.getAttributeNames().forEach((function (e) {
+            if(element instanceof Element && typeof element.getAttributeNames == 'function')
+            {
+                element.getAttributeNames().forEach((function(e)
+                {
 
-                    if (e != 'data-src' && e != 'data-href' && e != 'class') {
+                    if(e != 'data-src' && e != 'data-href' && e != 'class')
+                    {
 
-                        if (e == 'data-nonce') {
+                        if(e == 'data-nonce')
+                        {
                             elem.setAttribute('nonce', element.getAttribute(e));
-                        } else {
+                        } else
+                        {
                             elem.setAttribute(e.toString(), element.getAttribute(e));
                         }
                     }
@@ -787,14 +895,15 @@
 
             element.remove();
 
-            if (typeof callback == "function") {
+            if(typeof callback == "function")
+            {
                 elem.addEventListener('load', callback);
             }
 
-            setTimeout(function () {
+            setTimeout(function()
+            {
                 document.head.appendChild(elem);
             }, 100);
-
 
 
         }
@@ -829,7 +938,8 @@
     }
 
 
-    var manageLoading = function manageLoading(element, settings, instance) {
+    var manageLoading = function manageLoading(element, settings, instance)
+    {
 
         // console.log('START manageLoading');
         // console.log(element);
@@ -852,52 +962,65 @@
     };
 
     var elementsWithLoadEvent = ["IMG", "IFRAME", "VIDEO"];
-    var hasLoadEvent = function hasLoadEvent(element) {
+    var hasLoadEvent = function hasLoadEvent(element)
+    {
         return elementsWithLoadEvent.indexOf(element.tagName) > -1;
     };
 
-    var checkFinish = function checkFinish(settings, instance) {
+    var checkFinish = function checkFinish(settings, instance)
+    {
 
 
-        if (instance && !isSomethingLoading(instance) && !haveElementsToLoad(instance)) {
+        if(instance && !isSomethingLoading(instance) && !haveElementsToLoad(instance))
+        {
             safeCallback(settings.callback_finish, instance);
         }
     };
 
-    var addEventListener = function addEventListener(element, eventName, handler) {
+    var addEventListener = function addEventListener(element, eventName, handler)
+    {
 
         element.addEventListener(eventName, handler);
         element.llEvLisnrs[eventName] = handler;
     };
 
-    var removeEventListener = function removeEventListener(element, eventName, handler) {
+    var removeEventListener = function removeEventListener(element, eventName, handler)
+    {
 
         element.removeEventListener(eventName, handler);
     };
 
-    var hasEventListeners = function hasEventListeners(element) {
+    var hasEventListeners = function hasEventListeners(element)
+    {
 
         return !!element.llEvLisnrs;
     };
 
-    var addEventListeners = function addEventListeners(element, loadHandler, errorHandler) {
+    var addEventListeners = function addEventListeners(element, loadHandler, errorHandler)
+    {
 
 
-        if (!hasEventListeners(element)) element.llEvLisnrs = {};
+        if(!hasEventListeners(element))
+        {
+            element.llEvLisnrs = {};
+        }
         var loadEventName = element.tagName === "VIDEO" ? "loadeddata" : "load";
         addEventListener(element, loadEventName, loadHandler);
         addEventListener(element, "error", errorHandler);
     };
 
-    var removeEventListeners = function removeEventListeners(element) {
+    var removeEventListeners = function removeEventListeners(element)
+    {
 
-        if (!hasEventListeners(element)) {
+        if(!hasEventListeners(element))
+        {
             return;
         }
 
         var eventListeners = element.llEvLisnrs;
 
-        for (var eventName in eventListeners) {
+        for(var eventName in eventListeners)
+        {
             var handler = eventListeners[eventName];
             removeEventListener(element, eventName, handler);
         }
@@ -905,7 +1028,8 @@
         delete element.llEvLisnrs;
     };
 
-    var doneHandler = function doneHandler(element, settings, instance) {
+    var doneHandler = function doneHandler(element, settings, instance)
+    {
 
 
         deleteTempImage(element);
@@ -913,12 +1037,14 @@
         decreaseToLoadCount(instance);
         removeClass(element, settings.class_loading);
 
-        if (settings.unobserve_completed) {
+        if(settings.unobserve_completed)
+        {
             unobserve(element, instance);
         }
     };
 
-    var loadHandler = function loadHandler(event, element, settings, instance) {
+    var loadHandler = function loadHandler(event, element, settings, instance)
+    {
 
 
         var goingNative = hasStatusNative(element);
@@ -926,35 +1052,46 @@
         addClass(element, settings.class_loaded);
         setStatus(element, statusLoaded);
         safeCallback(settings.callback_loaded, element, instance);
-        if (!goingNative) checkFinish(settings, instance);
+        if(!goingNative)
+        {
+            checkFinish(settings, instance);
+        }
     };
 
-    var errorHandler = function errorHandler(event, element, settings, instance) {
+    var errorHandler = function errorHandler(event, element, settings, instance)
+    {
 
         var goingNative = hasStatusNative(element);
         doneHandler(element, settings, instance);
         addClass(element, settings.class_error);
         setStatus(element, statusError);
         safeCallback(settings.callback_error, element, instance);
-        if (!goingNative) checkFinish(settings, instance);
+        if(!goingNative)
+        {
+            checkFinish(settings, instance);
+        }
     };
 
-    var addOneShotEventListeners = function addOneShotEventListeners(element, settings, instance) {
+    var addOneShotEventListeners = function addOneShotEventListeners(element, settings, instance)
+    {
 
 
         var elementToListenTo = getTempImage(element) || element;
 
-        if (hasEventListeners(elementToListenTo)) {
+        if(hasEventListeners(elementToListenTo))
+        {
             // This happens when loading is retried twice
             return;
         }
 
-        var _loadHandler = function _loadHandler(event) {
+        var _loadHandler = function _loadHandler(event)
+        {
             loadHandler(event, element, settings, instance);
             removeEventListeners(elementToListenTo);
         };
 
-        var _errorHandler = function _errorHandler(event) {
+        var _errorHandler = function _errorHandler(event)
+        {
             errorHandler(event, element, settings, instance);
             removeEventListeners(elementToListenTo);
         };
@@ -963,7 +1100,8 @@
     };
 
 
-    var loadBackground = function loadBackground(element, settings, instance) {
+    var loadBackground = function loadBackground(element, settings, instance)
+    {
 
         addTempImage(element);
         addOneShotEventListeners(element, settings, instance);
@@ -971,7 +1109,8 @@
         setMultiBackground(element, settings, instance);
     };
 
-    var loadRegular = function loadRegular(element, settings, instance) {
+    var loadRegular = function loadRegular(element, settings, instance)
+    {
 
         // console.log('loadRegular');
         // console.log(element);
@@ -982,23 +1121,27 @@
     };
 
 
-    var load = function load(element, settings, instance) {
+    var load = function load(element, settings, instance)
+    {
 
 
         // console.log('load');
         // console.log(element);
 
-        if (hasLoadEvent(element)) {
+        if(hasLoadEvent(element))
+        {
 
 
             loadRegular(element, settings, instance);
-        } else {
+        } else
+        {
             loadBackground(element, settings, instance);
         }
     };
 
 
-    var loadNative = function loadNative(element, settings, instance) {
+    var loadNative = function loadNative(element, settings, instance)
+    {
 
         // console.log('loadNative');
 
@@ -1008,12 +1151,22 @@
     };
 
 
-    var cancelLoading = function cancelLoading(element, entry, settings, instance) {
+    var cancelLoading = function cancelLoading(element, entry, settings, instance)
+    {
 
 
-        if (!settings.cancel_on_exit) return;
-        if (!hasStatusLoading(element)) return;
-        if (element.tagName !== "IMG") return; // Работает только на изображениях
+        if(!settings.cancel_on_exit)
+        {
+            return;
+        }
+        if(!hasStatusLoading(element))
+        {
+            return;
+        }
+        if(element.tagName !== "IMG")
+        {
+            return;
+        } // Работает только на изображениях
 
         removeEventListeners(element);
         resetSourcesImg(element);
@@ -1025,7 +1178,8 @@
     };
 
 
-    var onEnter = function onEnter(element, entry, settings, instance) {
+    var onEnter = function onEnter(element, entry, settings, instance)
+    {
 
         // console.log('onEnter');
         // console.log(element);
@@ -1035,20 +1189,26 @@
         removeClass(element, settings.class_exited);
         unobserveEntered(element, settings, instance);
         safeCallback(settings.callback_enter, element, entry, instance);
-        if (hadStartedLoading(element)) return; //Prevent loading it again
+        if(hadStartedLoading(element))
+        {
+            return;
+        } //Prevent loading it again
 
         load(element, settings, instance);
     };
 
 
-    var onExit = function onExit(element, entry, settings, instance) {
+    var onExit = function onExit(element, entry, settings, instance)
+    {
 
         // console.log('START onExit');
         // console.log(element);
 
 
-
-        if (hasEmptyStatus(element)) return; //Игнорировать первый проход при посадке
+        if(hasEmptyStatus(element))
+        {
+            return;
+        } //Игнорировать первый проход при посадке
 
         addClass(element, settings.class_exited);
         cancelLoading(element, entry, settings, instance);
@@ -1062,23 +1222,27 @@
     var tagsWithNativeLazy = ["IMG", "IFRAME", "SCRIPT"];
 
 
-    var shouldUseNative = function shouldUseNative(settings) {
+    var shouldUseNative = function shouldUseNative(settings)
+    {
 
         return settings.use_native && "loading" in HTMLImageElement.prototype;
     };
 
 
-    var loadAllNative = function loadAllNative(elements, settings, instance) {
+    var loadAllNative = function loadAllNative(elements, settings, instance)
+    {
 
 
         // console.log('loadAllNative');
 
-        elements.forEach(function (element) {
+        elements.forEach(function(element)
+        {
 
 
             // console.log(elements);
 
-            if (tagsWithNativeLazy.indexOf(element.tagName) === -1) {
+            if(tagsWithNativeLazy.indexOf(element.tagName) === -1)
+            {
                 return;
             }
 
@@ -1096,11 +1260,13 @@
     };
 
 
-    var isIntersecting = function isIntersecting(entry) {
+    var isIntersecting = function isIntersecting(entry)
+    {
         return entry.isIntersecting || entry.intersectionRatio > 0;
     };
 
-    var getObserverSettings = function getObserverSettings(settings) {
+    var getObserverSettings = function getObserverSettings(settings)
+    {
 
         return {
             root: settings.container === document ? null : settings.container,
@@ -1108,40 +1274,50 @@
         };
     };
 
-    var intersectionHandler = function intersectionHandler(entries, settings, instance) {
+    var intersectionHandler = function intersectionHandler(entries, settings, instance)
+    {
 
-        entries.forEach(function (entry) {
+        entries.forEach(function(entry)
+        {
             invokeScript(entry.target);
             return isIntersecting(entry) ? onEnter(entry.target, entry, settings, instance) : onExit(entry.target, entry, settings, instance);
         });
 
-        document.querySelectorAll('.modal-link').forEach(function(el) {
-            el.classList.remove('disabled');
-        });
+        /** Снимаем блокировку модальных кнопок */
+        setTimeout(() =>
+        {
+            document.querySelectorAll('.modal-link').forEach(function(el)
+            {
+                el.classList.remove('disabled');
+            });
+        }, 500);
     };
 
-    var observeElements = function observeElements(observer, elements) {
+    var observeElements = function observeElements(observer, elements)
+    {
 
         // console.log('observeElements');
         //elements.forEach(function (element) {
-            // console.log(element);
+        // console.log(element);
         //});
 
         // console.log('*************');
 
 
-        elements.forEach(function (element) {
+        elements.forEach(function(element)
+        {
             observer.observe(element);
         });
     };
 
-    var updateObserver = function updateObserver(observer, elementsToObserve) {
+    var updateObserver = function updateObserver(observer, elementsToObserve)
+    {
 
         // console.log('START updateObserver');
 
         //elementsToObserve.forEach(function (element) {
-            // console.log(element);
-       // });
+        // console.log(element);
+        // });
 
         // console.log('bind resetObserver');
         resetObserver(observer);
@@ -1158,21 +1334,24 @@
 
     };
 
-    var setObserver = function setObserver(settings, instance) {
+    var setObserver = function setObserver(settings, instance)
+    {
 
         // console.log('START setObserver');
 
-        if (!supportsIntersectionObserver || shouldUseNative(settings)) {
+        if(!supportsIntersectionObserver || shouldUseNative(settings))
+        {
             return;
         }
 
-        instance._observer = new IntersectionObserver(function (entries) {
+        instance._observer = new IntersectionObserver(function(entries)
+        {
 
 
             // console.log('START IntersectionObserver');
 
             //entries.forEach(function (element) {
-                // console.log(element.target);
+            // console.log(element.target);
             //});
 
             intersectionHandler(entries, settings, instance);
@@ -1191,46 +1370,53 @@
     };
 
 
-    var toArray = function toArray(nodeSet) {
+    var toArray = function toArray(nodeSet)
+    {
         return Array.prototype.slice.call(nodeSet);
     };
 
 
-    var queryElements = function queryElements(settings) {
+    var queryElements = function queryElements(settings)
+    {
 
         return settings.container.querySelectorAll(settings.elements_selector);
     };
 
 
-    var excludeManagedElements = function excludeManagedElements(elements) {
+    var excludeManagedElements = function excludeManagedElements(elements)
+    {
 
         return toArray(elements).filter(hasEmptyStatus);
     };
 
 
-    var hasError = function hasError(element) {
+    var hasError = function hasError(element)
+    {
 
         return hasStatusError(element);
     };
 
 
-    var filterErrorElements = function filterErrorElements(elements) {
+    var filterErrorElements = function filterErrorElements(elements)
+    {
 
         return toArray(elements).filter(hasError);
     };
 
-    var getElementsToLoad = function getElementsToLoad(elements, settings) {
+    var getElementsToLoad = function getElementsToLoad(elements, settings)
+    {
 
         return excludeManagedElements(elements || queryElements(settings));
     };
 
 
-
-    var retryLazyLoad = function retryLazyLoad(settings, instance) {
+    var retryLazyLoad = function retryLazyLoad(settings, instance)
+    {
 
         var errorElements = filterErrorElements(queryElements(settings));
 
-        errorElements.forEach(function (element) {
+        errorElements.forEach(function(element)
+        {
             removeClass(element, settings.class_error);
             resetStatus(element);
         });
@@ -1239,19 +1425,23 @@
     };
 
 
-    var setOnlineCheck = function setOnlineCheck(settings, instance) {
+    var setOnlineCheck = function setOnlineCheck(settings, instance)
+    {
 
-        if (!runningOnBrowser) {
+        if(!runningOnBrowser)
+        {
             return;
         }
 
-        window.addEventListener("online", function () {
+        window.addEventListener("online", function()
+        {
             retryLazyLoad(settings, instance);
         });
     };
 
 
-    var LazyLoad = function LazyLoad(customSettings, elements) {
+    var LazyLoad = function LazyLoad(customSettings, elements)
+    {
 
         // console.log('START LazyLoad');
         // console.log(elements);
@@ -1280,7 +1470,8 @@
     LazyLoad.prototype = {
 
 
-        update: function update(givenNodeset) {
+        update: function update(givenNodeset)
+        {
             LazyLoad.prototype
 
             // console.log('START LazyLoad.prototype');
@@ -1292,14 +1483,16 @@
             setToLoadCount(this, elementsToLoad.length);
 
 
-            if (isRobot || !supportsIntersectionObserver) {
+            if(isRobot || !supportsIntersectionObserver)
+            {
 
 
                 this.loadAll(elementsToLoad);
                 return;
             }
 
-            if (shouldUseNative(settings)) {
+            if(shouldUseNative(settings))
+            {
 
 
                 loadAllNative(elementsToLoad, settings, this);
@@ -1316,16 +1509,19 @@
 
         },
 
-        destroy: function destroy() {
+        destroy: function destroy()
+        {
 
 
             // Observer
-            if (this._observer) {
+            if(this._observer)
+            {
                 this._observer.disconnect();
             } // Очистить пользовательские атрибуты элементов
 
 
-            queryElements(this._settings).forEach(function (element) {
+            queryElements(this._settings).forEach(function(element)
+            {
                 delete element.llOriginalAttrs;
             }); //Удалить все внутренние реквизиты
 
@@ -1335,14 +1531,16 @@
             delete this.toLoadCount;
         },
 
-        loadAll: function loadAll(elements) {
+        loadAll: function loadAll(elements)
+        {
 
             var _this = this;
 
             var settings = this._settings;
             var elementsToLoad = getElementsToLoad(elements, settings);
 
-            elementsToLoad.forEach(function (element) {
+            elementsToLoad.forEach(function(element)
+            {
 
                 // console.log(element);
 
@@ -1352,20 +1550,23 @@
         }
     };
 
-    LazyLoad.load = function (element, customSettings) {
+    LazyLoad.load = function(element, customSettings)
+    {
 
         var settings = getExtendedSettings(customSettings);
         load(element, settings);
     };
 
-    LazyLoad.resetStatus = function (element) {
+    LazyLoad.resetStatus = function(element)
+    {
 
 
         resetStatus(element);
     }; // Automatic instances creation if required (useful for async script loading)
 
 
-    if (runningOnBrowser) {
+    if(runningOnBrowser)
+    {
 
         autoInitialize(LazyLoad, window.lazyLoadOptions);
     }
