@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Core\Listeners\Event;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use DateInterval;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -51,36 +52,37 @@ final class SettingsDeviceListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $agent = $event->getRequest()->headers->get('User-Agent');
+        $device = 'pc';
 
-        //dump($agent);
-
-        if ($agent)
+        if($agent)
         {
             $AppCache = $this->cache->init('core');
 
-            $device = $AppCache->get(md5($agent), function (ItemInterface $item) use ($agent) {
-                $item->expiresAfter(60 * 60 * 24); // сутки
+            $device = $AppCache->get(md5($agent), function(ItemInterface $item) use ($agent) {
+
+                $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
                 $browscap = ini_get('browscap') ? get_browser($agent) : null;
 
                 $device = 'pc';
 
-                if ($browscap?->ismobiledevice)
+                if($browscap?->ismobiledevice)
                 {
                     $device = 'mobile';
 
-                    if ($browscap->istablet)
+                    if($browscap->istablet)
                     {
                         $device = 'tablet';
                     }
                 }
 
+                if(empty($device) || !in_array($device, ['pc', 'mobile', 'tablet']))
+                {
+                    $device = 'pc';
+                }
+
                 return $device;
             });
-        }
-        else
-        {
-            $device = 'pc';
         }
 
         $event->getRequest()->headers->set('x-device', $device);

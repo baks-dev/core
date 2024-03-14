@@ -91,7 +91,7 @@ final class MessageDispatch implements MessageDispatchInterface
             $isRunning = $this->pingTransport();
 
             /** Транспорт resources всегда должен быть запущен */
-            if($transport === 'resources' && $isRunning === false)
+            if($transport === 'files-res' && $isRunning === false)
             {
                 return false;
             }
