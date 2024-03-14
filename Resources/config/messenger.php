@@ -26,15 +26,14 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Config\FrameworkConfig;
 
 return static function(FrameworkConfig $framework) {
-    
-    $messenger = $framework->messenger();
 
-    $messenger->failureTransport('failed');
+    $messenger = $framework->messenger();
 
     $messenger
         ->transport('async')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
         ->options(['queue_name' => 'async'])
+        ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(3)
         ->delay(1000)
