@@ -309,11 +309,12 @@ abstract class AbstractController
             $routingName = explode(':', $route)[1];
         }
 
+        $fileDefault = 'template.html.twig';
 
         if(!$file)
         {
             // Если AJAX подключаем content.html.twig иначе template.html.twig
-            $file = 'template.html.twig';
+            $file = $fileDefault;
 
             if($request->getCurrentRequest()->headers->get('X-Requested-With') === 'XMLHttpRequest')
             {
@@ -330,13 +331,20 @@ abstract class AbstractController
          * Подключаем шаблон в директории Template
          */
         $ModuleTemplate = '@Template';
-        $view = $ModuleTemplate.'/'.$module.'/'.$fileName;
 
         if(file_exists($this->project_dir.'/templates/'.$module.'/'.$fileName))
         {
+            $view = $ModuleTemplate.'/'.$module.'/'.$fileName;
             $content = $this->environment->render($view, $parameters);
         }
+        // Пробуем определить файл шаблона по умолчанию template.html.twig
+        elseif(file_exists($this->project_dir.'/templates/'.$module.'/'.$fileDefault))
+        {
+            $fileName = str_replace('.', '/', $routingName).'/'.$fileDefault;
 
+            $view = $ModuleTemplate.'/'.$module.'/'.$fileName;
+            $content = $this->environment->render($view, $parameters);
+        }
 
         /**
          * Подключаем шаблон в директории @App
@@ -344,13 +352,18 @@ abstract class AbstractController
         if($content === null)
         {
             $ModuleTemplate = '@App';
-            $view = $ModuleTemplate.'/'.$module.'/Resources/view/'.$fileName;
 
             if(file_exists($this->project_dir.'/src/'.$module.'/Resources/view/'.$fileName))
             {
+                $view = $ModuleTemplate.'/'.$module.'/Resources/view/'.$fileName;
                 $content = $this->environment->render($view, $parameters);
             }
-
+            // Пробуем определить файл шаблона по умолчанию template.html.twig
+            elseif(file_exists($this->project_dir.'/src/'.$module.'/Resources/view/'.$fileDefault))
+            {
+                $view = $ModuleTemplate.'/'.$module.'/Resources/view/'.$fileDefault;
+                $content = $this->environment->render($view, $parameters);
+            }
         }
 
         /**
