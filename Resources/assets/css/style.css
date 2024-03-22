@@ -211,11 +211,11 @@ small, .small, .help-text {
 }
 
 
-.border-dashed {
-    border: 1px dashed #e4e6ef !important;
+.border-dotted {
+    border: 2px dotted #e4e6ef !important;
 }
 
-.border-dashed.active {
+.border-dotted.active {
     border-color: var(--bs-blue) !important;
     color: #000 !important;
 }
