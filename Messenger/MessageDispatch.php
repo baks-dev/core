@@ -150,7 +150,12 @@ final class MessageDispatch implements MessageDispatchInterface
                     return $object::{$property}();
                 }
 
-                return (string) $object;
+                if(method_exists($object, '__toString'))
+                {
+                    return (string) $object;
+                }
+
+                return 'object';
 
             }, null, $object);
         }
@@ -199,16 +204,19 @@ final class MessageDispatch implements MessageDispatchInterface
      * Делаем пинг на указанный транспорт
      */
 
-    public function pingTransport() : bool
+    public function pingTransport(): bool
     {
-        if(!$this->transport) { return false; }
+        if(!$this->transport)
+        {
+            return false;
+        }
 
         $cache = $this->cache->init('core');
         $cacheConsume = $cache->getItem('consume-'.$this->transport);
 
         if($cacheConsume->isHit())
         {
-           return $cacheConsume->get();
+            return $cacheConsume->get();
         }
 
         $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume | grep '.$this->transport);
