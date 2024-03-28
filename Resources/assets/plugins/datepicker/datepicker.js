@@ -1031,11 +1031,21 @@ datapickerLang = {
     }
 }
 
+
+
 document.querySelectorAll('.js-datepicker').forEach((datepicker) => {
 
     let $elementDate = document.getElementById(datepicker.id).value;
-    const [day, month, year] = $elementDate.split('.');
-    $selectedDate = new Date(+year, month - 1, +day);
+
+    if($elementDate)
+    {
+        const [day, month, year] = $elementDate.split('.');
+        $selectedDate = new Date(+year, month - 1, +day);
+    }
+    else
+    {
+        $selectedDate = new Date();
+    }
 
     MCDatepicker.create({
         el: '#' + datepicker.id,
@@ -1050,6 +1060,6 @@ document.querySelectorAll('.js-datepicker').forEach((datepicker) => {
         dateFormat: 'DD.MM.YYYY',
         customWeekDays: datapickerLang[$lang].customWeekDays,
         customMonths: datapickerLang[$lang].customMonths,
-        selectedDate:  $selectedDate === 'Invalid Date' ? new Date() : $selectedDate,
+        selectedDate:  $selectedDate == 'Invalid Date' ? new Date() : $selectedDate,
     });
 });

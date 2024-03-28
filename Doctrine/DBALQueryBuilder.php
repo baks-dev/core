@@ -798,7 +798,25 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function analyze(): void
     {
-        $analyze = $this->connection->prepare('EXPLAIN (ANALYZE)  '.$this->getSQL())->executeQuery($this->getParameters())->fetchAllAssociativeIndexed();
+        //dd($this->getParameters());
+
+        $connection = $this->connection->prepare('EXPLAIN (ANALYZE)  '.$this->getSQL());
+
+        foreach($this->getParameters() as $param => $value)
+        {
+            $connection->bindValue($param, $value);
+        }
+
+        $analyze = $connection->executeQuery()->fetchAllAssociativeIndexed();
+
+//        $analyze = $connection
+//
+//            ->bindValue()
+//            ->executeQuery($this->getParameters())
+//            ->fetchAllAssociativeIndexed();
+
+
+
         dd($analyze);
     }
 
