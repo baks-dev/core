@@ -85,7 +85,6 @@ abstract class Uid implements ValueResolverInterface
 
     public function equals(mixed $value): bool
     {
-
         if($value === null)
         {
             return false;

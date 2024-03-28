@@ -1,3 +1,4 @@
+<?php
 /*
  *  Copyright 2023.  Baks.dev <admin@baks.dev>
  *
@@ -20,57 +21,36 @@
  *  THE SOFTWARE.
  */
 
-printer = document.querySelector('#printer');
+namespace BaksDev\Core\Twig;
 
-if (printer)
+use chillerlan\QRCode\QRCode;
+use InvalidArgumentException;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+
+/** Функция преобразует строку формата json в массив */
+final class QrcodeExtension extends AbstractExtension
 {
-    printer.addEventListener('click', printOne);
-
-    function printOne() {
-
-        setTimeout(function () {
-
-            /* Закрываем модальное окно */
-            let myModalEl = document.querySelector('#modal');
-
-            if (myModalEl)
-            {
-                let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-                modal.hide();
-            }
-
-        }, 500);
-
-        window.print();
-    }
-}
-else
-{
-    print_all = document.querySelector('#print_all');
-
-    if (print_all)
+    public function getFunctions(): array
     {
-        print_all.addEventListener('click', printAll);
+        return [
+            new TwigFunction(
+                'qrcode',
+                [$this, 'qrcode'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
+            ),
+        ];
+    }
 
-        function printAll() {
-
-            setTimeout(function () {
-
-                /* Закрываем модальное окно */
-                let myModalEl = document.querySelector('#modal');
-
-                if (myModalEl)
-                {
-                    let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-                    modal.hide();
-                }
-
-            }, 500);
-
-            window.print();
-
+	public function qrcode(Environment $twig, string $data) : string
+	{
+        if(!class_exists(QRCode::class))
+        {
+            return '';
         }
 
-    }
+        return (new QRCode())->render($data);
+	}
 }
-

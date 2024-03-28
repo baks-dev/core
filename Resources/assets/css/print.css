@@ -163,6 +163,7 @@
     }
 
     .d-print-block {
+        visibility: visible !important;
         display: block !important
     }
 
