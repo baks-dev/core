@@ -88,7 +88,7 @@ final class MessageDispatch implements MessageDispatchInterface
         if($this->transport)
         {
             /* Делаем пинг на указанный транспорт */
-            $isRunning = $this->pingTransport();
+            $isRunning = $this->isConsumer();
 
             /** Транспорт resources всегда должен быть запущен */
             if($transport === 'files-res' && $isRunning === false)
@@ -204,9 +204,9 @@ final class MessageDispatch implements MessageDispatchInterface
      * Делаем пинг на указанный транспорт
      */
 
-    public function pingTransport(): bool
+    public function isConsumer(?string $transport = null): bool
     {
-        if(!$this->transport)
+        if(!$this->transport && !$transport)
         {
             return false;
         }

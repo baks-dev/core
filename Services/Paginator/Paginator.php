@@ -147,7 +147,7 @@ final class Paginator implements PaginatorInterface
             }
             else
             {
-                if($qb->getCacheQueries()->hasItem($cacheKey))
+                if($qb->getCacheQueries()?->hasItem($cacheKey))
                 {
 
                     $this->counter = ($qb->getCacheQueries()->getItem($cacheKey))->get();

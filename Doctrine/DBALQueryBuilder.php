@@ -50,6 +50,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DBALQueryBuilder extends QueryBuilder
@@ -59,10 +60,9 @@ final class DBALQueryBuilder extends QueryBuilder
 
     private string|CompositeExpression|null $where = null;
 
-
     private Connection $connection;
 
-    private CacheItemPoolInterface $cacheQueries;
+    private CacheInterface|CacheItemPoolInterface $cacheQueries;
 
     private string $cacheKey;
 
@@ -808,14 +808,6 @@ final class DBALQueryBuilder extends QueryBuilder
         }
 
         $analyze = $connection->executeQuery()->fetchAllAssociativeIndexed();
-
-//        $analyze = $connection
-//
-//            ->bindValue()
-//            ->executeQuery($this->getParameters())
-//            ->fetchAllAssociativeIndexed();
-
-
 
         dd($analyze);
     }

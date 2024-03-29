@@ -29,4 +29,6 @@ interface MessageDispatchInterface
 
     public function transport(string $transport) : self;
 
+    public function isConsumer(?string $transport = null): bool;
+
 }

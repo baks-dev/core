@@ -36,11 +36,12 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ORMQueryBuilder extends QueryBuilder
 {
-    private CacheItemPoolInterface $cacheQueries;
+    private CacheInterface|CacheItemPoolInterface $cacheQueries;
 
     private bool $isCache = false;
 
@@ -141,10 +142,6 @@ final class ORMQueryBuilder extends QueryBuilder
                 register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
             }
         }
-
-
-
-
 
         $this->query
             ->setQueryCache($this->cacheQueries)
