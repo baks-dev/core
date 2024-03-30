@@ -43,7 +43,7 @@ final class RefreshController extends AbstractController
     #[Route('/refresh', name: 'refresh', methods: ['POST', 'GET'])]
     public function refresh(): Response
     {
-        return $this->redirectToReferer();
+        return $this->redirectToReferer(status: 307);
     }
 
     /* редирект на страницу с проверкой доступа по роли */
@@ -53,7 +53,6 @@ final class RefreshController extends AbstractController
         RouterInterface $router
     ): Response
     {
-
         $url = $request->get('url');
 
         if($url)

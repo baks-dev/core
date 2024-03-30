@@ -56,12 +56,12 @@ class SearchDTO
         {
             $session = $this->request->getSession();
 
-            if($session->get('statusCode') === 302)
+            if($session->get('statusCode') === 307)
             {
                 $this->request->getSession()->remove($this->session);
             }
 
-            if(time() - $session->getMetadataBag()->getLastUsed() > 7)
+            if(time() - $session->getMetadataBag()->getLastUsed() > 30)
             {
                 $session->remove($this->session);
             }
