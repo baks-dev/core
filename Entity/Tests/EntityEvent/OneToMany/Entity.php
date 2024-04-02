@@ -33,7 +33,7 @@ final class Entity extends EntityEvent
     private UserUid $id;
 
     /** OneToMany */
-    #[ORM\OneToMany(mappedBy: 'entity', targetEntity: EntityOneToMany::class)]
+    #[ORM\OneToMany(targetEntity: EntityOneToMany::class, mappedBy: 'entity')]
     private Collection $collection;
 
 

@@ -34,7 +34,7 @@ final class Entity extends EntityState
     private UserUid $id;
 
     /** OneToMany */
-    #[ORM\OneToMany(mappedBy: 'entity', targetEntity: EntityOneToMany::class)]
+    #[ORM\OneToMany(targetEntity: EntityOneToMany::class, mappedBy: 'entity')]
     private Collection $collection;
 
     public function __construct()

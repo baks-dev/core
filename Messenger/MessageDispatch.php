@@ -224,7 +224,7 @@ final class MessageDispatch implements MessageDispatchInterface
         $process->run();
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
-        $isRunning = (bool) strripos($result, 'messenger:consume '.$this->transport.' ');
+        $isRunning = (!empty($result) && strripos($result, 'messenger:consume '.$this->transport.' '));
 
         $cacheConsume->set($isRunning);
         $cacheConsume->expiresAfter(DateInterval::createFromDateString('5 minutes'));

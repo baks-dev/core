@@ -32,7 +32,7 @@ final class Entity extends EntityEvent
     private UserUid $id;
 
     /** Модификатор */
-    #[ORM\OneToOne(mappedBy: 'entity', targetEntity: EntityOneToOne::class)]
+    #[ORM\OneToOne(targetEntity: EntityOneToOne::class, mappedBy: 'entity')]
     private EntityOneToOne $o2o;
 
     public function __construct()
