@@ -52,6 +52,7 @@ final class SettingsDeviceListener
     public function onKernelRequest(RequestEvent $event): void
     {
         $agent = $event->getRequest()->headers->get('User-Agent');
+
         $device = 'pc';
 
         if($agent)
@@ -76,13 +77,13 @@ final class SettingsDeviceListener
                     }
                 }
 
-                if(empty($device) || !in_array($device, ['pc', 'mobile', 'tablet']))
-                {
-                    $device = 'pc';
-                }
-
                 return $device;
             });
+
+            if(empty($device) || !in_array($device, ['pc', 'mobile', 'tablet']))
+            {
+                $device = 'pc';
+            }
         }
 
         $event->getRequest()->headers->set('x-device', $device);

@@ -48,6 +48,11 @@ final class CallTwigFuncExtension extends AbstractExtension
             return $value;
         }
 
+        if (empty($value))
+        {
+            return null;
+        }
+
         $callable = $twig->getFunction($func)?->getCallable();
         
         if (!$callable)
