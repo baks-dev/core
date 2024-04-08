@@ -211,7 +211,7 @@ small, .small, .help-text {
 
 
 .border-dotted {
-    border: 2px dotted #e4e6ef !important;
+    border: 0.1rem dotted #e4e6ef !important;
 }
 
 .border-dotted.active {
