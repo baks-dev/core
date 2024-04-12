@@ -245,8 +245,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAssociative(): array|false
     {
-        $this->setMaxResults(1);
-
         $result = $this->executeDBALQuery()->fetchAssociative();
 
         return $result ?: false;
