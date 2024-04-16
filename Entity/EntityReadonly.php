@@ -23,7 +23,7 @@
 
 namespace BaksDev\Core\Entity;
 
-use BaksDev\Products\Category\Entity\Offers\ProductCategoryOffersInterface;
+use BaksDev\Products\Category\Entity\Offers\CategoryProductOffersInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Id as OrmAttributeId;

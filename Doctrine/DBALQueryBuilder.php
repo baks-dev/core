@@ -385,9 +385,9 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $this->query = $query;
 
-        $integer = preg_replace("/[^0-9]/", "", $this->query->query);
+        $integer = preg_replace("/[^0-9]/", "", (string) $this->query->query);
 
-        if($integer == $this->query->query)
+        if($integer === $this->query->query)
         {
             $integer = (int) $integer < 2147483647 ? (int) $integer : false;
 

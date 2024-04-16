@@ -34,7 +34,10 @@ final class CspNonceListener
 {
     private CspNonceGenerator $CspNonceGenerator;
 
-    public function __construct(CspNonceGenerator $CspNonceGenerator)
+    public function __construct(
+        CspNonceGenerator $CspNonceGenerator,
+
+    )
     {
         $this->CspNonceGenerator = $CspNonceGenerator;
     }

@@ -61,8 +61,6 @@ final class RefreshController extends AbstractController
             $path = parse_url($url, PHP_URL_PATH);
             $routeInfo = $router->match($path);
 
-
-
             $class = substr($routeInfo['_controller'], 0, strpos($routeInfo['_controller'], '::'));
 
             $ref = new ReflectionClass($class);

@@ -106,7 +106,7 @@ final class Paginator implements PaginatorInterface
 
         $qb->enableCache($namespace ?: $this->namespace, 3600);
 
-        if($this->request->getSession()->get('statusCode') === 302)
+        if($this->request->getSession()->get('statusCode') === 307)
         {
             /** Сбрасываем кеш ключа запроса */
             $qb->deleteCacheQueries();
@@ -134,7 +134,7 @@ final class Paginator implements PaginatorInterface
         {
             $cacheKey = 'counter.'.$qb->getCacheKey();
 
-            if($this->request->getSession()->get('statusCode') === 302)
+            if($this->request->getSession()->get('statusCode') === 307)
             {
                 /** Сбрасываем кеш ключа запроса */
                 $qb->select('COUNT(*)');
@@ -166,7 +166,7 @@ final class Paginator implements PaginatorInterface
         }
 
 
-        if($this->request->getSession()->get('statusCode') === 302)
+        if($this->request->getSession()->get('statusCode') === 307)
         {
             /** Сбрасываем кеш ключа запроса */
             $this->request->getSession()->remove('statusCode');
@@ -184,7 +184,7 @@ final class Paginator implements PaginatorInterface
 
         $qb->enableCache($namespace ?: $this->namespace, 3600);
 
-        if($this->request->getSession()->get('statusCode') === 302)
+        if($this->request->getSession()->get('statusCode') === 307)
         {
             /** Сбрасываем кеш ключа запроса */
             $qb->deleteCacheQueries();
