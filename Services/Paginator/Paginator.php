@@ -224,6 +224,14 @@ final class Paginator implements PaginatorInterface
         return $this->limit;
     }
 
+    /** Возвращает переданное значение лимита */
+    public function setLimit(int $limit): self
+    {
+        $this->limit = $limit;
+        return $this;
+    }
+
+
     /** Возвращает дефолтное значение LIMIT */
     public function getDefaultLimit(): int
     {

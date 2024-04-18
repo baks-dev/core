@@ -50,6 +50,8 @@ else
 
     if (print_all)
     {
+        print_all.classList.remove('d-none');
+
         print_all.addEventListener('click', printAll);
 
         function printAll() {

@@ -102,6 +102,7 @@
 
 						<span class="small d-block text-truncate">{{ card.product_name }}</span>
 
+
 						{# Значение множественного варианта ТП #}
 						{{ product_offer.variation_value|call_twig_func(product_offer.variation_reference~'_render') ~
 						product_offer.modification_value|call_twig_func(product_offer.modification_reference~'_render') }}
@@ -118,7 +119,6 @@
 						url: card.url
 					}) }}" class="text-decoration-none text-dark">
 
-
 						<span class="small d-block text-truncate">{{ card.product_name }}</span>
 
 						{% if filter.vars.data.variation %}
@@ -127,12 +127,14 @@
 
 						{% if filter.vars.data.modification %}
 
-							{% if filter.vars.data.variation %}
-								{{ product_offer.modification_value|call_twig_func(product_offer.modification_reference) }}
+							{% if filter.vars.data.variation is empty %}
+								{{ product_offer.modification_value|call_twig_func(product_offer.modification_reference~'_template') }}
 							{% else %}
 								{{ product_offer.modification_value|call_twig_func(product_offer.modification_reference~'_render') }}
 							{% endif %}
+
 						{% endif %}
+
 
 						{% if filter.vars.data.offer %}
 							{{ product_offer.offer_value|call_twig_func(product_offer.offer_reference~'_render') }}
@@ -140,14 +142,12 @@
 					</a>
 				
 				{% endif %}
-
 				
 				{# Свойства, учавствующие в названии #}
 				{% for name_property in arr_property | filter(props => props.field_name == true) %}
 					{{ name_property.field_value|call_twig_func(name_property.field_type) }}
 				{% endfor %}
-				
-				
+
 				</a>
 			</h2>
 
