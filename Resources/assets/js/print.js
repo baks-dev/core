@@ -20,59 +20,156 @@
  *  THE SOFTWARE.
  */
 
-printer = document.querySelector('#printer');
+//printer = document.querySelector('#printer');
+//
+//if (printer)
+//{
+//    printer.addEventListener('click', printOne);
+//
+//    function printOne() {
+//
+//        setTimeout(function () {
+//
+//            /* Закрываем модальное окно */
+//            let myModalEl = document.querySelector('#modal');
+//
+//            if (myModalEl)
+//            {
+//                let modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+//                modal.hide();
+//            }
+//
+//        }, 500);
+//
+//        window.print();
+//    }
+//}
+//else
+//{
+//    print_all = document.querySelector('#print_all');
+//
+//    if (print_all)
+//    {
+//        print_all.classList.remove('d-none');
+//
+//        print_all.addEventListener('click', printAll);
+//
+//        function printAll() {
+//
+//            setTimeout(function () {
+//
+//                /* Закрываем модальное окно */
+//                let myModalEl = document.querySelector('#modal');
+//
+//                if (myModalEl)
+//                {
+//                    let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
+//                    modal.hide();
+//                }
+//
+//            }, 500);
+//
+//            window.print();
+//
+//        }
+//
+//    }
+//}
 
-if (printer)
+document.querySelectorAll('.prnt').forEach(function(element, i, arr)
 {
-    printer.addEventListener('click', printOne);
 
-    function printOne() {
+    element.classList.remove('prnt');
+    element.classList.remove('d-none');
 
-        setTimeout(function () {
-
-            /* Закрываем модальное окно */
-            let myModalEl = document.querySelector('#modal');
-
-            if (myModalEl)
-            {
-                let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-                modal.hide();
-            }
-
-        }, 500);
-
-        window.print();
-    }
-}
-else
-{
-    print_all = document.querySelector('#print_all');
-
-    if (print_all)
+    if(element.dataset.href || element.href)
     {
-        print_all.classList.remove('d-none');
+        element.addEventListener('click', printElement);
+    }
 
-        print_all.addEventListener('click', printAll);
+});
 
-        function printAll() {
+function printElement()
+{
 
-            setTimeout(function () {
+    /* Отключаем дефолтный переход по ссылке если */
+    event.preventDefault();
+
+    /* Создаём объект класса XMLHttpRequest */
+    const request = new XMLHttpRequest();
+
+    /*  Получаем из ссылки адрес запроса */
+    let url = null;
+
+    if(this.href)
+    {
+        url = this.href;
+    } else if(this.dataset.href)
+    {
+        url = this.dataset.href
+    }
+
+    if(!url)
+    {
+        return;
+    }
+
+
+    /* Указываем метод соединения GET и путь к файлу на сервере */
+    request.open('GET', url);
+    /* Указываем заголовки для сервера */
+    //request.setRequestHeader('Content-Type', 'application/x-www-form-url');
+    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+    /* Получаем ответ от сервера на запрос*/
+    request.addEventListener("readystatechange", function(evemnt)
+    {
+
+
+        /* request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) */
+        if(request.readyState === 4 && request.status === 200)
+        {
+
+            const prnt = document.getElementById('prnt');
+
+            if(prnt)
+            {
+                prnt.innerHTML = request.responseText;
 
                 /* Закрываем модальное окно */
                 let myModalEl = document.querySelector('#modal');
 
-                if (myModalEl)
+                if(myModalEl)
                 {
-                    let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-                    modal.hide();
+                    setTimeout(function()
+                    {
+                        ///myModalEl.addEventListener('shown.bs.modal', () => {
+                        let modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+                        modal.hide();
+
+                        myModalEl.addEventListener('hidden.bs.modal', printers);
+
+                    }, 500);
+
                 }
-
-            }, 500);
-
-            window.print();
-
+            }
         }
+    });
 
-    }
+    /*Выполняем запрос*/
+    request.send();
+
+    return false;
+
 }
 
+function printers()
+{
+    window.print();
+    document.getElementById('prnt').innerHTML = '';
+
+    /* Удаляем прослушиватель событий  */
+    let myModalEl = document.querySelector('#modal');
+    myModalEl.removeEventListener('hidden.bs.modal', printers);
+
+}
