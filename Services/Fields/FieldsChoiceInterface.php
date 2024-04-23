@@ -42,6 +42,7 @@ interface FieldsChoiceInterface
 	/** Возвращает класс формы для рендера */
 	public function form(): string;
 	
-	
-	
+	/** Возвращает ограничения формы */
+	public function constraints(): ?array;
+
 }

@@ -98,6 +98,8 @@
     --bs-tooltip-arrow-height: 0.4rem;
 }
 
+input, select { box-shadow: none !important; }
+
 .popover {
     --bs-popover-header-bg: white;
     --bs-popover-zindex: 1050;
