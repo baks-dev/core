@@ -286,6 +286,13 @@ async function offcanvasLink(offcanvas) {
                 bsOffcanvas.show();
 
 
+
+                /** Обновляем Preload */
+
+                let lazy = document.createElement('script');
+                lazy.src = '/assets/js/lazyload.min.js?v={{ version }}';
+                document.head.appendChild(lazy);
+
                 //console.log(data);
 
                 // var parser = new DOMParser();
