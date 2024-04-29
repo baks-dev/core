@@ -37,7 +37,11 @@ setTimeout(function hsrxswFKs()
         var inputs = document.querySelectorAll('input[type="tel"]');
 
         Array.prototype.forEach.call(inputs, function(input) {
-            new InputMask(input)
+
+            if(input.classList.contains('loaded') === false)
+            {
+                new InputMask(input)
+            }
         })
 
         return;
@@ -56,6 +60,13 @@ setTimeout(function hsrxswFKs()
 
 function InputMask(element) {
 
+    this.layout = '+_ (___) ___-__-__';
+
+    if(element.dataset.mask)
+    {
+        this.layout = element.dataset.mask;
+    }
+
     this.el = element;
 
 /*    this.el = this.getElement(options.selector);
@@ -68,6 +79,8 @@ function InputMask(element) {
     this.setListeners();*/
     //this.maskreg = this.getRegexp();
     this.setListeners();
+
+    element.classList.add('loaded');
 }
 
 
@@ -77,37 +90,74 @@ InputMask.prototype.getRegexp = function() {
     str = str.replace(/\)/g, '\\)')
     str = str.replace(/\+/g, '\\+')
     str = str.replace(/\s/g, '\\s')
-
     return str;
 }
 
 InputMask.prototype.mask = function(e) {
 
-    this.layout = '+_ (___) ___-__-__';
+
 
     var _this = e.target,
         matrix = this.layout,
         i = 0,
-        def = matrix.replace(/\D/g, ""),
-        val = _this.value.replace(/\D/g, "");
+        def = matrix.replace(/\D/g, "");
+
+
+    var lastCharacterInt = _this.value.length - 1;
+    var currentChar = _this.value[lastCharacterInt];
+
+    if(lastCharacterInt === 0)
+    {
+        /** Если первый сичвол 8 - номер в междуГОРОДном формате */
+
+        if(currentChar == 8)
+        {
+            this.layout = '_ (___) ___-__-__';
+            _this.value = 8;
+            return 8;
+        }
+
+        /** номер в междуНАРОДном формате */
+
+        if(currentChar == '+')
+        {
+            this.layout = '+_ (___) ___-__-__';
+            //_this.value = '+';
+            return '+';
+        }
+
+        if(currentChar != 8)
+        {
+            this.layout = '+'+currentChar+' (___) ___-__-__';
+            _this.value = '+'+currentChar;
+            return '+'+currentChar;
+        }
+    }
+
+
+    var val = _this.value.replace(/\D/g, "");
 
     if (def.length >= val.length) val = def;
 
     _this.value = matrix.replace(/./g, function(a) {
-
-        if(val.length == 1 && val != 7)
-        {
-            val = '7';
-        }
-
         return /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a
     });
 
 
     if (e.type == "blur") {
+
+
+
+
         var regexp = new RegExp(this.maskreg);
         if (!regexp.test(_this.value)) _this.value = "";
+
+
+
     } else {
+
+
+
         this.setCursorPosition(_this.value.length, _this);
     }
 }
