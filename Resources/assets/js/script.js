@@ -980,8 +980,16 @@ function createToast(data) {
         var tostStrong = document.createElement('strong');
         tostStrong.classList.add('me-auto');
         tostStrong.classList.add('mt-1');
+
+        if($type == 'danger' || $type == 'error')
+        {
+            tostStrong.classList.add('text-danger');
+        }
+
         tostStrong.textContent = $header;
         tostHeader.append(tostStrong);
+
+        // me-auto mt-1
 
         /* Кнопка закрыть */
         var tostClosed = document.createElement('button');
@@ -998,6 +1006,8 @@ function createToast(data) {
         toastEl.append(toastBody);
 
         var toastText = document.createElement('p');
+        toastText.className = 'p-0';
+        toastText.className = 'm-0';
         toastText.textContent = $message;
         toastBody.append(toastText);
 
