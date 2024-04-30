@@ -125,12 +125,41 @@ InputMask.prototype.mask = function(e) {
             //_this.value = '+';
             return '+';
         }
-
         if(currentChar != 8)
         {
             this.layout = '+'+currentChar+' (___) ___-__-__';
             _this.value = '+'+currentChar;
             return '+'+currentChar;
+        }
+    }
+    else if(lastCharacterInt > 0)
+    {
+        var currentMaskChar = this.layout[lastCharacterInt];
+
+        /** Если вводный символ равен маске */
+        if(currentChar === currentMaskChar)
+        {
+            return currentChar;
+        }
+
+        var space = false;
+
+        /** Если вводный символ пробел - проверяем следующий за пробелом символ */
+        if(currentMaskChar == ' ')
+        {
+            space = true;
+            currentMaskChar = this.layout[_this.value.length];
+        }
+
+        if(currentChar === currentMaskChar)
+        {
+            if(space)
+            {
+                _this.value + currentChar;
+                space = false;
+            }
+
+            return;
         }
     }
 
@@ -145,19 +174,9 @@ InputMask.prototype.mask = function(e) {
 
 
     if (e.type == "blur") {
-
-
-
-
         var regexp = new RegExp(this.maskreg);
         if (!regexp.test(_this.value)) _this.value = "";
-
-
-
     } else {
-
-
-
         this.setCursorPosition(_this.value.length, _this);
     }
 }
