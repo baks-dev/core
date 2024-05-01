@@ -30,9 +30,12 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Type\Locale\Locale;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Cache\CacheItemPoolInterface;
+use ReflectionAttribute;
+use ReflectionClass;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -241,5 +244,18 @@ final class ORMQueryBuilder extends QueryBuilder
     {
         $this->entityManager->clear();
         return $this;
+    }
+
+    public function table(string $class): string
+    {
+        if(class_exists($class))
+        {
+            $ref = new ReflectionClass($class);
+            /** @var ReflectionAttribute $current */
+            $current = current($ref->getAttributes(Table::class));
+            return $current->getArguments()['name'] ?? $class;
+        }
+
+        return $class;
     }
 }

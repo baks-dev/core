@@ -125,6 +125,7 @@ InputMask.prototype.mask = function(e) {
             //_this.value = '+';
             return '+';
         }
+
         if(currentChar != 8)
         {
             this.layout = '+'+currentChar+' (___) ___-__-__';
