@@ -220,17 +220,17 @@ final class DBALQueryBuilder extends QueryBuilder
     }
 
 
-    public function fetchAllHydrate(string $class): Generator
+    public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
         $result = $this->executeDBALQuery()->iterateAssociative();
 
         foreach($result as $item)
         {
-            yield new $class(...$item);
+            yield $method ? (new $class())->{$method}(...$item) : new $class(...$item);
         }
     }
 
-    public function fetchHydrate(string $class): mixed
+    public function fetchHydrate(string $class, ?string $method = null): mixed
     {
         $result = $this->executeDBALQuery()->fetchAssociative();
 
@@ -239,7 +239,7 @@ final class DBALQueryBuilder extends QueryBuilder
             return null;
         }
 
-        return new $class(...$result);
+        return $method ? (new $class())->{$method}(...$result)  : new $class(...$result);
     }
 
 
@@ -553,9 +553,11 @@ final class DBALQueryBuilder extends QueryBuilder
             //$this->addGroupBy($field);
         }
 
-        $addGroupBy = array_unique($addGroupBy);
-        $this->addGroupBy(...$addGroupBy);
-
+        if($addGroupBy)
+        {
+            $addGroupBy = array_unique($addGroupBy);
+            $this->addGroupBy(...$addGroupBy);
+        }
     }
 
 
