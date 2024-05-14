@@ -40,6 +40,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Query\QueryType;
 use Doctrine\DBAL\Result;
+use Doctrine\DBAL\Statement;
 use Doctrine\ORM\Mapping\Table;
 use Generator;
 use InvalidArgumentException;
@@ -693,7 +694,6 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
-
     /**
      * Возвращает новый QueryBuilder (не участвует в открытом запросе)
      */
@@ -825,5 +825,8 @@ final class DBALQueryBuilder extends QueryBuilder
         return $class;
     }
 
+    public function prepare(string $sql) : Statement {
+        return $this->connection->prepare($sql);
+    }
 
 }

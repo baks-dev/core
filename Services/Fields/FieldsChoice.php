@@ -36,9 +36,14 @@ final class FieldsChoice
         $this->fields = $fields;
     }
 
-    public function getChoice(?InputField $field): ?FieldsChoiceInterface
+    public function getChoice(InputField|string|null $field): ?FieldsChoiceInterface
     {
         if(!$field) { return null; }
+
+        if(is_string($field))
+        {
+            $field = new InputField($field);
+        }
 
         foreach ($this->fields as $fields)
         {
