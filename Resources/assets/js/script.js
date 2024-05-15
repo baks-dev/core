@@ -876,6 +876,11 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                                 }
                             }
 
+                            if(!$placeholderText)
+                            {
+                                $placeholderText = input.id;
+                            }
+
                             if ($placeholderText) {
                                 $errorFormHandler = '{ "type":"danger" , ' +
                                     '"header":"Ошибка заполнения"   , ' +
