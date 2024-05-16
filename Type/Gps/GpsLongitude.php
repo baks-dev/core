@@ -25,14 +25,14 @@ final class GpsLongitude
         }
 
         $value = str_replace(',', '.', $value);
-
+        $value = trim($value);
 
         if (!empty($value) && !preg_match('{^[\d]+\.[\d]{4,}$}Di', (string) $value))
         {
             throw new InvalidArgumentException('Incorrect Gps.');
         }
 
-        $this->value = (string) $value;
+        $this->value = $value;
     }
 
     public function __toString(): string

@@ -25,6 +25,7 @@ final class GpsLatitude
         }
 
         $value = str_replace(',', '.', $value);
+        $value = trim($value);
 
         if (!empty($value) && !preg_match('{^[\d]+\.[\d]{4,}$}Di', $value))
         {
