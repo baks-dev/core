@@ -70,17 +70,6 @@ final class MessageDispatch implements MessageDispatchInterface
             $cache->clear();
         }
 
-        /** Логируем данные  */
-        if(!Kernel::isTestEnvironment())
-        {
-            $data = $this->objectToArray($message);
-
-            $this->logger->info('MessageDispatch', [
-                'message' => $message::class,
-                'data' => sprintf('%s', json_encode($data, JSON_UNESCAPED_UNICODE))
-            ]);
-        }
-
         /**
          * Если указан транспорт - пробуем отправить в очередь
          */
@@ -93,6 +82,7 @@ final class MessageDispatch implements MessageDispatchInterface
             /** Транспорт resources всегда должен быть запущен */
             if($transport === 'files-res' && $isRunning === false)
             {
+                $this->logger->critical('Messanger Транспорт files-res не найден');
                 return false;
             }
 
@@ -101,7 +91,6 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($isRunning)
             {
-                $this->logger->info(sprintf('Найден транспорт %s, отправляем в очередь', $this->transport));
                 return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
             }
 
