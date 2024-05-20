@@ -40,6 +40,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -65,6 +66,7 @@ abstract class AbstractController
     private string $project_dir;
 
     private CacheCssInterface $cacheCss;
+    private CsrfTokenManagerInterface $csrfTokenManager;
 
 
     public function __construct(
@@ -77,7 +79,8 @@ abstract class AbstractController
         TranslatorInterface $translator,
         TokenStorageInterface $tokenStorage,
         SettingsMainInterface $settingsMain,
-        CacheCssInterface $cacheCss
+        CacheCssInterface $cacheCss,
+        CsrfTokenManagerInterface $csrfTokenManager,
     )
     {
         $this->authorizationChecker = $authorizationChecker;
@@ -90,6 +93,7 @@ abstract class AbstractController
         $this->router = $router;
         $this->project_dir = $project_dir;
         $this->cacheCss = $cacheCss;
+        $this->csrfTokenManager = $csrfTokenManager;
     }
 
 
@@ -570,5 +574,10 @@ abstract class AbstractController
         }
 
         return null;
+    }
+
+    public function refreshTokenForm(FormInterface $form): void
+    {
+        $this->csrfTokenManager->refreshToken($form->getName());
     }
 }
