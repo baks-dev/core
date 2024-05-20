@@ -111,6 +111,7 @@ final class Paginator implements PaginatorInterface
             /** Сбрасываем кеш ключа запроса */
             $qb->deleteCacheQueries();
             $qb->disableResultCache();
+            $qb->resetCacheQuery();
         }
 
         if($qb->getMaxResults())
