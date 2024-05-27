@@ -27,9 +27,9 @@ final class GpsLatitude
         $value = str_replace(',', '.', $value);
         $value = trim($value);
 
-        if (!empty($value) && !preg_match('{^[\d]+\.[\d]{4,}$}Di', $value))
+        if (!empty($value) && !preg_match('{^-?[\d]+\.[\d]{3,}$}Di', $value))
         {
-            throw new InvalidArgumentException('Incorrect Gps.');
+            throw new InvalidArgumentException('Incorrect Gps Latitude '.$value);
         }
 
         $this->value = $value;
