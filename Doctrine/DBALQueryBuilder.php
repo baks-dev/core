@@ -439,7 +439,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $array = [
             "MIN", "MAX", "COUNT", "SUM",
             "JSON_AGG", "ARRAY_AGG", "STRING_AGG",
-            "EXISTS", "FALSE", "TRUE"
+            "EXISTS", "FALSE", "TRUE", "COALESCE"
         ];
 
         $addGroupBy = null;
