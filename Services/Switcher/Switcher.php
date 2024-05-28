@@ -47,84 +47,6 @@ final class Switcher implements SwitcherInterface
         return is_int($text) ? $this->text : $this->switch('en');
     }
 
-    public function toNumber(int|string $text, bool $lower = true): string
-    {
-        $this->text = (string) $text;
-        $this->lower = $lower;
-
-        return is_int($text) ? $this->text : $this->switch('en');
-    }
-
-
-    public function number()
-    {
-
-        $alphabet = ['а' => 1,
-    'б' => 2,
-    'в' => 3,
-    'г' => 4,
-    'д' => 5,
-    'е' => 6,
-    'ё' => 7,
-    'ж' => 8,
-    'з' => 9,
-    'и' => 10,
-    'й' => 11,
-    'к' => 12,
-    'л' => 13,
-    'м' => 14,
-    'н' => 15,
-    'о' => 16,
-    'п' => 17,
-    'р' => 18,
-    'с' => 19,
-    'т' => 20,
-    'у' => 21,
-    'ф' => 22,
-    'х' => 23,
-    'ц' => 24,
-    'ч' => 25,
-    'ш' => 26,
-    'щ' => 27,
-    'ъ' => 28,
-    'ы' => 29,
-    'ь' => 30,
-    'э' => 31,
-    'ю' => 32,
-    'я' => 33,
-    'a' => 34,
-    'b' => 35,
-    'c' => 36,
-    'd' => 37,
-    'e' => 38,
-    'f' => 39,
-    'g' => 40,
-    'h' => 41,
-    'i' => 42,
-    'j' => 43,
-    'k' => 44,
-    'l' => 45,
-    'm' => 46,
-    'n' => 47,
-    'o' => 48,
-    'p' => 49,
-    'q' => 50,
-    'r' => 51,
-    's' => 52,
-    't' => 53,
-    'u' => 54,
-    'v' => 55,
-    'w' => 56,
-    'x' => 57,
-    'y' => 58,
-    'z' => 59];
-
-
-
-    }
-
-
-
     protected function switch(string $lng): string
     {
         $str['en'] = [
@@ -237,6 +159,8 @@ final class Switcher implements SwitcherInterface
             'I' => 'Ш',
             'O' => 'Щ',
             'P' => 'З',
+            //'[' => 'Х',
+            //']' => 'Ъ',
             'A' => 'Ф',
             'S' => 'Ы',
             'D' => 'В',
@@ -246,6 +170,8 @@ final class Switcher implements SwitcherInterface
             'J' => 'О',
             'K' => 'Л',
             'L' => 'Д',
+            //';' => 'Ж',
+            //'\'' => 'Э',
             'Z' => '?',
             'X' => 'ч',
             'C' => 'С',
@@ -253,6 +179,8 @@ final class Switcher implements SwitcherInterface
             'B' => 'И',
             'N' => 'Т',
             'M' => 'Ь',
+            //',' => 'Б',
+            //'.' => 'Ю',
         ];
 
         $reload = strtr($this->text, $str[$lng]);
