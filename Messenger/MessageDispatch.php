@@ -97,8 +97,25 @@ final class MessageDispatch implements MessageDispatchInterface
             $transportRequire = $this->isUid(); // транспорт UID
 
             /** Если транспорт не определяется и он является UID (обязательным) */
-            if($isRunning === false && $transportRequire)
+            if($transportRequire)
             {
+                // На ситуацию, когда транспорт перезапускается делаем проверку
+                for ($i = 1; $i <= 3; $i++) {
+
+                    $cache = $this->cache->init('core');
+                    $cacheConsume = $cache->getItem('consume-'.$this->transport);
+                    $cache->deleteItem($cacheConsume);
+
+                    $isRunning = $this->isConsumer();
+
+                    if($isRunning)
+                    {
+                        return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
+                    }
+
+                    sleep($i);
+                }
+
                 $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport));
                 return false;
             }
@@ -117,76 +134,6 @@ final class MessageDispatch implements MessageDispatchInterface
     public function isUid(): bool
     {
         return (bool) preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $this->transport);
-    }
-
-    /** Получаем через рефлексию значение свойства */
-    private function getPropertyValue(string $property, object $object): mixed
-    {
-        $modifiers = new ReflectionProperty($object, $property);
-
-        // Если свойство не инициировано - false
-        if(!$modifiers->isInitialized($object))
-        {
-            return false;
-        }
-
-        if($modifiers->isStatic())
-        {
-            $getPropertyEntity = Closure::bind(function($object, $property) {
-
-                if(method_exists($object, $property))
-                {
-                    return $object::{$property}();
-                }
-
-                if(method_exists($object, '__toString'))
-                {
-                    return (string) $object;
-                }
-
-                return 'object';
-
-            }, null, $object);
-        }
-        else
-        {
-            if(method_exists($object, '__toString'))
-            {
-                return (string) $object;
-            }
-
-            $getPropertyEntity = Closure::bind(function($object, $property) {
-                return $object->{$property};
-            }, null, $object);
-        }
-
-        return $getPropertyEntity($object, $property);
-    }
-
-    public function objectToArray(mixed $object)
-    {
-        $new = [];
-
-        if(is_object($object))
-        {
-            if(method_exists($object, '__toString'))
-            {
-                return (string) $object;
-            }
-
-            $ReflectionClass = new ReflectionClass($object);
-
-            foreach($ReflectionClass->getProperties() as $reflectionProperty)
-            {
-                $propertyName = $reflectionProperty->getName();
-                $propertyValue = $this->getPropertyValue($propertyName, $object);
-                $new[$propertyName] = $this->objectToArray($propertyValue);
-            }
-
-            return $new;
-        }
-
-        return $object;
     }
 
     /**

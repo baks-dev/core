@@ -579,5 +579,6 @@ abstract class AbstractController
     public function refreshTokenForm(FormInterface $form): void
     {
         $this->csrfTokenManager->refreshToken($form->getName());
+        usleep(300);
     }
 }
