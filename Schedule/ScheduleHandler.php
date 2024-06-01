@@ -25,29 +25,21 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Schedule;
 
-use BaksDev\Core\Cache\AppCacheInterface;
-use BaksDev\Wildberries\Orders\Schedule\NewOrders\NewOrdersScheduleMessage;
-use BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus\UpdateOrdersStatusScheduleMessage;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 
 
 #[AsSchedule('default')]
 final class ScheduleHandler implements ScheduleProviderInterface
 {
     private iterable $schedule;
-    private CacheInterface $cache;
 
-    public function __construct(
-        #[TaggedIterator('baks.schedule')] iterable $schedule,
-        AppCacheInterface $cache
-    ) {
+    public function __construct(#[TaggedIterator('baks.schedule')] iterable $schedule)
+    {
         $this->schedule = $schedule;
-        $this->cache = $cache->init('schedule');
     }
 
     /**
@@ -60,10 +52,7 @@ final class ScheduleHandler implements ScheduleProviderInterface
         /** @var ScheduleInterface $message */
         foreach($this->schedule as $message)
         {
-            $Schedule
-                ->add(RecurringMessage::every($message->getInterval(), $message->getMessage()))
-                ->stateful($this->cache)
-            ;
+            $Schedule->add(RecurringMessage::every($message->getInterval(), $message->getMessage()));
         }
 
         return $Schedule;

@@ -92,7 +92,6 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($isRunning)
             {
-                usleep(100);
                 return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
             }
 

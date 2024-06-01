@@ -58,10 +58,15 @@ final class MessengerConsumersHandler
             {
                 if(preg_match('/messenger:consume (.*?) /', $consumers, $matches))
                 {
-                    $consumer = $matches[1];
-                    $cacheConsume = $cache->getItem('consume-'.$consumer);
-                    $cacheConsume->expiresAfter(DateInterval::createFromDateString('5 minutes'));
-                    $cache->save($cacheConsume);
+                    $consumer = $matches[1] ?? null;
+
+                    if(!empty($consumer))
+                    {
+                        $cacheConsume = $cache->getItem('consume-'.$consumer);
+                        $cacheConsume->set(true);
+                        $cacheConsume->expiresAfter(DateInterval::createFromDateString('5 minutes'));
+                        $cache->save($cacheConsume);
+                    }
                 }
             }
         }
