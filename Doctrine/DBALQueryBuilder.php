@@ -745,6 +745,15 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
+    public function delete(string $table): self
+    {
+        $from = $this->table($table);
+
+        parent::delete($from);
+
+        return $this;
+    }
+
 
     private function buildExist($existClass, $alias, $condition): string
     {
