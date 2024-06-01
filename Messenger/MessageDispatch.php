@@ -34,6 +34,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 use Symfony\Component\Process\Process;
@@ -59,7 +60,7 @@ final class MessageDispatch implements MessageDispatchInterface
         $this->cache = $cache;
     }
 
-    public function dispatch(object $message, array $stamps = [], string $transport = null): mixed
+    public function dispatch(object $message, array $stamps = [], string $transport = null): ?Envelope
     {
         if($transport)
         {
@@ -83,7 +84,7 @@ final class MessageDispatch implements MessageDispatchInterface
             if($transport === 'files-res' && $isRunning === false)
             {
                 $this->logger->critical('Messanger Транспорт files-res не найден');
-                return false;
+                return null;
             }
 
             /**
@@ -91,6 +92,7 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($isRunning)
             {
+                usleep(100);
                 return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
             }
 
@@ -99,25 +101,8 @@ final class MessageDispatch implements MessageDispatchInterface
             /** Если транспорт не определяется и он является UID (обязательным) */
             if($transportRequire)
             {
-                // На ситуацию, когда транспорт перезапускается делаем проверку
-                for ($i = 1; $i <= 3; $i++) {
-
-                    $cache = $this->cache->init('core');
-                    $cacheConsume = $cache->getItem('consume-'.$this->transport);
-                    $cache->deleteItem($cacheConsume);
-
-                    $isRunning = $this->isConsumer();
-
-                    if($isRunning)
-                    {
-                        return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
-                    }
-
-                    sleep($i);
-                }
-
                 $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport));
-                return false;
+                return null;
             }
         }
 
