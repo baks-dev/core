@@ -23,11 +23,13 @@
 
 namespace BaksDev\Core\Cache;
 
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
 interface AppCacheInterface
 {
+    /** @return FilesystemAdapter */
     public function init(
         string $namespace = '',
         int $defaultLifetime = 0,

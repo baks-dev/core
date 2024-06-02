@@ -81,6 +81,7 @@ document.querySelectorAll('.prnt').forEach(function(element, i, arr)
 
     element.classList.remove('prnt');
     element.classList.remove('d-none');
+    element.classList.remove('disabled');
 
     if(element.dataset.href || element.href)
     {
