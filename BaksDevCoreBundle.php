@@ -12,42 +12,14 @@ declare(strict_types=1);
 
 namespace BaksDev\Core;
 
-use BaksDev\Core\DependencyInjection\LocalePass;
 use BaksDev\Core\Type\Locale\Locales\LocaleInterface;
-use DirectoryIterator;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use Symfony\Component\DependencyInjection\ChildDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class BaksDevCoreBundle extends AbstractBundle
 {
+    public const NAMESPACE = __NAMESPACE__.'\\';
 
-	public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
-	{
-
-        $builder->registerForAutoconfiguration(LocaleInterface::class)
-            ->addTag('baks.locale')
-        ;
-
-
-		$path = __DIR__.'/Resources/config/';
-		
-		foreach(new DirectoryIterator($path) as $config)
-		{
-			if($config->isDot() || $config->isDir())
-			{
-				continue;
-			}
-			
-			if($config->isFile() && $config->getExtension() === 'php' && $config->getFilename() !== 'routes.php')
-			{
-				$container->import($config->getPathname());
-			}
-		}
-	}
-
+    public const PATH = __DIR__.DIRECTORY_SEPARATOR;
 
     public static function getDeclared(): array
     {
