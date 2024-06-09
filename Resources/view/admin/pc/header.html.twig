@@ -1,9 +1,9 @@
 <div class="sticky-top bg-primary d-print-none">
-	<div class="container">
+    <div class="container">
+		
+        {% if constant('BaksDev\\Menu\\Admin\\BaksDevMenuAdminBundle::NAMESPACE') is defined %}
+            {{ render_menu_admin() }}
+        {% endif %}
 
-		{{ render_menu_admin is defined ? render_menu_admin() }}
-
-		{{ render_menu_admin() }}
-
-	</div>
+    </div>
 </div>
