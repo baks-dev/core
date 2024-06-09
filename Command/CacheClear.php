@@ -48,6 +48,7 @@ class CacheClear extends Command
 {
     private string $project_dir;
     private AppCacheInterface $appCache;
+    private Filesystem $filesystem;
 
     public function __construct(
         #[Autowire('%kernel.project_dir%')] string $project_dir,
@@ -57,6 +58,7 @@ class CacheClear extends Command
         parent::__construct();
         $this->project_dir = $project_dir;
         $this->appCache = $appCache;
+        $this->filesystem = new Filesystem();
     }
 
 
@@ -104,10 +106,6 @@ class CacheClear extends Command
             }
         }
 
-        $command = ($this->getApplication())->get('cache:clear');
-        $command->run($input, new NullOutput());
-
-
         $path = $this->project_dir.'/var/cache';
 
         /** @var DirectoryIterator $cache */
@@ -118,10 +116,22 @@ class CacheClear extends Command
                 continue;
             }
 
-            $process = Process::fromShellCommandline('rm -rf '.$cache->getRealPath());
-            $process->setTimeout(5);
-            $process->run();
+            $origin = $cache->getRealPath();
+            $target = $cache->getRealPath().'_'.time();
+
+            /** Запускаем асинхронную команду на удаление директории  */
+            register_shutdown_function(function() use ($origin, $target) {
+
+                $this->filesystem->rename($origin, $target);
+
+                $process = Process::fromShellCommandline('rm -rf '.$target);
+                $process->setTimeout(5);
+                $process->run();
+
+            }, 'throw');
+
         }
+
 
         $io->warning('Рекомендуется выполнить комманду:');
 
@@ -138,6 +148,8 @@ class CacheClear extends Command
             $io->text('sudo service centrifugo restart');
             $io->text('');
         }
+
+        $io->text(PHP_EOL);
 
         return Command::SUCCESS;
     }
