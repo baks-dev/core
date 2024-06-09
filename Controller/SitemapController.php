@@ -29,11 +29,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 #[AsController]
 final class SitemapController extends AbstractController
 {
     #[Route('/sitemap.xml', name: 'sitemap', methods: ['GET'])]
+    #[Route('/sitemaps.xml', name: 'sitemaps', methods: ['GET'])]
     public function sitemap(): Response
     {
         $sitemaps = [];
@@ -52,7 +52,7 @@ final class SitemapController extends AbstractController
             ];
         }
 
-        $response = $this->render(['sitemaps' => $sitemaps]);
+        $response = $this->render(['sitemaps' => $sitemaps], routingName: 'sitemap');
         $response->headers->set('Content-Type', 'text/xml');
 
         return $response;

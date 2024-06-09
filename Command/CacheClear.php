@@ -65,7 +65,6 @@ class CacheClear extends Command
         $this->addArgument('module', InputArgument::OPTIONAL, 'Модуль');
     }
 
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $module = $input->getArgument('module');
