@@ -22,24 +22,28 @@
  */
 
 return [
-	'ru' => 'Russian',
-	'en' => 'English',
-	
-	'sort' => 'Sorting',
-	'images' => 'Only .png, .jpg, .jpeg and .webp image files are accepted',
-	
-	'admin' =>
-		[
-			'page' =>
-				['index' => 'Administration'],
-		],
-	
-	
-	'breadcrumb' =>
-		[
-			'homepage' =>
-				[
-					'admin' => 'Administration',
-				],
-		],
+
+    'ru' => 'Russian',
+    'en' => 'English',
+
+    'sort' => 'Sorting',
+    'images' => 'Only .png, .jpg, .jpeg and .webp image files are accepted',
+
+    'admin' =>
+        [
+            'page' =>
+                [
+                    'user' => 'Home',
+                    'index' => 'Administration'
+                ],
+        ],
+
+    'breadcrumb' =>
+        [
+            'homepage' =>
+                [
+                    'user' => 'Home',
+                    'index' => 'Administration',
+                ],
+        ],
 ];
