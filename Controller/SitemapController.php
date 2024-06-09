@@ -33,7 +33,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[AsController]
 final class SitemapController extends AbstractController
 {
-    /* Обновление страницы и сброс кеша */
     #[Route('/sitemap.xml', name: 'sitemap', methods: ['GET'])]
     public function sitemap(): Response
     {
@@ -59,8 +58,6 @@ final class SitemapController extends AbstractController
         return $response;
     }
 
-
-    /* Обновление страницы и сброс кеша */
     #[Route('/sitemap/urls.xml', name: 'sitemap.urls', methods: ['GET'])]
     public function homepage(): Response
     {
