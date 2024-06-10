@@ -34,6 +34,14 @@ class BaksDevCoreBundle extends AbstractBundle
             ->autowire()
             ->autoconfigure();
 
+        $services->load(self::NAMESPACE, self::PATH)
+            ->exclude([
+                self::PATH.'{Entity,Resources,Type}',
+                self::PATH.'**/*Message.php',
+                self::PATH.'**/*DTO.php',
+                self::PATH.'**/regions.php',
+            ]);
+
         /* Language */
         $services->load(
             self::NAMESPACE.'Type\Locale\Locales\\',
