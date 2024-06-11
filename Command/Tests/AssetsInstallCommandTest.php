@@ -48,7 +48,7 @@ final class AssetsInstallCommandTest extends KernelTestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString('[OK] Все ресурсы были успешно установлены.', $output);
+        $this->assertStringContainsString('Установка файловых ресурсов', $output);
 
         // ...
     }

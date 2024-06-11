@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[AsController]
-//#[RoleSecurity('ROLE_ADMINISTRATION')]
+#[RoleSecurity('ROLE_ADMINISTRATION')]
 class HomeController extends AbstractController
 {
     #[Route('/admin', name: 'admin.homepage')]
