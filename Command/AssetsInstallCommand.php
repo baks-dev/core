@@ -66,9 +66,7 @@ class AssetsInstallCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
 
-        /*
-         * Установка конфигурационных файлов
-         */
+        /* ******************************* */
 
         $io->text('Установка конфигурационных файлов');
         $io->newLine();
@@ -80,9 +78,7 @@ class AssetsInstallCommand extends Command
             $io->table(['', 'Module', 'Method / Error'], $rows);
         }
 
-        /**
-         * Установка файлов роутинга
-         */
+        /* ******************************* */
 
         $io->text('Установка файлов роутинга');
         $io->newLine();
@@ -95,9 +91,10 @@ class AssetsInstallCommand extends Command
         }
 
 
-        /*
-         * Установка файловых ресурсов
-         */
+        /* ******************************* */
+
+        $io->text('Установка файловых ресурсов');
+        $io->newLine();
 
         $rows = $this->assetsFile();
 
