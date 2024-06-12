@@ -13,7 +13,24 @@ $ composer require baks-dev/core
 
 ## Натсройка
 
-В корне проекта файла environment (.env) указать натсроки основного домена
+Рекомендуется в composer.json проекта добавить в секцию автоматическое выполнение комманд
+
+``` json
+"scripts": {
+    "auto-scripts": {
+        "baks:assets:install": "symfony-cmd",
+        "baks:cache:clear": "symfony-cmd"
+    },
+    "post-install-cmd": [
+        "@auto-scripts"
+    ],
+    "post-update-cmd": [
+        "@auto-scripts"
+    ]
+}
+```
+
+В корне проекта файла environment (.env) указать настроки основного домена
 
 ``` dotenv
 ###> HOST ###
@@ -21,6 +38,7 @@ HOST=domain.exemple
 ```
 
 Для преобразования файлов изобращений в формат WEBP устанавливаем модуль [Files Cdn](https://github.com/baks-dev/files-cdn)
+
 
 
 ## Тестирование

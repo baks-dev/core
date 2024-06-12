@@ -35,12 +35,10 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 // the name of the command is what users type after "php bin/console"
 #[AsCommand(name: 'baks:cache:clear')]
@@ -71,27 +69,31 @@ class CacheClear extends Command
     {
         $module = $input->getArgument('module');
 
-        $path = $this->project_dir.'/vendor/baks-dev';
+        $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'vendor', 'baks-dev', null]);
 
         $io = new SymfonyStyle($input, $output);
 
+
         if($module)
         {
-            if(is_dir($path.'/'.$module))
+            /**
+             * Сбрасываем кеш только указанного модуля
+             */
+            if(is_dir($path.$module))
             {
                 $this->clearModule($module);
                 $io->success(sprintf('Кеш модуля %s успешно удален', mb_strtoupper($module)));
 
                 return Command::SUCCESS;
             }
-
-            $io->error(sprintf('Невозможно определить кеш модуля %s', mb_strtoupper($module)));
-            return Command::FAILURE;
-
         }
         else
         {
-            /** @var DirectoryIterator $module */
+
+            /**
+             * Сбрасываем кеш всех модулей
+             * @var DirectoryIterator $module
+             */
             foreach(new DirectoryIterator($path) as $module)
             {
                 if($module->isDot())
@@ -106,9 +108,37 @@ class CacheClear extends Command
             }
         }
 
-        $path = $this->project_dir.'/var/cache';
 
-        /** @var DirectoryIterator $cache */
+        $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', null]);
+
+
+        /**
+         * Сбрасываем только кеш шаблонов
+         */
+        if($module === 'template' || $module === 'twig')
+        {
+            $origin = $path.implode(DIRECTORY_SEPARATOR, ['prod', 'twig']);
+
+            if(is_dir($origin))
+            {
+                $target = $origin.'_'.time();
+
+                /** Удаляем директорию при завершении работы */
+                register_shutdown_function(function() use ($origin, $target) {
+                    $this->filesystem->rename($origin, $target);
+                    $this->filesystem->remove($target);
+                }, 'throw');
+            }
+
+            $io->success('Кеш шаблонов успешно удален');
+            return Command::SUCCESS;
+        }
+
+
+        /**
+         * Полностью удаляем кеш
+         * @var DirectoryIterator $cache
+         */
         foreach(new DirectoryIterator($path) as $cache)
         {
             if($cache->isDot())
@@ -123,10 +153,7 @@ class CacheClear extends Command
             register_shutdown_function(function() use ($origin, $target) {
 
                 $this->filesystem->rename($origin, $target);
-
-                $process = Process::fromShellCommandline('rm -rf '.$target);
-                $process->setTimeout(5);
-                $process->run();
+                $this->filesystem->remove($target);
 
             }, 'throw');
 
