@@ -21,34 +21,24 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use Symfony\Config\FrameworkConfig;
+namespace BaksDev\Core\Messenger\Message;
 
-return static function (FrameworkConfig $framework) {
+final class CoreMessage
+{
+    private string $transport;
 
-    $messenger = $framework->messenger();
+    public function __construct(string $transport) {
+        $this->transport = $transport;
+    }
 
-    $messenger
-        ->transport('async')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
-        ->options(['stream' => 'async'])
-        ->failureTransport('failed')
-        ->retryStrategy()
-        ->maxRetries(3)
-        ->delay(1000)
-        ->maxDelay(0)
-        ->multiplier(3)
-        ->service(null)
-    ;
+    /**
+     * Transport
+     */
+    public function getTransport(): string
+    {
+        return $this->transport;
+    }
 
-    $messenger->transport('sync')->dsn('sync://');
-
-    $failure = $framework->messenger();
-
-    $failure->transport('failed')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'failed'])
-    ;
-
-};
+}

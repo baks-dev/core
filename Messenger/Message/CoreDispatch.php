@@ -21,34 +21,21 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use Symfony\Config\FrameworkConfig;
+namespace BaksDev\Core\Messenger\Message;
 
-return static function (FrameworkConfig $framework) {
+use BaksDev\Core\Cache\AppCacheInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-    $messenger = $framework->messenger();
+#[AsMessageHandler]
+final class CoreDispatch
+{
+    public function __invoke(CoreMessage $message): void
+    {
 
-    $messenger
-        ->transport('async')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
-        ->options(['stream' => 'async'])
-        ->failureTransport('failed')
-        ->retryStrategy()
-        ->maxRetries(3)
-        ->delay(1000)
-        ->maxDelay(0)
-        ->multiplier(3)
-        ->service(null)
-    ;
-
-    $messenger->transport('sync')->dsn('sync://');
-
-    $failure = $framework->messenger();
-
-    $failure->transport('failed')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'failed'])
-    ;
-
-};
+        //throw new \DomainException('Бросаем исключение');
+        dump($message->getTransport());
+    }
+}

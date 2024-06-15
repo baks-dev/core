@@ -1,48 +1,6 @@
 //eventEmitter = new EventTarget();
 $html = false;
 
-/* определяем язык системы по тегу HTML */
-// $htmlLang = document.getElementsByTagName('html');
-// const $lang = $htmlLang[0].getAttribute('lang');
-
-
-//document.addEventListener("DOMContentLoaded", function (event) {
-
-/* Прелоадер при отправке формы */
-/*document.querySelectorAll('form').forEach(function (forms) {
-    /!* событие отправки формы *!/
-    forms.addEventListener('submit', function (event) {
-        indicatorSubmit(this);
-    });
-});*/
-
-/*function indicatorSubmit(context) {
-    /!* показываем индикатор *!/
-    let indicator = context.querySelector('.indicator-progress');
-
-    if (indicator) {
-        indicator.className = 'indicator-label progress';
-        /!* Блокируем кнопку от повторной отправки *!/
-        indicator.closest('button[type="submit"]').type = 'button';
-    }
-}*/
-
-
-/*function indicatorReset() {
-    /!* Сбрасываем индикатор *!/
-    let indicator_progress = document.querySelector('.progress');
-
-    if (indicator_progress) {
-        indicator_progress.className = 'indicator-progress';
-        /!* Снимаем блок с кнопки от повторной отправки *!/
-        let btn = indicator_progress.closest('button[type="button"]');
-
-        btn.type = 'submit';
-
-        return btn;
-    }
-}*/
-
 setTimeout(function initBootstrap() {
 
     /*console.log(bootstrap);*/

@@ -1055,12 +1055,12 @@ document.querySelectorAll('.js-datepicker').forEach((datepicker) => {
         closeOndblclick: true,
         closeOnBlur: true,
         customOkBTN: 'OK',
-        customClearBTN: datapickerLang[$lang].customClearBTN,
-        customCancelBTN: datapickerLang[$lang].customCancelBTN,
-        firstWeekday: datapickerLang[$lang].firstWeekday,
+        customClearBTN: datapickerLang[$locale].customClearBTN,
+        customCancelBTN: datapickerLang[$locale].customCancelBTN,
+        firstWeekday: datapickerLang[$locale].firstWeekday,
         dateFormat: 'DD.MM.YYYY',
-        customWeekDays: datapickerLang[$lang].customWeekDays,
-        customMonths: datapickerLang[$lang].customMonths,
+        customWeekDays: datapickerLang[$locale].customWeekDays,
+        customMonths: datapickerLang[$locale].customMonths,
         selectedDate:  $selectedDate == 'Invalid Date' ? new Date() : $selectedDate,
     });
 });

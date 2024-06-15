@@ -17,6 +17,7 @@ use BaksDev\Core\Repository\SettingsMain\SettingsMainRepository;
 use BaksDev\Core\Type\Crypt\CryptKey;
 use BaksDev\Core\Type\Crypt\CryptKeyInterface;
 use BaksDev\Core\Type\Locale\Locales\LocaleInterface;
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -72,22 +73,31 @@ class BaksDevCoreBundle extends AbstractBundle
             CryptKey::class
         );
 
-
-
-
-        //        $services->load(self::NAMESPACE, self::PATH)
-        //            ->exclude([
-        //                self::PATH.'{Entity,Resources,Type}',
-        //                self::PATH.'**/*Message.php',
-        //                self::PATH.'**/*DTO.php',
-        //            ]);
     }
+
+
+    public function configure(DefinitionConfigurator $definition): void
+    {
+        //dump('configure');
+
+        $rootNode = $definition->rootNode();
+
+        $domainPath = $rootNode->children();
+
+        $domainPath
+            ->scalarNode('messenger_transport')
+            ->defaultValue('doctrine')
+            ->end()
+        ;
+    }
+
+
 
     public static function getDeclared(): array
     {
         return array_filter(
             get_declared_classes(),
-            static function($className) {
+            static function ($className) {
                 return in_array(LocaleInterface::class, class_implements($className), true);
             }
         );

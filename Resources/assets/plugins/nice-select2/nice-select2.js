@@ -15,10 +15,10 @@
  *
  */
 
-if (typeof $lang === 'undefined') {
+if (typeof $locale === 'undefined') {
     let html = document.querySelector('html');
     let lng = html.getAttribute('lang');
-    $lang = lng ? lng : 'en';
+    $locale = lng ? lng : 'en';
 }
 
 
@@ -108,7 +108,7 @@ function NiceSelect(element, options, reset = false) {
         this.placeholder =
             attr(this.el, "placeholder") ||
             this.config.placeholder ||
-            niceLang[$lang].placeholder;
+            niceLang[$locale].placeholder;
     }
 
     this.dropdown = null;
@@ -204,7 +204,7 @@ NiceSelect.prototype.renderDropdown = function () {
         this.multiple ? "has-multiple" : ""
     ];
 
-    let seachPlaceholder = this.el.dataset.search != undefined ? this.el.dataset.search : niceLang[$lang].search;
+    let seachPlaceholder = this.el.dataset.search != undefined ? this.el.dataset.search : niceLang[$locale].search;
 
     let searchHtml = "<div class='nice-select-search-box'><input type='text' class='nice-select-search' placeholder='" + seachPlaceholder + "'/></div>";
 

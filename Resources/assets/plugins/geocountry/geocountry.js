@@ -7,53 +7,39 @@ let yamapsLang = {
     }
 }
 
-//$htmlLang = document.getElementsByTagName('html');
-//let $lang = $htmlLang[0].getAttribute('lang');
-
-
-/*https://github.com/Kolyaj/CrossJS/blob/master/source/lang/Function.js#L26  */
-
-/*(function (Function_prototype) {
-    Function_prototype.debounce = function (delay, ctx) {
-        var fn = this, timer;
-        return function () {
-            var args = arguments, that = this;
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                fn.apply(ctx || that, args);
-            }, delay);
-        };
-    };
-
-})(Function.prototype);*/
-
-
-function getSelectedOption(sel) {
+function getSelectedOption(sel)
+{
     var opt;
-    for (var i = 0, len = sel.options.length; i < len; i++) {
+    for(var i = 0, len = sel.options.length; i < len; i++)
+    {
         opt = sel.options[i];
-        if (opt.selected === true) {
+        if(opt.selected === true)
+        {
             break;
         }
     }
     return opt;
 }
 
-function readGeoMaps($idCity, $idCityHelp) {
+function readGeoMaps($idCity, $idCityHelp)
+{
 
     /* Определяем поле ввода города */
     $profileCity = document.getElementById($idCity);
 
-    if (!$profileCity) {
+    if(!$profileCity)
+    {
         console.log('не найдено поле ' + $idCity);
         return false;
     }
 
-    function getCountry() {
+    function getCountry()
+    {
 
         let $city = this.value;
         let $textCountry;
-        if ($city.length > 2) {
+        if($city.length > 2)
+        {
             /* Определяем выбранный элемент Страны */
             //$country = document.getElementById($idCountry);
             $textCountry = 'Россия';
@@ -63,18 +49,21 @@ function readGeoMaps($idCity, $idCityHelp) {
             var myGeocoder = ymaps.geocode($city);
 
             myGeocoder.then(
-                function (res) {
+                function(res)
+                {
                     let $res = res.geoObjects.get(0).properties.getAll();
                     //console.log($res);
 
                     let $helpCountry = document.getElementById($idCityHelp);
                     $helpCountry.classList.remove('text-muted');
 
-                    if ($res.name !== $city) {
+                    if($res.name !== $city)
+                    {
 
                         $helpCountry.style.color = 'red';
-                        $helpCountry.innerText = yamapsLang[$lang].errorCity + ' "' + $res.text + '"';
-                    } else {
+                        $helpCountry.innerText = yamapsLang[$locale].errorCity + ' "' + $res.text + '"';
+                    } else
+                    {
                         $helpCountry.style.color = 'green';
                         $helpCountry.innerText = $res.text
                     }
@@ -86,7 +75,8 @@ function readGeoMaps($idCity, $idCityHelp) {
 
                     $helpCountry.appendChild(span);
 
-                    span.addEventListener('click', function (event) {
+                    span.addEventListener('click', function(event)
+                    {
                         $profileCity.value = $res.text;
                         $helpCountry.innerText = '';
                     });
@@ -95,7 +85,8 @@ function readGeoMaps($idCity, $idCityHelp) {
                     // Выведем в консоль данные, полученные в результате геокодирования объекта.
                     /* console.log('Все данные геообъекта: ', res.geoObjects.get(0).properties.getAll()); */
                 },
-                function (err) {
+                function(err)
+                {
                     // Обработка ошибки.
                 }
             );
@@ -106,48 +97,57 @@ function readGeoMaps($idCity, $idCityHelp) {
 
 }
 
-
 /*document.addEventListener('DOMContentLoaded', function () {
 
-ymaps.ready(init);
+ ymaps.ready(init);
 
-function init() {
+ function init() {
 
-// Осуществляет поиск объекта с именем "Москва".
-// Полученный результат сразу отображается на карте.
-    var myGeocoder = ymaps.geocode("Беларусь, Калинковичи");
-    myGeocoder.then(
-        function (res) {
-            // Выведем в консоль данные, полученные в результате геокодирования объекта.
-            console.log('Все данные геообъекта: ', res.geoObjects.get(0).properties.getAll());
-        },
-        function (err) {
-            // Обработка ошибки.
-        }
-    );
+ // Осуществляет поиск объекта с именем "Москва".
+ // Полученный результат сразу отображается на карте.
+ var myGeocoder = ymaps.geocode("Беларусь, Калинковичи");
+ myGeocoder.then(
+ function (res) {
+ // Выведем в консоль данные, полученные в результате геокодирования объекта.
+ console.log('Все данные геообъекта: ', res.geoObjects.get(0).properties.getAll());
+ },
+ function (err) {
+ // Обработка ошибки.
+ }
+ );
 
-}
-});*/
+ }
+ });*/
 
 
-function ymapsInit(e) {
+function ymapsInit(e)
+{
     var n = this, t = {ns: {}, supports: {}, env: e};
     t.performance = {
-        now: n.performance && n.performance.now ? n.performance.now.bind(n.performance) : function () {
+        now: n.performance && n.performance.now ? n.performance.now.bind(n.performance) : function()
+        {
             return Date.now();
         }
-    }, t.count = function (e) {
-        function n() {
+    }, t.count = function(e)
+    {
+        function n()
+        {
             r.push(arguments)
         }
 
-        var t = {exports: {}}, r = (t.exports, []), o = null, i = function () {
+        var t = {exports: {}}, r = (t.exports, []), o = null, i = function()
+        {
             (o || n).apply(null, arguments)
         };
-        return i.active = function () {
+        return i.active = function()
+        {
             return !o || o.active.apply(null, arguments)
-        }, i.provideImplementation = function (e) {
-            if (o) throw new Error("
+        }, i.provideImplementation = function(e)
+        {
+            if(o)
+            {
+                throw new Error("
+            }
             ym.count
         :
             implementation
