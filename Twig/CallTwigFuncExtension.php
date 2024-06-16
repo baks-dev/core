@@ -30,32 +30,32 @@ use Twig\TwigFilter;
 /** Фильтр вызывает указанную функцию и применяет к значению */
 final class CallTwigFuncExtension extends AbstractExtension
 {
-    public function getFilters() : array
+    public function getFilters(): array
     {
         return [
-        	new TwigFilter(
-        	    'call_twig_func',
-        	    [$this, 'call'],
-        	    ['needs_environment' => true, 'is_safe' => ['html']]
-        	),
+            new TwigFilter(
+                'call_twig_func',
+                [$this, 'call'],
+                ['needs_environment' => true, 'is_safe' => ['html']]
+            ),
         ];
     }
 
-    public function call(Environment $twig, mixed $value, ?string $func) : ?string
+    public function call(Environment $twig, mixed $value, ?string $func): ?string
     {
-        if (empty($func))
+        if(empty($func))
         {
             return $value;
         }
 
-        if (empty($value))
+        if(empty($value))
         {
             return null;
         }
 
         $callable = $twig->getFunction($func)?->getCallable();
-        
-        if (!$callable)
+
+        if(!$callable)
         {
             return null;
         }

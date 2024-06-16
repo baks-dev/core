@@ -45,24 +45,28 @@ final class SecurityListener
     {
         $attributes = $event->getAttributes();
 
-        if (!is_array($attributes[RoleSecurity::class] ?? null)) {
+        if(!is_array($attributes[RoleSecurity::class] ?? null))
+        {
             return;
         }
 
         $token = $this->security->getToken();
 
-        if (!$token) {
+        if(!$token)
+        {
             throw new AccessDeniedException();
         }
 
-        if (!$token->getUser()) {
+        if(!$token->getUser())
+        {
             throw new AccessDeniedException();
         }
 
         $usr = $token->getUser();
         $roles = $usr?->getRoles();
 
-        if (empty($roles)) {
+        if(empty($roles))
+        {
             throw new AccessDeniedException();
         }
 
@@ -73,7 +77,8 @@ final class SecurityListener
             $granted
         );
 
-        if (empty($commonRoles)) {
+        if(empty($commonRoles))
+        {
             throw new AccessDeniedException();
         }
 

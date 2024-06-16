@@ -30,17 +30,17 @@ use Twig\TwigFunction;
 /** Функция преобразует строку формата json в массив */
 final class JsonDecodeExtension extends AbstractExtension
 {
-	public function getFilters(): array
+    public function getFilters(): array
     {
-		return [
-			new TwigFilter('json_decode', [$this, 'jsonDecode']),
-		];
-	}
-	
-	
-	public function jsonDecode($string) : array
-	{
-		return json_decode($string, false, 512, JSON_THROW_ON_ERROR);
-	}
-	
+        return [
+            new TwigFilter('json_decode', [$this, 'jsonDecode']),
+        ];
+    }
+
+
+    public function jsonDecode($string): array
+    {
+        return json_decode($string, false, 512, JSON_THROW_ON_ERROR);
+    }
+
 }

@@ -70,8 +70,6 @@ abstract class AbstractController
     private CsrfTokenManagerInterface $csrfTokenManager;
 
 
-
-
     public function __construct(
         #[Autowire('%kernel.project_dir%')] string $project_dir,
         RouterInterface $router,

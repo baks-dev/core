@@ -37,9 +37,8 @@ $ composer require baks-dev/core
 HOST=domain.exemple
 ```
 
-Для преобразования файлов изобращений в формат WEBP устанавливаем модуль [Files Cdn](https://github.com/baks-dev/files-cdn)
-
-
+Для преобразования файлов изобращений в формат WEBP устанавливаем
+модуль [Files Cdn](https://github.com/baks-dev/files-cdn)
 
 ## Тестирование
 

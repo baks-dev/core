@@ -39,9 +39,10 @@ class ErrorController
         #[Autowire(service: 'twig.error_renderer.html')] ErrorRendererInterface $errorRenderer,
         #[Autowire(env: 'ROOT_IP')] string $root = '0.0.0.0',
         #[Autowire(env: 'APP_ENV')] string $env = 'prod',
-    ): Response {
+    ): Response
+    {
 
-        if ($env === 'dev' && $request->getClientIp() === $root)
+        if($env === 'dev' && $request->getClientIp() === $root)
         {
             $exception = $errorRenderer->render($exception);
             return new Response($exception->getAsString(), $exception->getStatusCode(), $exception->getHeaders());

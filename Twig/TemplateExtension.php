@@ -30,33 +30,34 @@ use Twig\TwigFunction;
 
 final class TemplateExtension extends AbstractExtension
 {
-	private ParameterBagInterface $parameter;
-	
-	
-	public function __construct(ParameterBagInterface $parameter) {
-		
-		$this->parameter = $parameter;
-	}
-	
-	
-	public function getFunctions(): array
+    private ParameterBagInterface $parameter;
+
+
+    public function __construct(ParameterBagInterface $parameter)
     {
-		return [
-			new TwigFunction('Template', $this->extends(...)),
-		];
-	}
+
+        $this->parameter = $parameter;
+    }
+
+
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('Template', $this->extends(...)),
+        ];
+    }
 
     /**
      * Функция определяет, имеется ли базовый пользовательский шаблон в директории template/Template, иначе применяет системный Core
      */
-	public function extends($string): string
-	{
-		if(file_exists($this->parameter->get('kernel.project_dir').'/templates/Template/'.$string))
-		{
-			return '@Template/Template/'.$string;
-		}
-		
-		return '@core/'.$string;
-	}
-	
+    public function extends($string): string
+    {
+        if(file_exists($this->parameter->get('kernel.project_dir').'/templates/Template/'.$string))
+        {
+            return '@Template/Template/'.$string;
+        }
+
+        return '@core/'.$string;
+    }
+
 }

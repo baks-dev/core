@@ -32,26 +32,27 @@ final class SwitcherExtension extends AbstractExtension
 {
     private SwitcherInterface $switcher;
 
-    public function __construct(SwitcherInterface $switcher) {
+    public function __construct(SwitcherInterface $switcher)
+    {
         $this->switcher = $switcher;
     }
 
-    public function getFunctions() : array
-	{
-		return [
-			new TwigFunction('isRus', $this->isRus(...)),
-			new TwigFunction('isEng', $this->isEng(...)),
-		];
-	}
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('isRus', $this->isRus(...)),
+            new TwigFunction('isEng', $this->isEng(...)),
+        ];
+    }
 
-	public function isRus(string $string) : bool
-	{
-		return $this->switcher->isRus($string);
-	}
+    public function isRus(string $string): bool
+    {
+        return $this->switcher->isRus($string);
+    }
 
-    public function isEng(string $string) : bool
+    public function isEng(string $string): bool
     {
         return $this->switcher->isEng($string);
     }
-	
+
 }

@@ -27,7 +27,7 @@ interface MessageDispatchInterface
 {
     public function dispatch(object $message, array $stamps = [], string $transport = null): mixed;
 
-    public function transport(string $transport) : self;
+    public function transport(string $transport): self;
 
     public function isConsumer(?string $transport = null): bool;
 

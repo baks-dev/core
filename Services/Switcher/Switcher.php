@@ -207,7 +207,7 @@ final class Switcher implements SwitcherInterface
 
 
     /** Определяет, является ли первый символ русского алфавита */
-    public function isRus($string) : bool
+    public function isRus($string): bool
     {
         $first = mb_substr($string, 0, 1, 'UTF-8');
 

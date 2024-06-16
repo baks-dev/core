@@ -124,8 +124,6 @@ final class ORMQueryBuilder extends QueryBuilder
             }, $this->getParameters()->toArray()));
 
 
-
-
         /** Сохраняем метку времени в APCU */
         $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
 
@@ -190,12 +188,12 @@ final class ORMQueryBuilder extends QueryBuilder
         return $this->getQuery()->getResult() ?: null;
     }
 
-//    public function join($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
-//    {
-//        parent::join($join, $alias, $conditionType, $condition, $indexBy);
-//
-//        return $this;
-//    }
+    //    public function join($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
+    //    {
+    //        parent::join($join, $alias, $conditionType, $condition, $indexBy);
+    //
+    //        return $this;
+    //    }
 
 
     public function flush(): void
@@ -240,7 +238,7 @@ final class ORMQueryBuilder extends QueryBuilder
         return $this;
     }
 
-    public function clear() : self
+    public function clear(): self
     {
         $this->entityManager->clear();
         return $this;

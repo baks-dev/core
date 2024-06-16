@@ -52,8 +52,8 @@ final class CryptKeyListener
         {
             foreach($this->crypt as $crypt)
             {
-               new $crypt();
-               break;
+                new $crypt();
+                break;
             }
         }
     }

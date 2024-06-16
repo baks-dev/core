@@ -82,8 +82,7 @@ final class OneToManyEntityEventTest extends KernelTestCase
 
         /** @var DTOOneToMany $DTOOneToMany */
         $DTOOneToMany = $DTO->getCollection()->current();
-        $DTOOneToMany->setValueObject(clone (new UserUid()));
-
+        $DTOOneToMany->setValueObject(clone(new UserUid()));
 
 
         /** @var DTO $EditDto */

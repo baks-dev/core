@@ -18,120 +18,120 @@
 
 
 
-        {% if baks_user_menu|length > 1 %}
+            {% if baks_user_menu|length > 1 %}
 
-        {#<a href='#'
+                {# <a href='#'
            class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.catalog.category' ? ' active' }}"
            type="button"
            id="dropdownMenu2"
            data-bs-toggle="dropdown"
            >
             Каталог
-        </a>#}
+        </a> #}
 
-        <div class="dropdown-menu w-100 rounded-3 p-4" {#aria-labelledby="dropdownMenu2"#}>
+                <div class="dropdown-menu w-100 rounded-3 p-4" {# aria-labelledby="dropdownMenu2" #}>
 
-            <div class="d-flex align-items-start">
+                    <div class="d-flex align-items-start">
 
-                <ul class=" leader list-group list-group-flush gap-3 nav-mouse"
-                    id="v-pills-tab"
-                    role="tablist"
-                    aria-orientation="vertical">
-
-
-                    {% set parent_active = false %}
-
-                    {% for key, menu in baks_user_menu %}
+                        <ul class=" leader list-group list-group-flush gap-3 nav-mouse"
+                            id="v-pills-tab"
+                            role="tablist"
+                            aria-orientation="vertical">
 
 
-                        {% set menu_active = '' %}
+                            {% set parent_active = false %}
 
-                        {% if category.parent_category_url is defined %}
-                            {% set menu_active = (menu.category_url == category.category_url or menu.category_url == category.parent_category_url) ? 'active' : '' %}
-
-                            {% if menu.category_url == category.category_url or menu.category_url == category.parent_category_url %}
-                                {% set parent_active = menu.category_url %}
-                            {% endif %}
-
-                        {% endif %}
+                            {% for key, menu in baks_user_menu %}
 
 
-                        <li class="list-group-item bg-transparent border-0 text-truncate rounded-5 {{ menu_active }}"
+                                {% set menu_active = '' %}
 
-                            id="{{ key }}-tab"
-                            data-bs-target="#v-pills-{{ key }}"
-                            title="{{ menu.category_name }}"
-                            style='margin-top: 0 !important;'
+                                {% if category.parent_category_url is defined %}
+                                    {% set menu_active = (menu.category_url == category.category_url or menu.category_url == category.parent_category_url) ? 'active' : '' %}
 
-                        >
-
-                            <a href="{{ path('products-product:user.catalog.category', { category : menu.category_url }) }}"
-                               class="text-decoration-none text-dark d-flex gap-3 align-items-center w-100 justify-content-start">
-
-                                {# Обложка  #}
-                                {% set image_path = '/assets/img/blank.svg' %}
-
-                                {% if menu.category_cover_ext is defined and menu.category_cover_ext is not null %}
-                                    {% set img_host =  menu.category_cover_cdn == true  ? CDN_HOST : '' %}
-                                    {% set img_dir = menu.category_cover_name %}
-                                    {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ menu.category_cover_ext %}
-                                    {% set image_path = img_host ~ img_dir ~ img_file %}
+                                    {% if menu.category_url == category.category_url or menu.category_url == category.parent_category_url %}
+                                        {% set parent_active = menu.category_url %}
+                                    {% endif %}
 
                                 {% endif %}
 
 
-                                <div>
+                                <li class="list-group-item bg-transparent border-0 text-truncate rounded-5 {{ menu_active }}"
+
+                                    id="{{ key }}-tab"
+                                    data-bs-target="#v-pills-{{ key }}"
+                                    title="{{ menu.category_name }}"
+                                    style='margin-top: 0 !important;'
+
+                                >
+
+                                    <a href="{{ path('products-product:user.catalog.category', { category : menu.category_url }) }}"
+                                       class="text-decoration-none text-dark d-flex gap-3 align-items-center w-100 justify-content-start">
+
+                                        {# Обложка  #}
+                                        {% set image_path = '/assets/img/blank.svg' %}
+
+                                        {% if menu.category_cover_ext is defined and menu.category_cover_ext is not null %}
+                                            {% set img_host =  menu.category_cover_cdn == true  ? CDN_HOST : '' %}
+                                            {% set img_dir = menu.category_cover_name %}
+                                            {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ menu.category_cover_ext %}
+                                            {% set image_path = img_host ~ img_dir ~ img_file %}
+
+                                        {% endif %}
+
+
+                                        <div>
 										<span class="icon rounded-circle bg-cover lazy p-1"
                                               style="width: 43px; height: 43px;"
                                               data-bg="{{ image_path }}"
                                         >
 										</span>
-                                </div>
+                                        </div>
 
-                                {{ menu.category_name }}
-                            </a>
-                        </li>
-                    {% endfor %}
-
-                </ul>
-
-                <div class="tab-content ms-5 w-100" id="v-pills-tabContent">
-
-                {% for key, menu in baks_user_menu %}
-
-                    <div class="tab-pane {{ parent_active ?  (menu.category_url == parent_active ? 'show active') : loop.first ? 'show active' }}"
-                         id="v-pills-{{ key }}"
-                         {#aria-labelledby="v-pills-{{ key }}-tab"#}
-                         tabindex="0">
-
-                        <div class='d-flex w-100 flex-wrap gap-3'>
-
-
-                            {% set parent_category = menu.parent_category|json_decode %}
-
-                            {% for parent in parent_category %}
-
-                                {% if parent.parent_category_counter %}
-                                    <a href="{{ path('products-product:user.catalog.category', { category : parent.parent_category_url }) }}"
-                                       class="text-decoration-none text-dark justify-content-start small text-decoration-none"
-                                       style='width: 23%;'>
-                                        {{ parent.parent_category_name }}
-                                        <span class='small text-muted ms-3'>{{ parent.parent_category_counter }}</span>
+                                        {{ menu.category_name }}
                                     </a>
-                                {% endif %}
-
+                                </li>
                             {% endfor %}
+
+                        </ul>
+
+                        <div class="tab-content ms-5 w-100" id="v-pills-tabContent">
+
+                            {% for key, menu in baks_user_menu %}
+
+                                <div class="tab-pane {{ parent_active ?  (menu.category_url == parent_active ? 'show active') : loop.first ? 'show active' }}"
+                                     id="v-pills-{{ key }}"
+                                        {# aria-labelledby="v-pills-{{ key }}-tab" #}
+                                     tabindex="0">
+
+                                    <div class='d-flex w-100 flex-wrap gap-3'>
+
+
+                                        {% set parent_category = menu.parent_category|json_decode %}
+
+                                        {% for parent in parent_category %}
+
+                                            {% if parent.parent_category_counter %}
+                                                <a href="{{ path('products-product:user.catalog.category', { category : parent.parent_category_url }) }}"
+                                                   class="text-decoration-none text-dark justify-content-start small text-decoration-none"
+                                                   style='width: 23%;'>
+                                                    {{ parent.parent_category_name }}
+                                                    <span class='small text-muted ms-3'>{{ parent.parent_category_counter }}</span>
+                                                </a>
+                                            {% endif %}
+
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+
                         </div>
                     </div>
-                {% endfor %}
-
-            </div>
-        </div>
 
 
-        {# ОДНОУРОВНЕВОЕ МЕНЮ   #}
+                    {# ОДНОУРОВНЕВОЕ МЕНЮ   #}
 
-        {# <ul class="leader list-group list-group-flush list-group-horizontal flex-wrap gap-3">
+                    {# <ul class="leader list-group list-group-flush list-group-horizontal flex-wrap gap-3">
 
 						{% for menu in baks_user_menu %}
 							<li class="list-group-item bg-transparent border-0 text-truncate rounded-5"
@@ -159,30 +159,30 @@
 							</li>
 						{% endfor %}
 					</ul> #}
-    </div>
+                </div>
 
-    {% else %}
-        {% for menu in baks_user_menu %}
-            {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.catalog.category' ? ' active' }}"
-               href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}">{{ menu.category_name }}</a>#}
-        {% endfor %}
-    {% endif %}
+            {% else %}
+                {% for menu in baks_user_menu %}
+                    {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.catalog.category' ? ' active' }}"
+               href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}">{{ menu.category_name }}</a> #}
+                {% endfor %}
+            {% endif %}
 
-    {% endif %}
+        {% endif %}
 
 
-    {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.about' ? ' active' }}"
-       href="{{ path('pages:user.about') }}">О компании</a>#}
-    {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'delivery:user.delivery' ? ' active' }}"
-       href="{{ path('delivery:user.delivery') }}">Доставка</a>#}
-    {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.wholesale' ? ' active' }}"
-       href="{{ path('pages:user.wholesale') }}">Опт</a>#}
-    {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.guaranty' ? ' active' }}"
-       href="{{ path('pages:user.guaranty') }}">Гарантия</a>#}
-    {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.calc' ? ' active' }}"
-       href="{{ path('pages:user.calc') }}">Шинный калькулятор</a>#}
-    {#<a class="nav-link rounded-3 px-3 text-white{{ route == 'contacts-region:user.contact' ? ' active' }}"
-       href="{{ path('contacts-region:user.contact') }}">Контакты</a>#}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.about' ? ' active' }}"
+       href="{{ path('pages:user.about') }}">О компании</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'delivery:user.delivery' ? ' active' }}"
+       href="{{ path('delivery:user.delivery') }}">Доставка</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.wholesale' ? ' active' }}"
+       href="{{ path('pages:user.wholesale') }}">Опт</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.guaranty' ? ' active' }}"
+       href="{{ path('pages:user.guaranty') }}">Гарантия</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.calc' ? ' active' }}"
+       href="{{ path('pages:user.calc') }}">Шинный калькулятор</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'contacts-region:user.contact' ? ' active' }}"
+       href="{{ path('contacts-region:user.contact') }}">Контакты</a> #}
     </div>
 
 </nav>

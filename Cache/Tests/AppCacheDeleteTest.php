@@ -36,7 +36,7 @@ use Symfony\Contracts\Cache\CacheInterface;
  *
  * @depends BaksDev\Core\Cache\Tests\AppCacheGetTest::class
  *
- * @see AppCacheGetTest
+ * @see     AppCacheGetTest
  */
 #[When(env: 'test')]
 final class AppCacheDeleteTest extends KernelTestCase

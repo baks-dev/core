@@ -4,6 +4,6 @@ namespace BaksDev\Core\Repository\UserProfilesByUser;
 
 interface UserProfilesByCurrentUserInterface
 {
-	public function fetchAllUserProfilesAssociative() : array;
-	
+    public function fetchAllUserProfilesAssociative(): array;
+
 }

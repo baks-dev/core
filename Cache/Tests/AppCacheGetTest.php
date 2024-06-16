@@ -35,7 +35,7 @@ use Symfony\Component\DependencyInjection\Attribute\When;
  *
  * @depends BaksDev\Core\Cache\Tests\AppCacheSaveTest::class
  *
- * @see AppCacheSaveTest
+ * @see     AppCacheSaveTest
  */
 #[When(env: 'test')]
 final class AppCacheGetTest extends KernelTestCase

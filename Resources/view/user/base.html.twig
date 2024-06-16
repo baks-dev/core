@@ -59,7 +59,7 @@
 
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
-    {#<link rel="preload" as="style" href="/assets/css/base.min.css"/>#}
+    {# <link rel="preload" as="style" href="/assets/css/base.min.css"/> #}
     <link rel="preload" as="image" href="/logo.webp">
 
     <link rel="preload" as="style" href="/assets/css/bootstrap.5.3.2.min.css">
@@ -68,7 +68,7 @@
     <link rel="preload" as="style" href="/assets/css/style.min.css">
     <link href="/assets/css/style.min.css" rel="stylesheet">
 
-    {#<style></style>#}
+    {# <style></style> #}
 
     {# БЛОК ДЛЯ ВСТАВКИ CSS #}
     {% block stylesheets %}{% endblock %}
@@ -105,7 +105,7 @@
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 
-<script nonce='{{ csp_nonce() }}' async  data-src='/assets/js/script.min.js?v={{ version }}' class="lazy"></script>
+<script nonce='{{ csp_nonce() }}' async data-src='/assets/js/script.min.js?v={{ version }}' class="lazy"></script>
 
 {% block javascript %}{% endblock %}
 

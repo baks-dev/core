@@ -34,81 +34,80 @@ use Symfony\Component\Routing\RouterInterface;
  * File | Settings | PHP | Symfony | Routing
  */
 #[AsCommand(
-	name: 'baks:core:phpstorm',
-	description: 'Генерирует массив роутингов для интеграции PhpStorm')
+    name: 'baks:core:phpstorm',
+    description: 'Генерирует массив роутингов для интеграции PhpStorm')
 ]
 class RouterPhpstormCommand extends Command
 {
-	private $router;
+    private $router;
 
-	private KernelInterface $kernel;
-	
-	private Filesystem $filesystem;
-	
-	
-	public function __construct(
-		RouterInterface $router,
-		KernelInterface $kernel,
-		Filesystem $filesystem,
-	)
-	{
-		parent::__construct();
-		$this->router = $router;
-		$this->kernel = $kernel;
-		$this->filesystem = $filesystem;
-	}
-	
-	
-//	/**
-//	 * {@inheritdoc}
-//	 */
-//	protected function configure() {}
-	
-	
+    private KernelInterface $kernel;
 
-	protected function execute(InputInterface $input, OutputInterface $output) : int
-	{
-		$io = new SymfonyStyle($input, $output);
-		$routes = $this->router->getRouteCollection();
-		
-		$fileName = $this->kernel->getProjectDir().DIRECTORY_SEPARATOR.'phpstorm.routes.php';
-		
-		$this->filesystem->dumpFile($fileName, "<?php \r\n");
-		$this->filesystem->appendToFile($fileName, "return [ \r\n");
+    private Filesystem $filesystem;
 
-		foreach($routes as $route)
-		{
-			$def = $route->getDefaults();
-			
-			if(isset($def["_canonical_route"]))
-			{
-				if($def["_locale"] != "ru")
-				{
-					continue;
-				}
-				
-				$explode = explode('.', $def["_canonical_route"]);
-				if(end($explode) == "css" || end($explode) == "js")
-				{
-					continue;
-				}
-				
-				$this->filesystem->appendToFile(
-					$fileName,
-					"\t'".$def["_canonical_route"]."' => [[], ['_controller' => '".quotemeta(
-						$def["_controller"]
-					)."']], \r\n"
-				);
-				
-			}
-			
-		}
-		
-		$this->filesystem->appendToFile($fileName, "];", true);
-		
-		$io->success('Файл роутинга phpstorm успешно сохранен');
-		
-		return 0;
-	}
-	
+
+    public function __construct(
+        RouterInterface $router,
+        KernelInterface $kernel,
+        Filesystem $filesystem,
+    )
+    {
+        parent::__construct();
+        $this->router = $router;
+        $this->kernel = $kernel;
+        $this->filesystem = $filesystem;
+    }
+
+
+    //	/**
+    //	 * {@inheritdoc}
+    //	 */
+    //	protected function configure() {}
+
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $routes = $this->router->getRouteCollection();
+
+        $fileName = $this->kernel->getProjectDir().DIRECTORY_SEPARATOR.'phpstorm.routes.php';
+
+        $this->filesystem->dumpFile($fileName, "<?php \r\n");
+        $this->filesystem->appendToFile($fileName, "return [ \r\n");
+
+        foreach($routes as $route)
+        {
+            $def = $route->getDefaults();
+
+            if(isset($def["_canonical_route"]))
+            {
+                if($def["_locale"] != "ru")
+                {
+                    continue;
+                }
+
+                $explode = explode('.', $def["_canonical_route"]);
+                if(end($explode) == "css" || end($explode) == "js")
+                {
+                    continue;
+                }
+
+                $this->filesystem->appendToFile(
+                    $fileName,
+                    "\t'".$def["_canonical_route"]."' => [[], ['_controller' => '".quotemeta(
+                        $def["_controller"]
+                    )."']], \r\n"
+                );
+
+            }
+
+        }
+
+        $this->filesystem->appendToFile($fileName, "];", true);
+
+        $io->success('Файл роутинга phpstorm успешно сохранен');
+
+        return 0;
+    }
+
 }

@@ -56,7 +56,7 @@ final class UidTest extends TestCase
     public function testToStringReturnsUid()
     {
         $uid = new UidClass(UidClass::TEST);
-        $this->assertEquals(UidClass::TEST, (string)$uid);
+        $this->assertEquals(UidClass::TEST, (string) $uid);
     }
 
     public function testIsEqual()
@@ -77,7 +77,7 @@ final class UidTest extends TestCase
         $uid3 = (new UidClass())->md5($md5);
 
         $UidMd5 = explode('-', (string) $uid3);
-        $this->assertEquals($UidMd5[0], substr($md5, 0, 8 ));
+        $this->assertEquals($UidMd5[0], substr($md5, 0, 8));
         $this->assertEquals($UidMd5[1], substr($md5, 8, 4));
         $this->assertEquals($UidMd5[2], '7'.substr($md5, 12, 3));
         $this->assertEquals($UidMd5[3], '9cb9');

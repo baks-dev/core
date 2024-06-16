@@ -14,12 +14,12 @@ final class GpsLongitude
 
     public function __construct(self|string|float $value = null)
     {
-        if ($value === null)
+        if($value === null)
         {
             return;
         }
 
-        if ($value instanceof self)
+        if($value instanceof self)
         {
             $this->value = $value->getValue();
         }
@@ -27,7 +27,7 @@ final class GpsLongitude
         $value = str_replace(',', '.', $value);
         $value = trim($value);
 
-        if (!empty($value) && !preg_match('{^-?[\d]+\.[\d]{3,}$}Di', (string) $value))
+        if(!empty($value) && !preg_match('{^-?[\d]+\.[\d]{3,}$}Di', (string) $value))
         {
             throw new InvalidArgumentException('Incorrect Gps Longitude '.$value);
         }

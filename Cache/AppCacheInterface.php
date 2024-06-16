@@ -37,5 +37,5 @@ interface AppCacheInterface
     ): CacheInterface;
 
 
-    public function getCacheType() : string;
+    public function getCacheType(): string;
 }

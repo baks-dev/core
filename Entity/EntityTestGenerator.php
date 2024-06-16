@@ -152,8 +152,6 @@ final class EntityTestGenerator
             }
 
 
-
-
             if(class_exists($property->getType()?->getName()))
             {
                 $instanceClass = new ReflectionClass($property->getType()?->getName());
@@ -226,10 +224,8 @@ final class EntityTestGenerator
                         {
 
 
-
                             /** @var ReflectionNamedType $paramType */
                             $paramTypeName = $paramType->getName();
-
 
 
                             if($paramTypeName === 'mixed')
@@ -249,7 +245,6 @@ final class EntityTestGenerator
                                 $parameners[$paramName] = $instanceClass->getName()::TEST;
                                 continue;
                             }
-
 
 
                             if(interface_exists($paramTypeName))
@@ -282,8 +277,8 @@ final class EntityTestGenerator
                 //                }
 
 
-//                dump($typeInstall::class);
-//                dump($parameners);
+                //                dump($typeInstall::class);
+                //                dump($parameners);
 
                 $class = new $typeInstall(...$parameners);
                 self::setPropertyValue($propertyName, $class, $entity);

@@ -9,15 +9,15 @@ use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\Collection\WbOrderStatusI
 /** Локализация  */
 final class ModifyAction
 {
-	public const TYPE = 'modify_action';
+    public const TYPE = 'modify_action';
 
-	public const TEST = ModifyActionNew::class;
+    public const TEST = ModifyActionNew::class;
 
-	private ModifyActionInterface $action;
-	
-	
-	public function __construct(ModifyActionInterface|self|string $action)
-	{
+    private ModifyActionInterface $action;
+
+
+    public function __construct(ModifyActionInterface|self|string $action)
+    {
 
         if(is_string($action) && class_exists($action))
         {
@@ -56,7 +56,7 @@ final class ModifyAction
 
         //throw new \InvalidArgumentException(sprintf('Not found ModifyAction %s', $action));
 
-	}
+    }
 
     public function __toString(): string
     {
@@ -64,15 +64,15 @@ final class ModifyAction
     }
 
 
-	public function getModifyAction(): ModifyActionInterface
-	{
-		return $this->action;
-	}
+    public function getModifyAction(): ModifyActionInterface
+    {
+        return $this->action;
+    }
 
-	public function getModifyActionValue(): string
-	{
-		return $this->action->getValue();
-	}
+    public function getModifyActionValue(): string
+    {
+        return $this->action->getValue();
+    }
 
     public function equals(mixed $status): bool
     {
@@ -81,7 +81,7 @@ final class ModifyAction
         return $this->getModifyActionValue() === $status->getModifyActionValue();
     }
 
-    
+
     public static function cases(): array
     {
         $case = [];
@@ -95,7 +95,7 @@ final class ModifyAction
 
         return $case;
     }
-    
+
 
     public static function getDeclared(): array
     {
@@ -106,5 +106,5 @@ final class ModifyAction
             }
         );
     }
-	
+
 }

@@ -30,21 +30,21 @@ use Twig\TwigFunction;
 /** Функция применяет в значение Dump And Die */
 final class DumpDieExtension extends AbstractExtension
 {
-    public function getFunctions() : array
-	{
-		return [
-			new TwigFunction('dump', $this->dump(...)),
-			new TwigFunction('dd', $this->dd(...)),
-		];
-	}
-	
-	public function dd($action = null)
-	{
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('dump', $this->dump(...)),
+            new TwigFunction('dd', $this->dd(...)),
+        ];
+    }
+
+    public function dd($action = null)
+    {
         if(Kernel::isDump())
         {
             dd($action);
         }
-	}
+    }
 
     public function dump($action = null)
     {

@@ -31,15 +31,15 @@ use Twig\TwigFunction;
 /** Функция преобразует строку формата json в массив */
 final class PathImageExtension extends AbstractExtension
 {
-	public function getFilters(): array
+    public function getFilters(): array
     {
-		return [
-			new TwigFilter('path_image', [$this, 'pathImage']),
-		];
-	}
+        return [
+            new TwigFilter('path_image', [$this, 'pathImage']),
+        ];
+    }
 
-	public function pathImage($array) : string
-	{
+    public function pathImage($array): string
+    {
         if(!isset($array['image_cdn']))
         {
             throw new InvalidArgumentException('Not fount image_cdn parameter');
@@ -55,7 +55,7 @@ final class PathImageExtension extends AbstractExtension
             throw new InvalidArgumentException('Not fount image_ext parameter');
         }
 
-		return '';
-	}
-	
+        return '';
+    }
+
 }

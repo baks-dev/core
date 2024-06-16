@@ -4,7 +4,6 @@ namespace BaksDev\Core\Entity\Tests;
 
 use BaksDev\Core\Entity\EntityTestGenerator;
 use BaksDev\Products\Product\Entity\Event\ProductEvent;
-use BaksDev\Users\User\Type\Id\UserUid;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -17,7 +16,15 @@ final class EntityTestGeneratorTest extends KernelTestCase
 {
     public function testEntityState(): void
     {
-        $Entity = EntityTestGenerator::get(ProductEvent::class);
-        self::assertInstanceOf(ProductEvent::class, $Entity);
+        if(class_exists(ProductEvent::class))
+        {
+            $Entity = EntityTestGenerator::get(ProductEvent::class);
+            self::assertInstanceOf(ProductEvent::class, $Entity);
+        }
+        else
+        {
+            self::assertTrue(true);
+        }
+
     }
 }

@@ -26,23 +26,24 @@ declare(strict_types=1);
 namespace BaksDev\Core\Services;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 final class BaksSessionTtl
 {
-	private AuthorizationCheckerInterface $security;
-	
-	public function __construct(AuthorizationCheckerInterface $security)
-	{
-		$this->security = $security;
-	}
-	
-	public function __invoke() : int
-	{
-		if($this->security->isGranted('ROLE_ADMIN'))
-		{
-			return (60 * 60 * 60 * 7); // 7 дней
-		}
-		
-		return (60 * 60 * 15); // 15 часов
-	}
-	
+    private AuthorizationCheckerInterface $security;
+
+    public function __construct(AuthorizationCheckerInterface $security)
+    {
+        $this->security = $security;
+    }
+
+    public function __invoke(): int
+    {
+        if($this->security->isGranted('ROLE_ADMIN'))
+        {
+            return (60 * 60 * 60 * 7); // 7 дней
+        }
+
+        return (60 * 60 * 15); // 15 часов
+    }
+
 }

@@ -29,7 +29,8 @@ final class CoreMessage
 {
     private string $transport;
 
-    public function __construct(string $transport) {
+    public function __construct(string $transport)
+    {
         $this->transport = $transport;
     }
 

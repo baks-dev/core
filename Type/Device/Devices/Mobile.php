@@ -43,7 +43,7 @@ class Mobile implements DeviceInterface
     {
         return self::DEVICE;
     }
-    
+
     public function getSort(): int
     {
         return 200;

@@ -6,10 +6,10 @@ namespace BaksDev\Core\Repository\UserProfilesByUser;
 
 final class UserProfilesByCurrentUser implements UserProfilesByCurrentUserInterface
 {
-	/** Список профилей пользователя для смены */
-	public function fetchAllUserProfilesAssociative() : array
-	{
-		return [];
-	}
-	
+    /** Список профилей пользователя для смены */
+    public function fetchAllUserProfilesAssociative(): array
+    {
+        return [];
+    }
+
 }

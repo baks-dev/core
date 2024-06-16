@@ -30,7 +30,8 @@ final class CacheClearMessage
     /** Идентификатор кеша */
     private ?string $cache = null;
 
-    public function __construct(string $cache) {
+    public function __construct(string $cache)
+    {
         $this->cache = $cache;
     }
 

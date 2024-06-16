@@ -99,7 +99,6 @@ final class ScalarEntityEventTest extends KernelTestCase
         self::assertTrue($DTO->getBool());
 
 
-
         /** @var DTO $EditDto */
         $EditDto = $Clone->getDto(DTO::class);
 

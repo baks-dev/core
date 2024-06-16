@@ -33,14 +33,15 @@ final class CacheClearHandler
 {
     private AppCacheInterface $cache;
 
-    public function __construct(AppCacheInterface $cache) {
+    public function __construct(AppCacheInterface $cache)
+    {
         $this->cache = $cache;
     }
 
     public function __invoke(CacheClearMessage $message): void
     {
-		/* Чистим кеш модуля */
-		$cache = $this->cache->init($message->getCache());
-		$cache->clear();
-	}
+        /* Чистим кеш модуля */
+        $cache = $this->cache->init($message->getCache());
+        $cache->clear();
+    }
 }

@@ -34,7 +34,7 @@ final class W3CValidatorCollector extends AbstractDataCollector
 {
     public function collect(Request $request, Response $response, Throwable $exception = null): void
     {
-        $this->data = [ 'url' => $request->getUri() ];
+        $this->data = ['url' => $request->getUri()];
     }
 
     public static function getTemplate(): ?string

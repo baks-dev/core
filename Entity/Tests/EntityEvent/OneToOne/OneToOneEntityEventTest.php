@@ -38,7 +38,6 @@ final class OneToOneEntityEventTest extends KernelTestCase
     }
 
 
-
     public function testEntityEventClone(): void
     {
         $Entity = new Entity();

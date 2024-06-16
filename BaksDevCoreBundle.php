@@ -39,8 +39,10 @@ class BaksDevCoreBundle extends AbstractBundle
             ->exclude([
                 self::PATH.'{Entity,Resources,Type}',
                 self::PATH.'**/*Message.php',
+                self::PATH.'**/*Test.php',
                 self::PATH.'**/*DTO.php',
                 self::PATH.'**/regions.php',
+
             ]);
 
         /* Language */

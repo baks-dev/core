@@ -39,7 +39,6 @@ final class StateEntityEventTest extends KernelTestCase
     }
 
 
-
     public function testEntityEventClone(): void
     {
 
@@ -58,9 +57,6 @@ final class StateEntityEventTest extends KernelTestCase
         $this->assertEquals($CloneOneToOne->getValueObject(), $EntityOneToOne->getValueObject());
         $this->assertEquals($CloneOneToOne->getValueObject(), new UserUid());
     }
-
-
-
 
 
     public function EntityEventCloneEdit(): void

@@ -123,8 +123,6 @@ abstract class Uid implements ValueResolverInterface
         }
 
 
-
-
         $key = $ParamConverter->getKey() ?: 'id';
 
         $value =

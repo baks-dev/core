@@ -119,7 +119,7 @@ final class Locale
     }
 
 
-    public static function default() : self
+    public static function default(): self
     {
         $default = new self(Ru::class);
 
@@ -165,7 +165,10 @@ final class Locale
     {
         $status = new self($status);
 
-        if(empty($status->getLocalValue())) { return false; }
+        if(empty($status->getLocalValue()))
+        {
+            return false;
+        }
 
         return $this->getLocalValue() === $status->getLocalValue();
     }

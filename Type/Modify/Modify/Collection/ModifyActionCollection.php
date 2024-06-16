@@ -32,7 +32,8 @@ final class ModifyActionCollection
     private iterable $locales;
 
     public function __construct(
-        #[TaggedIterator('baks.modify.action', defaultPriorityMethod: 'sort')] iterable $locales)
+        #[TaggedIterator('baks.modify.action', defaultPriorityMethod: 'sort')] iterable $locales
+    )
     {
         $this->locales = $locales;
     }
@@ -42,7 +43,8 @@ final class ModifyActionCollection
     {
         $case = null;
 
-        foreach ($this->locales as $locale) {
+        foreach($this->locales as $locale)
+        {
             $case[] = new $locale();
         }
 

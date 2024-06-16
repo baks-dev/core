@@ -19,7 +19,8 @@ final class CspNonceGenerator extends AbstractExtension
     /** генерирует значение nonce для Content-Security-Policy Header */
     public function getNonce(): string
     {
-        if (null === $this->nonce) {
+        if(null === $this->nonce)
+        {
             $this->nonce = base64_encode(random_bytes(20));
         }
 

@@ -32,22 +32,26 @@ final class FieldsChoice
 
     public function __construct(
         #[TaggedIterator('baks.fields.choice')] iterable $fields
-    ) {
+    )
+    {
         $this->fields = $fields;
     }
 
     public function getChoice(InputField|string|null $field): ?FieldsChoiceInterface
     {
-        if(!$field) { return null; }
+        if(!$field)
+        {
+            return null;
+        }
 
         if(is_string($field))
         {
             $field = new InputField($field);
         }
 
-        foreach ($this->fields as $fields)
+        foreach($this->fields as $fields)
         {
-            if ($fields->equals($field->getType()))
+            if($fields->equals($field->getType()))
             {
                 return $fields;
             }

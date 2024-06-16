@@ -240,7 +240,7 @@ final class DBALQueryBuilder extends QueryBuilder
             return null;
         }
 
-        return $method ? (new $class())->{$method}(...$result)  : new $class(...$result);
+        return $method ? (new $class())->{$method}(...$result) : new $class(...$result);
     }
 
 
@@ -834,7 +834,8 @@ final class DBALQueryBuilder extends QueryBuilder
         return $class;
     }
 
-    public function prepare(string $sql) : Statement {
+    public function prepare(string $sql): Statement
+    {
         return $this->connection->prepare($sql);
     }
 

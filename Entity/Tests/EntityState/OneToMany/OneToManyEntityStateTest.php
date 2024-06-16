@@ -85,7 +85,6 @@ final class OneToManyEntityStateTest extends KernelTestCase
         $DTOOneToMany->setValueObject(clone new UserUid());
 
 
-
         /** @var DTO $EditDto */
         $EditDto = $Entity->getDto(DTO::class);
         // идентификатор неизменен
@@ -118,7 +117,6 @@ final class OneToManyEntityStateTest extends KernelTestCase
         /** @var DTOOneToMany $DTOOneToMany */
         $DTOOneToMany = $DTO->getCollection()->current();
         $DTOOneToMany->setValueObject(clone new UserUid());
-
 
 
         /** @var DTO $EditDto */

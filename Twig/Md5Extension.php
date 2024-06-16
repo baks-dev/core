@@ -30,16 +30,16 @@ use Twig\TwigFunction;
 /** Функция преобразует строку формата json в массив */
 final class Md5Extension extends AbstractExtension
 {
-	public function getFilters(): array
+    public function getFilters(): array
     {
-		return [
-			new TwigFilter('md5', [$this, 'md5']),
-		];
-	}
+        return [
+            new TwigFilter('md5', [$this, 'md5']),
+        ];
+    }
 
-	public function md5($string) : string
+    public function md5($string): string
     {
-		return md5($string);
-	}
-	
+        return md5($string);
+    }
+
 }

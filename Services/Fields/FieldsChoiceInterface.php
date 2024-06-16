@@ -25,24 +25,24 @@ namespace BaksDev\Core\Services\Fields;
 
 interface FieldsChoiceInterface
 {
-	/** Метод проверяет, имеется ли поле с ключем в итераторе */
-	public function equals($key) : bool;
-	
-	/** Возвращает тип (ключ) поля */
-	public function type(): string;
-	
-	///** Возвращает массив значений поля (если поле является выбором) */
-	//public function choice() : bool|array;
-	
-	/** Возвращает домен для переводов
-	 * в файлах пеерводов должен содержаться ключ 'label' и 'placeholder'
-	 */
-	public function domain(): string;
-	
-	/** Возвращает класс формы для рендера */
-	public function form(): string;
-	
-	/** Возвращает ограничения формы */
-	public function constraints(): ?array;
+    /** Метод проверяет, имеется ли поле с ключем в итераторе */
+    public function equals($key): bool;
+
+    /** Возвращает тип (ключ) поля */
+    public function type(): string;
+
+    ///** Возвращает массив значений поля (если поле является выбором) */
+    //public function choice() : bool|array;
+
+    /** Возвращает домен для переводов
+     * в файлах пеерводов должен содержаться ключ 'label' и 'placeholder'
+     */
+    public function domain(): string;
+
+    /** Возвращает класс формы для рендера */
+    public function form(): string;
+
+    /** Возвращает ограничения формы */
+    public function constraints(): ?array;
 
 }

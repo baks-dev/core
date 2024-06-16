@@ -29,18 +29,18 @@ use Twig\TwigFunction;
 
 final class ArrayExtension extends AbstractExtension
 {
-	public function getFunctions() : array
-	{
-		return [
-			new TwigFunction('add_array', $this->add_array(...)),
-		];
-	}
-	
-	/**
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('add_array', $this->add_array(...)),
+        ];
+    }
+
+    /**
      * Функция добавляет в массив значение key => value
      */
-	public function add_array(mixed $key, mixed $value, array $array = []) : array
-	{
-		return array_merge($array, [$key => $value]);
-	}
+    public function add_array(mixed $key, mixed $value, array $array = []): array
+    {
+        return array_merge($array, [$key => $value]);
+    }
 }

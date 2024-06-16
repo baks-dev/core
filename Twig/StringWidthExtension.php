@@ -29,19 +29,19 @@ use function mb_strimwidth;
 
 final class StringWidthExtension extends AbstractExtension
 {
-	public function getFunctions() : array
-	{
-		return [
-			new TwigFunction('string_width', $this->strimwidth(...)),
-		];
-	}
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('string_width', $this->strimwidth(...)),
+        ];
+    }
 
     /**
      * Функция обрезает казанную строку до заданного размера, применяя маркер в конце в случае если строка обрезается
      */
-	public function strimwidth(?string $string, int $width) : ?string
-	{
-		return empty($string) ? null : mb_strimwidth($string, 0, $width, "...");
-	}
-	
+    public function strimwidth(?string $string, int $width): ?string
+    {
+        return empty($string) ? null : mb_strimwidth($string, 0, $width, "...");
+    }
+
 }

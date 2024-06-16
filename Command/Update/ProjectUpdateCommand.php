@@ -40,7 +40,8 @@ class ProjectUpdateCommand extends Command
 
     public function __construct(
         #[TaggedIterator('baks.project.upgrade', defaultPriorityMethod: 'priority')] iterable $upgrades
-    ) {
+    )
+    {
         parent::__construct();
 
         $this->upgrades = $upgrades;
@@ -48,11 +49,11 @@ class ProjectUpdateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        foreach ($this->upgrades as $upgrade)
+        foreach($this->upgrades as $upgrade)
         {
             $command = $this->getApplication()?->find($upgrade->getName());
 
-            if ($command)
+            if($command)
             {
                 $arguments = ['command' => $upgrade->getName()];
 
@@ -60,7 +61,6 @@ class ProjectUpdateCommand extends Command
                 $command->run($greetInput, $output);
             }
         }
-
 
 
         return $this::SUCCESS;

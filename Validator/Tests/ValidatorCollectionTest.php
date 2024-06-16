@@ -88,10 +88,6 @@ final class ValidatorCollectionTest extends KernelTestCase
         self::assertFalse($validate);
 
 
-
-
-
-
     }
 
 }

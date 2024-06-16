@@ -27,12 +27,12 @@ interface ValidatorCollectionInterface
 {
     /**
      * Добавляет в коллекцию объекты для валидации
-    */
+     */
     public function add(?object $item, string $message = null, ?array $context = []): bool|string;
 
     /**
      * Валидирует все добавленные объекты, в случае ошибки валидации возвращает uniquid ошибки и записывает в лог
-    */
+     */
     public function isInvalid(): bool|string;
 
 

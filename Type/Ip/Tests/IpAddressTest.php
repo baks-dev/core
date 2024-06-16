@@ -55,7 +55,7 @@ final class IpAddressTest extends TestCase
     public function testToStringReturnsValue()
     {
         $ipAddress = new IpAddress('127.0.0.1');
-        $this->assertEquals('127.0.0.1', (string)$ipAddress);
+        $this->assertEquals('127.0.0.1', (string) $ipAddress);
     }
 
     public function testIsEqual()

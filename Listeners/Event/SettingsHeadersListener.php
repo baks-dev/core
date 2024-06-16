@@ -61,7 +61,7 @@ final class SettingsHeadersListener
 
         $AppCache = $this->cache->init('core');
 
-        $data = $AppCache->get('b8oUi9K01Hd', function (ItemInterface $item) {
+        $data = $AppCache->get('b8oUi9K01Hd', function(ItemInterface $item) {
             $data['title'] = $this->translator->trans('user.title', domain: 'default.header');
             $data['description'] = $this->translator->trans('user.description', domain: 'default.header');
             $data['keywords'] = $this->translator->trans('user.keywords', domain: 'default.header');

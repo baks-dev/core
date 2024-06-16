@@ -44,13 +44,13 @@ final class QrcodeExtension extends AbstractExtension
         ];
     }
 
-	public function qrcode(Environment $twig, string $data) : string
-	{
+    public function qrcode(Environment $twig, string $data): string
+    {
         if(!class_exists(QRCode::class))
         {
             return '';
         }
 
         return (new QRCode())->render($data);
-	}
+    }
 }

@@ -35,15 +35,18 @@ final class RoleSecurity
 
     public function __construct(array|string $roles = null)
     {
-        if (null === $roles) {
+        if(null === $roles)
+        {
             $this->roles = ['ROLE_ADMIN'];
         }
 
-        if (is_string($roles)) {
+        if(is_string($roles))
+        {
             $this->roles = ['ROLE_ADMIN', $roles];
         }
 
-        if (is_array($roles)) {
+        if(is_array($roles))
+        {
             $this->roles = array_merge(['ROLE_ADMIN'], $roles);
         }
     }

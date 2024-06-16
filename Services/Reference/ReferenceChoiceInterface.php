@@ -25,21 +25,21 @@ namespace BaksDev\Core\Services\Reference;
 
 interface ReferenceChoiceInterface
 {
-	/** Метод проверяет, имеется ли библиотека с ключем в итераторе */
-	public function equals($key) : bool;
-	
-	/** Возвращает тип (ключ) библиотеки */
-	public function type(): string;
+    /** Метод проверяет, имеется ли библиотека с ключем в итераторе */
+    public function equals($key): bool;
+
+    /** Возвращает тип (ключ) библиотеки */
+    public function type(): string;
 
     /** Возвращает класс */
     public function class(): string;
 
-	/** Возвращает домен для переводов
-	 * в файлах пеерводов должен содержаться ключ 'label' и 'placeholder'
-	 */
-	public function domain(): string;
-	
-	/** Возвращает класс формы для рендера */
-	public function form(): string;
-	
+    /** Возвращает домен для переводов
+     * в файлах пеерводов должен содержаться ключ 'label' и 'placeholder'
+     */
+    public function domain(): string;
+
+    /** Возвращает класс формы для рендера */
+    public function form(): string;
+
 }

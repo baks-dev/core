@@ -31,15 +31,16 @@ final class ReferenceChoice
 
     public function __construct(
         #[TaggedIterator('baks.reference.choice')] iterable $reference
-    ) {
+    )
+    {
         $this->reference = $reference;
     }
 
     public function getChoice($key): ?ReferenceChoiceInterface
     {
-        foreach ($this->reference as $reference)
+        foreach($this->reference as $reference)
         {
-            if ($reference->equals($key))
+            if($reference->equals($key))
             {
                 return $reference;
             }

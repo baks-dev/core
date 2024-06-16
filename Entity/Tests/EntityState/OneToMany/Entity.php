@@ -43,10 +43,10 @@ final class Entity extends EntityState
         $this->collection = new ArrayCollection();
     }
 
-//    public function __clone(): void
-//    {
-//        $this->id = clone $this->id;
-//    }
+    //    public function __clone(): void
+    //    {
+    //        $this->id = clone $this->id;
+    //    }
 
     public function __toString(): string
     {
@@ -93,8 +93,6 @@ final class Entity extends EntityState
 
         return $this;
     }
-
-
 
 
 }

@@ -39,7 +39,8 @@ final class ValidatorCollectionDTO
     #[Assert\NotBlank]
     private ?Uuid $event = null;
 
-    public function __construct(?Uuid $id = null) {
+    public function __construct(?Uuid $id = null)
+    {
         $this->id = $id;
     }
 

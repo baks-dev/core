@@ -25,6 +25,6 @@ namespace BaksDev\Core\Repository\SettingsMain;
 
 interface SettingsMainInterface
 {
-	public function getSettingsMainAssociative() : ?array;
-	
+    public function getSettingsMainAssociative(): ?array;
+
 }

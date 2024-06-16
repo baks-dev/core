@@ -77,5 +77,5 @@ final class DBALQueryBuilderTest extends TestCase
         $this->assertEquals('TestClass', $newInstance->getCacheKey());
 
     }
-    
+
 }

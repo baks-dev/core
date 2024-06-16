@@ -43,7 +43,7 @@ class Desktop implements DeviceInterface
     {
         return self::DEVICE;
     }
-    
+
     public function getSort(): int
     {
         return 100;

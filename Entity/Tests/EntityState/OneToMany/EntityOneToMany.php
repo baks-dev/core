@@ -46,10 +46,10 @@ final class EntityOneToMany extends EntityState
         $this->event = $entity;
     }
 
-//    public function __clone(): void
-//    {
-//        $this->id = clone $this->id;
-//    }
+    //    public function __clone(): void
+    //    {
+    //        $this->id = clone $this->id;
+    //    }
 
     public function __toString(): string
     {

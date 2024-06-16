@@ -175,7 +175,7 @@ abstract class EntityDataMapper
             elseif($setterDtoMethod = $dtoReflectionClass->getMethodSetter())
             {
                 /** Проверяем, что сеттер принимает тип
-                Если свойство является объектом, сеттер принимает класс, но их типы не равны - пропускаем  */
+                 * Если свойство является объектом, сеттер принимает класс, но их типы не равны - пропускаем  */
                 if(is_object($getEntityPropertyValue) && class_exists($dtoReflectionClass->getPropertyTypeName()) && !$getEntityPropertyValue instanceof $type)
                 {
                     continue;
@@ -527,7 +527,6 @@ abstract class EntityDataMapper
 
         return $this;
     }
-
 
 
     public function cloneEntity($entity = null)
