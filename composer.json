@@ -28,7 +28,6 @@
     "symfony/scheduler": "^7.1",
     "symfony/messenger": "^7.1",
     "symfony/console": "^7.1",
-    "symfony/security": "^4.4",
     "symfony/translation": "^7.1"
   },
   "require-dev": {
