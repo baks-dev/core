@@ -27,15 +27,24 @@ use DateInterval;
 
 interface DeduplicatorInterface
 {
+    /** Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя) */
     public function expiresAfter(DateInterval $time): void;
 
+    /** Метод присваивает пространство имен для дедубликации */
     public function namespace(string $namespace): self;
 
-    public function deduplication(string $key, string $value): self;
+    /** Метод присваивает ключ(и) для проверки дедубликации  */
+    public function deduplication(string|array $keys): self;
 
+    /** Метод снимает лок с процесса  */
     public function unlock(): void;
 
+    /** Метод делает проверку и возвращает результат выполненного ранее процесса */
     public function isExecuted(): bool;
 
+    /** Метод сохраняет результат выполнения */
     public function save(): void;
+
+    /** Метод удаляет результат выполненного процесса */
+    public function delete(): bool;
 }

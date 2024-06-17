@@ -46,7 +46,7 @@ class DeduplicatorStartTest extends KernelTestCase
 
         $Deduplicator = $DeduplicatorInterface
             ->namespace('DeduplicatorEndTest')
-            ->deduplication('key', 'value');
+            ->deduplication(['key', 'value']);
 
         $Deduplicator->expiresAfter(DateInterval::createFromDateString('1 minutes'));
 
