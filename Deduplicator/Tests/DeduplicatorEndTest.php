@@ -44,7 +44,7 @@ class DeduplicatorEndTest extends KernelTestCase
         $DeduplicatorInterface = self::getContainer()->get(DeduplicatorInterface::class);
 
         $Deduplicator = $DeduplicatorInterface
-            ->namespace('DeduplicatorEndTest')
+            ->namespace('DeduplicatorTest')
             ->deduplication(['key', 'value']);
 
         self::assertTrue($Deduplicator->isExecuted());

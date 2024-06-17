@@ -167,9 +167,4 @@ final class Deduplicator implements DeduplicatorInterface
 
         return $this->cache->deleteItem($this->item->getKey());
     }
-
-    public function __destruct()
-    {
-        $this->lock->release();
-    }
 }
