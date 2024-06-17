@@ -33,7 +33,20 @@ interface DeduplicatorInterface
     /** Метод присваивает пространство имен для дедубликации */
     public function namespace(string $namespace): self;
 
-    /** Метод присваивает ключ(и) для проверки дедубликации  */
+    /** Метод присваивает ключ(и) для проверки дедубликации
+     *
+     *<code>
+     *  $Deduplicator = $this->deduplicator
+     *      ->deduplication([$key1, $key2]);
+     *
+     *  if($Deduplicator->isExecuted())
+     *  {
+     *      return;
+     *  }
+     *
+     *  $Deduplicator->save();
+     * </code>
+     */
     public function deduplication(string|array $keys): self;
 
     /** Метод снимает лок с процесса  */
