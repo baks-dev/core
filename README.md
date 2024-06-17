@@ -30,7 +30,7 @@ $ composer require baks-dev/core
 }
 ```
 
-В корне проекта файла environment (.env) указать настроки основного домена
+В корне проекта файла environment (.env) указать настройки основного домена
 
 ``` dotenv
 ###> HOST ###
