@@ -59,29 +59,36 @@ final class Deduplicator implements DeduplicatorInterface
         $this->appCache = $appCache;
         $this->appLock = $appLock;
 
-        /** Время жизни дедубликации по умолчанию 1 неделя */
+        /* Время жизни дедубликации по умолчанию 1 неделя */
         $this->expires = DateInterval::createFromDateString('1 weeks');
 
     }
 
-    /** Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя) */
+    /**
+     * Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя)
+     */
     public function expiresAfter(DateInterval $time): void
     {
         $this->expires = $time;
     }
 
-    /** Метод присваивает пространство имен для дедубликации */
+    /**
+     * Метод присваивает пространство имен для дедубликации
+     */
     public function namespace(string $namespace): self
     {
         $this->namespace = $namespace;
         return $this;
     }
 
-    /** Метод присваивает ключ(и) для проверки дедубликации  */
+    /**
+     * Метод присваивает ключ(и) для проверки дедубликации
+     */
     public function deduplication(string|array $keys): self
     {
         $key = is_array($keys) ? implode('', $keys) : $keys;
 
+        /* Если не присвоено пространство имен - присваиваем из стека вызовов */
         if($this->namespace === null)
         {
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
@@ -89,11 +96,11 @@ final class Deduplicator implements DeduplicatorInterface
             $this->namespace = md5(implode('', $classes));
         }
 
-        /** блокируем одновременное выполнение скрипта (по умолчанию 1 мин) */
+        /* блокируем одновременное выполнение скрипта (по умолчанию 1 мин) */
         $this->lock = $this->appLock->createLock($this->namespace);
         $this->lock->wait();
 
-        /** получаем из кеша результат */
+        /* получаем из кеша результат */
         $this->cache = $this->appCache->init($this->namespace);
         $this->item = $this->cache->getItem($key);
 
@@ -102,13 +109,17 @@ final class Deduplicator implements DeduplicatorInterface
         return $this;
     }
 
-    /** Метод снимает лок с процесса  */
+    /**
+     * Метод снимает лок с процесса
+     */
     public function unlock(): void
     {
         $this->lock->release();
     }
 
-    /** Метод делает проверку и возвращает результат выполненного ранее процесса */
+    /**
+     * Метод делает проверку и возвращает результат выполненного ранее процесса
+     */
     public function isExecuted(): bool
     {
         if($this->init === false)
@@ -125,7 +136,9 @@ final class Deduplicator implements DeduplicatorInterface
         return false;
     }
 
-    /** Метод сохраняет результат выполнения */
+    /**
+     * Метод сохраняет результат выполнения
+     */
     public function save(): void
     {
         if($this->init === false)
@@ -133,16 +146,18 @@ final class Deduplicator implements DeduplicatorInterface
             throw new \InvalidArgumentException('Invalid Argument: call method deduplication');
         }
 
-        /** Сохраняем ключ дедубликации */
+        /* Сохраняем ключ дедубликации */
         $this->item->set(true);
         $this->item->expiresAfter($this->expires);
         $this->cache->save($this->item);
 
-        /** Снимаем лок с процесса */
+        /* Снимаем лок с процесса */
         $this->lock->release();
     }
 
-    /** Метод удаляет результат выполненного процесса */
+    /**
+     * Метод удаляет результат выполненного процесса
+     */
     public function delete(): bool
     {
         if($this->init === false)

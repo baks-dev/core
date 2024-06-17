@@ -26,11 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Core\Deduplicator\Tests;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
-use BaksDev\Core\Doctrine\DBALQueryBuilder;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
-use BaksDev\Core\Deduplicator\Tests\DeduplicatorStartTest;
 
 /**
  * @group core
@@ -43,7 +40,6 @@ class DeduplicatorEndTest extends KernelTestCase
 {
     public function testUseCase(): void
     {
-
         /** @var DeduplicatorInterface $DeduplicatorInterface */
         $DeduplicatorInterface = self::getContainer()->get(DeduplicatorInterface::class);
 
@@ -55,6 +51,4 @@ class DeduplicatorEndTest extends KernelTestCase
 
         $Deduplicator->delete();
     }
-
-
 }

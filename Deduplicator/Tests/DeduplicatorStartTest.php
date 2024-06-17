@@ -26,9 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Core\Deduplicator\Tests;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
-use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use DateInterval;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -55,6 +53,4 @@ class DeduplicatorStartTest extends KernelTestCase
         $Deduplicator->save();
 
     }
-
-
 }
