@@ -32,29 +32,88 @@ use Symfony\Component\Lock\Store\FlockStore;
 
 final class AppLock implements AppLockInterface
 {
+    private SharedLockInterface $lock;
+    private LockFactory $factory;
+
+    private string $key;
+    private float $ttl = 60;
+    private bool $release = true;
     private string $project_dir;
 
-    private SharedLockInterface $lock;
-
-    private float $ttl;
 
     public function __construct(
         #[Autowire('%kernel.project_dir%')] string $project_dir,
-    )
-    {
+    ) {
         $this->project_dir = $project_dir;
     }
 
     /**
      * Метод включает блокировку ресурса
      */
-    public function createLock(string $key, int|float $defaultLifetime = 60.0): self
+    public function createLock(string|array $key): self
     {
-        $store = new FlockStore($this->project_dir.'/var/stores');
-        $factory = new LockFactory($store);
+        if(is_array($key))
+        {
+            $key = implode('', $key);
+        }
 
-        $this->lock = $factory
-            ->createLock($key, (float) $defaultLifetime, false);
+        $this->key = $key;
+
+        $FlockStore = new FlockStore($this->project_dir.'/var/stores');
+        $this->factory = new LockFactory($FlockStore);
+
+        return $this;
+    }
+
+
+    /**
+     * Устанавливает время жизни блокировки
+     */
+    public function lifetime(int|float $ttl = 60): self
+    {
+        $this->ttl = (float) $ttl;
+        return $this;
+    }
+
+    /**
+     * Метод создает блокировку ресурса, параллельные запросы будут ожидать завершения блокировки
+     *
+     * <code>
+     * $lock = $appLock
+     *  ->createLock('example-key')
+     *  ->lifetime(30)
+     *  ->wait(); // выполняем последовательно запросы
+     *
+     * // выполняем код
+     *
+     * $lock->release(); // снимаем блокировку
+     *
+     * </code>
+     *
+     */
+    public function wait(): self
+    {
+        $this->lock = $this->factory->createLock(
+            $this->key,
+            $this->ttl
+        );
+
+        $this->lock->acquire(true);
+
+        return $this;
+    }
+
+
+    /**
+     * Метод применяет блокировку процесса, без последующего автоматического снятия (ожидает все время)
+     */
+    public function waitAllTime(): self
+    {
+        $this->lock = $this->factory->createLock(
+            $this->key,
+            $this->ttl,
+            false
+        );
 
         $this->lock->acquire(true);
 
@@ -62,40 +121,59 @@ final class AppLock implements AppLockInterface
     }
 
     /**
+     * Метод возвращает результат блокировки процесса
+     *
+     * false - Если ресурс не заблокирован (блокируем для других процессов и продолжаем выполнение)
+     * true - Если ресурс занят другом процессом (завершаем выполнение программы)
+     *
+     * <code>
+     *
+     * $lock = $appLock
+     *  ->createLock('example-key')
+     *  ->lifetime(30);
+     *
+     * if($lock->isLock())
+     * {
+     *      return 'Невозможно выполнить запрос: процесс заблокирован';
+     * }
+     *
+     * </code>
+     *
+     */
+    public function isLock(): bool
+    {
+
+        $this->lock = $this->factory->createLock(
+            $this->key,
+            $this->ttl,
+            false
+        );
+
+        $this->lock->acquire();
+
+        if($this->lock->isAcquired())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
      * Метод завершает блокировку
      */
     public function release(): void
     {
-        $this->lock->release();
-    }
-
-    public function getType()
-    {
-        return 'file';
-    }
-
-    /** Ожидаем снятие блокировки для последующего выполнения */
-    public function wait(): self
-    {
-        $this->lock->acquire(true);
-        return $this;
-    }
-
-    public function lifetime(int|float $ttl = 60): self
-    {
-        $this->ttl = (float) $ttl;
-        return $this;
-    }
-
-    public function isLock(): bool
-    {
-        if($this->lock->isAcquired())
+        if($this->release)
         {
-            return true;
+            $this->lock->release();
         }
+    }
 
-        $this->lock->acquire();
 
-        return false;
+    public function getTypeLock(): string
+    {
+        return 'redis';
     }
 }

@@ -30,7 +30,7 @@ interface AppLockInterface
     /**
      * Инициируем блокировку процесса
      */
-    public function createLock(string $key): self;
+    public function createLock(string|array $key): self;
 
     /**
      * Устанавливает время жизни блокировки
@@ -54,6 +54,11 @@ interface AppLockInterface
      *
      */
     public function wait(): self;
+
+    /**
+     * Метод применяет блокировку процесса, без последующего автоматического снятия (ожидает все время)
+     */
+    public function waitAllTime(): self;
 
 
     /**

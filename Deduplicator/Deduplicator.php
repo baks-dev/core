@@ -153,6 +153,8 @@ final class Deduplicator implements DeduplicatorInterface
         $this->item->expiresAfter($this->expires);
         $this->cache->save($this->item);
 
+        usleep(100);
+
         /* Снимаем лок с процесса */
         $this->lock->release();
     }
