@@ -45,7 +45,10 @@ class DeduplicatorEndTest extends KernelTestCase
 
         $Deduplicator = $DeduplicatorInterface
             ->namespace('DeduplicatorTest')
-            ->deduplication(['key', 'value']);
+            ->deduplication([
+                'key1',
+                'key2'
+            ]);
 
         self::assertTrue($Deduplicator->isExecuted());
 

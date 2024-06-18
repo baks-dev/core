@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Deduplicator;
 
+use App\Kernel;
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Lock\AppLockInterface;
 use DateInterval;
@@ -60,7 +61,8 @@ final class Deduplicator implements DeduplicatorInterface
         $this->appLock = $appLock;
 
         /* Время жизни дедубликации по умолчанию 1 неделя */
-        $this->expires = DateInterval::createFromDateString('1 weeks');
+        $this->expires = DateInterval::createFromDateString(Kernel::isTestEnvironment() ? '1 seconds' : '1 weeks');
+
 
     }
 
@@ -127,7 +129,7 @@ final class Deduplicator implements DeduplicatorInterface
             throw new \InvalidArgumentException('Invalid Argument: call method deduplication');
         }
 
-        if($this->item->isHit())
+        if($this->item->isHit() && $this->item->get() === true)
         {
             $this->lock->release();
             return true;
