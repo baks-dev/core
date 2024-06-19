@@ -98,7 +98,14 @@
     --bs-tooltip-arrow-height: 0.4rem;
 }
 
-input, select { box-shadow: none !important; }
+.container-xxl, .container-xl, .container-lg, .container-md, .container-sm, .container {
+    max-width: 1200px;
+}
+
+
+input, select {
+    box-shadow: none !important;
+}
 
 .popover {
     --bs-popover-header-bg: white;
@@ -592,7 +599,6 @@ img.loaded, div.loaded {
 }
 
 
-
 .tooltip {
     --bs-tooltip-zindex: 1080;
     --bs-tooltip-max-width: 200px;
@@ -703,5 +709,5 @@ img.loaded, div.loaded {
     text-align: center;
     background-color: var(--bs-tooltip-bg);
     border-radius: var(--bs-tooltip-border-radius);
-    box-shadow: 0 -0.3rem 3rem rgba(0,0,0,.2) !important;
+    box-shadow: 0 -0.3rem 3rem rgba(0, 0, 0, .2) !important;
 }
