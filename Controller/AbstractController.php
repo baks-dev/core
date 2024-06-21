@@ -46,54 +46,20 @@ use Twig\Environment;
 
 abstract class AbstractController
 {
-    private RouterInterface $router;
-
-    private AuthorizationCheckerInterface $authorizationChecker;
-
-    private Environment $environment;
-
-    private RequestStack $requestStack;
-
-    private TokenStorageInterface $tokenStorage;
-
-    private FormFactoryInterface $formFactory;
-
-    private TranslatorInterface $translator;
-
-    private SettingsMainInterface $settingsMain;
-
-    private string $project_dir;
-
-    private CacheCssInterface $cacheCss;
-
-    private CsrfTokenManagerInterface $csrfTokenManager;
-
-
     public function __construct(
-        #[Autowire('%kernel.project_dir%')] string $project_dir,
-        RouterInterface $router,
-        AuthorizationCheckerInterface $authorizationChecker,
-        Environment $environment,
-        RequestStack $requestStack,
-        FormFactoryInterface $formFactory,
-        TranslatorInterface $translator,
-        TokenStorageInterface $tokenStorage,
-        SettingsMainInterface $settingsMain,
-        CacheCssInterface $cacheCss,
-        CsrfTokenManagerInterface $csrfTokenManager,
-    ) {
-        $this->authorizationChecker = $authorizationChecker;
-        $this->environment = $environment;
-        $this->requestStack = $requestStack;
-        $this->tokenStorage = $tokenStorage;
-        $this->formFactory = $formFactory;
-        $this->translator = $translator;
-        $this->settingsMain = $settingsMain;
-        $this->router = $router;
-        $this->project_dir = $project_dir;
-        $this->cacheCss = $cacheCss;
-        $this->csrfTokenManager = $csrfTokenManager;
-    }
+        #[Autowire('%kernel.project_dir%')]
+        private string $project_dir,
+        private RouterInterface $router,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private Environment $environment,
+        private RequestStack $requestStack,
+        private FormFactoryInterface $formFactory,
+        private TranslatorInterface $translator,
+        private TokenStorageInterface $tokenStorage,
+        private SettingsMainInterface $settingsMain,
+        private CacheCssInterface $cacheCss,
+        private CsrfTokenManagerInterface $csrfTokenManager,
+    ) {}
 
 
     public function contentMinify(string $body)
