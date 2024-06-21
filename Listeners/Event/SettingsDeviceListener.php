@@ -42,8 +42,7 @@ final class SettingsDeviceListener
     public function __construct(
         Environment $twig,
         AppCacheInterface $cache
-    )
-    {
+    ) {
         $this->twig = $twig;
         $this->cache = $cache;
     }
@@ -59,7 +58,7 @@ final class SettingsDeviceListener
         {
             $AppCache = $this->cache->init('core');
 
-            $device = $AppCache->get(md5($agent), function(ItemInterface $item) use ($agent) {
+            $device = $AppCache->get(md5($agent), function (ItemInterface $item) use ($agent) {
 
                 $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
@@ -73,7 +72,9 @@ final class SettingsDeviceListener
 
                     if($browscap->istablet)
                     {
-                        $device = 'tablet';
+                        /** TODO: */
+                        // $device = 'tablet';
+                        $device = 'pc';
                     }
                 }
 
