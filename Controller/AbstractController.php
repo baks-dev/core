@@ -46,7 +46,6 @@ use Twig\Environment;
 
 abstract class AbstractController
 {
-
     private RouterInterface $router;
 
     private AuthorizationCheckerInterface $authorizationChecker;
@@ -82,8 +81,7 @@ abstract class AbstractController
         SettingsMainInterface $settingsMain,
         CacheCssInterface $cacheCss,
         CsrfTokenManagerInterface $csrfTokenManager,
-    )
-    {
+    ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->environment = $environment;
         $this->requestStack = $requestStack;
@@ -184,8 +182,7 @@ abstract class AbstractController
         string $domain = 'messages',
         array|string|object $arguments = null,
         int $status = 302
-    ): ?Response
-    {
+    ): ?Response {
 
         if(is_object($arguments))
         {
@@ -240,7 +237,8 @@ abstract class AbstractController
                             'header' => $label,
                             'message' => $message,
                             'arguments' => is_array($arguments) ? json_encode($arguments) : $arguments,
-                        ], status: $status
+                        ],
+                        status: $status
                     );
                 }
 
@@ -292,8 +290,7 @@ abstract class AbstractController
         string $routingName = null,
         string $file = null,
         Response $response = null,
-    ): Response
-    {
+    ): Response {
 
         $request = $this->requestStack;
 
@@ -530,8 +527,7 @@ abstract class AbstractController
         string $route,
         array $parameters = [],
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
-    ): string
-    {
+    ): string {
         return $this->router->generate($route, $parameters, $referenceType);
     }
 
@@ -542,8 +538,7 @@ abstract class AbstractController
             $this->requestStack
                 ->getMainRequest()
                 ?->isXmlHttpRequest()
-        )
-        {
+        ) {
 
             $referer = $this->requestStack->getCurrentRequest()->headers->get('referer');
 
@@ -570,7 +565,8 @@ abstract class AbstractController
                     'header' => current(array_keys($flash)),
                     'message' => $message ? current($message) : '',
                     'redirect' => $url ?: $referer,
-                ], status: $status
+                ],
+                status: $status
             );
         }
 
@@ -580,6 +576,5 @@ abstract class AbstractController
     public function refreshTokenForm(FormInterface $form): void
     {
         $this->csrfTokenManager->refreshToken($form->getName());
-        usleep(300);
     }
 }
