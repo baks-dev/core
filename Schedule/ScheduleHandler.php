@@ -31,16 +31,13 @@ use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
 
-
 #[AsSchedule('default')]
-final class ScheduleHandler implements ScheduleProviderInterface
+final readonly class ScheduleHandler implements ScheduleProviderInterface
 {
-    private iterable $schedule;
-
-    public function __construct(#[TaggedIterator('baks.schedule')] iterable $schedule)
-    {
-        $this->schedule = $schedule;
-    }
+    public function __construct(
+        #[TaggedIterator('baks.schedule')]
+        private iterable $schedule
+    ) {}
 
     /**
      * Возвращает объект сообщения

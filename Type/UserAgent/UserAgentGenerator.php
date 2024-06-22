@@ -29,7 +29,6 @@ use Exception;
 
 final class UserAgentGenerator
 {
-
     public $windows_os = ['[Windows; |Windows; U; |]Windows NT 6.:number0-3:;[ Win64; x64| WOW64| x64|]',
         '[Windows; |Windows; U; |]Windows NT 10.:number0-5:;[ Win64; x64| WOW64| x64|]',];
 
@@ -149,11 +148,11 @@ final class UserAgentGenerator
         'ipod' => 'iPod; CPU iPod OS :number7-11:_:number0-9:_:number0-9:; like Mac OS X;',];
 
 
-    public function getOS($os = NULL)
+    public function getOS($os = null)
     {
         $_os = [];
 
-        if($os === NULL || in_array($os, ['chrome', 'firefox', 'explorer']))
+        if($os === null || in_array($os, ['chrome', 'firefox', 'explorer']))
         {
             $_os = $os === 'explorer' ? $this->windows_os : array_merge($this->windows_os, $this->linux_os, $this->mac_os);
         }
@@ -166,13 +165,13 @@ final class UserAgentGenerator
         $selected_os = rtrim($_os[random_int(0, count($_os) - 1)], ';');
 
         // check for spin syntax
-        if(strpos($selected_os, '[') !== FALSE)
+        if(strpos($selected_os, '[') !== false)
         {
             $selected_os = self::processSpinSyntax($selected_os);
         }
 
         // check for random number syntax
-        if(strpos($selected_os, ':number') !== FALSE)
+        if(strpos($selected_os, ':number') !== false)
         {
             $selected_os = self::processRandomNumbers($selected_os);
         }
@@ -184,7 +183,7 @@ final class UserAgentGenerator
         return $selected_os;
     }
 
-    public function getMobileOS($os = NULL)
+    public function getMobileOS($os = null)
     {
         $os = mb_strtolower($os);
         $_os = [];
@@ -204,17 +203,17 @@ final class UserAgentGenerator
         // select random mobile os
         $selected_os = rtrim($_os[random_int(0, count($_os) - 1)], ';');
 
-        if(strpos($selected_os, ':androidVersion:') !== FALSE)
+        if(strpos($selected_os, ':androidVersion:') !== false)
         {
             $selected_os = $this->processAndroidVersion($selected_os);
         }
 
-        if(strpos($selected_os, ':androidDevice:') !== FALSE)
+        if(strpos($selected_os, ':androidDevice:') !== false)
         {
             $selected_os = $this->addAndroidDevice($selected_os);
         }
 
-        if(strpos($selected_os, ':number') !== FALSE)
+        if(strpos($selected_os, ':number') !== false)
         {
             $selected_os = self::processRandomNumbers($selected_os);
         }
@@ -225,29 +224,38 @@ final class UserAgentGenerator
 
     public static function processRandomNumbers($selected_os)
     {
-        return preg_replace_callback('/:number(\d+)-(\d+):/i',
-            function($matches) {
+        return preg_replace_callback(
+            '/:number(\d+)-(\d+):/i',
+            function ($matches) {
                 return random_int((int) $matches[1], (int) $matches[2]);
-            }, $selected_os);
+            },
+            $selected_os
+        );
     }
 
     public static function processSpinSyntax($selected_os)
     {
-        return preg_replace_callback('/\[([\w\-\s|;]*?)\]/i',
-            function($matches) {
+        return preg_replace_callback(
+            '/\[([\w\-\s|;]*?)\]/i',
+            function ($matches) {
                 $shuffle = explode('|', $matches[1]);
                 return $shuffle[array_rand($shuffle)];
-            }, $selected_os);
+            },
+            $selected_os
+        );
     }
 
     public function processAndroidVersion($selected_os)
     {
         $this->androidVersion = $version = $this->androidVersions[array_rand($this->androidVersions)];
 
-        return preg_replace_callback('/:androidVersion:/i',
-            function($matches) use ($version) {
+        return preg_replace_callback(
+            '/:androidVersion:/i',
+            function ($matches) use ($version) {
                 return $version;
-            }, $selected_os);
+            },
+            $selected_os
+        );
     }
 
     public function addAndroidDevice($selected_os)
@@ -256,10 +264,13 @@ final class UserAgentGenerator
         $device = $devices[array_rand($devices)];
 
         $device = self::processSpinSyntax($device);
-        return preg_replace_callback('/:androidDevice:/i',
-            function($matches) use ($device) {
+        return preg_replace_callback(
+            '/:androidDevice:/i',
+            function ($matches) use ($device) {
                 return $device;
-            }, $selected_os);
+            },
+            $selected_os
+        );
     }
 
     public static function chromeVersion($version): string

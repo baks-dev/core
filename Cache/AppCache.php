@@ -35,29 +35,22 @@ final class AppCache implements AppCacheInterface
 {
     private string $type = FilesystemAdapter::class;
 
-    private string $HOST;
-
     public function __construct(
-        #[Autowire(env: 'HOST')] string $HOST,
-    )
-    {
-        $this->HOST = $HOST;
-    }
+        #[Autowire(env: 'HOST')]
+        private readonly string $HOST,
+    ) {}
 
     public function init(
         string $namespace = null,
         int $defaultLifetime = 0,
         MarshallerInterface $marshaller = null
-    ): CacheInterface
-    {
+    ): CacheInterface {
+
         $namespace = $namespace ? $this->HOST.'.'.$namespace : $this->HOST;
 
         $cache = (function_exists('apcu_enabled') && apcu_enabled()) ? ApcuAdapter::class : FilesystemAdapter::class;
 
-        // (string $namespace = '', int $defaultLifetime = 0, string $version = null, MarshallerInterface $marshaller = null)
-        // (string $namespace = '', int $defaultLifetime = 0, string $directory = null, MarshallerInterface $marshaller = null)
-
-        return new $cache ($namespace, 0, marshaller: $marshaller);
+        return new $cache($namespace, 0, marshaller: $marshaller);
     }
 
     public function getCacheType(): string

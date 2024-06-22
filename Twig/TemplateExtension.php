@@ -27,17 +27,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-
 final class TemplateExtension extends AbstractExtension
 {
-    private ParameterBagInterface $parameter;
-
-
-    public function __construct(ParameterBagInterface $parameter)
-    {
-
-        $this->parameter = $parameter;
-    }
+    public function __construct(private readonly ParameterBagInterface $parameter) {}
 
 
     public function getFunctions(): array

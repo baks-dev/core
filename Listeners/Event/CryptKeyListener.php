@@ -33,14 +33,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Twig\Environment;
 
 #[AsEventListener(event: RequestEvent::class, priority: 1)]
-final class CryptKeyListener
+final readonly class CryptKeyListener
 {
-    private LocaleCollection $collection;
-
-    public function __construct(LocaleCollection $collection)
-    {
-        $this->collection = $collection;
-    }
+    public function __construct(private LocaleCollection $collection) {}
 
     public function onKernelRequest(RequestEvent $event): void
     {

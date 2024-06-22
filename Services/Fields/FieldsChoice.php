@@ -28,14 +28,10 @@ use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class FieldsChoice
 {
-    private iterable $fields;
-
     public function __construct(
-        #[TaggedIterator('baks.fields.choice')] iterable $fields
-    )
-    {
-        $this->fields = $fields;
-    }
+        #[TaggedIterator('baks.fields.choice')]
+        private readonly iterable $fields
+    ) {}
 
     public function getChoice(InputField|string|null $field): ?FieldsChoiceInterface
     {

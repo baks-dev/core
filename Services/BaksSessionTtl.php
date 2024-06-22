@@ -27,14 +27,9 @@ namespace BaksDev\Core\Services;
 
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class BaksSessionTtl
+final readonly class BaksSessionTtl
 {
-    private AuthorizationCheckerInterface $security;
-
-    public function __construct(AuthorizationCheckerInterface $security)
-    {
-        $this->security = $security;
-    }
+    public function __construct(private AuthorizationCheckerInterface $security) {}
 
     public function __invoke(): int
     {

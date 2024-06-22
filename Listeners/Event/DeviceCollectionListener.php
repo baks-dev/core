@@ -34,14 +34,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 #[AsEventListener(event: ControllerEvent::class)]
 #[AsEventListener(event: ConsoleEvents::COMMAND)]
-final class DeviceCollectionListener
+final readonly class DeviceCollectionListener
 {
-    private DeviceCollection $collection;
-
-    public function __construct(DeviceCollection $collection)
-    {
-        $this->collection = $collection;
-    }
+    public function __construct(private DeviceCollection $collection) {}
 
     public function onKernelController(ControllerEvent $event): void
     {

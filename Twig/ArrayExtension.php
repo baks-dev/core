@@ -26,9 +26,11 @@ namespace BaksDev\Core\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-
 final class ArrayExtension extends AbstractExtension
 {
+    /**
+     * Функция добавляет в массив значение key => value
+     */
     public function getFunctions(): array
     {
         return [
@@ -36,9 +38,6 @@ final class ArrayExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * Функция добавляет в массив значение key => value
-     */
     public function add_array(mixed $key, mixed $value, array $array = []): array
     {
         return array_merge($array, [$key => $value]);

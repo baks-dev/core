@@ -28,7 +28,6 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-/** Функция преобразует строку формата json в массив */
 final class PathImageExtension extends AbstractExtension
 {
     public function getFilters(): array

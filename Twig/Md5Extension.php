@@ -27,9 +27,11 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-/** Функция преобразует строку формата json в массив */
 final class Md5Extension extends AbstractExtension
 {
+    /**
+     * Фильтр применяет к строке MD5-хеш
+     */
     public function getFilters(): array
     {
         return [

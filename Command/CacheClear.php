@@ -44,19 +44,13 @@ use Symfony\Component\Filesystem\Filesystem;
 #[AsCommand(name: 'baks:cache:clear')]
 class CacheClear extends Command
 {
-    private string $project_dir;
-    private AppCacheInterface $appCache;
-    private Filesystem $filesystem;
-
     public function __construct(
-        #[Autowire('%kernel.project_dir%')] string $project_dir,
-        AppCacheInterface $appCache
-    )
-    {
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $project_dir,
+        private readonly AppCacheInterface $appCache,
+        private readonly Filesystem $filesystem
+    ) {
         parent::__construct();
-        $this->project_dir = $project_dir;
-        $this->appCache = $appCache;
-        $this->filesystem = new Filesystem();
     }
 
 
@@ -65,8 +59,10 @@ class CacheClear extends Command
         $this->addArgument('module', InputArgument::OPTIONAL, 'Модуль');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output
+    ): int {
         $module = $input->getArgument('module');
 
         $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'vendor', 'baks-dev', null]);
@@ -124,7 +120,7 @@ class CacheClear extends Command
                 $target = $origin.'_'.time();
 
                 /** Удаляем директорию при завершении работы */
-                register_shutdown_function(function() use ($origin, $target) {
+                register_shutdown_function(function () use ($origin, $target) {
                     $this->filesystem->rename($origin, $target);
                     $this->filesystem->remove($target);
                 }, 'throw');
@@ -150,7 +146,7 @@ class CacheClear extends Command
             $target = $cache->getRealPath().'_'.time();
 
             /** Запускаем асинхронную команду на удаление директории  */
-            register_shutdown_function(function() use ($origin, $target) {
+            register_shutdown_function(function () use ($origin, $target) {
 
                 $this->filesystem->rename($origin, $target);
                 $this->filesystem->remove($target);
@@ -182,8 +178,9 @@ class CacheClear extends Command
     }
 
 
-    public function clearModule(string $module): void
-    {
+    public function clearModule(
+        string $module
+    ): void {
         /** Сбрасываем кеш адаптера AppCache */
         $appCache = $this->appCache->init($module);
         $appCache->clear();

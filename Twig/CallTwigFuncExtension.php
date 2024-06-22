@@ -27,7 +27,9 @@ use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
-/** Фильтр вызывает указанную функцию и применяет к значению */
+/**
+ * Фильтр вызывает указанную функцию и применяет к значению
+ */
 final class CallTwigFuncExtension extends AbstractExtension
 {
     public function getFilters(): array

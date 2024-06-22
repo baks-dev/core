@@ -34,7 +34,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\RouterInterface;
 
-
 #[AsController]
 #[RoleSecurity('ROLE_USER')]
 final class RefreshController extends AbstractController
@@ -51,8 +50,8 @@ final class RefreshController extends AbstractController
     public function redirect(
         Request $request,
         RouterInterface $router
-    ): Response
-    {
+    ): Response {
+
         $url = $request->get('url');
 
         if($url)

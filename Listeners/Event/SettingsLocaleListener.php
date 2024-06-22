@@ -31,14 +31,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Twig\Environment;
 
 #[AsEventListener(event: RequestEvent::class, priority: 1)]
-final class SettingsLocaleListener
+final readonly class SettingsLocaleListener
 {
-    private Environment $twig;
-
-    public function __construct(Environment $twig)
-    {
-        $this->twig = $twig;
-    }
+    public function __construct(private Environment $twig) {}
 
     public function onKernelRequest(RequestEvent $event): void
     {

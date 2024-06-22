@@ -60,7 +60,7 @@ final class UserAgent
         {
             if($declare::equals($userAgent))
             {
-                $this->userAgent = new $declare;
+                $this->userAgent = new $declare();
                 return;
             }
         }
@@ -88,7 +88,7 @@ final class UserAgent
         foreach(self::getDeclared() as $declared)
         {
             /** @var UserAgentInterface $declared */
-            $class = new $declared;
+            $class = new $declared();
             $case[] = new self($class);
         }
 
@@ -101,7 +101,7 @@ final class UserAgent
     {
         return array_filter(
             get_declared_classes(),
-            static function($className) {
+            static function ($className) {
                 return in_array(UserAgentInterface::class, class_implements($className), true);
             }
         );

@@ -30,17 +30,9 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 #[AsEventListener(event: ResponseEvent::class)]
-final class CspNonceListener
+final readonly class CspNonceListener
 {
-    private CspNonceGenerator $CspNonceGenerator;
-
-    public function __construct(
-        CspNonceGenerator $CspNonceGenerator,
-
-    )
-    {
-        $this->CspNonceGenerator = $CspNonceGenerator;
-    }
+    public function __construct(private CspNonceGenerator $CspNonceGenerator) {}
 
     /*
         default-src 'self' 'unsafe-inline' 'unsafe-eval';

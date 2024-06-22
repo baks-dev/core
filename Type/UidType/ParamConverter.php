@@ -32,8 +32,7 @@ class ParamConverter extends ValueResolver implements ArgumentInterface
     public function __construct(
         string $resolver,
         string $key = null
-    )
-    {
+    ) {
         parent::__construct($resolver);
         $this->key = $key;
     }
@@ -56,14 +55,4 @@ class ParamConverter extends ValueResolver implements ArgumentInterface
         return $this->key;
     }
 
-    //
-    //    public function fromParameter(): string
-    //    {
-    //        return key($this->values);
-    //    }
-    //
-    //    public function toParameter(): string
-    //    {
-    //        return current($this->values);
-    //    }
 }

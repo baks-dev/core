@@ -29,14 +29,9 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class CacheClearHandler
+final readonly class CacheClearHandler
 {
-    private AppCacheInterface $cache;
-
-    public function __construct(AppCacheInterface $cache)
-    {
-        $this->cache = $cache;
-    }
+    public function __construct(private AppCacheInterface $cache) {}
 
     public function __invoke(CacheClearMessage $message): void
     {

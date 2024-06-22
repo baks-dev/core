@@ -39,20 +39,12 @@ use Twig\Environment;
 
 #[AsEventListener(event: ControllerEvent::class)]
 #[AsEventListener(event: ConsoleEvents::COMMAND)]
-final class ModifyActionListener
+final readonly class ModifyActionListener
 {
-
-    private ModifyActionCollection $collection;
-
-
-    public function __construct(ModifyActionCollection $collection)
-    {
-        $this->collection = $collection;
-    }
+    public function __construct(private ModifyActionCollection $collection) {}
 
     public function onKernelController(ControllerEvent $event): void
     {
-        // Инициируем статусы
         if(in_array(ModifyActionType::class, get_declared_classes(), true))
         {
             $this->collection->cases();

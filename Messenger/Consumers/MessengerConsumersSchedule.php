@@ -29,7 +29,6 @@ use BaksDev\Core\Schedule\ScheduleInterface;
 use DateInterval;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-
 /**
  * Проверяем каждую минуту Messenger Consumers
  */

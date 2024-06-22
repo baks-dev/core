@@ -39,10 +39,6 @@ final class Deduplicator implements DeduplicatorInterface
 
     private ?string $namespace = null;
 
-    private AppCacheInterface $appCache;
-
-    private AppLockInterface $appLock;
-
     private AppLockInterface $lock;
 
     private CacheItem $item;
@@ -53,17 +49,12 @@ final class Deduplicator implements DeduplicatorInterface
     private DateInterval $expires;
 
     public function __construct(
-        AppCacheInterface $appCache,
-        AppLockInterface $appLock
+        private readonly AppCacheInterface $appCache,
+        private readonly AppLockInterface $appLock
     ) {
-
-        $this->appCache = $appCache;
-        $this->appLock = $appLock;
 
         /* Время жизни дедубликации по умолчанию 1 неделя */
         $this->expires = DateInterval::createFromDateString(Kernel::isTestEnvironment() ? '1 seconds' : '1 weeks');
-
-
     }
 
     /**
@@ -88,7 +79,7 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function deduplication(string|array $keys): self
     {
-        $key = is_array($keys) ? implode('', $keys) : $keys;
+        $key = is_array($keys) ? implode('.', $keys) : $keys;
 
         /* Если не присвоено пространство имен - присваиваем из стека вызовов */
         if($this->namespace === null)

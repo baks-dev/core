@@ -34,14 +34,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 #[AsEventListener(event: KernelEvents::REQUEST)]
 #[AsEventListener(event: ConsoleEvents::COMMAND)]
-final class LocaleListener
+final readonly class LocaleListener
 {
-    private LocaleCollection $collection;
-
-    public function __construct(LocaleCollection $collection)
-    {
-        $this->collection = $collection;
-    }
+    public function __construct(private LocaleCollection $collection) {}
 
     public function onKernelRequest(RequestEvent $event): void
     {

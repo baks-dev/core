@@ -33,19 +33,12 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Twig\Environment;
 
 #[AsEventListener(event: RequestEvent::class, priority: 990)]
-final class SettingsDeviceListener
+final readonly class SettingsDeviceListener
 {
-    private Environment $twig;
-
-    private AppCacheInterface $cache;
-
     public function __construct(
-        Environment $twig,
-        AppCacheInterface $cache
-    ) {
-        $this->twig = $twig;
-        $this->cache = $cache;
-    }
+        private Environment $twig,
+        private AppCacheInterface $cache
+    ) {}
 
     /** Событие определяет браузер пользователя */
     public function onKernelRequest(RequestEvent $event): void

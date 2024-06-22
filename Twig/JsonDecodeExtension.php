@@ -27,9 +27,11 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-/** Функция преобразует строку формата json в массив */
 final class JsonDecodeExtension extends AbstractExtension
 {
+    /**
+     * Фильтр преобразует строку формата json в массив
+     */
     public function getFilters(): array
     {
         return [

@@ -28,16 +28,12 @@ namespace BaksDev\Core\Type\Locale\Locales;
 use BaksDev\Core\Type\Locale\Locale;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-final class LocaleCollection
+final readonly class LocaleCollection
 {
-    private iterable $locales;
-
     public function __construct(
-        #[TaggedIterator('baks.locale', defaultPriorityMethod: 'sort')] iterable $locales
-    )
-    {
-        $this->locales = $locales;
-    }
+        #[TaggedIterator('baks.locale', defaultPriorityMethod: 'sort')]
+        private iterable $locales
+    ) {}
 
     /** Возвращает массив Locale */
     public function cases(): array

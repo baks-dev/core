@@ -25,10 +25,12 @@ namespace BaksDev\Core\Twig;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use function mb_strimwidth;
 
 final class StringWidthExtension extends AbstractExtension
 {
+    /**
+     * Функция обрезает казанную строку до заданного размера, применяя маркер в конце в случае если строка обрезается
+     */
     public function getFunctions(): array
     {
         return [
@@ -36,9 +38,6 @@ final class StringWidthExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * Функция обрезает казанную строку до заданного размера, применяя маркер в конце в случае если строка обрезается
-     */
     public function strimwidth(?string $string, int $width): ?string
     {
         return empty($string) ? null : mb_strimwidth($string, 0, $width, "...");

@@ -56,7 +56,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DBALQueryBuilder extends QueryBuilder
 {
-
     private array $select = [];
 
     private string|CompositeExpression|null $where = null;
@@ -99,8 +98,7 @@ final class DBALQueryBuilder extends QueryBuilder
         TranslatorInterface $translator,
         AppCacheInterface $cache,
         #[Autowire(env: 'APP_ENV')] string $env = 'test',
-    )
-    {
+    ) {
         $this->connection = $connection;
         $this->switcher = $switcher;
         $this->translator = $translator;
@@ -151,18 +149,18 @@ final class DBALQueryBuilder extends QueryBuilder
         /** Кешируем в редис */
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
 
-        $this->cacheKey .= '.'.implode('.', array_map(function($value) {
+        $this->cacheKey .= '.'.implode('.', array_map(function ($value) {
 
 
-                if($value instanceof DateTimeImmutable)
-                {
-                    $value = $value->getTimestamp();
-                }
+            if($value instanceof DateTimeImmutable)
+            {
+                $value = $value->getTimestamp();
+            }
 
-                return is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : $value;
+            return is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : $value;
 
 
-            }, $this->getParameters()));
+        }, $this->getParameters()));
 
 
         if($refresh)
@@ -585,8 +583,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $identifier = 'id',
         $sort = null,
         $desc = 'DESC'
-    )
-    {
+    ) {
         $leftOneJoin = new QueryBuilder($this->connection);
 
         $leftOneJoin

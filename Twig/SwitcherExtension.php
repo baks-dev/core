@@ -27,15 +27,9 @@ use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-
 final class SwitcherExtension extends AbstractExtension
 {
-    private SwitcherInterface $switcher;
-
-    public function __construct(SwitcherInterface $switcher)
-    {
-        $this->switcher = $switcher;
-    }
+    public function __construct(private readonly SwitcherInterface $switcher) {}
 
     public function getFunctions(): array
     {

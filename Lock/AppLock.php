@@ -38,14 +38,12 @@ final class AppLock implements AppLockInterface
     private string $key;
     private float $ttl = 60;
     private bool $release = true;
-    private string $project_dir;
 
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%')] string $project_dir,
-    ) {
-        $this->project_dir = $project_dir;
-    }
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $project_dir,
+    ) {}
 
     /**
      * Метод включает блокировку ресурса
@@ -54,7 +52,7 @@ final class AppLock implements AppLockInterface
     {
         if(is_array($key))
         {
-            $key = implode('', $key);
+            $key = md5(implode('', $key));
         }
 
         $this->key = $key;

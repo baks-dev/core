@@ -2,7 +2,6 @@
 
 namespace BaksDev\Core\Type\Device;
 
-
 use BaksDev\Core\Type\Device\Devices\Collection\DeviceInterface;
 use BaksDev\Core\Type\Device\Devices\Desktop;
 
@@ -42,7 +41,7 @@ final class Device
         {
             if($declare::equals($device))
             {
-                $this->device = new $declare;
+                $this->device = new $declare();
                 return;
             }
         }
@@ -70,7 +69,7 @@ final class Device
         foreach(self::getDeclared() as $declared)
         {
             /** @var DeviceInterface $declared */
-            $class = new $declared;
+            $class = new $declared();
             $case[$class->getSort()] = new self($class);
         }
 
@@ -83,7 +82,7 @@ final class Device
     {
         return array_filter(
             get_declared_classes(),
-            static function($className) {
+            static function ($className) {
                 return in_array(DeviceInterface::class, class_implements($className), true);
             }
         );

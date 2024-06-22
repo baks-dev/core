@@ -31,14 +31,10 @@ use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class DeviceCollection
 {
-    private iterable $device;
-
     public function __construct(
-        #[TaggedIterator('baks.device')] iterable $device
-    )
-    {
-        $this->device = $device;
-    }
+        #[TaggedIterator('baks.device')]
+        private readonly iterable $device
+    ) {}
 
     /** Возвращает массив Language */
     public function cases(): array
@@ -56,4 +52,3 @@ final class DeviceCollection
         return $case;
     }
 }
-

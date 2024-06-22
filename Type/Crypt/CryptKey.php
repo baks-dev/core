@@ -29,12 +29,10 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class CryptKey implements CryptKeyInterface
 {
-    private string $secret;
-
-    public function __construct(#[Autowire(env: 'APP_SECRET')] string $secret)
-    {
-        $this->secret = $secret;
-    }
+    public function __construct(
+        #[Autowire(env: 'APP_SECRET')]
+        private readonly string $secret
+    ) {}
 
     public function getCryptKey(): string
     {

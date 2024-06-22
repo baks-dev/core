@@ -44,8 +44,7 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
     public function __construct(
         ValidatorInterface $validator,
         LoggerInterface $validatorLogger,
-    )
-    {
+    ) {
         parent::__construct();
         $this->validator = $validator;
         $this->logger = $validatorLogger;

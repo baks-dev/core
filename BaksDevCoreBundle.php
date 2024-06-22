@@ -24,9 +24,9 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
 class BaksDevCoreBundle extends AbstractBundle
 {
-    public const NAMESPACE = __NAMESPACE__.'\\';
+    public const string NAMESPACE = __NAMESPACE__.'\\';
 
-    public const PATH = __DIR__.DIRECTORY_SEPARATOR;
+    public const string PATH = __DIR__.DIRECTORY_SEPARATOR;
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
@@ -80,8 +80,6 @@ class BaksDevCoreBundle extends AbstractBundle
 
     public function configure(DefinitionConfigurator $definition): void
     {
-        //dump('configure');
-
         $rootNode = $definition->rootNode();
 
         $domainPath = $rootNode->children();
@@ -89,10 +87,8 @@ class BaksDevCoreBundle extends AbstractBundle
         $domainPath
             ->scalarNode('messenger_transport')
             ->defaultValue('doctrine')
-            ->end()
-        ;
+            ->end();
     }
-
 
 
     public static function getDeclared(): array

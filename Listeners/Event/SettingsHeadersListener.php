@@ -33,35 +33,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AsEventListener(event: RequestEvent::class, priority: 999)]
-final class SettingsHeadersListener
+final readonly class SettingsHeadersListener
 {
-    private Environment $twig;
-
-    private TranslatorInterface $translator;
-
-    private AppCacheInterface $cache;
-
     public function __construct(
-        Environment $twig,
-        TranslatorInterface $translator,
-        AppCacheInterface $cache
-    )
-    {
-        $this->twig = $twig;
-        $this->translator = $translator;
-        $this->cache = $cache;
-    }
+        private Environment $twig,
+        private TranslatorInterface $translator,
+        private AppCacheInterface $cache
+    ) {}
 
     public function onKernelRequest(RequestEvent $event): void
     {
-
-        //dump($event);
-
-        //dump($_ENV);
-
         $AppCache = $this->cache->init('core');
 
-        $data = $AppCache->get('b8oUi9K01Hd', function(ItemInterface $item) {
+        $data = $AppCache->get('b8oUi9K01Hd', function (ItemInterface $item) {
             $data['title'] = $this->translator->trans('user.title', domain: 'default.header');
             $data['description'] = $this->translator->trans('user.description', domain: 'default.header');
             $data['keywords'] = $this->translator->trans('user.keywords', domain: 'default.header');

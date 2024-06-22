@@ -35,35 +35,19 @@ use Symfony\Component\Routing\RouterInterface;
  */
 #[AsCommand(
     name: 'baks:core:phpstorm',
-    description: 'Генерирует массив роутингов для интеграции PhpStorm')
+    description: 'Генерирует массив роутингов для интеграции PhpStorm'
+)
 ]
 class RouterPhpstormCommand extends Command
 {
-    private $router;
-
-    private KernelInterface $kernel;
-
-    private Filesystem $filesystem;
-
-
     public function __construct(
-        RouterInterface $router,
-        KernelInterface $kernel,
-        Filesystem $filesystem,
-    )
-    {
+        private readonly RouterInterface $router,
+        private readonly KernelInterface $kernel,
+        private readonly Filesystem $filesystem,
+    ) {
         parent::__construct();
-        $this->router = $router;
-        $this->kernel = $kernel;
-        $this->filesystem = $filesystem;
+
     }
-
-
-    //	/**
-    //	 * {@inheritdoc}
-    //	 */
-    //	protected function configure() {}
-
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -81,13 +65,13 @@ class RouterPhpstormCommand extends Command
 
             if(isset($def["_canonical_route"]))
             {
-                if($def["_locale"] != "ru")
+                if($def["_locale"] !== "ru")
                 {
                     continue;
                 }
 
                 $explode = explode('.', $def["_canonical_route"]);
-                if(end($explode) == "css" || end($explode) == "js")
+                if(end($explode) === "css" || end($explode) === "js")
                 {
                     continue;
                 }

@@ -27,9 +27,12 @@ use App\Kernel;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/** Функция применяет в значение Dump And Die */
+
 final class DumpDieExtension extends AbstractExtension
 {
+    /**
+     * Функция применяет в значение Dump And Die
+     */
     public function getFunctions(): array
     {
         return [

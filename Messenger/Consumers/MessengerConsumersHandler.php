@@ -31,14 +31,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Process\Process;
 
 #[AsMessageHandler]
-final class MessengerConsumersHandler
+final readonly class MessengerConsumersHandler
 {
-    private AppCacheInterface $cache;
-
-    public function __construct(AppCacheInterface $cache)
-    {
-        $this->cache = $cache;
-    }
+    public function __construct(private AppCacheInterface $cache) {}
 
     /** Сохраняем информацию о запущенных воркерах */
     public function __invoke(MessengerConsumersMessage $message): void

@@ -9,6 +9,10 @@ final class CspNonceGenerator extends AbstractExtension
 {
     private ?string $nonce = null;
 
+    /**
+     * генерирует значение nonce для Content-Security-Policy Header
+     */
+
     public function getFunctions(): array
     {
         return [
@@ -16,7 +20,6 @@ final class CspNonceGenerator extends AbstractExtension
         ];
     }
 
-    /** генерирует значение nonce для Content-Security-Policy Header */
     public function getNonce(): string
     {
         if(null === $this->nonce)

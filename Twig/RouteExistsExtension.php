@@ -30,21 +30,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/**
- * Функция определяет, имеется ли указанный Route в системен
- */
 final class RouteExistsExtension extends AbstractExtension
 {
+    public function __construct(private readonly RouterInterface $route) {}
 
-    private RouterInterface $route;
-
-
-    public function __construct(RouterInterface $route)
-    {
-        $this->route = $route;
-    }
-
-
+    /**
+     * Функция определяет, имеется ли указанный Route в системе
+     */
     public function getFunctions(): array
     {
         return [

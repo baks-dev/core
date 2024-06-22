@@ -27,25 +27,20 @@ namespace BaksDev\Core\Type\Modify\Modify\Collection;
 
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
-final class ModifyActionCollection
+final readonly class ModifyActionCollection
 {
-    private iterable $locales;
-
     public function __construct(
-        #[TaggedIterator('baks.modify.action', defaultPriorityMethod: 'sort')] iterable $locales
-    )
-    {
-        $this->locales = $locales;
-    }
+        #[TaggedIterator('baks.modify.action', defaultPriorityMethod: 'sort')]
+        private iterable $modify
+    ) {}
 
-    /** Возвращает массив Locale */
     public function cases(): array
     {
         $case = null;
 
-        foreach($this->locales as $locale)
+        foreach($this->modify as $mod)
         {
-            $case[] = new $locale();
+            $case[] = new $mod();
         }
 
         return $case;

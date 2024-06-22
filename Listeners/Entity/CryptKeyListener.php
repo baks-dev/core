@@ -36,14 +36,10 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 #[AsEventListener(event: ConsoleEvents::COMMAND)]
 final class CryptKeyListener
 {
-    private iterable $crypt;
-
     public function __construct(
-        #[TaggedIterator('baks.crypt.key')] iterable $crypt
-    )
-    {
-        $this->crypt = $crypt;
-    }
+        #[TaggedIterator('baks.crypt.key')]
+        private readonly iterable $crypt
+    ) {}
 
     public function onKernelController(ControllerEvent $event): void
     {

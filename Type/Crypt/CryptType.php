@@ -57,7 +57,7 @@ final class CryptType extends Type
     {
         $CryptKeys = array_filter(
             get_declared_classes(),
-            static function($className) {
+            static function ($className) {
                 return in_array(CryptKeyInterface::class, class_implements($className), true);
             }
         );
@@ -65,7 +65,7 @@ final class CryptType extends Type
         $current = current($CryptKeys);
 
         /** @var CryptKeyInterface $CryptKeyClass */
-        $CryptKeyClass = class_exists($current) ? (new $current) : null;
+        $CryptKeyClass = class_exists($current) ? (new $current()) : null;
 
         return $CryptKeyClass instanceof CryptKeyInterface ? $CryptKeyClass->getCryptKey() : false;
     }

@@ -43,21 +43,16 @@ final class MessageDispatch implements MessageDispatchInterface
 {
     private ?string $transport = null;
 
-    private MessageBusInterface $messageBus;
-
     private LoggerInterface $logger;
 
-    private AppCacheInterface $cache;
 
     public function __construct(
-        MessageBusInterface $messageBus,
+        private readonly MessageBusInterface $messageBus,
+        private readonly AppCacheInterface $cache,
         LoggerInterface $messageDispatchLogger,
-        AppCacheInterface $cache
-    )
-    {
-        $this->messageBus = $messageBus;
+    ) {
         $this->logger = $messageDispatchLogger;
-        $this->cache = $cache;
+
     }
 
     public function dispatch(object $message, array $stamps = [], string $transport = null): ?Envelope

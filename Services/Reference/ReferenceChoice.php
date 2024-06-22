@@ -27,14 +27,10 @@ use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final class ReferenceChoice
 {
-    private iterable $reference;
-
     public function __construct(
-        #[TaggedIterator('baks.reference.choice')] iterable $reference
-    )
-    {
-        $this->reference = $reference;
-    }
+        #[TaggedIterator('baks.reference.choice')]
+        private readonly iterable $reference
+    ) {}
 
     public function getChoice($key): ?ReferenceChoiceInterface
     {

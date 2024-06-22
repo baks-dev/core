@@ -25,7 +25,4 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Messenger\Consumers;
 
-final class MessengerConsumersMessage
-{
-
-}
+final class MessengerConsumersMessage {}

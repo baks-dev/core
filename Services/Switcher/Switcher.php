@@ -17,12 +17,6 @@
 
 namespace BaksDev\Core\Services\Switcher;
 
-//use function mb_strtolower;
-//use function strtr;
-
-use function mb_strtolower;
-use function strtr;
-
 final class Switcher implements SwitcherInterface
 {
     private string $text;

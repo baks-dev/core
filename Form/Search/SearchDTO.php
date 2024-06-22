@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SearchDTO
 {
-
     public ?string $session = null;
 
     /**

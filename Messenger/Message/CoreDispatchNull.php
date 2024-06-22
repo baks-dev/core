@@ -30,12 +30,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class CoreDispatch
+final class CoreDispatchNull
 {
-    public function __invoke(CoreMessage $message): void
-    {
-
-        //throw new \DomainException('Бросаем исключение');
-        dump($message->getTransport());
-    }
+    public function __invoke(CoreMessage $message): void {}
 }

@@ -27,12 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class SearchForm extends AbstractType
 {
-    private RequestStack $request;
-
-    public function __construct(RequestStack $request,)
-    {
-        $this->request = $request;
-    }
+    public function __construct(private readonly RequestStack $request) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -40,7 +35,6 @@ final class SearchForm extends AbstractType
         $builder->add('query', TextType::class, [
             'attr' => [
                 'class' => 'w-100',
-                /*'onfocus' => "this.value=''",*/
                 'placeholder' => 'Search',
             ],
             'label' => false,
@@ -50,7 +44,7 @@ final class SearchForm extends AbstractType
 
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
-            function(FormEvent $event): void {
+            function (FormEvent $event): void {
                 /** @var SearchDTO $data */
                 $data = $event->getData();
 
@@ -64,8 +58,7 @@ final class SearchForm extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults
-        (
+        $resolver->setDefaults(
             [
                 'translation_domain' => 'core.search',
                 'data_class' => SearchDTO::class,

@@ -15,7 +15,9 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
+
 use function dirname;
+
 use const DIRECTORY_SEPARATOR;
 
 #[AsCommand(
@@ -24,8 +26,8 @@ use const DIRECTORY_SEPARATOR;
 )]
 class AssetsInstallCommand extends Command
 {
-    public const METHOD_COPY = 'copy';
-    public const METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
+    public const string METHOD_COPY = 'copy';
+    public const string METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
 
     private Filesystem $filesystem;
 
@@ -34,31 +36,12 @@ class AssetsInstallCommand extends Command
     public function __construct(
         Filesystem $filesystem,
         KernelInterface $kernel
-    )
-    {
+    ) {
         parent::__construct();
 
         $this->filesystem = $filesystem;
         $this->projectDir = $kernel->getProjectDir();
     }
-
-
-    //	protected function configure()
-    //	{
-    //		$this
-    //			->setDefinition([
-    //				new InputArgument('target', InputArgument::OPTIONAL, 'The target directory', null),
-    //			])
-    //			->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink the assets instead of copying them')
-    //			->addOption('relative', null, InputOption::VALUE_NONE, 'Make relative symlinks')
-    //			->addOption(
-    //				'no-cleanup',
-    //				null,
-    //				InputOption::VALUE_NONE,
-    //				'Do not remove the assets of the bundles that no longer exist'
-    //			)
-    //		;
-    //	}
 
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -123,7 +106,8 @@ class AssetsInstallCommand extends Command
         /* Получаем все имеющиеся папки с ресурсами ASSET */
         $ModuleAssets = $this->searchAssets($this->projectDir.DIRECTORY_SEPARATOR.'src', 'assets') ?: [];
 
-        $ModuleAssets = array_merge($ModuleAssets,
+        $ModuleAssets = array_merge(
+            $ModuleAssets,
             $this->searchAssets($this->projectDir.DIRECTORY_SEPARATOR.'vendor/baks-dev', 'assets')
         );
 
@@ -153,7 +137,7 @@ class AssetsInstallCommand extends Command
 
                 try
                 {
-                    $this->filesystem->remove($targetDir); // continue; 
+                    $this->filesystem->remove($targetDir); // continue;
 
                     $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
 

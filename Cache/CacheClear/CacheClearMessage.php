@@ -25,15 +25,10 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Cache\CacheClear;
 
-final class CacheClearMessage
+final readonly class CacheClearMessage
 {
     /** Идентификатор кеша */
-    private ?string $cache = null;
-
-    public function __construct(string $cache)
-    {
-        $this->cache = $cache;
-    }
+    public function __construct(private ?string $cache = null) {}
 
     /**
      * Cache

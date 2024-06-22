@@ -30,7 +30,6 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
-/** Функция преобразует строку формата json в массив */
 final class QrcodeExtension extends AbstractExtension
 {
     public function getFunctions(): array
