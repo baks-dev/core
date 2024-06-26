@@ -20,16 +20,15 @@
  *  THE SOFTWARE.
  */
 
-const copyId = document.querySelectorAll('.copy');
-
-copyId.forEach(el => {
-
-    el.addEventListener('click', event => {
-
+document.querySelectorAll('.copy').forEach(el =>
+{
+    el.addEventListener('click', event =>
+    {
         navigator.clipboard.writeText(el.dataset.copy)
-            .then(() => {
+            .then(() =>
+            {
 
-                $successSupplyToast = '{ "type":"success" , ' +
+                let $successSupplyToast = '{ "type":"success" , ' +
                     '"header":"Копирование"  , ' +
                     '"message" : "Результат успешно скопирован в буфер обмена" }';
 
@@ -37,12 +36,14 @@ copyId.forEach(el => {
 
                 el.classList.add('opacity-25');
 
-                setTimeout(() => {
+                setTimeout(() =>
+                {
                     el.classList.remove('opacity-25');
                 }, 500);
 
             })
-            .catch(err => {
+            .catch(err =>
+            {
                 console.log('Something went wrong', err);
             });
     });
