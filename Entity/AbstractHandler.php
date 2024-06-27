@@ -55,8 +55,7 @@ abstract class AbstractHandler
         ValidatorCollectionInterface $validatorCollection,
         ImageUploadInterface $imageUpload,
         FileUploadInterface $fileUpload,
-    )
-    {
+    ) {
         $this->entityManager = $entityManager;
         $this->messageDispatch = $messageDispatch;
         $this->validatorCollection = $validatorCollection;
@@ -91,8 +90,7 @@ abstract class AbstractHandler
                 'class' => $EventClass,
                 'id' => $command->getEvent(),
             ])
-        )
-        {
+        ) {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -124,8 +122,7 @@ abstract class AbstractHandler
                 'class' => $MainClass,
                 'event' => $command->getEvent(),
             ])
-        )
-        {
+        ) {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -196,8 +193,7 @@ abstract class AbstractHandler
                 'class' => $EventClass,
                 'id' => $command->getEvent(),
             ])
-        )
-        {
+        ) {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -220,8 +216,7 @@ abstract class AbstractHandler
                 'class' => $MainClass,
                 'event' => $command->getEvent(),
             ])
-        )
-        {
+        ) {
             throw new DomainException($this->validatorCollection->getErrorUniqid().': '.$command->getEvent());
         }
 
