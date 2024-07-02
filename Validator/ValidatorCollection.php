@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Core\Validator;
 
 use ArrayObject;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -84,7 +85,15 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
 
         foreach($this->getIterator() as $item)
         {
-            $errors = $this->validator->validate($item);
+            try
+            {
+                $errors = $this->validator->validate($item);
+            }
+            catch(Exception $exception)
+            {
+                $this->logger->error($exception->getMessage());
+                continue;
+            }
 
             if(count($errors) > 0)
             {
