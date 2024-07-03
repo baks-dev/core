@@ -50,7 +50,7 @@ final class AppCache implements AppCacheInterface
 
         $cache = (function_exists('apcu_enabled') && apcu_enabled()) ? ApcuAdapter::class : FilesystemAdapter::class;
 
-        return new $cache($namespace, 0, marshaller: $marshaller);
+        return new $cache($namespace, $defaultLifetime, marshaller: $marshaller);
     }
 
     public function getCacheType(): string
