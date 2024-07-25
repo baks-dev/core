@@ -63,6 +63,7 @@ class CacheClear extends Command
         InputInterface $input,
         OutputInterface $output
     ): int {
+
         $module = $input->getArgument('module');
 
         $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'vendor', 'baks-dev', null]);
@@ -80,12 +81,13 @@ class CacheClear extends Command
                 $this->clearModule($module);
                 $io->success(sprintf('Кеш модуля %s успешно удален', mb_strtoupper($module)));
 
+                opcache_reset();
+
                 return Command::SUCCESS;
             }
         }
         else
         {
-
             /**
              * Сбрасываем кеш всех модулей
              * @var DirectoryIterator $module
@@ -102,6 +104,8 @@ class CacheClear extends Command
                     $this->clearModule($module->getFilename());
                 }
             }
+
+            opcache_reset();
         }
 
 
@@ -125,6 +129,8 @@ class CacheClear extends Command
                     $this->filesystem->remove($target);
                 }, 'throw');
             }
+
+            opcache_reset();
 
             $io->success('Кеш шаблонов успешно удален');
             return Command::SUCCESS;
@@ -150,6 +156,7 @@ class CacheClear extends Command
 
                 $this->filesystem->rename($origin, $target);
                 $this->filesystem->remove($target);
+                opcache_reset();
 
             }, 'throw');
 

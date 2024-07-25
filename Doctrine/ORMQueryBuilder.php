@@ -160,7 +160,7 @@ final class ORMQueryBuilder extends QueryBuilder
     }
 
     /**
-     * Возвращает ровно один результат или ноль.
+     * Возвращает ровно один результат или null.
      */
     public function getOneOrNullResult(): ?object
     {

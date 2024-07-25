@@ -40,16 +40,38 @@ final class TemplateExtension extends AbstractExtension
     }
 
     /**
-     * Функция определяет, имеется ли базовый пользовательский шаблон в директории template/Template, иначе применяет системный Core
+     * Функция определяет, имеется ли базовый пользовательский шаблон в директории template/Template
+     * если не указан вторым аргументом модуль - присваивается core, иначе подключается указанный
      */
-    public function extends($string): string
+    public function extends($string, string $module = 'Template'): string
     {
+        /** Если указан модуль (первый символ === @) - выделяем модуль и проверяем переопределение в templates*/
+        if(strpos($string, '@') === 0)
+        {
+            $module = strtok($string, '@/');
+
+            $path = str_replace('@'.$module.'/', '', $string);
+
+            /** Если переопределен шаблон модуля в директории templates */
+            if(file_exists($this->parameter->get('kernel.project_dir').'/templates/'.$module.'/'.$path))
+            {
+                return '@Template/'.$module.'/'.$path;
+            }
+        }
+
+        /** Если переопределен шаблон модуля в директории templates/Template */
         if(file_exists($this->parameter->get('kernel.project_dir').'/templates/Template/'.$string))
         {
             return '@Template/Template/'.$string;
         }
 
-        return '@core/'.$string;
+        /** Если модуль не передан в переменной $module и по умолчанию модуль Template - подключаем @core */
+        if($module === 'Template')
+        {
+            return '@core/'.$string;
+        }
+
+        return $string;
     }
 
 }

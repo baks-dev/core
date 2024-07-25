@@ -110,10 +110,19 @@ setTimeout(function initBootstrap() {
 
             const pops = new bootstrap.Popover(popoverTriggerEl, {
                 html: true,
+                sanitize: false,
 
                 content: function () {
 
                     if (popoverTriggerEl.id) {
+                        let content = document.getElementById(popoverTriggerEl.id + '-content');
+
+                        if (content) {
+                            return content.innerHTML;
+                        }
+                    }
+
+                    if (popoverTriggerEl.dataset.id) {
                         let content = document.getElementById(popoverTriggerEl.id + '-content');
 
                         if (content) {
@@ -126,6 +135,13 @@ setTimeout(function initBootstrap() {
 
                     if (popoverTriggerEl.id) {
                         let title = document.getElementById(popoverTriggerEl.id + '-title');
+                        if (title) {
+                            return title.innerHTML;
+                        }
+                    }
+
+                    if (popoverTriggerEl.dataset.id) {
+                        let title = document.getElementById(popoverTriggerEl.dataset.id + '-title');
                         if (title) {
                             return title.innerHTML;
                         }

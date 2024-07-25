@@ -52,6 +52,5 @@ final class AppCacheSaveTest extends KernelTestCase
 
         self::assertTrue($isSaved);
 
-
     }
 }
