@@ -46,7 +46,7 @@ final class TemplateExtension extends AbstractExtension
     public function extends($string, string $module = 'Template'): string
     {
         /** Если указан модуль (первый символ === @) - выделяем модуль и проверяем переопределение в templates*/
-        if(strpos($string, '@') === 0)
+        if(str_starts_with($string, '@'))
         {
             $module = strtok($string, '@/');
 
