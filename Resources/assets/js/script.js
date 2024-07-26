@@ -1,191 +1,415 @@
 //eventEmitter = new EventTarget();
 $html = false;
 
-setTimeout(function initBootstrap() {
+//let limitBootstrap = 100;
+//
+//setTimeout(function initBootstrap()
+//{
+//    if(typeof bootstrap === 'object')
+//    {
+//
+//        var carouselElList = [].slice.call(document.querySelectorAll('.carousel'));
+//        carouselElList.map(function(carouselEl)
+//        {
+//            return new bootstrap.Carousel(carouselEl);
+//        });
+//
+//        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+//        tooltipTriggerList.map(function(tooltipTriggerEl)
+//        {
+//
+//            const tooltipInstance = new bootstrap.Tooltip(tooltipTriggerEl);
+//
+//            tooltipTriggerEl.addEventListener('click', event =>
+//            {
+//                tooltipInstance.hide();
+//            });
+//
+//            return tooltipInstance;
+//        });
+//
+//        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+//        toastElList.map(function(toastEl)
+//        {
+//            return new bootstrap.Toast(toastEl, {delay: 15000}).show();
+//        });
+//
+//        //$('.carousel-inner').carousel({interval: 2000});
+//
+//        // var offcanvasElList = [].slice.call(document.querySelectorAll('.offcanvas'));
+//        // offcanvasElList.map(function (offcanvaslEl) {
+//        //     return new bootstrap.Offcanvas(offcanvaslEl);
+//        // });
+//
+//
+//        /** Добавляем  */
+//        const triggerTabList = document.querySelectorAll('.nav-mouse li')
+//        triggerTabList.forEach(triggerEl =>
+//        {
+//            const tabTrigger = new bootstrap.Tab(triggerEl)
+//
+//            triggerEl.addEventListener('mouseover', event =>
+//            {
+//                event.preventDefault()
+//                tabTrigger.show()
+//            })
+//        })
+//
+//
+//        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+//
+//
+//        popoverTriggerList.map(function(popoverTriggerEl)
+//        {
+//
+//
+//            popoverTriggerEl.addEventListener('shown.bs.popover', function(event)
+//            {
+//
+//                let describedby = this.getAttribute('aria-describedby');
+//
+//                if(describedby)
+//                {
+//
+//                    let elementDescribedby = document.getElementById(describedby);
+//
+//                    document.addEventListener('click', HidePopover);
+//
+//                    function HidePopover(e)
+//                    {
+//                        const withinBoundaries = e.composedPath().includes(elementDescribedby);
+//
+//                        if(!withinBoundaries)
+//                        {
+//                            document.removeEventListener("click", HidePopover);
+//                            pops.toggle();
+//                        }
+//                    }
+//
+//                    elementDescribedby.querySelectorAll('.modal-link').forEach(function(item, i, arr)
+//                    {
+//                        /* Добавляем атрибуты модального окна */
+//                        item.dataset.bsTarget = '#modal';
+//                        item.dataset.bsToggle = 'modal';
+//                        modalLink(item);
+//                    });
+//
+//
+//                    elementDescribedby.querySelectorAll('.dropdown-toggle').forEach(function(item, i, arr)
+//                    {
+//                        /* Добавляем атрибуты модального окна */
+//                        item.dataset.bsToggle = 'dropdown';
+//                        new bootstrap.Dropdown(item);
+//                    });
+//
+//
+//                    /* document.getElementById(describedby).querySelectorAll('.dropdown-toggle').forEach(function (item, i, arr) {
+//                     /!* Добавляем атрибуты модального окна *!/
+//                     console.log(465465465);
+//
+//                     new bootstrap.Dropdown(item);
+//                     });*/
+//
+//
+//                    //const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
+//                    //const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
+//
+//
+//                }
+//            })
+//
+//
+//            const pops = new bootstrap.Popover(popoverTriggerEl, {
+//                html: true,
+//                sanitize: false,
+//
+//                content: function()
+//                {
+//
+//                    if(popoverTriggerEl.id)
+//                    {
+//                        let content = document.getElementById(popoverTriggerEl.id + '-content');
+//
+//                        if(content)
+//                        {
+//                            return content.innerHTML;
+//                        }
+//                    }
+//
+//                    if(popoverTriggerEl.dataset.id)
+//                    {
+//                        let content = document.getElementById(popoverTriggerEl.id + '-content');
+//
+//                        if(content)
+//                        {
+//                            return content.innerHTML;
+//                        }
+//                    }
+//                },
+//
+//                title: function()
+//                {
+//
+//                    if(popoverTriggerEl.id)
+//                    {
+//                        let title = document.getElementById(popoverTriggerEl.id + '-title');
+//                        if(title)
+//                        {
+//                            return title.innerHTML;
+//                        }
+//                    }
+//
+//                    if(popoverTriggerEl.dataset.id)
+//                    {
+//                        let title = document.getElementById(popoverTriggerEl.dataset.id + '-title');
+//                        if(title)
+//                        {
+//                            return title.innerHTML;
+//                        }
+//                    }
+//
+//                }
+//            });
+//
+//            return pops;
+//        });
+//
+//
+//        // Enables popover
+//        /*$("#example-popover").popover({
+//         html : true,
+//         content: function() {
+//         return $("#example-popover-content").html();
+//         },
+//         title: function() {
+//         return $("#example-popover-title").html();
+//         }
+//         });*/
+//
+//
+//        return;
+//    }
+//
+//    limitBootstrap = limitBootstrap * 2;
+//
+//    setTimeout(initBootstrap, limitBootstrap);
+//
+//}, limitBootstrap);
 
-    /*console.log(bootstrap);*/
+/** Функция выполняется повторно, пока не верне TRUE  */
+function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 1000)
+{
+    return new Promise((resolve, reject) =>
+    {
+        let delay = initialDelay;
 
-    if (bootstrap) {
+        const run = () =>
+        {
+            const result = func();
 
-        var carouselElList = [].slice.call(document.querySelectorAll('.carousel'));
-        carouselElList.map(function (carouselEl) {
-            return new bootstrap.Carousel(carouselEl);
+            if(delay > limit)
+            {
+                console.error('Ошибка при выполнении функции');
+                resolve(true);
+                return;
+            }
+
+            if(result === true)
+            {
+                resolve(true);
+                return;
+            }
+
+            setTimeout(run, delay);
+
+            delay *= multiplier; // Увеличиваем задержку
+
+        };
+
+        run();
+    });
+}
+
+
+/**
+ * *  Инициируем Bootstrap
+ */
+
+executeFunc(function()
+{
+    if(typeof bootstrap !== 'object')
+    {
+        return false;
+    }
+
+    /** Carousel */
+
+    var carouselElList = [].slice.call(document.querySelectorAll('.carousel'));
+
+    carouselElList.map(function(carouselEl)
+    {
+        return new bootstrap.Carousel(carouselEl);
+    });
+
+    /** Tooltip */
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+    tooltipTriggerList.map(function(tooltipTriggerEl)
+    {
+        const tooltipInstance = new bootstrap.Tooltip(tooltipTriggerEl);
+
+        tooltipTriggerEl.addEventListener('click', event =>
+        {
+            tooltipInstance.hide();
         });
 
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-
-            const tooltipInstance = new bootstrap.Tooltip(tooltipTriggerEl);
-
-            tooltipTriggerEl.addEventListener('click', event => {
-                tooltipInstance.hide();
-            });
-
-            return tooltipInstance;
-        });
-
-        var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-        toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl, {delay: 15000}).show();
-        });
-
-        //$('.carousel-inner').carousel({interval: 2000});
-
-        // var offcanvasElList = [].slice.call(document.querySelectorAll('.offcanvas'));
-        // offcanvasElList.map(function (offcanvaslEl) {
-        //     return new bootstrap.Offcanvas(offcanvaslEl);
-        // });
+        return tooltipInstance;
+    });
 
 
-        /** Добавляем  */
-        const triggerTabList = document.querySelectorAll('.nav-mouse li')
-        triggerTabList.forEach(triggerEl => {
-            const tabTrigger = new bootstrap.Tab(triggerEl)
+    /** Toast */
 
-            triggerEl.addEventListener('mouseover', event => {
-                event.preventDefault()
-                tabTrigger.show()
-            })
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+
+    toastElList.map(function(toastEl)
+    {
+        return new bootstrap.Toast(toastEl, {delay: 15000}).show();
+    });
+
+
+    /** Tab */
+
+    const triggerTabList = document.querySelectorAll('.nav-mouse li')
+
+    triggerTabList.forEach(triggerEl =>
+    {
+        const tabTrigger = new bootstrap.Tab(triggerEl)
+
+        triggerEl.addEventListener('mouseover', event =>
+        {
+            event.preventDefault()
+            tabTrigger.show()
+        })
+    })
+
+
+    /** Popover */
+
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+
+    popoverTriggerList.map(function(popoverTriggerEl)
+    {
+        popoverTriggerEl.addEventListener('shown.bs.popover', function(event)
+        {
+            let describedby = this.getAttribute('aria-describedby');
+
+            if(describedby)
+            {
+                let elementDescribedby = document.getElementById(describedby);
+
+                document.addEventListener('click', HidePopover);
+
+                function HidePopover(e)
+                {
+                    const withinBoundaries = e.composedPath().includes(elementDescribedby);
+
+                    if(!withinBoundaries)
+                    {
+                        document.removeEventListener("click", HidePopover);
+                        pops.toggle();
+                    }
+                }
+
+                elementDescribedby.querySelectorAll('.modal-link').forEach(function(item, i, arr)
+                {
+                    /* Добавляем атрибуты модального окна */
+                    item.dataset.bsTarget = '#modal';
+                    item.dataset.bsToggle = 'modal';
+                    modalLink(item);
+                });
+
+
+                elementDescribedby.querySelectorAll('.dropdown-toggle').forEach(function(item, i, arr)
+                {
+                    /* Добавляем атрибуты модального окна */
+                    item.dataset.bsToggle = 'dropdown';
+                    new bootstrap.Dropdown(item);
+                });
+            }
         })
 
 
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        const pops = new bootstrap.Popover(popoverTriggerEl, {
+            html: true,
+            sanitize: false,
 
+            content: function()
+            {
 
-        popoverTriggerList.map(function (popoverTriggerEl) {
+                if(popoverTriggerEl.id)
+                {
+                    let content = document.getElementById(popoverTriggerEl.id + '-content');
 
-
-
-
-
-            popoverTriggerEl.addEventListener('shown.bs.popover', function (event) {
-
-                let describedby = this.getAttribute('aria-describedby');
-
-                if (describedby) {
-
-                    let elementDescribedby = document.getElementById(describedby);
-
-                    document.addEventListener('click', HidePopover);
-
-                    function HidePopover(e) {
-                        const withinBoundaries = e.composedPath().includes(elementDescribedby);
-
-                        if (!withinBoundaries) {
-                            document.removeEventListener("click", HidePopover);
-                            pops.toggle();
-                        }
+                    if(content)
+                    {
+                        return content.innerHTML;
                     }
-
-                    elementDescribedby.querySelectorAll('.modal-link').forEach(function (item, i, arr) {
-                        /* Добавляем атрибуты модального окна */
-                        item.dataset.bsTarget = '#modal';
-                        item.dataset.bsToggle = 'modal';
-                        modalLink(item);
-                    });
-
-
-                    elementDescribedby.querySelectorAll('.dropdown-toggle').forEach(function (item, i, arr) {
-                        /* Добавляем атрибуты модального окна */
-                        item.dataset.bsToggle = 'dropdown';
-                        new bootstrap.Dropdown(item);
-                    });
-
-
-                    /* document.getElementById(describedby).querySelectorAll('.dropdown-toggle').forEach(function (item, i, arr) {
-                         /!* Добавляем атрибуты модального окна *!/
-                         console.log(465465465);
-
-                         new bootstrap.Dropdown(item);
-                     });*/
-
-
-                    //const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
-                    //const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
-
-
                 }
-            })
 
+                if(popoverTriggerEl.dataset.id)
+                {
+                    let content = document.getElementById(popoverTriggerEl.id + '-content');
 
-            const pops = new bootstrap.Popover(popoverTriggerEl, {
-                html: true,
-                sanitize: false,
-
-                content: function () {
-
-                    if (popoverTriggerEl.id) {
-                        let content = document.getElementById(popoverTriggerEl.id + '-content');
-
-                        if (content) {
-                            return content.innerHTML;
-                        }
+                    if(content)
+                    {
+                        return content.innerHTML;
                     }
-
-                    if (popoverTriggerEl.dataset.id) {
-                        let content = document.getElementById(popoverTriggerEl.id + '-content');
-
-                        if (content) {
-                            return content.innerHTML;
-                        }
-                    }
-                },
-
-                title: function () {
-
-                    if (popoverTriggerEl.id) {
-                        let title = document.getElementById(popoverTriggerEl.id + '-title');
-                        if (title) {
-                            return title.innerHTML;
-                        }
-                    }
-
-                    if (popoverTriggerEl.dataset.id) {
-                        let title = document.getElementById(popoverTriggerEl.dataset.id + '-title');
-                        if (title) {
-                            return title.innerHTML;
-                        }
-                    }
-
                 }
-            });
+            },
 
-            return pops;
+            title: function()
+            {
+                if(popoverTriggerEl.id)
+                {
+                    let title = document.getElementById(popoverTriggerEl.id + '-title');
+                    if(title)
+                    {
+                        return title.innerHTML;
+                    }
+                }
+
+                if(popoverTriggerEl.dataset.id)
+                {
+                    let title = document.getElementById(popoverTriggerEl.dataset.id + '-title');
+                    if(title)
+                    {
+                        return title.innerHTML;
+                    }
+                }
+            }
         });
 
+        return pops;
 
-        // Enables popover
-        /*$("#example-popover").popover({
-            html : true,
-            content: function() {
-                return $("#example-popover-content").html();
-            },
-            title: function() {
-                return $("#example-popover-title").html();
-            }
-        });*/
+    });
 
-
-        return;
-    }
-
-    setTimeout(initBootstrap, 100);
-
-}, 100);
-
+    return true;
+});
 
 /*setTimeout(function initBootstrap() {
 
-    /!*console.log(bootstrap);*!/
+ /!*console.log(bootstrap);*!/
 
-    if (bootstrap) {
-        return;
-    }
-    setTimeout(initBootstrap, 100);
+ if (bootstrap) {
+ return;
+ }
+ setTimeout(initBootstrap, 100);
 
-}, 100);*/
+ }, 100);*/
 
-function modaHidden() {
+function modaHidden()
+{
     /* Скрываем модальное окно */
     let ModalElement = document.getElementById('modal');
     bootstrap.Modal.getInstance(ModalElement).hide();
@@ -194,21 +418,25 @@ function modaHidden() {
 
 /* вешаем события на модальные ссылки */
 document.querySelectorAll('.modal-link')
-    .forEach(function (item, i, arr) {
+    .forEach(function(item, i, arr)
+    {
         modalLink(item);
     });
 
 
 /* вешаем события на OFFCANVAS */
 document.querySelectorAll('.offcanvas-link')
-    .forEach(function (item, i, arr) {
-        item.addEventListener('click', function () {
+    .forEach(function(item, i, arr)
+    {
+        item.addEventListener('click', function()
+        {
             offcanvasLink(item);
         });
     });
 
 
-async function offcanvasLink(offcanvas) {
+async function offcanvasLink(offcanvas)
+{
 
 
     //const data = new FormData(forms);
@@ -227,18 +455,22 @@ async function offcanvasLink(offcanvas) {
     })
 
         //.then((response) => response)
-        .then((response) => {
+        .then((response) =>
+        {
 
-            if (response.status !== 200) {
+            if(response.status !== 200)
+            {
                 return false;
             }
 
             return response.text();
         })
 
-        .then((data) => {
+        .then((data) =>
+        {
 
-            if (data) {
+            if(data)
+            {
 
 
                 // var offcanvasElList = [].slice.call(document.querySelectorAll('.offcanvas'));
@@ -258,7 +490,6 @@ async function offcanvasLink(offcanvas) {
                 myOffcanvas.innerHTML = data;
 
                 bsOffcanvas.show();
-
 
 
                 /** Обновляем Preload */
@@ -319,9 +550,11 @@ async function offcanvasLink(offcanvas) {
 }
 
 /** сплывающее модальное окно */
-function modalLink(item) {
+function modalLink(item)
+{
 
-    item.addEventListener('click', function (event) {
+    item.addEventListener('click', function(event)
+    {
 
         /* Отключаем дефолтный переход по ссылке */
         event.preventDefault();
@@ -332,13 +565,16 @@ function modalLink(item) {
         /*  Получаем из ссылки адрес запроса */
         let url = null;
 
-        if (this.href) {
+        if(this.href)
+        {
             url = item.href;
-        } else {
+        } else
+        {
             url = item.dataset.href
         }
 
-        if (!url) {
+        if(!url)
+        {
             return;
         }
 
@@ -350,9 +586,11 @@ function modalLink(item) {
 
 
         /* Получаем ответ от сервера на запрос*/
-        request.addEventListener("readystatechange", function (evemnt) {
+        request.addEventListener("readystatechange", function(evemnt)
+        {
             /* request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) */
-            if (request.readyState === 4 && request.status === 200) {
+            if(request.readyState === 4 && request.status === 200)
+            {
 
                 const modal = document.getElementById('modal');
 
@@ -362,18 +600,21 @@ function modalLink(item) {
                 //eventEmitter.dispatchEvent(new Event('complete'));
 
                 /* Сбрасываем содержимое модального окна при закрытии */
-                modal.addEventListener('hidden.bs.modal', function (event) {
+                modal.addEventListener('hidden.bs.modal', function(event)
+                {
                     this.innerHTML = '<div class="modal-dialog modal-dialog-centered"><div class="d-flex justify-content-center w-100"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div></div>';
                 })
 
                 /* Если в модальном окне присутствует select2 */
-                modal.querySelectorAll('[data-select="select2"]').forEach(function (item) {
+                modal.querySelectorAll('[data-select="select2"]').forEach(function(item)
+                {
                     new NiceSelect(item, {searchable: true});
                 });
 
 
                 /* Если в модальном окне присутствует select2 */
-                modal.querySelectorAll('.modal-link').forEach(function (item, i, arr) {
+                modal.querySelectorAll('.modal-link').forEach(function(item, i, arr)
+                {
                     modalLink(item);
 
                     //modalToggle = document.getElementById('modal');
@@ -382,19 +623,22 @@ function modalLink(item) {
                 });
 
 
-                modal.querySelectorAll('form').forEach(function (forms) {
+                modal.querySelectorAll('form').forEach(function(forms)
+                {
 
                     //console.log(forms);
 
                     /* событие отправки формы */
-                    forms.addEventListener('submit', function (event) {
+                    forms.addEventListener('submit', function(event)
+                    {
                         event.preventDefault();
                         submitModalForm(forms);
                         return false;
                     });
                 });
 
-                if ($html) {
+                if($html)
+                {
                     $html = request.responseText;
                 }
 
@@ -406,12 +650,15 @@ function modalLink(item) {
                 lazy.src = '/assets/js/lazyload.min.js?v={{ version }}';
                 document.head.appendChild(lazy);
 
-            } else {
+            } else
+            {
 
 
-                if (request.status === 302) {
+                if(request.status === 302)
+                {
                     let requestJson = JSON.parse(request.response);
-                    if (requestJson.redirect) {
+                    if(requestJson.redirect)
+                    {
                         window.location.href = requestJson.redirect;
                     }
                 }
@@ -434,21 +681,22 @@ function modalLink(item) {
         /*
 
 
-            /!* создаем модальное окно *!/
-            var $modal = document.getElementById('modal');
+         /!* создаем модальное окно *!/
+         var $modal = document.getElementById('modal');
 
-            /!* сбрасываем модальное окно при закрытии *!/
-            $modal.addEventListener('hidden.bs.modal', function () {
-                this.innerHTML = '';
-            });
+         /!* сбрасываем модальное окно при закрытии *!/
+         $modal.addEventListener('hidden.bs.modal', function () {
+         this.innerHTML = '';
+         });
 
-        */
+         */
     });
 }
 
 
 /** Отправка модального окна */
-async function submitModalForm(forms) {
+async function submitModalForm(forms)
+{
 
     const data = new FormData(forms);
     let resolved = 100;
@@ -456,7 +704,8 @@ async function submitModalForm(forms) {
     // /* показываем индикатор */
     let indicator = forms.querySelector('.spinner-border');
 
-    if (indicator) {
+    if(indicator)
+    {
         btn = indicator.closest('button');
 
         indicator.classList.remove('d-none');
@@ -477,14 +726,16 @@ async function submitModalForm(forms) {
         body: data // body data type must match "Content-Type" header
     })
 
-        .then((response) => {
+        .then((response) =>
+        {
 
             closeProgress();
             btn.type = 'submit';
 
             const contentType = response.headers.get('content-type');
 
-            if (!contentType || !contentType.includes('application/json')) {
+            if(!contentType || !contentType.includes('application/json'))
+            {
 
                 $errorFormHandler = '{ "type":"danger" , ' +
                     '"header":"Ошибка"  , ' +
@@ -505,16 +756,20 @@ async function submitModalForm(forms) {
 
         })
 
-        .then((data) => {
+        .then((data) =>
+        {
 
-            if (data === undefined) {
+            if(data === undefined)
+            {
 
                 return false;
             }
 
-            if (data.status === 302) {
+            if(data.status === 302)
+            {
 
-                if (data.redirect == undefined) {
+                if(data.redirect == undefined)
+                {
                     window.location.href = '/refresh';
                     return;
                 }
@@ -525,18 +780,22 @@ async function submitModalForm(forms) {
 
             createToast(data);
 
-            if (data.status !== 200) {
+            if(data.status !== 200)
+            {
                 return;
             }
 
-            setTimeout(function initResolve() {
-                if (typeof resolve == 'function') {
+            setTimeout(function initResolve()
+            {
+                if(typeof resolve == 'function')
+                {
                     resolve(data);
                     return;
                 }
                 console.log('resolve not found');
 
-                if (resolved > 1000) {
+                if(resolved > 1000)
+                {
                     return;
                 }
                 resolved = resolved * 2;
@@ -555,7 +814,8 @@ async function submitModalForm(forms) {
 }
 
 /** Отправка по ссылке */
-async function submitLink(href, id = null) {
+async function submitLink(href, id = null)
+{
 
     let resolved = 100;
 
@@ -575,10 +835,12 @@ async function submitLink(href, id = null) {
 
     })
 
-        .then((response) => {
+        .then((response) =>
+        {
 
             const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
+            if(!contentType || !contentType.includes('application/json'))
+            {
 
                 $errorFormHandler = '{ "type":"danger" , ' +
                     '"header":"Ошибка"  , ' +
@@ -592,16 +854,20 @@ async function submitLink(href, id = null) {
             return response.json();
         })
 
-        .then((data) => {
+        .then((data) =>
+        {
 
-            if (data === undefined) {
+            if(data === undefined)
+            {
 
                 return false;
             }
 
-            if (data.status === 302) {
+            if(data.status === 302)
+            {
 
-                if (data.redirect == undefined) {
+                if(data.redirect == undefined)
+                {
                     window.location.href = '/refresh';
                     return;
                 }
@@ -610,18 +876,21 @@ async function submitLink(href, id = null) {
                 return false;
             }
 
-            setTimeout(function HunLIOPGlZ() {
+            setTimeout(function HunLIOPGlZ()
+            {
 
                 console.log(typeof resolve);
 
-                if (typeof resolve == 'function') {
+                if(typeof resolve == 'function')
+                {
                     resolve(data);
                     return;
                 }
 
                 console.log('resolve not found');
 
-                if (resolved > 1000) {
+                if(resolved > 1000)
+                {
                     return;
                 }
                 resolved = resolved * 2;
@@ -632,11 +901,13 @@ async function submitLink(href, id = null) {
 
             createToast(data);
 
-            if (data.status !== 200) {
+            if(data.status !== 200)
+            {
                 return;
             }
 
-            if (typeof success !== undefined && id !== null) {
+            if(typeof success !== undefined && id !== null)
+            {
                 success(id);
             }
 
@@ -651,24 +922,31 @@ async function submitLink(href, id = null) {
 checked_item = document.querySelectorAll('.checked-item');
 all_usecase = document.getElementById('all_usecase');
 
-function checkedAll($this) {
+function checkedAll($this)
+{
 
 
     all_usecase.classList.add('d-none');
 
-    if ($this.checked) {
+    if($this.checked)
+    {
         all_usecase.classList.remove('d-none')
     }
 
-    if ($this.dataset.id !== undefined) {
-        document.querySelectorAll('.checked-item-all').forEach(function (item, i, arr) {
+    if($this.dataset.id !== undefined)
+    {
+        document.querySelectorAll('.checked-item-all').forEach(function(item, i, arr)
+        {
             item.checked = $this.dataset.id === item.dataset.id;
         });
     }
 
-    checked_item.forEach(function (item, i, arr) {
-        if ($this.dataset.id !== undefined) {
-            if ($this.dataset.id !== item.dataset.id) {
+    checked_item.forEach(function(item, i, arr)
+    {
+        if($this.dataset.id !== undefined)
+        {
+            if($this.dataset.id !== item.dataset.id)
+            {
                 item.checked = false;
                 return;
             }
@@ -679,27 +957,36 @@ function checkedAll($this) {
     });
 }
 
-function checkedItem(checkedItem = null) {
+function checkedItem(checkedItem = null)
+{
 
     all_usecase.classList.add('d-none');
 
-    checked_item.forEach(function (item, i, arr) {
-        if (item.checked) {
+    checked_item.forEach(function(item, i, arr)
+    {
+        if(item.checked)
+        {
             all_usecase.classList.remove('d-none');
         }
 
-        if (item.dataset.id !== undefined) {
-            document.querySelectorAll('.checked-item-all').forEach(function (itemAll, i, arr) {
-                if (itemAll.dataset.id !== item.dataset.id) {
+        if(item.dataset.id !== undefined)
+        {
+            document.querySelectorAll('.checked-item-all').forEach(function(itemAll, i, arr)
+            {
+                if(itemAll.dataset.id !== item.dataset.id)
+                {
                     itemAll.checked = false;
                 }
             });
         }
     });
 
-    if (checkedItem && checkedItem.dataset.id !== undefined) {
-        document.querySelectorAll('.checked-item').forEach(function (itemOther, i, arr) {
-            if (itemOther.dataset.id != checkedItem.dataset.id) {
+    if(checkedItem && checkedItem.dataset.id !== undefined)
+    {
+        document.querySelectorAll('.checked-item').forEach(function(itemOther, i, arr)
+        {
+            if(itemOther.dataset.id != checkedItem.dataset.id)
+            {
                 itemOther.checked = false;
             }
         });
@@ -707,13 +994,17 @@ function checkedItem(checkedItem = null) {
 }
 
 
-(function (Function_prototype) {
-    Function_prototype.debounce = function (delay, ctx) {
+(function(Function_prototype)
+{
+    Function_prototype.debounce = function(delay, ctx)
+    {
         var fn = this, timer;
-        return function () {
+        return function()
+        {
             var args = arguments, that = this;
             clearTimeout(timer);
-            timer = setTimeout(function () {
+            timer = setTimeout(function()
+            {
                 fn.apply(ctx || that, args);
             }, delay);
         };
@@ -722,7 +1013,8 @@ function checkedItem(checkedItem = null) {
 })(Function.prototype);
 
 
-function backToTop() {
+function backToTop()
+{
 
 
     const scrollingElement = (document.scrollingElement || document.body);
@@ -738,7 +1030,8 @@ function backToTop() {
     ///document.documentElement.scrollTop = 0;
 }
 
-function backToEnd() {
+function backToEnd()
+{
 
     const scrollingElement = (document.scrollingElement || document.body);
     window.scrollBy({
@@ -748,24 +1041,29 @@ function backToEnd() {
 }
 
 
-function scrollFunction() {
+function scrollFunction()
+{
 
     const scrollingElement = document.scrollingElement.scrollHeight;
 
-    if (
+    if(
         document.body.scrollTop > 60 ||
         document.documentElement.scrollTop > 60
-    ) {
+    )
+    {
         mybutton.style.display = "block";
-    } else {
+    } else
+    {
         mybutton.style.display = "none";
     }
 
     let clientHeight = (document.documentElement.clientHeight * 2) + document.documentElement.scrollTop;
 
-    if (clientHeight > scrollingElement) {
+    if(clientHeight > scrollingElement)
+    {
         mybuttonEnd.style.display = "none";
-    } else {
+    } else
+    {
         mybuttonEnd.style.display = "block";
     }
 }
@@ -778,8 +1076,10 @@ mybutton = document.getElementById("btn-back-to-top");
 mybuttonEnd = document.getElementById("btn-back-to-end");
 
 /* Когда пользователь прокручивает вниз 20 пикселей от верха документа, показываем кнопку */
-if (mybutton || mybuttonEnd) {
-    window.onscroll = function () {
+if(mybutton || mybuttonEnd)
+{
+    window.onscroll = function()
+    {
         scrollFunction();
     };
 
@@ -790,41 +1090,49 @@ if (mybutton || mybuttonEnd) {
 
 
 /*var modal = new bootstrap.Modal('#typeForm');
-document.addEventListener('closeModal', () => {
-    modal.hide();
-});*/
+ document.addEventListener('closeModal', () => {
+ modal.hide();
+ });*/
 
 
 /* Прелоадер */
-document.querySelectorAll('.spinner-border').forEach(function (indicator) {
+document.querySelectorAll('.spinner-border').forEach(function(indicator)
+{
     let btn = indicator.closest('.btn');
 
-    if (btn) {
+    if(btn)
+    {
 
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function()
+        {
             indicator.classList.remove('d-none');
             this.disabled = true;
 
             /* Если спнер в форме - проверяем валидацию */
             let spinnerForm = this.closest('form')
 
-            if (spinnerForm) {
+            if(spinnerForm)
+            {
                 let frm = document.forms[spinnerForm.name];
 
                 /* событие отправки формы */
-                frm.addEventListener('submit', function (event) {
+                frm.addEventListener('submit', function(event)
+                {
                     event.preventDefault();
                     return false;
                 });
 
-                if (frm) {
+                if(frm)
+                {
 
                     let formSubmit = true;
 
-                    Array.from(frm.elements).forEach((input) => {
+                    Array.from(frm.elements).forEach((input) =>
+                    {
                         let $errorFormHandler = false;
 
-                        if (input.validity.valid === false) {
+                        if(input.validity.valid === false)
+                        {
 
                             formSubmit = false;
 
@@ -836,15 +1144,18 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                             $label = document.querySelector('label[for="' + input.id + '"]');
                             $placeholderText = $label ? $label.innerHTML : false;
 
-                            if (!$placeholderText) {
+                            if(!$placeholderText)
+                            {
                                 /* Поиск полей по Placeholder */
                                 $placeholderInput = document.querySelector('#' + input.id + '');
 
-                                if ($placeholderInput.tagName === 'SELECT') {
+                                if($placeholderInput.tagName === 'SELECT')
+                                {
                                     /* если элемент SELECT - получаем placeholder по первому элементу списка в empty value  */
                                     const firstOption = $placeholderInput.options[0];
                                     $placeholderText = firstOption.value === '' ? firstOption.textContent : false;
-                                } else {
+                                } else
+                                {
                                     $placeholder = $placeholderInput.getAttribute('placeholder');
                                     $placeholderText = $placeholder ? $placeholder : false;
                                 }
@@ -855,12 +1166,14 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                                 $placeholderText = input.id;
                             }
 
-                            if ($placeholderText) {
+                            if($placeholderText)
+                            {
                                 $errorFormHandler = '{ "type":"danger" , ' +
                                     '"header":"Ошибка заполнения"   , ' +
                                     '"message" : "' + $placeholderText + '"}';
 
-                                if ($errorFormHandler !== false) {
+                                if($errorFormHandler !== false)
+                                {
                                     createToast(JSON.parse($errorFormHandler));
                                 }
                             }
@@ -869,11 +1182,13 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
                     });
 
                     /** Если форма добавления в корзину */
-                    if (frm.classList.contains('order-basket')) {
+                    if(frm.classList.contains('order-basket'))
+                    {
                         return;
                     }
 
-                    if (formSubmit) {
+                    if(formSubmit)
+                    {
                         frm.submit()
                     }
                 }
@@ -886,14 +1201,17 @@ document.querySelectorAll('.spinner-border').forEach(function (indicator) {
 });
 
 
-function closeProgress() {
-    document.querySelectorAll('.spinner-border').forEach(function (indicator) {
+function closeProgress()
+{
+    document.querySelectorAll('.spinner-border').forEach(function(indicator)
+    {
 
         indicator.classList.add('d-none');
 
         let btn = indicator.closest('.btn');
 
-        if (btn) {
+        if(btn)
+        {
             btn.disabled = false;
             btn.removeAttribute('disabled');
         }
@@ -903,28 +1221,31 @@ function closeProgress() {
 
 /*setTimeout(() => {
 
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+ var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+ tooltipTriggerList.map(function (tooltipTriggerEl) {
+ return new bootstrap.Tooltip(tooltipTriggerEl);
+ });
 
-    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    toastElList.map(function (toastEl) {
-        return bootstrap.Toast(toastEl, {delay: 300000}).show();
-    });
+ var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+ toastElList.map(function (toastEl) {
+ return bootstrap.Toast(toastEl, {delay: 300000}).show();
+ });
 
-}, 3000);*/
+ }, 3000);*/
 
 
 selectPagination = document.getElementById('select-pagination');
-if (selectPagination) {
-    selectPagination.addEventListener('change', function (event) {
+if(selectPagination)
+{
+    selectPagination.addEventListener('change', function(event)
+    {
         this.form.submit();
     });
 }
 
 
-function createToast(data) {
+function createToast(data)
+{
 
     let $type = data.type;
     let $header = data.header;
@@ -934,7 +1255,8 @@ function createToast(data) {
 
     var toastDiv = document.getElementById('toast');
 
-    if (toastDiv) {
+    if(toastDiv)
+    {
         // class="alert alert-light" role="alert"
         var toastEl = document.createElement('div');
         toastEl.className = 'toast';
@@ -947,11 +1269,11 @@ function createToast(data) {
         toastEl.append(tostHeader);
 
         /*var toastSpan = document.createElement('SPAN');
-        toastSpan.classList.add('symbol');
-        toastSpan.classList.add('symbol-circle');
-        toastSpan.classList.add('toast-icon');
-        if ($type) { toastSpan.classList.add('bg-' + $type); }
-        toastSpan.classList.add('me-3');*/
+         toastSpan.classList.add('symbol');
+         toastSpan.classList.add('symbol-circle');
+         toastSpan.classList.add('toast-icon');
+         if ($type) { toastSpan.classList.add('bg-' + $type); }
+         toastSpan.classList.add('me-3');*/
 
         //tostHeader.append(toastSpan);
 
@@ -991,7 +1313,8 @@ function createToast(data) {
         toastBody.append(toastText);
 
 
-        if ($href) {
+        if($href)
+        {
             var toastHref = document.createElement('a');
             toastHref.classList.add('text-decoration-none');
             toastHref.classList.add('ms-3');
@@ -1007,9 +1330,11 @@ function createToast(data) {
         //new bootstrap.Toast(toastEl, {delay: 3000000}).show();
 
 
-        setTimeout(function showToast() {
+        setTimeout(function showToast()
+        {
 
-            if (bootstrap) {
+            if(bootstrap)
+            {
                 new bootstrap.Toast(toastEl, {delay: 15000}).show();
                 return;
             }
@@ -1025,22 +1350,22 @@ function createToast(data) {
 /* TODO RESET */
 
 /*document.querySelectorAll('[type="reset"]').forEach(function (reset) {
-    reset.addEventListener('click', function (event) {
-        let elements_form = reset.closest('form').elements;
+ reset.addEventListener('click', function (event) {
+ let elements_form = reset.closest('form').elements;
 
-        for (const element of elements_form) {
+ for (const element of elements_form) {
 
-            if (element.type == 'radio')
-            {
+ if (element.type == 'radio')
+ {
 
-                if (!element.value || element.value.length === 0 )
-                {
-                    // console.log(element);
-                    // element.setAttribute('checked', true)
-                    // element.checked = true;
-                }
-            }
-        }
-    });
-});*/
+ if (!element.value || element.value.length === 0 )
+ {
+ // console.log(element);
+ // element.setAttribute('checked', true)
+ // element.checked = true;
+ }
+ }
+ }
+ });
+ });*/
 
