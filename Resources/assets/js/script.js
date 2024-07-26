@@ -235,14 +235,17 @@ function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 1000)
  * *  Инициируем Bootstrap
  */
 
-executeFunc(function()
+
+/** Carousel */
+
+executeFunc(bindBootstrapCarousel);
+
+function bindBootstrapCarousel()
 {
     if(typeof bootstrap !== 'object')
     {
         return false;
     }
-
-    /** Carousel */
 
     var carouselElList = [].slice.call(document.querySelectorAll('.carousel'));
 
@@ -251,7 +254,19 @@ executeFunc(function()
         return new bootstrap.Carousel(carouselEl);
     });
 
-    /** Tooltip */
+    return true;
+}
+
+/** Tooltip */
+
+executeFunc(bindBootstrapTooltip);
+
+function bindBootstrapTooltip()
+{
+    if(typeof bootstrap !== 'object')
+    {
+        return false;
+    }
 
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 
@@ -267,8 +282,19 @@ executeFunc(function()
         return tooltipInstance;
     });
 
+    return true;
+}
 
-    /** Toast */
+/** Toast */
+
+executeFunc(bindBootstrapToast);
+
+function bindBootstrapToast()
+{
+    if(typeof bootstrap !== 'object')
+    {
+        return false;
+    }
 
     var toastElList = [].slice.call(document.querySelectorAll('.toast'));
 
@@ -277,9 +303,15 @@ executeFunc(function()
         return new bootstrap.Toast(toastEl, {delay: 15000}).show();
     });
 
+    return true;
+}
 
-    /** Tab */
+/** Tab */
 
+executeFunc(bindBootstrapTab);
+
+function bindBootstrapTab()
+{
     const triggerTabList = document.querySelectorAll('.nav-mouse li')
 
     triggerTabList.forEach(triggerEl =>
@@ -291,10 +323,22 @@ executeFunc(function()
             event.preventDefault()
             tabTrigger.show()
         })
-    })
+    });
+
+    return true;
+}
 
 
-    /** Popover */
+/** Popover */
+
+executeFunc(bindBootstrapPopover);
+
+function bindBootstrapPopover()
+{
+    if(typeof bootstrap !== 'object')
+    {
+        return false;
+    }
 
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
 
@@ -395,7 +439,7 @@ executeFunc(function()
     });
 
     return true;
-});
+}
 
 /*setTimeout(function initBootstrap() {
 
