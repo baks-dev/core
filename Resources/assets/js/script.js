@@ -196,6 +196,7 @@ $html = false;
 //
 //}, limitBootstrap);
 
+
 /** Функция выполняется повторно, пока не верне TRUE  */
 function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 1000)
 {
@@ -441,17 +442,6 @@ function bindBootstrapPopover()
     return true;
 }
 
-/*setTimeout(function initBootstrap() {
-
- /!*console.log(bootstrap);*!/
-
- if (bootstrap) {
- return;
- }
- setTimeout(initBootstrap, 100);
-
- }, 100);*/
-
 function modaHidden()
 {
     /* Скрываем модальное окно */
@@ -481,7 +471,6 @@ document.querySelectorAll('.offcanvas-link')
 
 async function offcanvasLink(offcanvas)
 {
-
 
     //const data = new FormData(forms);
 
@@ -541,46 +530,6 @@ async function offcanvasLink(offcanvas)
                 let lazy = document.createElement('script');
                 lazy.src = '/assets/js/lazyload.min.js?v={{ version }}';
                 document.head.appendChild(lazy);
-
-                //console.log(data);
-
-                // var parser = new DOMParser();
-                // var doc = parser.parseFromString(data, 'text/html');
-                //
-                // let user_delivery = doc.getElementById('user_delivery');
-                // document.getElementById('user_delivery').replaceWith(user_delivery);
-                //
-                // /** Пересобираем поля для способа дотсавки */
-                // document.querySelectorAll('input[name="order_form[users][delivery][delivery]"]').forEach(function (user_delivery) {
-                //     user_delivery.addEventListener('change', function (event) {
-                //
-                //         let forms = this.closest('form');
-                //         submitDeliveryForm(forms);
-                //         return false;
-                //     });
-                // });
-                //
-                //
-                // document.querySelectorAll('select.change_region_field').forEach(function (userRegion) {
-                //     userRegion.addEventListener('change', function (event) {
-                //         let forms = this.closest('form');
-                //         submitRegionForm(forms, userRegion.id);
-                //         return false;
-                //     });
-                // });
-                //
-                // /** Делаем перерасчет */
-                //
-                //
-                // /** Пересобирваем tooltip */
-                // var tooltipTriggerList = [].slice.call(user_delivery.querySelectorAll('[data-bs-toggle="tooltip"]'))
-                // tooltipTriggerList.map(function (tooltipTriggerEl) {
-                //     return new bootstrap.Tooltip(tooltipTriggerEl);
-                // });
-                //
-                // /** Персчет всего количество */
-                // total();
-
             }
         });
 
@@ -1076,7 +1025,6 @@ function backToTop()
 
 function backToEnd()
 {
-
     const scrollingElement = (document.scrollingElement || document.body);
     window.scrollBy({
         top: scrollingElement.scrollHeight,
@@ -1087,7 +1035,6 @@ function backToEnd()
 
 function scrollFunction()
 {
-
     const scrollingElement = document.scrollingElement.scrollHeight;
 
     if(
@@ -1128,8 +1075,8 @@ if(mybutton || mybuttonEnd)
     };
 
     /* Когда пользователь нажимает кнопку, прокручиваем до верхней части старницы. */
-    mybutton.addEventListener("click", backToTop);
-    mybuttonEnd.addEventListener("click", backToEnd);
+    mybutton?.addEventListener("click", backToTop);
+    mybuttonEnd?.addEventListener("click", backToEnd);
 }
 
 
@@ -1142,117 +1089,150 @@ if(mybutton || mybuttonEnd)
 /* Прелоадер */
 document.querySelectorAll('.spinner-border').forEach(function(indicator)
 {
-    let btn = indicator.closest('.btn');
-
-    if(btn)
-    {
-
-        btn.addEventListener('click', function()
-        {
-            indicator.classList.remove('d-none');
-            this.disabled = true;
-
-            /* Если спнер в форме - проверяем валидацию */
-            let spinnerForm = this.closest('form')
-
-            if(spinnerForm)
-            {
-                let frm = document.forms[spinnerForm.name];
-
-                /* событие отправки формы */
-                frm.addEventListener('submit', function(event)
-                {
-                    event.preventDefault();
-                    return false;
-                });
-
-                if(frm)
-                {
-
-                    let formSubmit = true;
-
-                    Array.from(frm.elements).forEach((input) =>
-                    {
-                        let $errorFormHandler = false;
-
-                        if(input.validity.valid === false)
-                        {
-
-                            formSubmit = false;
-
-                            let $placeholderText = false;
-
-                            setTimeout(closeProgress, 1000);
-
-                            /* Поиск полей по LABEL */
-                            $label = document.querySelector('label[for="' + input.id + '"]');
-                            $placeholderText = $label ? $label.innerHTML : false;
-
-                            if(!$placeholderText)
-                            {
-                                /* Поиск полей по Placeholder */
-                                $placeholderInput = document.querySelector('#' + input.id + '');
-
-                                if($placeholderInput.tagName === 'SELECT')
-                                {
-                                    /* если элемент SELECT - получаем placeholder по первому элементу списка в empty value  */
-                                    const firstOption = $placeholderInput.options[0];
-                                    $placeholderText = firstOption.value === '' ? firstOption.textContent : false;
-                                } else
-                                {
-                                    $placeholder = $placeholderInput.getAttribute('placeholder');
-                                    $placeholderText = $placeholder ? $placeholder : false;
-                                }
-                            }
-
-                            if(!$placeholderText)
-                            {
-                                $placeholderText = input.id;
-                            }
-
-                            if($placeholderText)
-                            {
-                                $errorFormHandler = '{ "type":"danger" , ' +
-                                    '"header":"Ошибка заполнения"   , ' +
-                                    '"message" : "' + $placeholderText + '"}';
-
-                                if($errorFormHandler !== false)
-                                {
-                                    createToast(JSON.parse($errorFormHandler));
-                                }
-                            }
-                        }
-
-                    });
-
-                    /** Если форма добавления в корзину */
-                    if(frm.classList.contains('order-basket'))
-                    {
-                        return;
-                    }
-
-                    if(formSubmit)
-                    {
-                        frm.submit()
-                    }
-                }
-            }
-
-            ///** Максимально крутим спинер - 3 сек */
-            setTimeout(closeProgress, 3000);
-        });
-    }
+    bindSpinner(indicator);
 });
 
 
-function closeProgress()
+function bindSpinner(indicator)
 {
-    document.querySelectorAll('.spinner-border').forEach(function(indicator)
+    let btn = indicator.closest('.btn');
+
+    if(btn === null)
     {
+        closeProgress(indicator);
+        return false;
+    }
 
-        indicator.classList.add('d-none');
+    btn.addEventListener('click', function()
+    {
+        indicator.classList.remove('d-none');
+        this.disabled = true;
 
-        let btn = indicator.closest('.btn');
+        /* Если спнер в форме - проверяем валидацию */
+        let spinnerForm = this.closest('form');
+
+        if(spinnerForm === null)
+        {
+            closeProgress(indicator);
+            return true;
+        }
+
+        let frm = document.forms[spinnerForm.name];
+
+        /* Блокируем событие отправки формы */
+        frm.addEventListener('submit', function(event)
+        {
+            event.preventDefault();
+            return false;
+        });
+
+        if(frm)
+        {
+
+            let formSubmit = true;
+
+            Array.from(frm.elements).forEach((input) =>
+            {
+                let $errorFormHandler = false;
+
+                if(input.validity.valid === false)
+                {
+
+                    formSubmit = false;
+
+                    let $placeholderText = false;
+
+                    setTimeout(closeProgress, 1000);
+
+                    /* Поиск полей по LABEL */
+                    $label = document.querySelector('label[for="' + input.id + '"]');
+                    $placeholderText = $label ? $label.innerHTML : false;
+
+                    if(!$placeholderText)
+                    {
+                        /* Поиск полей по Placeholder */
+                        $placeholderInput = document.querySelector('#' + input.id + '');
+
+                        if($placeholderInput.tagName === 'SELECT')
+                        {
+                            /* если элемент SELECT - получаем placeholder по первому элементу списка в empty value  */
+                            const firstOption = $placeholderInput.options[0];
+                            $placeholderText = firstOption.value === '' ? firstOption.textContent : false;
+                        } else
+                        {
+                            $placeholder = $placeholderInput.getAttribute('placeholder');
+                            $placeholderText = $placeholder ? $placeholder : false;
+                        }
+                    }
+
+                    if(!$placeholderText)
+                    {
+                        $placeholderText = input.id;
+                    }
+
+                    if($placeholderText)
+                    {
+                        $errorFormHandler = '{ "type":"danger" , ' +
+                            '"header":"Ошибка заполнения"   , ' +
+                            '"message" : "' + $placeholderText + '"}';
+
+                        if($errorFormHandler !== false)
+                        {
+                            createToast(JSON.parse($errorFormHandler));
+                        }
+                    }
+                }
+
+            });
+
+            /** Если форма добавления в корзину */
+            if(frm.classList.contains('order-basket'))
+            {
+                return true;
+            }
+
+            if(formSubmit)
+            {
+                frm.submit()
+            }
+        }
+
+
+        ///** Максимально крутим спинер - 3 сек */
+        setTimeout(closeProgress, 3000);
+    });
+
+    return true;
+
+}
+
+
+/** Инициируем спинеры в модальном окне */
+const spinnerModal = document.getElementById('modal');
+
+spinnerModal?.addEventListener('shown.bs.modal', event =>
+{
+    setTimeout(function()
+    {
+        spinnerModal.querySelectorAll('.spinner-border').forEach(function(indicator)
+        {
+            executeFunc(function(){ return bindSpinner(indicator); });
+        });
+
+    }, 500);
+});
+
+
+/** Закрываем спинер */
+function closeProgress(indicator = null)
+{
+    const indicators = indicator ? [indicator] : document.querySelectorAll('.spinner-border');
+
+    indicators.forEach(item =>
+    {
+        item.classList.add('d-none');
+
+        const btn = item.closest('.btn');
 
         if(btn)
         {
@@ -1263,29 +1243,12 @@ function closeProgress()
 }
 
 
-/*setTimeout(() => {
+/** Отправляем форму пагинации при изменении LIMIT  */
 
- var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
- tooltipTriggerList.map(function (tooltipTriggerEl) {
- return new bootstrap.Tooltip(tooltipTriggerEl);
- });
-
- var toastElList = [].slice.call(document.querySelectorAll('.toast'));
- toastElList.map(function (toastEl) {
- return bootstrap.Toast(toastEl, {delay: 300000}).show();
- });
-
- }, 3000);*/
-
-
-selectPagination = document.getElementById('select-pagination');
-if(selectPagination)
+document.getElementById('select-pagination')?.addEventListener('change', function(event)
 {
-    selectPagination.addEventListener('change', function(event)
-    {
-        this.form.submit();
-    });
-}
+    this.form.submit();
+});
 
 
 function createToast(data)
