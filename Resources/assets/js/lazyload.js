@@ -1575,4 +1575,40 @@
 
 })));
 
+
+/** Функция выполняется повторно, пока не верне TRUE  */
+function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 2000)
+{
+    return new Promise((resolve, reject) =>
+    {
+        let delay = initialDelay;
+
+        const run = () =>
+        {
+            const result = func();
+
+            if(delay > limit)
+            {
+                console.error('Ошибка при выполнении функции');
+                console.log(func);
+                resolve(true);
+                return;
+            }
+
+            if(result === true)
+            {
+                resolve(true);
+                return;
+            }
+
+            setTimeout(run, delay);
+
+            delay *= multiplier; // Увеличиваем задержку
+
+        };
+
+        run();
+    });
+}
+
 //  invokeScript(element);

@@ -197,41 +197,6 @@ $html = false;
 //}, limitBootstrap);
 
 
-/** Функция выполняется повторно, пока не верне TRUE  */
-function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 1000)
-{
-    return new Promise((resolve, reject) =>
-    {
-        let delay = initialDelay;
-
-        const run = () =>
-        {
-            const result = func();
-
-            if(delay > limit)
-            {
-                console.error('Ошибка при выполнении функции');
-                resolve(true);
-                return;
-            }
-
-            if(result === true)
-            {
-                resolve(true);
-                return;
-            }
-
-            setTimeout(run, delay);
-
-            delay *= multiplier; // Увеличиваем задержку
-
-        };
-
-        run();
-    });
-}
-
-
 /**
  * *  Инициируем Bootstrap
  */
@@ -1351,6 +1316,21 @@ function createToast(data)
         }, 500);
 
     }
+}
+
+idFormDebounce = false;
+lastFormDebounce = false;
+
+// Функция debounce
+function formDebounce(func, delay)
+{
+    let timeoutId;
+    return function(...args)
+    {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+        idFormDebounce = timeoutId;
+    };
 }
 
 
