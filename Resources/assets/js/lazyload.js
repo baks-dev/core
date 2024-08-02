@@ -1469,7 +1469,6 @@
 
     LazyLoad.prototype = {
 
-
         update: function update(givenNodeset)
         {
             LazyLoad.prototype
@@ -1552,8 +1551,13 @@
 
     LazyLoad.load = function(element, customSettings)
     {
-
         var settings = getExtendedSettings(customSettings);
+
+        if(element.dataset.allStatus === settings.class_loaded)
+        {
+            return;
+        }
+
         load(element, settings);
     };
 
@@ -1575,6 +1579,12 @@
 
 })));
 
+function reloadLazy(element = null)
+{
+    const selector = element ? element.querySelectorAll('.lazy') : document.querySelectorAll('.lazy');
+
+    selector.forEach(e => window.LazyLoad.load(e));
+}
 
 /** Функция выполняется повторно, пока не верне TRUE  */
 function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 2000)
@@ -1610,5 +1620,3 @@ function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 2000)
         run();
     });
 }
-
-//  invokeScript(element);

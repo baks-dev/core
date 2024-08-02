@@ -76,6 +76,11 @@ final class DBALQueryBuilder extends QueryBuilder
     /** Билдер поиска */
     private ?QueryBuilder $search = null;
 
+    /** Билдер рекурсии */
+    private ?string $recursive = null;
+    private ?string $recursive_alias = null;
+
+
     private SwitcherInterface $switcher;
 
     /** Строка поиска */
@@ -413,6 +418,84 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $this;
     }
+
+    /**
+     * Метод добавляет условие рекурсивного запроса
+     */
+    public function joinRecursive($fromAlias, $join, $alias, $condition = null): self
+    {
+        //$this->recursive = new QueryBuilder($this->connection);
+        $this->recursive_alias = $alias;
+
+//        $this->recursive = sprintf(
+//            ' INNER JOIN %s %s ON %s ',
+//            $this->table($join),
+//            $alias,
+//            $condition
+//        );
+
+        $this->join(
+            $fromAlias,
+            $this->table($join),
+            $alias,
+            $condition
+        );
+
+        return $this;
+    }
+
+
+    /**
+     * @param $id - идентификатор сущности
+     * @param $parent - идентификатор свойства на основную сущность
+     */
+    //public function findAllRecursive(string $id, string $parent)
+
+    public function findAllRecursive(array $condition)
+    {
+//        if($this->recursive === null)
+//        {
+//            throw new \InvalidArgumentException('Метод рекурсивного запроса не определен');
+//        }
+
+        $parent = key($condition);
+        $id = current($condition);
+
+        $dbal_union = clone $this;
+
+        $this->andWhere($this->recursive_alias.'.'.$parent.' IS NULL');
+
+
+        $dbal_union->join(
+            $this->recursive_alias,
+            'recursive_table',
+            '',
+            'recursive_table.'.$id.' = '.$this->recursive_alias.'.'.$parent
+        );
+
+
+        $dbal_union->resetWhere();
+
+
+        $sql = "WITH RECURSIVE recursive_table AS (";
+        $sql .= $this->getSQL();
+        $sql .= ' UNION ';
+        $sql .= $dbal_union->getSQL();
+        $sql .= ') SELECT * FROM recursive_table';
+
+
+        $Statement = $this->prepare($sql);
+
+        foreach($this->getParameters() as $param => $value)
+        {
+            $Statement->bindValue($param, $value);
+        }
+
+        return $Statement
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
 
     public function select(string ...$expressions): self
     {

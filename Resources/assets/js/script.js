@@ -369,7 +369,7 @@ function bindBootstrapPopover()
 
                 if(popoverTriggerEl.dataset.id)
                 {
-                    let content = document.getElementById(popoverTriggerEl.id + '-content');
+                    let content = document.getElementById(popoverTriggerEl.dataset.id + '-content');
 
                     if(content)
                     {
@@ -1173,19 +1173,19 @@ function bindSpinner(indicator)
 
 
 /** Инициируем спинеры в модальном окне */
-const spinnerModal = document.getElementById('modal');
-
-spinnerModal?.addEventListener('shown.bs.modal', event =>
-{
-    setTimeout(function()
-    {
-        spinnerModal.querySelectorAll('.spinner-border').forEach(function(indicator)
-        {
-            executeFunc(function(){ return bindSpinner(indicator); });
-        });
-
-    }, 500);
-});
+//const spinnerModal = document.getElementById('modal');
+//
+//spinnerModal?.addEventListener('shown.bs.modal', event =>
+//{
+//    setTimeout(function()
+//    {
+//        spinnerModal.querySelectorAll('.spinner-border').forEach(function(indicator)
+//        {
+//            executeFunc(function(){ return bindSpinner(indicator); });
+//        });
+//
+//    }, 500);
+//});
 
 
 /** Закрываем спинер */

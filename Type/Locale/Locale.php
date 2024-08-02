@@ -48,7 +48,7 @@ final class Locale
 
             if($instance->getLocalValue() === $locale)
             {
-                $this->locale = new $declare;
+                $this->locale = new $declare();
                 return;
             }
         }
@@ -103,7 +103,7 @@ final class Locale
         foreach(self::getDeclared() as $key => $declared)
         {
             /** @var LocaleInterface $declared */
-            $class = new $declared;
+            $class = new $declared();
 
             if($class instanceof LocaleDisable)
             {
@@ -137,11 +137,20 @@ final class Locale
         return $default;
     }
 
+    /**
+     * Метод возвращает региональность в формате в стандарте ISO 639-1
+     * @example ru_RU
+     */
+    public function getLangCountry(): string
+    {
+        return mb_strtolower($this->locale->getValue()).'_'.mb_strtoupper($this->locale->getValue());
+    }
+
     public static function getDeclared(): array
     {
         return array_filter(
             get_declared_classes(),
-            static function($className) {
+            static function ($className) {
                 return in_array(LocaleInterface::class, class_implements($className), true);
             }
         );
