@@ -1002,25 +1002,23 @@ function scrollFunction()
 {
     const scrollingElement = document.scrollingElement.scrollHeight;
 
+    backButtonTop.style.display = "none";
+
     if(
         document.body.scrollTop > 60 ||
         document.documentElement.scrollTop > 60
     )
     {
-        mybutton.style.display = "block";
-    } else
-    {
-        mybutton.style.display = "none";
+        backButtonTop.style.display = "block";
     }
 
-    let clientHeight = (document.documentElement.clientHeight * 2) + document.documentElement.scrollTop;
+    let clientHeight = (document.documentElement.clientHeight * 1.1) + document.documentElement.scrollTop;
+
+    backButtonEnd.style.display = "block";
 
     if(clientHeight > scrollingElement)
     {
-        mybuttonEnd.style.display = "none";
-    } else
-    {
-        mybuttonEnd.style.display = "block";
+        backButtonEnd.style.display = "none";
     }
 }
 
@@ -1028,20 +1026,22 @@ function scrollFunction()
 //window.addEventListener('load', function () {
 
 
-mybutton = document.getElementById("btn-back-to-top");
-mybuttonEnd = document.getElementById("btn-back-to-end");
+backButtonTop = document.getElementById("btn-back-to-top");
+backButtonEnd = document.getElementById("btn-back-to-end");
 
 /* Когда пользователь прокручивает вниз 20 пикселей от верха документа, показываем кнопку */
-if(mybutton || mybuttonEnd)
+if(backButtonTop || backButtonEnd)
 {
     window.onscroll = function()
     {
         scrollFunction();
     };
 
+    scrollFunction();
+
     /* Когда пользователь нажимает кнопку, прокручиваем до верхней части старницы. */
-    mybutton?.addEventListener("click", backToTop);
-    mybuttonEnd?.addEventListener("click", backToEnd);
+    backButtonTop?.addEventListener("click", backToTop);
+    backButtonEnd?.addEventListener("click", backToEnd);
 }
 
 
