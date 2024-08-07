@@ -18,8 +18,10 @@
 namespace BaksDev\Core\Services\Paginator;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Core\Type\Locale\Locales\Ru;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class Paginator implements PaginatorInterface
 {
@@ -28,6 +30,8 @@ final class Paginator implements PaginatorInterface
     private const LIMIT = 24;
 
     private ?Request $request;
+
+    private ?SessionInterface $session = null;
 
     private int $page;
 
@@ -62,30 +66,28 @@ final class Paginator implements PaginatorInterface
 
     public function __construct(RequestStack $request)
     {
-        $this->request = $request->getCurrentRequest();
+        $this->request = $request->getCurrentRequest() ?: new Request();
 
-        if(!$this->request)
-        {
-            return;
-        }
-
-        $this->path = $this->request->get('_route');
+        $this->path = $this->request->get('_route') ?: 'core';
         $this->namespace = substr($this->path, 0, strpos($this->path, ':'));
 
+
+        $this->session = $this->request->hasPreviousSession() ? $this->request->getSession() : null;
+
+
         /** Получаем limit */
-        $session = $this->request->getSession();
 
         if($this->request->query->getInt('limit'))
         {
-            $session->set($this->namespace.':limit', $this->request->query->getInt('limit'));
+            $this->session?->set($this->namespace.':limit', $this->request->query->getInt('limit'));
         }
 
-        $this->limit = $session->get($this->namespace.':limit') ?: 0;
+        $this->limit = $this->session?->get($this->namespace.':limit') ?: 0;
 
         if(!$this->limit)
         {
             $this->limit = self::LIMIT;
-            $session->set($this->namespace.':limit', self::LIMIT);
+            $this->session?->set($this->namespace.':limit', self::LIMIT);
         }
 
         $this->id = $this->request->attributes->get('id') ?: $this->request->get('id');
@@ -99,14 +101,14 @@ final class Paginator implements PaginatorInterface
 
     public function fetchAllAssociative(DBALQueryBuilder $qb, string $namespace = null): self
     {
-        if(!$this->request)
+        $namespace = $namespace ?: $this->namespace;
+
+        if($namespace)
         {
-            return $this;
+            $qb->enableCache($namespace, 3600);
         }
 
-        $qb->enableCache($namespace ?: $this->namespace, 3600);
-
-        if($this->request->getSession()->get('statusCode') === 307)
+        if($this->request && $this->session?->get('statusCode') === 307)
         {
             /** Сбрасываем кеш ключа запроса */
             $qb->deleteCacheQueries();
@@ -135,7 +137,7 @@ final class Paginator implements PaginatorInterface
         {
             $cacheKey = 'counter.'.$qb->getCacheKey();
 
-            if($this->request->getSession()->get('statusCode') === 307)
+            if($this->session?->get('statusCode') === 307)
             {
                 /** Сбрасываем кеш ключа запроса */
                 $qb->select('COUNT(*)');
@@ -167,10 +169,10 @@ final class Paginator implements PaginatorInterface
         }
 
 
-        if($this->request->getSession()->get('statusCode') === 307)
+        if($this->request && $this->session?->get('statusCode') === 307)
         {
             /** Сбрасываем кеш ключа запроса */
-            $this->request->getSession()->remove('statusCode');
+            $this->session?->remove('statusCode');
         }
 
         return $this;
@@ -178,14 +180,14 @@ final class Paginator implements PaginatorInterface
 
     public function fetchAllAssociativeIndexed(DBALQueryBuilder $qb, string $namespace = null): self
     {
-        if(!$this->request)
+        $namespace = $namespace ?: $this->namespace;
+
+        if($namespace)
         {
-            return $this;
+            $qb->enableCache($namespace, 3600);
         }
 
-        $qb->enableCache($namespace ?: $this->namespace, 3600);
-
-        if($this->request->getSession()->get('statusCode') === 307)
+        if($this->request && $this->session->get('statusCode') === 307)
         {
             /** Сбрасываем кеш ключа запроса */
             $qb->deleteCacheQueries();
