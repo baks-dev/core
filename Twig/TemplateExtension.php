@@ -43,35 +43,34 @@ final class TemplateExtension extends AbstractExtension
      * Функция определяет, имеется ли базовый пользовательский шаблон в директории template/Template
      * если не указан вторым аргументом модуль - присваивается core, иначе подключается указанный
      */
-    public function extends($string, string $module = 'Template'): string
+    public function extends(string $string): string
     {
-        /** Если указан модуль (первый символ === @) - выделяем модуль и проверяем переопределение в templates*/
+        /** @example  @core:user/base.html.twig */
+        if(strpos($string, ':'))
+        {
+            $module = strtok($string, '@:');
+            $string = str_replace('@'.$module.':', '/', $string);
+        }
+
+        /** @example  @core/user/base.html.twig */
         if(str_starts_with($string, '@'))
         {
             $module = strtok($string, '@/');
-
-            $path = str_replace('@'.$module.'/', '', $string);
-
-            /** Если переопределен шаблон модуля в директории templates */
-            if(file_exists($this->parameter->get('kernel.project_dir').'/templates/'.$module.'/'.$path))
-            {
-                return '@Template/'.$module.'/'.$path;
-            }
+            $string = str_replace('@'.$module.'/', '', $string);
         }
 
-        /** Если переопределен шаблон модуля в директории templates/Template */
+        /** Если переопределен шаблон модуля в директории templates */
+        if(isset($module) && file_exists($this->parameter->get('kernel.project_dir').'/templates/'.$module.'/'.$string))
+        {
+            return '@Template/'.$module.'/'.$string;
+        }
+
+        /** Если модуль не определен и имеется шаблон в директории templates/Template */
         if(file_exists($this->parameter->get('kernel.project_dir').'/templates/Template/'.$string))
         {
             return '@Template/Template/'.$string;
         }
 
-        /** Если модуль не передан в переменной $module и по умолчанию модуль Template - подключаем @core */
-        if($module === 'Template')
-        {
-            return '@core/'.$string;
-        }
-
-        return $string;
+        return (isset($module) ? '@'.$module.'/' : '@core/').$string;
     }
-
 }

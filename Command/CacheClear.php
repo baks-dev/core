@@ -45,8 +45,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class CacheClear extends Command
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string $project_dir,
+        #[Autowire('%kernel.project_dir%')] private readonly string $project_dir,
         private readonly AppCacheInterface $appCache,
         private readonly Filesystem $filesystem
     ) {
@@ -70,53 +69,12 @@ class CacheClear extends Command
 
         $io = new SymfonyStyle($input, $output);
 
-
-        if($module)
-        {
-            /**
-             * Сбрасываем кеш только указанного модуля
-             */
-            if(is_dir($path.$module))
-            {
-                $this->clearModule($module);
-                $io->success(sprintf('Кеш модуля %s успешно удален', mb_strtoupper($module)));
-
-                opcache_reset();
-
-                return Command::SUCCESS;
-            }
-        }
-        else
-        {
-            /**
-             * Сбрасываем кеш всех модулей
-             * @var DirectoryIterator $module
-             */
-            foreach(new DirectoryIterator($path) as $module)
-            {
-                if($module->isDot())
-                {
-                    continue;
-                }
-
-                if($module->isDir())
-                {
-                    $this->clearModule($module->getFilename());
-                }
-            }
-
-            opcache_reset();
-        }
-
-
-        $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', null]);
-
-
         /**
          * Сбрасываем только кеш шаблонов
          */
         if($module === 'template' || $module === 'twig')
         {
+            // Кеш шаблонов сбрасываем только в PROD
             $origin = $path.implode(DIRECTORY_SEPARATOR, ['prod', 'twig']);
 
             if(is_dir($origin))
@@ -127,15 +85,49 @@ class CacheClear extends Command
                 register_shutdown_function(function () use ($origin, $target) {
                     $this->filesystem->rename($origin, $target);
                     $this->filesystem->remove($target);
+                    opcache_reset();
                 }, 'throw');
             }
 
-            opcache_reset();
 
             $io->success('Кеш шаблонов успешно удален');
             return Command::SUCCESS;
         }
 
+
+        /**
+         * Сбрасываем кеш модулей
+         * @var DirectoryIterator $moduleDir
+         */
+        foreach(new DirectoryIterator($path) as $moduleDir)
+        {
+            if($moduleDir->isDot())
+            {
+                continue;
+            }
+
+            if($moduleDir->isDir())
+            {
+                // если указан модуль и он имеет вхождение в директорию модуля - удаляем
+                if(isset($module) && stripos($moduleDir->getFilename(), $module) === false)
+                {
+                    continue;
+                }
+
+                $result = $this->clearModule($moduleDir->getFilename());
+                $io->text(sprintf('Сбросили кеш модуля %s', $result));
+            }
+        }
+
+        if(!empty($module))
+        {
+            $io->success('Кеш модулей успешно удален');
+            return Command::SUCCESS;
+        }
+
+
+        // Указываем абсолютный путь к директории кеша
+        $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', null]);
 
         /**
          * Полностью удаляем кеш
@@ -167,7 +159,6 @@ class CacheClear extends Command
 
         $io->text('sudo -u unit php bin/console cache:warmup');
 
-
         if(class_exists(BaksDevNginxUnitBundle::class))
         {
             $io->text('sudo service unit restart');
@@ -185,10 +176,8 @@ class CacheClear extends Command
     }
 
 
-    public function clearModule(
-        string $module
-    ): void {
-
+    public function clearModule(string $module): string
+    {
         /** Сбрасываем кеш адаптера AppCache */
         $appCache = $this->appCache->init($module);
         $appCache->clear();
@@ -201,6 +190,8 @@ class CacheClear extends Command
 
         $fileCache = new FilesystemAdapter($module);
         $fileCache->clear();
+
+        return $module;
     }
 
 }

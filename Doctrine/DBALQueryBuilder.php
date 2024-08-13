@@ -481,7 +481,18 @@ final class DBALQueryBuilder extends QueryBuilder
         $sql .= $this->getSQL();
         $sql .= ' UNION ';
         $sql .= $dbal_union->getSQL();
-        $sql .= ') SELECT * FROM recursive_table';
+        $sql .= ') SELECT * FROM recursive_table ORDER BY 
+         
+                    CASE 
+					    WHEN recursive_table.'.$parent.' IS NOT NULL 
+					    THEN recursive_table.'.$parent.'
+					    ELSE recursive_table.'.$id.'
+					    
+					END, 
+					
+					recursive_table.sort, 
+					recursive_table.'.$id.'
+        ';
 
 
         $Statement = $this->prepare($sql);
