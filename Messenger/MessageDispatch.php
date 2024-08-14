@@ -45,7 +45,6 @@ final class MessageDispatch implements MessageDispatchInterface
 
     private LoggerInterface $logger;
 
-
     public function __construct(
         private readonly MessageBusInterface $messageBus,
         private readonly AppCacheInterface $cache,
@@ -55,6 +54,12 @@ final class MessageDispatch implements MessageDispatchInterface
 
     }
 
+    /**
+     * Метод добавляет сообщение в очередь:
+     * - Если имеется воркер переданного транспорта - сообщение обрабатывается асинхронно в очереди воркера
+     * - Если воркера не найдено - сообщение обрабатываться синхронно
+     * - Если транспорт UID - наличие запущенного воркера обязательно, в противном случае сообщение не отрабатывает
+     */
     public function dispatch(object $message, array $stamps = [], string $transport = null): ?Envelope
     {
         if($transport)
@@ -75,7 +80,9 @@ final class MessageDispatch implements MessageDispatchInterface
             /* Делаем пинг на указанный транспорт */
             $isRunning = $this->isConsumer();
 
-            /** Транспорт resources всегда должен быть запущен */
+            /**
+             * Транспорт resources (для отправки файлов на CDN) всегда должен быть запущен
+             */
             if($transport === 'files-res' && $isRunning === false)
             {
                 $this->logger->critical('Messanger Транспорт files-res не найден');
@@ -92,7 +99,9 @@ final class MessageDispatch implements MessageDispatchInterface
 
             $transportRequire = $this->isUid(); // транспорт UID
 
-            /** Если транспорт не определяется и он является UID (обязательным) */
+            /**
+             * Если транспорт не определяется и он является UID (обязательным)
+             */
             if($transportRequire)
             {
                 $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport));
@@ -104,13 +113,19 @@ final class MessageDispatch implements MessageDispatchInterface
         return $this->messageBus->dispatch($message, $stamps);
     }
 
+    /**
+     * Метод присваивает транспорт сообщения
+     */
     public function transport(string $transport): self
     {
         $this->transport = $transport;
         return $this;
     }
 
-    public function isUid(): bool
+    /**
+     * Метод проверяет, является ли указанный транспорт UID
+     */
+    private function isUid(): bool
     {
         return (bool) preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $this->transport);
     }
@@ -118,7 +133,6 @@ final class MessageDispatch implements MessageDispatchInterface
     /**
      * Делаем пинг на указанный транспорт
      */
-
     public function isConsumer(?string $transport = null): bool
     {
         if(!$this->transport && !$transport)
@@ -126,13 +140,15 @@ final class MessageDispatch implements MessageDispatchInterface
             return false;
         }
 
-        $cache = $this->cache->init('core');
+        $cache = $this->cache->init('dispatch');
         $cacheConsume = $cache->getItem('consume-'.$this->transport);
 
         if($cacheConsume->isHit())
         {
             return $cacheConsume->get();
         }
+
+        /** Процесс проверки воркера указанного транспорта */
 
         $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume | grep '.$this->transport);
         $process->setTimeout(1);
@@ -141,10 +157,22 @@ final class MessageDispatch implements MessageDispatchInterface
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
         $isRunning = (!empty($result) && strripos($result, 'messenger:consume '.$this->transport.' '));
 
+        /** Кешируем результат для следующих сообщений транспорта */
+
         $cacheConsume->set($isRunning);
         $cacheConsume->expiresAfter(DateInterval::createFromDateString('5 minutes'));
         $cache->save($cacheConsume);
 
         return $isRunning;
+    }
+
+    /**
+     * При вызове диспатчера сообщения - можно передать особый модуль (отличающийся от сообщения) для сброса кеша
+     */
+    public function clearCache(string $module): void
+    {
+        /* Чистим кеш модуля (транспорта) */
+        $cache = $this->cache->init($module);
+        $cache->clear();
     }
 }
