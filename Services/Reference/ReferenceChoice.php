@@ -23,12 +23,12 @@
 
 namespace BaksDev\Core\Services\Reference;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class ReferenceChoice
 {
     public function __construct(
-        #[TaggedIterator('baks.reference.choice')]
+        #[AutowireIterator('baks.reference.choice')]
         private readonly iterable $reference
     ) {}
 

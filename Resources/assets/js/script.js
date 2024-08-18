@@ -407,6 +407,30 @@ function bindBootstrapPopover()
     return true;
 }
 
+
+/** Функция отправки формы поиска */
+executeFunc(function()
+{
+    if(typeof formDebounce !== 'function')
+    {
+        return false;
+    }
+
+    const form = document.forms.search_form;
+
+    if(typeof form === 'undefined')
+    {
+        return false;
+    }
+
+    const search = form.querySelector('#search_form_query');
+
+    search.addEventListener('input', formDebounce(() => { form.submit(); }, 700));
+
+    return true;
+});
+
+
 function modaHidden()
 {
     /* Скрываем модальное окно */

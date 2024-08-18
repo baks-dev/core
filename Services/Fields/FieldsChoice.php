@@ -24,12 +24,12 @@
 namespace BaksDev\Core\Services\Fields;
 
 use BaksDev\Core\Type\Field\InputField;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class FieldsChoice
 {
     public function __construct(
-        #[TaggedIterator('baks.fields.choice')]
+        #[AutowireIterator('baks.fields.choice')]
         private readonly iterable $fields
     ) {}
 

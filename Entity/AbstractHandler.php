@@ -86,7 +86,7 @@ abstract class AbstractHandler
 
         if(
             !$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [
-                __FILE__.':'.__LINE__,
+                self::class.':'.__LINE__,
                 'class' => $EventClass,
                 'id' => $command->getEvent(),
             ])
@@ -118,7 +118,7 @@ abstract class AbstractHandler
 
         if(
             false === $this->validatorCollection->add($this->main, context: [
-                __FILE__.':'.__LINE__,
+                self::class.':'.__LINE__,
                 'class' => $MainClass,
                 'event' => $command->getEvent(),
             ])
@@ -189,7 +189,7 @@ abstract class AbstractHandler
 
         if(
             !$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [
-                __FILE__.':'.__LINE__,
+                self::class.':'.__LINE__,
                 'class' => $EventClass,
                 'id' => $command->getEvent(),
             ])
@@ -212,7 +212,7 @@ abstract class AbstractHandler
 
         if(
             false === $this->validatorCollection->add($this->main, context: [
-                __FILE__.':'.__LINE__,
+                self::class.':'.__LINE__,
                 'class' => $MainClass,
                 'event' => $command->getEvent(),
             ])

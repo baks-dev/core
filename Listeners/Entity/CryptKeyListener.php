@@ -28,7 +28,7 @@ namespace BaksDev\Core\Listeners\Entity;
 use BaksDev\Core\Type\Crypt\CryptType;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -37,7 +37,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 final class CryptKeyListener
 {
     public function __construct(
-        #[TaggedIterator('baks.crypt.key')]
+        #[AutowireIterator('baks.crypt.key')]
         private readonly iterable $crypt
     ) {}
 

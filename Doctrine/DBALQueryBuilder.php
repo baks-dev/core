@@ -240,7 +240,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         if(empty($result))
         {
-            return null;
+            return false;
         }
 
         return $method ? (new $class())->{$method}(...$result) : new $class(...$result);
@@ -427,12 +427,12 @@ final class DBALQueryBuilder extends QueryBuilder
         //$this->recursive = new QueryBuilder($this->connection);
         $this->recursive_alias = $alias;
 
-//        $this->recursive = sprintf(
-//            ' INNER JOIN %s %s ON %s ',
-//            $this->table($join),
-//            $alias,
-//            $condition
-//        );
+        //        $this->recursive = sprintf(
+        //            ' INNER JOIN %s %s ON %s ',
+        //            $this->table($join),
+        //            $alias,
+        //            $condition
+        //        );
 
         $this->join(
             $fromAlias,
@@ -453,11 +453,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function findAllRecursive(array $condition)
     {
-//        if($this->recursive === null)
-//        {
-//            throw new \InvalidArgumentException('Метод рекурсивного запроса не определен');
-//        }
-
         $parent = key($condition);
         $id = current($condition);
 

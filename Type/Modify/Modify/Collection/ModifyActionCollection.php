@@ -25,12 +25,12 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Type\Modify\Modify\Collection;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class ModifyActionCollection
 {
     public function __construct(
-        #[TaggedIterator('baks.modify.action', defaultPriorityMethod: 'sort')]
+        #[AutowireIterator('baks.modify.action', defaultPriorityMethod: 'sort')]
         private iterable $modify
     ) {}
 

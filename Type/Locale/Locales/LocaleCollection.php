@@ -26,12 +26,12 @@ declare(strict_types=1);
 namespace BaksDev\Core\Type\Locale\Locales;
 
 use BaksDev\Core\Type\Locale\Locale;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class LocaleCollection
 {
     public function __construct(
-        #[TaggedIterator('baks.locale', defaultPriorityMethod: 'sort')]
+        #[AutowireIterator('baks.locale', defaultPriorityMethod: 'sort')]
         private iterable $locales
     ) {}
 

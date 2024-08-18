@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Schedule;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
@@ -35,7 +35,7 @@ use Symfony\Component\Scheduler\ScheduleProviderInterface;
 final readonly class ScheduleHandler implements ScheduleProviderInterface
 {
     public function __construct(
-        #[TaggedIterator('baks.schedule')]
+        #[AutowireIterator('baks.schedule')]
         private iterable $schedule
     ) {}
 

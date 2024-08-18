@@ -26,12 +26,12 @@ declare(strict_types=1);
 namespace BaksDev\Core\Type\UserAgent\Agent\Collection;
 
 use BaksDev\Core\Type\UserAgent\UserAgent;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class UserAgentCollection
 {
     public function __construct(
-        #[TaggedIterator('baks.useragent')]
+        #[AutowireIterator('baks.useragent')]
         private iterable $userAgent
     ) {}
 

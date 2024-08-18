@@ -44,7 +44,7 @@
                 </svg>
             </button>
 
-            <form action="{{ path(query.path, params) }}">
+            <form action="{{ path(query.path, params) }}" method="get">
                 <label>
                     <select id="select-pagination"
                             name="limit"

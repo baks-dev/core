@@ -28,7 +28,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 #[AsCommand(
     name: 'baks:project:upgrade:all',
@@ -39,7 +39,7 @@ class ProjectUpdateCommand extends Command
     private iterable $upgrades;
 
     public function __construct(
-        #[TaggedIterator('baks.project.upgrade', defaultPriorityMethod: 'priority')] iterable $upgrades
+        #[AutowireIterator('baks.project.upgrade', defaultPriorityMethod: 'priority')] iterable $upgrades
     )
     {
         parent::__construct();

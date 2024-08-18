@@ -74,7 +74,6 @@ final class Paginator implements PaginatorInterface
 
         $this->session = $this->request->hasPreviousSession() ? $this->request->getSession() : null;
 
-
         /** Получаем limit */
 
         if($this->request->query->getInt('limit'))

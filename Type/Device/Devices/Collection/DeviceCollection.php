@@ -27,12 +27,12 @@ namespace BaksDev\Core\Type\Device\Devices\Collection;
 
 use BaksDev\Core\Type\Device\Device;
 use BaksDev\Core\Type\Language\Language;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class DeviceCollection
 {
     public function __construct(
-        #[TaggedIterator('baks.device')]
+        #[AutowireIterator('baks.device')]
         private readonly iterable $device
     ) {}
 
