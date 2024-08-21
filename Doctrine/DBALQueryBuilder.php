@@ -234,6 +234,18 @@ final class DBALQueryBuilder extends QueryBuilder
         }
     }
 
+    public function fetchAllIndexHydrate(string $class): array|false
+    {
+        $result = $this->executeDBALQuery()->fetchAllAssociativeIndexed();
+
+        foreach($result as $key => $item)
+        {
+            $result[$key] = new $class(...$item);
+        }
+
+        return $result ?: false;
+    }
+
     public function fetchHydrate(string $class, ?string $method = null): mixed
     {
         $result = $this->executeDBALQuery()->fetchAssociative();

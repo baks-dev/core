@@ -168,11 +168,14 @@ final class MessageDispatch implements MessageDispatchInterface
 
     /**
      * При вызове диспатчера сообщения - можно передать особый модуль (отличающийся от сообщения) для сброса кеша
+     * addClearCacheOther
      */
-    public function clearCache(string $module): void
+    public function addClearCacheOther(string $module): self
     {
         /* Чистим кеш модуля (транспорта) */
         $cache = $this->cache->init($module);
         $cache->clear();
+
+        return $this;
     }
 }

@@ -31,4 +31,6 @@ interface MessageDispatchInterface
 
     public function isConsumer(?string $transport = null): bool;
 
+    /** Метод сбрасывает кеш указанного модуля */
+    public function addClearCacheOther(string $module): self;
 }
