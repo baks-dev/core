@@ -210,9 +210,10 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
         $this->deleteCacheQueries(); // Удаляем
-        $this->executeCacheQuery(); // Сохраняем
-
         return true;
+
+        //$this->executeCacheQuery(); // Сохраняем
+        //return true;
     }
 
 
@@ -535,10 +536,16 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function allGroupByExclude(string|array $exclude = null): void
     {
+
         $array = [
             "MIN", "MAX", "COUNT", "SUM",
-            "JSON_AGG", "ARRAY_AGG", "STRING_AGG",
-            "EXISTS", "FALSE", "TRUE", "COALESCE"
+
+            "JSON_AGG",
+            "ARRAY_AGG",
+            "STRING_AGG",
+
+            "EXISTS", "FALSE", "TRUE",
+            //"COALESCE"
         ];
 
         $addGroupBy = null;
@@ -552,6 +559,25 @@ final class DBALQueryBuilder extends QueryBuilder
                     continue 2;
                 }
             }
+
+
+            preg_match_all('/\b(\w+\.\w+)\b/', $field, $matches);
+            $result = $matches[1];
+
+            foreach($result as $r)
+            {
+                //                if(stripos('exist_move_event', $r) !== false)
+                //                {
+                //                    continue;
+                //                }
+
+                $addGroupBy[] = $r;
+                //dump($r);
+            }
+
+
+            continue;
+
 
             $field = str_replace(array(PHP_EOL, "\t"), ' ', $field);
             $field = trim($field);
@@ -652,6 +678,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $addGroupBy[] = $field;
             //$this->addGroupBy($field);
         }
+
 
         if($addGroupBy)
         {

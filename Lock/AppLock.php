@@ -41,21 +41,18 @@ final class AppLock implements AppLockInterface
 
 
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string $project_dir,
+        #[Autowire('%kernel.project_dir%')] private readonly string $project_dir,
     ) {}
 
     /**
      * Метод включает блокировку ресурса
      */
-    public function createLock(string|array $key): self
+    public function createLock(string|array $keys): self
     {
-        if(is_array($key))
-        {
-            $key = md5(implode('', $key));
-        }
 
-        $this->key = $key;
+        $key = is_array($keys) ? implode('.', $keys) : $keys;
+
+        $this->key = md5($key.'lock');
 
         $FlockStore = new FlockStore($this->project_dir.'/var/stores');
         $this->factory = new LockFactory($FlockStore);

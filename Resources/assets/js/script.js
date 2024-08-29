@@ -438,9 +438,9 @@ function modaHidden()
     bootstrap.Modal.getInstance(ModalElement).hide();
 }
 
-
+'[data-bs-toggle="popover"]'
 /* вешаем события на модальные ссылки */
-document.querySelectorAll('.modal-link')
+document.querySelectorAll('[data-bs-toggle="modal"]')
     .forEach(function(item, i, arr)
     {
         modalLink(item);
@@ -491,6 +491,7 @@ async function offcanvasLink(offcanvas)
         .then((data) =>
         {
 
+
             if(data)
             {
 
@@ -504,9 +505,23 @@ async function offcanvasLink(offcanvas)
 
 
                 var myOffcanvas = document.getElementById('offcanvas');
-                var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
 
-                //console.log(myOffcanvas);
+               if(myOffcanvas === null)
+               {
+                   console.log('Элемент с идентификатором id="offcanvas" не найден');
+
+                   /**
+                    <div class="offcanvas offcanvas-start"
+                        tabindex="-1"
+                        id="offcanvas"
+                        style="--bs-offcanvas-width: 800px;">
+                    </div>
+                    */
+
+                   return;
+               }
+
+                var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
 
 
                 myOffcanvas.innerHTML = data;
@@ -537,6 +552,8 @@ function modalLink(item)
 
     item.addEventListener('click', function(event)
     {
+        /** Показываем прелоад модального окна */
+        document.querySelector('#modal .spinner-border').classList.remove('d-none');
 
         /* Отключаем дефолтный переход по ссылке */
         event.preventDefault();
@@ -594,14 +611,10 @@ function modalLink(item)
                 });
 
 
-                /* Если в модальном окне присутствует select2 */
-                modal.querySelectorAll('.modal-link').forEach(function(item, i, arr)
+                /* Если в модальном окне присутствуют модальные ссылки */
+                modal.querySelectorAll('[data-bs-toggle="modal"]').forEach(function(item, i, arr)
                 {
                     modalLink(item);
-
-                    //modalToggle = document.getElementById('modal');
-                    //bootstrap.Modal.getInstance(modalToggle).show();
-
                 });
 
 
@@ -1355,6 +1368,70 @@ function formDebounce(func, delay)
         timeoutId = setTimeout(() => func.apply(this, args), delay);
         idFormDebounce = timeoutId;
     };
+}
+
+
+function disabledElementsForm(ChangeForm)
+{
+    /* Имя формы */
+    //const ChangeForm = document.forms.new_order_form;
+
+    Array.from(ChangeForm.elements).forEach((input) =>
+    {
+        if(input.disabled)
+        {
+            return;
+        }
+
+        if(input.tagName === 'SELECT')
+        {
+            input.classList.add('disabled');
+            document.getElementById(input.id + '_select2')?.classList.add('disabled');
+        }
+
+        if(input.tagName === 'BUTTON')
+        {
+            /** Блокируем submit */
+            input.classList.add('disabled');
+            input.querySelector('.spinner-border')?.classList.remove('d-none');
+        }
+
+    });
+}
+
+function enableElementsForm(ChangeForm)
+{
+
+    /* Имя формы */
+    //const ChangeForm = document.forms.new_order_form;
+
+    Array.from(ChangeForm.elements).forEach((input) =>
+    {
+        if(input.disabled)
+        {
+            return;
+        }
+
+
+
+        if(input.tagName === 'SELECT')
+        {
+            input.classList.remove('disabled');
+            document.getElementById(input.id + '_select2')?.classList.remove('disabled');
+        }
+
+        if(input.tagName === 'BUTTON')
+        {
+            /** Блокируем submit */
+            input.classList.remove('disabled');
+            input.querySelector('.spinner-border')?.classList.add('d-none');
+        }
+
+
+
+        //console.log(input.tagName);
+    });
+
 }
 
 

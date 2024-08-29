@@ -37,6 +37,7 @@ interface DeduplicatorInterface
      *
      *<code>
      *  $Deduplicator = $this->deduplicator
+     *      ->namespace('module-name')
      *      ->deduplication([$key1, $key2]);
      *
      *  if($Deduplicator->isExecuted())

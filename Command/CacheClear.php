@@ -75,7 +75,7 @@ class CacheClear extends Command
         if($module === 'template' || $module === 'twig')
         {
             // Кеш шаблонов сбрасываем только в PROD
-            $origin = $path.implode(DIRECTORY_SEPARATOR, ['prod', 'twig']);
+            $origin = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', 'prod', 'twig']);
 
             if(is_dir($origin))
             {
@@ -86,7 +86,7 @@ class CacheClear extends Command
                     $this->filesystem->rename($origin, $target);
                     $this->filesystem->remove($target);
                     opcache_reset();
-                }, 'throw');
+                });
             }
 
 

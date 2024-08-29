@@ -54,7 +54,7 @@ final class Deduplicator implements DeduplicatorInterface
     ) {
 
         /* Время жизни дедубликации по умолчанию 1 неделя */
-        $this->expires = DateInterval::createFromDateString(Kernel::isTestEnvironment() ? '1 seconds' : '1 weeks');
+        $this->expires = DateInterval::createFromDateString(Kernel::isTestEnvironment() ? '1 seconds' : '30 days');
     }
 
     /**
@@ -90,11 +90,11 @@ final class Deduplicator implements DeduplicatorInterface
         }
 
         /* блокируем одновременное выполнение скрипта (по умолчанию 1 мин) */
-        $this->lock = $this->appLock->createLock($this->namespace);
+        $this->lock = $this->appLock->createLock($key);
         $this->lock->wait();
 
         /* получаем из кеша результат */
-        $this->cache = $this->appCache->init($this->namespace);
+        $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
         $this->item = $this->cache->getItem($key);
 
         $this->init = true;
@@ -120,7 +120,7 @@ final class Deduplicator implements DeduplicatorInterface
             throw new \InvalidArgumentException('Invalid Argument: call method deduplication');
         }
 
-        if($this->item->isHit() && $this->item->get() === true)
+        if($this->item->isHit() && $this->item->get() === 'executed')
         {
             $this->lock->release();
             return true;
@@ -140,7 +140,7 @@ final class Deduplicator implements DeduplicatorInterface
         }
 
         /* Сохраняем ключ дедубликации */
-        $this->item->set(true);
+        $this->item->set('executed');
         $this->item->expiresAfter($this->expires);
         $this->cache->save($this->item);
 
