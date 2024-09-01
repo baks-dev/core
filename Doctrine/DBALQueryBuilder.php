@@ -299,7 +299,7 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $result = $this->executeDBALQuery()->fetchOne();
 
-        return $result ?: null;
+        return $result ?: false;
     }
 
     public function fetchExist($not = false): bool

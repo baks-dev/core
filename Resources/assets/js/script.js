@@ -278,6 +278,11 @@ executeFunc(bindBootstrapTab);
 
 function bindBootstrapTab()
 {
+    if(typeof bootstrap !== 'object')
+    {
+        return false;
+    }
+
     const triggerTabList = document.querySelectorAll('.nav-mouse li')
 
     triggerTabList.forEach(triggerEl =>
@@ -409,7 +414,7 @@ function bindBootstrapPopover()
 
 
 /** Функция отправки формы поиска */
-executeFunc(function()
+executeFunc(function uQnFyjnB()
 {
     if(typeof formDebounce !== 'function')
     {
@@ -420,12 +425,17 @@ executeFunc(function()
 
     if(typeof form === 'undefined')
     {
-        return false;
+        return true;
+    }
+
+    if(form.action.includes('search'))
+    {
+        return true;
     }
 
     const search = form.querySelector('#search_form_query');
 
-    search.addEventListener('input', formDebounce(() => { form.submit(); }, 700));
+    search.addEventListener('input', formDebounce(() => { form.submit(); }, 1500));
 
     return true;
 });
@@ -506,20 +516,20 @@ async function offcanvasLink(offcanvas)
 
                 var myOffcanvas = document.getElementById('offcanvas');
 
-               if(myOffcanvas === null)
-               {
-                   console.log('Элемент с идентификатором id="offcanvas" не найден');
+                if(myOffcanvas === null)
+                {
+                    console.log('Элемент с идентификатором id="offcanvas" не найден');
 
-                   /**
-                    <div class="offcanvas offcanvas-start"
-                        tabindex="-1"
-                        id="offcanvas"
-                        style="--bs-offcanvas-width: 800px;">
-                    </div>
-                    */
+                    /**
+                     <div class="offcanvas offcanvas-start"
+                     tabindex="-1"
+                     id="offcanvas"
+                     style="--bs-offcanvas-width: 800px;">
+                     </div>
+                     */
 
-                   return;
-               }
+                    return;
+                }
 
                 var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
 
@@ -553,7 +563,9 @@ function modalLink(item)
     item.addEventListener('click', function(event)
     {
         /** Показываем прелоад модального окна */
-        document.querySelector('#modal .spinner-border').classList.remove('d-none');
+        document.querySelector('#modal .spinner-border')
+            ?.classList
+            .remove('d-none');
 
         /* Отключаем дефолтный переход по ссылке */
         event.preventDefault();
@@ -723,29 +735,24 @@ async function submitModalForm(forms)
 
         .then((response) =>
         {
-
             closeProgress();
             btn.type = 'submit';
 
             const contentType = response.headers.get('content-type');
 
+            /* Закрываем модальное окно */
+            const modalElement = document.getElementById('modal');
+            bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+
             if(!contentType || !contentType.includes('application/json'))
             {
-
                 $errorFormHandler = '{ "type":"danger" , ' +
                     '"header":"Ошибка"  , ' +
                     '"message" : "Возникла ошибка при заполнении" }';
 
                 createToast(JSON.parse($errorFormHandler));
-
-
                 throw new TypeError("Oops, we haven't got JSON!");
             }
-
-            /* Закрываем модальное окно */
-            let myModalEl = document.querySelector('#modal')
-            let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-            modal.hide();
 
             return response.json();
 
@@ -832,8 +839,8 @@ async function submitLink(href, id = null)
 
         .then((response) =>
         {
-
             const contentType = response.headers.get('content-type');
+
             if(!contentType || !contentType.includes('application/json'))
             {
 
@@ -847,6 +854,7 @@ async function submitLink(href, id = null)
             }
 
             return response.json();
+
         })
 
         .then((data) =>
@@ -854,13 +862,11 @@ async function submitLink(href, id = null)
 
             if(data === undefined)
             {
-
                 return false;
             }
 
             if(data.status === 302)
             {
-
                 if(data.redirect == undefined)
                 {
                     window.location.href = '/refresh';
@@ -871,27 +877,14 @@ async function submitLink(href, id = null)
                 return false;
             }
 
-            setTimeout(function HunLIOPGlZ()
+            executeFunc(function HunLIOPGlZ()
             {
-
-                console.log(typeof resolve);
-
                 if(typeof resolve == 'function')
                 {
                     resolve(data);
-                    return;
+                    return true;
                 }
-
-                console.log('resolve not found');
-
-                if(resolved > 1000)
-                {
-                    return;
-                }
-                resolved = resolved * 2;
-                setTimeout(HunLIOPGlZ, resolved);
-
-            }, 100);
+            });
 
 
             createToast(data);
@@ -905,8 +898,6 @@ async function submitLink(href, id = null)
             {
                 success(id);
             }
-
-
         });
 
 
@@ -1413,7 +1404,6 @@ function enableElementsForm(ChangeForm)
         }
 
 
-
         if(input.tagName === 'SELECT')
         {
             input.classList.remove('disabled');
@@ -1426,7 +1416,6 @@ function enableElementsForm(ChangeForm)
             input.classList.remove('disabled');
             input.querySelector('.spinner-border')?.classList.add('d-none');
         }
-
 
 
         //console.log(input.tagName);

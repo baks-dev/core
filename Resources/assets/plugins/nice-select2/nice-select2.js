@@ -472,11 +472,14 @@ NiceSelect.prototype._onClicked = function(e)
         t = this.dropdown.querySelector(".selected");
         addClass(t, "focus");
 
-        t?.scrollIntoView({
-            block: "start", // Вертикальное выравнивание
-            inline: "start", // Горизонтальное выравнивание
-            behavior: "smooth" // Анимация прокрутки
-        });
+        var list = this.dropdown.querySelector('.nice-select-dropdown .list');
+
+        if(t && list)
+        {
+            const targetPosition = t.offsetTop;
+            const parentScrollTop = list.scrollTop;
+            parent.scrollTop = targetPosition - parentScrollTop;
+        }
 
         this.dropdown.querySelectorAll("ul li").forEach(function(item)
         {
