@@ -95,6 +95,8 @@ class CacheClear extends Command
         }
 
 
+        $unknown = true;
+
         /**
          * Сбрасываем кеш модулей
          * @var DirectoryIterator $moduleDir
@@ -114,6 +116,8 @@ class CacheClear extends Command
                     continue;
                 }
 
+                $unknown = false;
+
                 $result = $this->clearModule($moduleDir->getFilename());
                 $io->text(sprintf('Сбросили кеш модуля %s', $result));
             }
@@ -121,6 +125,13 @@ class CacheClear extends Command
 
         if(!empty($module))
         {
+            if($unknown)
+            {
+                /** Сбрасываем кеш c namespace */
+                $result = $this->clearModule($module);
+                $io->text(sprintf('Сбросили кеш c namespace %s', $result));
+            }
+
             $io->success('Кеш модулей успешно удален');
             return Command::SUCCESS;
         }
