@@ -60,9 +60,10 @@ final class Deduplicator implements DeduplicatorInterface
     /**
      * Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя)
      */
-    public function expiresAfter(DateInterval $time): void
+    public function expiresAfter(DateInterval $time): self
     {
         $this->expires = $time;
+        return $this;
     }
 
     /**

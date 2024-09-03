@@ -28,7 +28,7 @@ use DateInterval;
 interface DeduplicatorInterface
 {
     /** Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя) */
-    public function expiresAfter(DateInterval $time): void;
+    public function expiresAfter(DateInterval $time): self;
 
     /** Метод присваивает пространство имен для дедубликации */
     public function namespace(string $namespace): self;
