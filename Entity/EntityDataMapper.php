@@ -198,6 +198,10 @@ abstract class EntityDataMapper
     }
 
 
+    /**
+     * Мотод обновляет одноименные свойства сущности из DTO при выполнении условий:
+     * 1. DTO должна иметь геттер одноименного свойтсва свойства
+     */
     public function setEntity($dto): mixed
     {
 
@@ -239,6 +243,10 @@ abstract class EntityDataMapper
 
             $entityReflectionPropertyByName = new ReflectionProperty($this, $propertyName);
 
+
+
+            /** Если нужно выполнить преобразование значения свойства DTO -  */
+
             // Для обновления свойства сущности значением из DTO - должен быть объявлен геттер
             $propertyMethodName = ucfirst($property->getName());
             $getDtoMethod = 'get'.$propertyMethodName;
@@ -248,6 +256,9 @@ abstract class EntityDataMapper
                 // Вызываем геттер, в случае если в геттере что-либо вызывается логика
                 $dto->{$getDtoMethod}();
             }
+
+
+
 
             $type = null;
 
@@ -509,8 +520,7 @@ abstract class EntityDataMapper
                     $entityReflectionPropertyByName->isReadOnly() && $entityReflectionPropertyByName->isInitialized(
                         $this
                     )
-                )
-                {
+                ) {
                     continue;
                 }
 
@@ -600,8 +610,7 @@ abstract class EntityDataMapper
             // Если свойство является коллекцией
             if(
                 interface_exists($instanceClassCollection) && $instanceClassCollection === Collection::class
-            )
-            {
+            ) {
                 $newColl = new ArrayCollection();
 
                 $cloneCollection = $this->getPropertyValue($propertyName, $clone);
@@ -727,7 +736,7 @@ abstract class EntityDataMapper
             return 'not_initialized';
         }
 
-        $getPropertyEntity = Closure::bind(static function($object, $property) {
+        $getPropertyEntity = Closure::bind(static function ($object, $property) {
             return $object->{$property};
         }, null, $object);
 
@@ -760,7 +769,7 @@ abstract class EntityDataMapper
             return;
         }
 
-        $setPropertyDto = Closure::bind(static function(object $object, string $property, mixed $value) {
+        $setPropertyDto = Closure::bind(static function (object $object, string $property, mixed $value) {
             return $object->{$property} = $value;
         }, null, $object);
 

@@ -20,81 +20,121 @@
  *  THE SOFTWARE.
  */
 
-let ClassicEditorRepeat = 100;
+//let ClassicEditorRepeat = 100;
+//
+//setTimeout(function wMxQwLKwnn()
+//{
+//
+//
+//    if(typeof ClassicEditor === 'function')
+//    {
+//        document.querySelectorAll('.ckeditor').forEach((ckeditor) =>
+//        {
+//
+//            ClassicEditor
+//                .create(ckeditor, {
+//                    extraPlugins: [MyCustomUploadAdapterPlugin],
+//                })
+//                .then(editor =>
+//                {
+//                    /*console.log(editor);*/
+//                })
+//                .catch(error =>
+//                {
+//                    console.error(error);
+//                });
+//        });
+//
+//        return;
+//    }
+//
+//    if(ClassicEditorRepeat > 500)
+//    {
+//        return;
+//    }
+//
+//    ClassicEditorRepeat += 100;
+//
+//    setTimeout(wMxQwLKwnn, ClassicEditorRepeat);
+//
+//}, 100);
 
-setTimeout(function wMxQwLKwnn() {
 
-
-    if (typeof ClassicEditor === 'function')
+executeFunc(function initClassicEditor()
+{
+    if(typeof ClassicEditor !== 'function')
     {
-        document.querySelectorAll('.ckeditor').forEach((ckeditor) => {
-
-            ClassicEditor
-                .create(ckeditor, {
-                    extraPlugins: [ MyCustomUploadAdapterPlugin ],
-                })
-                .then(editor => {
-                    /*console.log(editor);*/
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        });
-
-        return;
+        return false;
     }
 
-    if (ClassicEditorRepeat > 500)
+    document.querySelectorAll('.ckeditor').forEach((ckeditor) =>
     {
-        return;
-    }
 
-    ClassicEditorRepeat += 100;
+        ClassicEditor
+            .create(ckeditor, {
+                extraPlugins: [MyCustomUploadAdapterPlugin],
+            })
+            .then(editor =>
+            {
+                /*console.log(editor);*/
+            })
+            .catch(error =>
+            {
+                console.error(error);
+            });
+    });
 
-    setTimeout(wMxQwLKwnn, ClassicEditorRepeat);
-
-}, 100);
-
+    return true;
+})
 
 
-class BaksUploadAdapter {
-    constructor( loader ) {
+BaksUploadAdapter = class BaksUploadAdapter
+{
+    constructor(loader)
+    {
         // Экземпляр загрузчика файлов, который будет использоваться во время загрузки.
         this.loader = loader;
     }
 
     // Запускает процесс загрузки.
-    upload() {
+    upload()
+    {
         return this.loader.file
-            .then( file => new Promise( ( resolve, reject ) => {
+            .then(file => new Promise((resolve, reject) =>
+            {
                 this._initRequest();
-                this._initListeners( resolve, reject, file );
-                this._sendRequest( file );
-            } ) );
+                this._initListeners(resolve, reject, file);
+                this._sendRequest(file);
+            }));
     }
 
     // Прерывает процесс загрузки.
-    abort() {
-        if ( this.xhr ) {
+    abort()
+    {
+        if(this.xhr)
+        {
             this.xhr.abort();
         }
     }
 
-    _initRequest() {
+    _initRequest()
+    {
         const xhr = this.xhr = new XMLHttpRequest();
-        xhr.open( 'POST', '/file/upload/image', true );
+        xhr.open('POST', '/file/upload/image', true);
         xhr.responseType = 'json';
     }
 
 
-    _initListeners( resolve, reject, file ) {
+    _initListeners(resolve, reject, file)
+    {
         const xhr = this.xhr;
         const loader = this.loader;
-        const genericErrorText = `Couldn't upload file: ${ file.name }.`;
+        const genericErrorText = `Couldn't upload file: ${file.name}.`;
 
-        xhr.addEventListener( 'error', () => reject( genericErrorText ) );
-        xhr.addEventListener( 'abort', () => reject() );
-        xhr.addEventListener( 'load', () => {
+        xhr.addEventListener('error', () => reject(genericErrorText));
+        xhr.addEventListener('abort', () => reject());
+        xhr.addEventListener('load', () =>
+        {
             const response = xhr.response;
 
             // This example assumes the XHR server's "response" object will come with
@@ -103,38 +143,41 @@ class BaksUploadAdapter {
             //
             // Your integration may handle upload errors in a different way so make sure
             // it is done properly. The reject() function must be called when the upload fails.
-            if ( !response || response.error ) {
-                return reject( response && response.error ? response.error.message : genericErrorText );
+            if(!response || response.error)
+            {
+                return reject(response && response.error ? response.error.message : genericErrorText);
             }
 
             // Если загрузка прошла успешно, разрешите обещание загрузки с помощью объекта, содержащего
             // по крайней мере, URL-адрес «по умолчанию», указывающий на изображение на сервере.
             // Этот URL-адрес будет использоваться для отображения изображения в контенте. Узнайте больше в
             // UploadAdapter#загрузить документацию.
-            resolve( {
-                default: response.url
-            } );
-        } );
+            resolve({ default: response.url });
+        });
 
         // Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
         // properties which are used e.g. to display the upload progress bar in the editor
         // user interface.
-        if ( xhr.upload ) {
-            xhr.upload.addEventListener( 'progress', evt => {
-                if ( evt.lengthComputable ) {
+        if(xhr.upload)
+        {
+            xhr.upload.addEventListener('progress', evt =>
+            {
+                if(evt.lengthComputable)
+                {
                     loader.uploadTotal = evt.total;
                     loader.uploaded = evt.loaded;
                 }
-            } );
+            });
         }
     }
 
 
-    _sendRequest(file){
+    _sendRequest(file)
+    {
         // Prepare the form data.
         const data = new FormData();
 
-        data.append( 'file', file );
+        data.append('file', file);
 
         // Важное примечание: это подходящее место для реализации механизмов безопасности.
         // как аутентификация и защита CSRF. Например, вы можете использовать
@@ -142,13 +185,15 @@ class BaksUploadAdapter {
         // токен CSRF, сгенерированный ранее вашим приложением.
 
         // Send the request.
-        this.xhr.send( data );
+        this.xhr.send(data);
     }
 }
 
 
-function MyCustomUploadAdapterPlugin( editor ) {
-    editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
+function MyCustomUploadAdapterPlugin(editor)
+{
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) =>
+    {
         // Configure the URL to the upload script in your back-end here!
         return new BaksUploadAdapter(loader);
     };

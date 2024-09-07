@@ -224,6 +224,13 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result ?: [];
     }
 
+    public function fetchAllGenerator(): Generator|false
+    {
+        $result = $this->executeDBALQuery()->iterateAssociative();
+
+        return $result->valid() ? $result : false;
+    }
+
 
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
