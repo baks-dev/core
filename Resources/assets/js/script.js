@@ -356,8 +356,7 @@ function bindBootstrapPopover()
 
 
         const pops = new bootstrap.Popover(popoverTriggerEl, {
-            html: true,
-            sanitize: false,
+            html: true, sanitize: false,
 
             content: function()
             {
@@ -480,8 +479,7 @@ async function offcanvasLink(offcanvas)
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
-        },
-        redirect: 'follow', // manual, *follow, error
+        }, redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
         //body: data // body data type must match "Content-Type" header
     })
@@ -705,6 +703,15 @@ function modalLink(item)
 async function submitModalForm(forms)
 {
 
+    /** Если в модальном окне присутствует ckeditor - обновляем элементы перд отправкой */
+    if(typeof ClassicEditor === 'function')
+    {
+        for(editors in ckeditors)
+        {
+            ckeditors[editors].updateSourceElement();
+        }
+    }
+
     const data = new FormData(forms);
     let resolved = 100;
 
@@ -727,8 +734,7 @@ async function submitModalForm(forms)
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
-        },
-        redirect: 'follow', // manual, *follow, error
+        }, redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
         body: data // body data type must match "Content-Type" header
     })
@@ -746,9 +752,7 @@ async function submitModalForm(forms)
 
             if(!contentType || !contentType.includes('application/json'))
             {
-                $errorFormHandler = '{ "type":"danger" , ' +
-                    '"header":"Ошибка"  , ' +
-                    '"message" : "Возникла ошибка при заполнении" }';
+                $errorFormHandler = '{ "type":"danger" , ' + '"header":"Ошибка"  , ' + '"message" : "Возникла ошибка при заполнении" }';
 
                 createToast(JSON.parse($errorFormHandler));
                 throw new TypeError("Oops, we haven't got JSON!");
@@ -831,8 +835,7 @@ async function submitLink(href, id = null)
         credentials: 'same-origin', // include, *same-origin, omit
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
-        },
-        redirect: 'follow', // manual, *follow, error
+        }, redirect: 'follow', // manual, *follow, error
         referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
 
     })
@@ -844,9 +847,7 @@ async function submitLink(href, id = null)
             if(!contentType || !contentType.includes('application/json'))
             {
 
-                $errorFormHandler = '{ "type":"danger" , ' +
-                    '"header":"Ошибка"  , ' +
-                    '"message" : "Возникла ошибка при заполнении" }';
+                $errorFormHandler = '{ "type":"danger" , ' + '"header":"Ошибка"  , ' + '"message" : "Возникла ошибка при заполнении" }';
 
                 createToast(JSON.parse($errorFormHandler));
 
@@ -1006,8 +1007,7 @@ function backToTop()
     const scrollingElement = (document.scrollingElement || document.body);
 
     window.scrollBy({
-        top: (scrollingElement.scrollTop * -1),
-        behavior: 'smooth'
+        top: (scrollingElement.scrollTop * -1), behavior: 'smooth'
     });
 
     return false;
@@ -1020,8 +1020,7 @@ function backToEnd()
 {
     const scrollingElement = (document.scrollingElement || document.body);
     window.scrollBy({
-        top: scrollingElement.scrollHeight,
-        behavior: 'smooth'
+        top: scrollingElement.scrollHeight, behavior: 'smooth'
     });
 }
 
@@ -1032,10 +1031,7 @@ function scrollFunction()
 
     backButtonTop.style.display = "none";
 
-    if(
-        document.body.scrollTop > 60 ||
-        document.documentElement.scrollTop > 60
-    )
+    if(document.body.scrollTop > 60 || document.documentElement.scrollTop > 60)
     {
         backButtonTop.style.display = "block";
     }
@@ -1165,9 +1161,7 @@ function bindSpinner(indicator)
 
                     if($placeholderText)
                     {
-                        $errorFormHandler = '{ "type":"danger" , ' +
-                            '"header":"Ошибка заполнения"   , ' +
-                            '"message" : "' + $placeholderText + '"}';
+                        $errorFormHandler = '{ "type":"danger" , ' + '"header":"Ошибка заполнения"   , ' + '"message" : "' + $placeholderText + '"}';
 
                         if($errorFormHandler !== false)
                         {

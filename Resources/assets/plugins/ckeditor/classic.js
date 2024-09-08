@@ -20,45 +20,7 @@
  *  THE SOFTWARE.
  */
 
-//let ClassicEditorRepeat = 100;
-//
-//setTimeout(function wMxQwLKwnn()
-//{
-//
-//
-//    if(typeof ClassicEditor === 'function')
-//    {
-//        document.querySelectorAll('.ckeditor').forEach((ckeditor) =>
-//        {
-//
-//            ClassicEditor
-//                .create(ckeditor, {
-//                    extraPlugins: [MyCustomUploadAdapterPlugin],
-//                })
-//                .then(editor =>
-//                {
-//                    /*console.log(editor);*/
-//                })
-//                .catch(error =>
-//                {
-//                    console.error(error);
-//                });
-//        });
-//
-//        return;
-//    }
-//
-//    if(ClassicEditorRepeat > 500)
-//    {
-//        return;
-//    }
-//
-//    ClassicEditorRepeat += 100;
-//
-//    setTimeout(wMxQwLKwnn, ClassicEditorRepeat);
-//
-//}, 100);
-
+ckeditors = {};
 
 executeFunc(function initClassicEditor()
 {
@@ -73,10 +35,11 @@ executeFunc(function initClassicEditor()
         ClassicEditor
             .create(ckeditor, {
                 extraPlugins: [MyCustomUploadAdapterPlugin],
+                autoUpdateElement: true
             })
             .then(editor =>
             {
-                /*console.log(editor);*/
+                ckeditors[editor.id] = editor;
             })
             .catch(error =>
             {
@@ -152,7 +115,7 @@ BaksUploadAdapter = class BaksUploadAdapter
             // по крайней мере, URL-адрес «по умолчанию», указывающий на изображение на сервере.
             // Этот URL-адрес будет использоваться для отображения изображения в контенте. Узнайте больше в
             // UploadAdapter#загрузить документацию.
-            resolve({ default: response.url });
+            resolve({default: response.url});
         });
 
         // Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
