@@ -702,7 +702,6 @@ function modalLink(item)
 /** Отправка модального окна */
 async function submitModalForm(forms)
 {
-
     /** Если в модальном окне присутствует ckeditor - обновляем элементы перд отправкой */
     if(typeof ClassicEditor === 'function')
     {
