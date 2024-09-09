@@ -35,6 +35,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -55,26 +56,26 @@ class CacheClear extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('module', InputArgument::OPTIONAL, 'Модуль');
+        $this->addOption('module', 'm', InputOption::VALUE_OPTIONAL, 'Очистить модуль с вхождением ((--module=... || -m ...))');
+        $this->addOption('exclude', 'ex', InputOption::VALUE_OPTIONAL, 'Исключить из очистки модуль ((--exclude=... || -ex ...))');
     }
 
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output
-    ): int {
-
-        $module = $input->getArgument('module');
-
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'vendor', 'baks-dev', null]);
 
         $io = new SymfonyStyle($input, $output);
+
+
+        $module = $input->getOption('module');
+        $exclude = $input->getOption('exclude');
 
         /**
          * Сбрасываем только кеш шаблонов
          */
         if($module === 'template' || $module === 'twig')
         {
-            // Кеш шаблонов сбрасываем только в PROD
+            // Кеш шаблонов сбрасываем только в PROD окружении
             $origin = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', 'prod', 'twig']);
 
             if(is_dir($origin))
@@ -110,6 +111,13 @@ class CacheClear extends Command
 
             if($moduleDir->isDir())
             {
+
+                if(isset($exclude) && stripos($moduleDir->getFilename(), $exclude) !== false)
+                {
+                    $io->text(sprintf('- Пропустили кеш модуля %s', $moduleDir->getFilename()));
+                    continue;
+                }
+
                 // если указан модуль и он имеет вхождение в директорию модуля - удаляем
                 if(isset($module) && stripos($moduleDir->getFilename(), $module) === false)
                 {
@@ -119,7 +127,8 @@ class CacheClear extends Command
                 $unknown = false;
 
                 $result = $this->clearModule($moduleDir->getFilename());
-                $io->text(sprintf('Сбросили кеш модуля %s', $result));
+
+                $output->writeln(sprintf('<info>Сбросили кеш модуля %s</info>', $result));
             }
         }
 
@@ -129,7 +138,7 @@ class CacheClear extends Command
             {
                 /** Сбрасываем кеш c namespace */
                 $result = $this->clearModule($module);
-                $io->text(sprintf('Сбросили кеш c namespace %s', $result));
+                $output->writeln(sprintf('<info>Сбросили кеш c namespace %s</info>', $result));
             }
 
             $io->success('Кеш модулей успешно удален');
