@@ -1284,13 +1284,23 @@
         });
 
         /** Снимаем блокировку модальных кнопок */
-        setTimeout(() =>
+
+        executeFunc(function activeDisableButton()
         {
-            document.querySelectorAll('.modal-link').forEach(function(el)
+            if(typeof bootstrap !== 'object')
+            {
+                return false;
+            }
+
+            document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function(el)
             {
                 el.classList.remove('disabled');
             });
-        }, 500);
+
+            return true;
+        });
+
+
     };
 
     var observeElements = function observeElements(observer, elements)
