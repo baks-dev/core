@@ -30,21 +30,20 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use BaksDev\Core\Type\Locale\Locale;
-use BaksDev\Users\Profile\UserProfile\Entity\Info\UserProfileInfo;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Query\QueryType;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\Mapping\Table;
 use Generator;
 use InvalidArgumentException;
 use Psr\Cache\CacheItemPoolInterface;
+use Random\Randomizer;
 use ReflectionAttribute;
 use ReflectionClass;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
@@ -58,8 +57,6 @@ final class DBALQueryBuilder extends QueryBuilder
 {
     private array $select = [];
 
-    private string|CompositeExpression|null $where = null;
-
     private Connection $connection;
 
     private CacheInterface|CacheItemPoolInterface $cacheQueries;
@@ -71,7 +68,7 @@ final class DBALQueryBuilder extends QueryBuilder
     /**  Флаг кеширования запроса  */
     private bool $isCache = false;
 
-    private $namespace;
+    private ?string $namespace;
 
     /** Билдер поиска */
     private ?QueryBuilder $search = null;
@@ -131,8 +128,21 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $newInstance->setParameters([]);
 
-        $newInstance->cacheKey = str_replace('\\', '.', is_object($class) ? $class::class : $class);
-        $newInstance->namespace = 'DBALCache';
+        $classNamespace = is_object($class) ? $class::class : $class;
+
+        $newInstance->namespace = $classNamespace;
+        $newInstance->cacheKey = md5($classNamespace);
+
+        if(class_exists($classNamespace))
+        {
+            /** Выделяем из namespace класса название модуля */
+            $reflect = new ReflectionClass($classNamespace);
+
+            if(preg_match('/vendor\/baks-dev\/([^\/]+)\//', $reflect->getFileName(), $matches))
+            {
+                $newInstance->namespace = $matches[1];
+            }
+        }
 
         return $newInstance;
     }
@@ -143,10 +153,13 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function enableCache(string $namespace = null, int $ttl = 86400, $refresh = true): self
     {
-        $this->isCache = true;
-        $this->ttl = $ttl + random_int(0, $ttl); // разбрасываем время кеша
+        $Randomizer = new Randomizer();
 
-        if($namespace)
+        $this->isCache = true;
+        $this->ttl = $ttl + $Randomizer->getInt(0, $ttl); // разбрасываем время кеша
+
+        /** Переопределяем кеш модуля */
+        if($namespace && $this->namespace !== $namespace)
         {
             $this->namespace = $namespace;
         }
@@ -154,8 +167,9 @@ final class DBALQueryBuilder extends QueryBuilder
         /** Кешируем в редис */
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
 
-        $this->cacheKey .= '.'.implode('.', array_map(function ($value) {
+        /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
 
+        $this->cacheKey .= '.'.implode('.', array_map(static function ($value) {
 
             if($value instanceof DateTimeImmutable)
             {
@@ -167,6 +181,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         }, $this->getParameters()));
 
+        $this->cacheKey = 'dbal-'.md5($this->cacheKey);
 
         if($refresh)
         {
@@ -178,7 +193,7 @@ final class DBALQueryBuilder extends QueryBuilder
             if($lastDatetime === null || time() > $lastDatetime)
             {
                 /* Перезаписываем метку времени запроса */
-                $lastDatetimeCache->set(time() + random_int(3, 10));
+                $lastDatetimeCache->set(time() + $Randomizer->getInt(3, 10));
                 $lastDatetimeCache->expiresAfter($this->ttl);
                 $DatetimeCache->save($lastDatetimeCache);
 
@@ -190,7 +205,6 @@ final class DBALQueryBuilder extends QueryBuilder
                 }
             }
         }
-
 
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
 
@@ -468,10 +482,11 @@ final class DBALQueryBuilder extends QueryBuilder
     /**
      * @param $id - идентификатор сущности
      * @param $parent - идентификатор свойства на основную сущность
+     * @throws Exception
      */
     //public function findAllRecursive(string $id, string $parent)
 
-    public function findAllRecursive(array $condition)
+    public function findAllRecursive(array $condition): array|false
     {
         $parent = key($condition);
         $id = current($condition);
@@ -479,7 +494,6 @@ final class DBALQueryBuilder extends QueryBuilder
         $dbal_union = clone $this;
 
         $this->andWhere($this->recursive_alias.'.'.$parent.' IS NULL');
-
 
         $dbal_union->join(
             $this->recursive_alias,
@@ -519,7 +533,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $Statement
             ->executeQuery()
-            ->fetchAllAssociative();
+            ->fetchAllAssociative() ?: false;
     }
 
 

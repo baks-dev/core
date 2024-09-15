@@ -28,8 +28,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 final class ReferenceChoice
 {
     public function __construct(
-        #[AutowireIterator('baks.reference.choice')]
-        private readonly iterable $reference
+        #[AutowireIterator('baks.reference.choice')] private readonly iterable $reference
     ) {}
 
     public function getChoice($key): ?ReferenceChoiceInterface

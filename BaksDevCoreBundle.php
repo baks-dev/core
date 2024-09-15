@@ -17,6 +17,8 @@ use BaksDev\Core\Repository\SettingsMain\SettingsMainRepository;
 use BaksDev\Core\Type\Crypt\CryptKey;
 use BaksDev\Core\Type\Crypt\CryptKeyInterface;
 use BaksDev\Core\Type\Locale\Locales\LocaleInterface;
+use DirectoryIterator;
+use RegexIterator;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -28,55 +30,88 @@ class BaksDevCoreBundle extends AbstractBundle
 
     public const string PATH = __DIR__.DIRECTORY_SEPARATOR;
 
-    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    //    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    //    {
+    //        $services = $container->services()
+    //            ->defaults()
+    //            ->autowire()
+    //            ->autoconfigure();
+    //
+    //        $services->load(self::NAMESPACE, self::PATH)
+    //            ->exclude([
+    //                self::PATH.'{Entity,Resources,Type}',
+    //                self::PATH.'**/*Message.php',
+    //                self::PATH.'**/*Test.php',
+    //                self::PATH.'**/*DTO.php',
+    //                self::PATH.'**/regions.php',
+    //
+    //            ]);
+    //
+    //        /* Language */
+    //        $services->load(
+    //            self::NAMESPACE.'Type\Locale\Locales\\',
+    //            self::PATH.'Type/Locale/Locales'
+    //        );
+    //
+    //        /* Device */
+    //        $services->load(
+    //            self::NAMESPACE.'Type\Device\Devices\\',
+    //            self::PATH.'Type/Device/Devices'
+    //        );
+    //
+    //        /* Модификаторы */
+    //        $services->load(
+    //            self::NAMESPACE.'Type\Modify\Modify\\',
+    //            self::PATH.'Type/Modify/Modify'
+    //        );
+    //
+    //
+    //        /** @see https://symfony.com/doc/current/service_container/autowiring.html#dealing-with-multiple-implementations-of-the-same-type */
+    //        $services->alias(
+    //            SettingsMainInterface::class,
+    //            SettingsMainRepository::class
+    //        );
+    //
+    //        $services->alias(
+    //            CryptKeyInterface::class,
+    //            CryptKey::class
+    //        );
+    //
+    //    }
+
+
+    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-        $services = $container->services()
-            ->defaults()
-            ->autowire()
-            ->autoconfigure();
 
-        $services->load(self::NAMESPACE, self::PATH)
-            ->exclude([
-                self::PATH.'{Entity,Resources,Type}',
-                self::PATH.'**/*Message.php',
-                self::PATH.'**/*Test.php',
-                self::PATH.'**/*DTO.php',
-                self::PATH.'**/regions.php',
+        /** Получаем корневую директорию для итерации по модулям */
+        $parentDirectory = dirname(rtrim(self::PATH, '/'));
 
-            ]);
+        /** @var DirectoryIterator $config */
+        foreach(new DirectoryIterator($parentDirectory) as $config)
+        {
+            if($config->isDot() || $config->isFile())
+            {
+                continue;
+            }
 
-        /* Language */
-        $services->load(
-            self::NAMESPACE.'Type\Locale\Locales\\',
-            self::PATH.'Type/Locale/Locales'
-        );
+            $path = $config->getRealPath().implode(DIRECTORY_SEPARATOR, ['', 'Resources', 'config']);
 
-        /* Device */
-        $services->load(
-            self::NAMESPACE.'Type\Device\Devices\\',
-            self::PATH.'Type/Device/Devices'
-        );
+            if(is_dir($path))
+            {
+                $services = new RegexIterator(new DirectoryIterator($path), '/\.php$/');
 
-        /* Модификаторы */
-        $services->load(
-            self::NAMESPACE.'Type\Modify\Modify\\',
-            self::PATH.'Type/Modify/Modify'
-        );
+                foreach($services as $service)
+                {
+                    if($service->isDot() || $service->isDir() || $service->getFilename() === 'routes.php')
+                    {
+                        continue;
+                    }
 
-
-        /** @see https://symfony.com/doc/current/service_container/autowiring.html#dealing-with-multiple-implementations-of-the-same-type */
-        $services->alias(
-            SettingsMainInterface::class,
-            SettingsMainRepository::class
-        );
-
-        $services->alias(
-            CryptKeyInterface::class,
-            CryptKey::class
-        );
-
+                    $container->import($service->getPathname());
+                }
+            }
+        }
     }
-
 
     public function configure(DefinitionConfigurator $definition): void
     {

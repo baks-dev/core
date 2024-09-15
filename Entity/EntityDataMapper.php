@@ -244,10 +244,9 @@ abstract class EntityDataMapper
             $entityReflectionPropertyByName = new ReflectionProperty($this, $propertyName);
 
 
-
-            /** Если нужно выполнить преобразование значения свойства DTO -  */
-
-            // Для обновления свойства сущности значением из DTO - должен быть объявлен геттер
+            /**
+             * Если нужно выполнить преобразование значения свойства DTO - должен быть объявлен геттер
+             */
             $propertyMethodName = ucfirst($property->getName());
             $getDtoMethod = 'get'.$propertyMethodName;
 
@@ -256,8 +255,6 @@ abstract class EntityDataMapper
                 // Вызываем геттер, в случае если в геттере что-либо вызывается логика
                 $dto->{$getDtoMethod}();
             }
-
-
 
 
             $type = null;
@@ -269,7 +266,7 @@ abstract class EntityDataMapper
                 );
             }
 
-            // Если тайпхинт свойства - класс
+            // Если тайпхинт свойства - класс, инициируем мимо конструктора
             if(class_exists($property->getType()?->getName()))
             {
                 $instanceClass = new ReflectionClass($property->getType()?->getName());
@@ -285,9 +282,10 @@ abstract class EntityDataMapper
                 }
             }
 
+
             if($type instanceof Collection)
             {
-                // Если в сущности имеется такое одноименное свойство сущности
+                // Если в сущности имеется одноименное свойство сущности
                 if(property_exists($this, $propertyName) && method_exists($dto, $getDtoMethod))
                 {
                     // $entityReflectionPropertyByName = new ReflectionProperty($this, $propertyName);
@@ -308,7 +306,7 @@ abstract class EntityDataMapper
 
 
                         // Получаем коллекцию DTO
-                        $collectionDTO = $this->getPropertyValue($propertyName, $dto); // $dto->$getDtoMethod();
+                        $dtoCollections = $this->getPropertyValue($propertyName, $dto); // $dto->$getDtoMethod();
 
                         /** Если сущность клонируется или коллекция пуста */
                         if($entityCollections->current() instanceof EntityEvent || $entityCollections->isEmpty())
@@ -317,7 +315,7 @@ abstract class EntityDataMapper
                             $entityCollections = new ArrayCollection();
                             $this->setPropertyValue($propertyName, $entityCollections, $this);
 
-                            foreach($collectionDTO as $value)
+                            foreach($dtoCollections as $value)
                             {
                                 $obj = new $o2oTargetEntity($this);
                                 $obj->setEntityManager($this->entityManager);
@@ -340,7 +338,9 @@ abstract class EntityDataMapper
                         {
                             $currentCollections = $entityCollections->current();
 
-                            /** Получаем идентификаторы сущности для обновления */
+                            /**
+                             * Получаем свойства сущности, которые являются идентификаторами
+                             */
                             $collectionReflectionClass = new ReflectionClass($currentCollections);
 
                             $identifier = [];
@@ -358,6 +358,7 @@ abstract class EntityDataMapper
 
                             $countIdentifier = count($identifier);
 
+
                             /** Удаляем сущности, которые были удалены из коллекции */
 
                             /** @var PersistentCollection $entityCollections */
@@ -365,21 +366,20 @@ abstract class EntityDataMapper
                             {
                                 $isRemove = false;
 
-                                foreach($collectionDTO as $value)
+                                foreach($dtoCollections as $value)
                                 {
                                     foreach($identifier as $propertyEqual)
                                     {
-                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) === (string) $this->getPropertyValue($propertyEqual, $value))
+                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) !== (string) $this->getPropertyValue($propertyEqual, $value))
                                         {
-                                            continue;
+                                            $isRemove = true;
+                                            break;
                                         }
-
-                                        $isRemove = true;
                                     }
                                 }
 
                                 /** Удаляем сущность из коллекции */
-                                if($isRemove || $collectionDTO->isEmpty())
+                                if($isRemove || $dtoCollections->isEmpty())
                                 {
                                     $this->entityManager?->remove($entityCollection);
                                     $entityCollections->removeElement($entityCollection);
@@ -390,7 +390,7 @@ abstract class EntityDataMapper
                             /** ОБНОВЛЯЕМ СУЩЕСТВУЮЩИЕ */
 
                             /** @var EntityState $entityCollection */
-                            foreach($collectionDTO as $value)
+                            foreach($dtoCollections as $value)
                             {
                                 foreach($entityCollections as $entityCollection)
                                 {
@@ -417,7 +417,7 @@ abstract class EntityDataMapper
 
 
                             /** Добавляем новые объекты в коллекцию */
-                            foreach($collectionDTO as $value)
+                            foreach($dtoCollections as $value)
                             {
                                 $isNew = true;
                                 $countNew = 0;
@@ -457,26 +457,30 @@ abstract class EntityDataMapper
                 }
             }
 
+
             /*
                 Если односторонняя связь на сущность или кастомный тип
-                в дто должны объявлены методы get{Property}Class и set{Property}
             */
             if(class_exists($property->getType()?->getName()) && property_exists($this, $propertyName))
             {
                 $o2o = $entityReflectionPropertyByName->getAttributes(OneToOne::class);
 
+
                 if($o2o)
                 {
+
+
+                    /** Получаем из аттрибута Target класс сущности */
                     $o2oTargetEntity = current($o2o)->getArguments()['targetEntity'];
                     // $getDtoMethod = 'get'.$propertyMethodName;
 
                     if(method_exists($dto, $getDtoMethod))
                     {
+                        // Вызываем геттер, в случае если в геттере что либо вызывается логика
+                        // и сравниваем что он не возвращает NULL
                         if($dto->{$getDtoMethod}() !== null)
                         {
-                            // Вызываем геттер, в случае если в геттере что либо вызывается логика
-                            $dto->{$getDtoMethod}();
-
+                            /** Если свойство не инициировано - создаем инстанс класса TargetEntity */
                             if($entityReflectionPropertyByName->isInitialized($this) === false)
                             {
                                 $this->setPropertyValue($propertyName, new $o2oTargetEntity($this), $this);
@@ -505,6 +509,24 @@ abstract class EntityDataMapper
                                     $this->setPropertyValue($propertyName, null, $this);
                                 }
                             }
+                        }
+                        else
+                        {
+
+                            $thisProperty = $this->getPropertyValue($propertyName, $this);
+
+                            /**
+                             * Если метод геттера DTO возвращает NULL - пробуем присвоить свойству сущности
+                             * если свойство сущности не принимает NULL - свойство останется неизменным
+                             */
+                            $isSetPropertyNull = $this->setPropertyValue($propertyName, null, $this);
+
+                            /** Если свойство допускает присваивание NULL - удаляем Target объект */
+                            if($isSetPropertyNull && is_object($thisProperty))
+                            {
+                                $this->entityManager->remove($thisProperty);
+                            }
+
                         }
                     }
 
@@ -748,11 +770,11 @@ abstract class EntityDataMapper
      * Присваиваем через рефлексию замыкание значение свойству
      */
 
-    protected function setPropertyValue(string $property, mixed $value, object $object): void
+    protected function setPropertyValue(string $property, mixed $value, object $object): bool
     {
         if(!property_exists($object, $property))
         {
-            return;
+            return false;
         }
 
         $modifiers = new ReflectionProperty($object, $property);
@@ -760,13 +782,13 @@ abstract class EntityDataMapper
         /* Если свойство не принимает null */
         if($value === null && !$modifiers->getType()?->allowsNull())
         {
-            return;
+            return false;
         }
 
         /* Если свойство ReadOnly и оно уже инициировано */
         if($modifiers->isReadOnly() && $modifiers->isInitialized($object))
         {
-            return;
+            return false;
         }
 
         $setPropertyDto = Closure::bind(static function (object $object, string $property, mixed $value) {
@@ -775,6 +797,7 @@ abstract class EntityDataMapper
 
         $setPropertyDto($object, $property, $value);
 
+        return true;
     }
 
     public function setEntityManager(?EntityManagerInterface $entityManager): void

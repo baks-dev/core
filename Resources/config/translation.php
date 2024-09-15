@@ -10,5 +10,5 @@ return static function (FrameworkConfig $config) {
 
     $config->defaultLocale((string) Locale::default());
 
-    $config->translator()->paths([BaksDevCoreBundle::PATH.'Resources/translations/']);
+    $config->translator()->paths([BaksDevCoreBundle::PATH.implode(DIRECTORY_SEPARATOR, ['Resources', 'translations', ''])]); // .'Resources/translations/']);
 };

@@ -74,7 +74,7 @@ final class DBALQueryBuilderTest extends TestCase
 
         $this->assertInstanceOf(DBALQueryBuilder::class, $newInstance);
         $this->assertNotSame($dbalQueryBuilder, $newInstance);
-        $this->assertEquals('TestClass', $newInstance->getCacheKey());
+        $this->assertEquals(md5('TestClass'), $newInstance->getCacheKey());
 
     }
 

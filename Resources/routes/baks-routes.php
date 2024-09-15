@@ -14,31 +14,16 @@
  *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
- *
- *
  */
 
-namespace BaksDev\Core\Controller\Admin;
+use BaksDev\Core\BaksDevCoreBundle;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-use BaksDev\Core\Controller\AbstractController;
-use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\Routing\Attribute\Route;
-
-#[AsController]
-#[RoleSecurity('ROLE_ADMINISTRATION')]
-class HomeController extends AbstractController
-{
-    #[Route('/admin', name: 'admin.homepage')]
-    public function index(Request $request): Response
-    {
-        return $this->render([]);
-    }
-}
+return function (RoutingConfigurator $routes): void {
+    $routes->import('.', 'baks');
+};

@@ -293,7 +293,10 @@ abstract class AbstractController
         $fileName = str_replace('.', '/', $routingName).'/'.$file;
 
 
+
+
         $content = null;
+
 
         /**
          * Подключаем шаблон в директории Template
@@ -334,6 +337,8 @@ abstract class AbstractController
             }
         }
 
+
+
         /**
          * Подключаем шаблон в директории модуля
          */
@@ -358,6 +363,8 @@ abstract class AbstractController
         //            $this->requestStack->getCurrentRequest()->headers->get('x-device'),
         //            (bool) $this->getUsr()
         //        );
+
+
 
         $response->setContent($content);
 

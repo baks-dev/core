@@ -108,13 +108,13 @@ class AssetsInstallCommand extends Command
 
         $ModuleAssets = array_merge(
             $ModuleAssets,
-            $this->searchAssets($this->projectDir.DIRECTORY_SEPARATOR.'vendor/baks-dev', 'assets')
+            $this->searchAssets($this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']), 'assets')
         );
 
         $validAssetDirs = null;
         $rows = null;
 
-        $bundlesDir = $publicDir.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR;
+        $bundlesDir = $publicDir.implode(DIRECTORY_SEPARATOR, ['', 'assets', '']);
 
         foreach($ModuleAssets as $moduleAsset)
         {
@@ -181,8 +181,8 @@ class AssetsInstallCommand extends Command
 
     private function assetsRouting(): ?array
     {
-        $ModuleRoutes = $this->searchAssets($this->projectDir.DIRECTORY_SEPARATOR.'vendor/baks-dev', 'routes') ?: [];
-        $routesDir = $this->projectDir.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'routes'.DIRECTORY_SEPARATOR.'baks-dev'.DIRECTORY_SEPARATOR;
+        $ModuleRoutes = $this->searchAssets($this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']), 'routes') ?: [];
+        $routesDir = $this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'config', 'routes', 'baks-dev', '']);
 
         if(!is_dir($routesDir))
         {
@@ -199,6 +199,12 @@ class AssetsInstallCommand extends Command
                 /* добавляем симлинки только на директории */
                 if($fileInfo->isDot() || !is_dir($fileInfo->getRealPath()))
                 {
+                    if($fileInfo->getFilename() === 'baks-routes.php')
+                    {
+                        $baksRoutesDir = $this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'config', 'routes', '']);
+                        $this->filesystem->copy($fileInfo->getRealPath(), $baksRoutesDir.'baks-routes.php');
+                    }
+
                     continue;
                 }
 
@@ -211,7 +217,13 @@ class AssetsInstallCommand extends Command
 
                 try
                 {
-                    $this->filesystem->remove($targetDir); // continue;
+                    /** Удаляем директорию с роутингом для обновления */
+                    $this->filesystem->remove($targetDir);
+
+                    if(false === $this->filesystem->exists($originDir))
+                    {
+                        continue;
+                    }
 
                     $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
 
@@ -227,6 +239,7 @@ class AssetsInstallCommand extends Command
                 catch(Exception $e)
                 {
                     $exitCode = 1;
+
                     $rows[] = [
                         sprintf(
                             '<fg=red;options=bold>%s</>',
@@ -243,7 +256,13 @@ class AssetsInstallCommand extends Command
         // удаляем ресурсы, которых больше не существуют
         if(is_dir($routesDir))
         {
-            $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($routesDir);
+            $dirsToRemove = Finder::create()->depth(0)->directories()->in($routesDir);
+
+            if($validAssetDirs)
+            {
+                $dirsToRemove->exclude($validAssetDirs);
+            }
+
             $this->filesystem->remove($dirsToRemove);
         }
 
@@ -253,9 +272,8 @@ class AssetsInstallCommand extends Command
 
     private function assetsPackages(): ?array
     {
-        $ModulePackages = $this->searchAssets($this->projectDir.DIRECTORY_SEPARATOR.'vendor/baks-dev', 'packages') ?: [];
-
-        $packagesDir = $this->projectDir.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'packages'.DIRECTORY_SEPARATOR.'baks-dev'.DIRECTORY_SEPARATOR;
+        $ModulePackages = $this->searchAssets($this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']), 'packages') ?: [];
+        $packagesDir = $this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'config', 'packages', 'baks-dev', '']);
 
         if(!is_dir($packagesDir))
         {
@@ -267,6 +285,8 @@ class AssetsInstallCommand extends Command
 
         foreach($ModulePackages as $path)
         {
+
+
             foreach(new DirectoryIterator($path) as $fileInfo)
             {
                 /* добавляем симлинки только на директории */
@@ -284,7 +304,12 @@ class AssetsInstallCommand extends Command
 
                 try
                 {
-                    $this->filesystem->remove($targetDir); // continue;
+                    $this->filesystem->remove($targetDir);
+
+                    if(false === $this->filesystem->exists($originDir))
+                    {
+                        continue;
+                    }
 
                     $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
 
@@ -315,7 +340,13 @@ class AssetsInstallCommand extends Command
         // удаляем ресурсы, которых больше не существуют
         if(is_dir($packagesDir))
         {
-            $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($packagesDir);
+            $dirsToRemove = Finder::create()->depth(0)->directories()->in($packagesDir);
+
+            if($validAssetDirs)
+            {
+                $dirsToRemove->exclude($validAssetDirs);
+            }
+
             $this->filesystem->remove($dirsToRemove);
         }
 
