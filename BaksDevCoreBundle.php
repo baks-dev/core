@@ -12,11 +12,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Core;
 
-use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
-use BaksDev\Core\Repository\SettingsMain\SettingsMainRepository;
-use BaksDev\Core\Type\Crypt\CryptKey;
-use BaksDev\Core\Type\Crypt\CryptKeyInterface;
-use BaksDev\Core\Type\Locale\Locales\LocaleInterface;
+use ArrayIterator;
 use DirectoryIterator;
 use RegexIterator;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -30,87 +26,41 @@ class BaksDevCoreBundle extends AbstractBundle
 
     public const string PATH = __DIR__.DIRECTORY_SEPARATOR;
 
-    //    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
-    //    {
-    //        $services = $container->services()
-    //            ->defaults()
-    //            ->autowire()
-    //            ->autoconfigure();
-    //
-    //        $services->load(self::NAMESPACE, self::PATH)
-    //            ->exclude([
-    //                self::PATH.'{Entity,Resources,Type}',
-    //                self::PATH.'**/*Message.php',
-    //                self::PATH.'**/*Test.php',
-    //                self::PATH.'**/*DTO.php',
-    //                self::PATH.'**/regions.php',
-    //
-    //            ]);
-    //
-    //        /* Language */
-    //        $services->load(
-    //            self::NAMESPACE.'Type\Locale\Locales\\',
-    //            self::PATH.'Type/Locale/Locales'
-    //        );
-    //
-    //        /* Device */
-    //        $services->load(
-    //            self::NAMESPACE.'Type\Device\Devices\\',
-    //            self::PATH.'Type/Device/Devices'
-    //        );
-    //
-    //        /* Модификаторы */
-    //        $services->load(
-    //            self::NAMESPACE.'Type\Modify\Modify\\',
-    //            self::PATH.'Type/Modify/Modify'
-    //        );
-    //
-    //
-    //        /** @see https://symfony.com/doc/current/service_container/autowiring.html#dealing-with-multiple-implementations-of-the-same-type */
-    //        $services->alias(
-    //            SettingsMainInterface::class,
-    //            SettingsMainRepository::class
-    //        );
-    //
-    //        $services->alias(
-    //            CryptKeyInterface::class,
-    //            CryptKey::class
-    //        );
-    //
-    //    }
-
+    private ArrayIterator $configs;
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
+        $this->configs = new ArrayIterator();
 
-        /** Получаем корневую директорию для итерации по модулям */
+        /** Получаем корневую директорию модулей для поиска файлов конфигурации */
         $parentDirectory = dirname(rtrim(self::PATH, '/'));
+        $this->searchResources($parentDirectory);
 
-        /** @var DirectoryIterator $config */
-        foreach(new DirectoryIterator($parentDirectory) as $config)
+
+        /** Получаем директорию SRC */
+        $src = $builder->getParameter('kernel.project_dir').DIRECTORY_SEPARATOR.'src';
+        $this->searchResources($src);
+
+
+        /**
+         * Импортируем конфиги
+         */
+
+        foreach($this->configs as $path)
         {
-            if($config->isDot() || $config->isFile())
+            $services = new RegexIterator(new DirectoryIterator($path), '/\.php$/');
+
+            foreach($services as $service)
             {
-                continue;
-            }
-
-            $path = $config->getRealPath().implode(DIRECTORY_SEPARATOR, ['', 'Resources', 'config']);
-
-            if(is_dir($path))
-            {
-                $services = new RegexIterator(new DirectoryIterator($path), '/\.php$/');
-
-                foreach($services as $service)
+                if($service->isDot() || $service->isDir() || $service->getFilename() === 'routes.php')
                 {
-                    if($service->isDot() || $service->isDir() || $service->getFilename() === 'routes.php')
-                    {
-                        continue;
-                    }
-
-                    $container->import($service->getPathname());
+                    continue;
                 }
+
+                $container->import($service->getPathname());
             }
         }
+
     }
 
     public function configure(DefinitionConfigurator $definition): void
@@ -126,13 +76,42 @@ class BaksDevCoreBundle extends AbstractBundle
     }
 
 
-    public static function getDeclared(): array
+    //    public static function getDeclared(): array
+    //    {
+    //        return array_filter(
+    //            get_declared_classes(),
+    //            static function ($className) {
+    //                return in_array(LocaleInterface::class, class_implements($className), true);
+    //            }
+    //        );
+    //    }
+
+
+    /**
+     * Метод рекурсивно сканирует директории в поиске папки /Resources/config.
+     */
+    public function searchResources(string $path): void
     {
-        return array_filter(
-            get_declared_classes(),
-            static function ($className) {
-                return in_array(LocaleInterface::class, class_implements($className), true);
+        /** @var DirectoryIterator $module */
+        foreach(new DirectoryIterator($path) as $module)
+        {
+            if($module->isDot() || !$module->isDir())
+            {
+                continue;
             }
-        );
+
+            if($module->getFilename() !== 'Resources')
+            {
+                $this->searchResources($module->getRealPath());
+                continue;
+            }
+
+            $configDir = $module->getRealPath().DIRECTORY_SEPARATOR.'config';
+
+            if(is_dir($configDir))
+            {
+                $this->configs->offsetSet($configDir, $configDir);
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 # BaksDev Core
 
-[![Version](https://img.shields.io/badge/version-7.1.49-blue)](https://github.com/baks-dev/core/releases)
+[![Version](https://img.shields.io/badge/version-7.1.50-blue)](https://github.com/baks-dev/core/releases)
 ![php 8.3+](https://img.shields.io/badge/php-min%208.3-red.svg)
 
 Модуль Core

@@ -25,9 +25,11 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Routing;
 
+use ArrayIterator;
 use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Products\Product\BaksDevProductsProductBundle;
 use DirectoryIterator;
+use RegexIterator;
 use RuntimeException;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\RouteCollection;
@@ -36,6 +38,8 @@ final class BaksRoutingLoader extends Loader
 {
     private bool $isLoaded = false;
 
+    private ArrayIterator $configs;
+
     public function load($resource, ?string $type = null): RouteCollection
     {
         if(true === $this->isLoaded)
@@ -43,24 +47,32 @@ final class BaksRoutingLoader extends Loader
             throw new RuntimeException('Do not add the "extra" loader twice');
         }
 
-        $routes = new RouteCollection();
+        $this->configs = new ArrayIterator();
 
+        $routes = new RouteCollection();
 
         /** Получаем корневую директорию для итерации по модулям */
         $parentDirectory = dirname(rtrim(BaksDevCoreBundle::PATH, '/'));
+        $this->searchResources($parentDirectory);
 
-        /** @var DirectoryIterator $config */
-        foreach(new DirectoryIterator($parentDirectory) as $config)
+        /** Получаем директорию SRC */
+        $project = explode('/vendor', BaksDevCoreBundle::PATH);
+        $src = current($project).DIRECTORY_SEPARATOR.'src';
+        $this->searchResources($src);
+
+        /**
+         * Импортируем файлы конфигурации роутинга
+         */
+
+        foreach($this->configs as $path)
         {
-            if($config->isDot() || $config->isFile())
-            {
-                continue;
-            }
+            $configs = new RegexIterator(new DirectoryIterator($path), '/routes\.php$/');
 
-            $path = $config->getRealPath().implode(DIRECTORY_SEPARATOR, ['', 'Resources', 'config', 'routes.php']);
-            if(file_exists($path))
+            /** @var DirectoryIterator $config */
+
+            foreach($configs as $config)
             {
-                $importedRoutes = $this->import($path, 'php');
+                $importedRoutes = $this->import($config->getRealPath(), 'php');
                 $routes->addCollection($importedRoutes);
             }
         }
@@ -74,5 +86,33 @@ final class BaksRoutingLoader extends Loader
     public function supports($resource, ?string $type = null): bool
     {
         return 'baks' === $type;
+    }
+
+    /**
+     * Метод рекурсивно сканирует директории в поиске папки /Resources/config.
+     */
+    public function searchResources(string $path): void
+    {
+        /** @var DirectoryIterator $module */
+        foreach(new DirectoryIterator($path) as $module)
+        {
+            if($module->isDot() || !$module->isDir())
+            {
+                continue;
+            }
+
+            if($module->getFilename() !== 'Resources')
+            {
+                $this->searchResources($module->getRealPath());
+                continue;
+            }
+
+            $configDir = $module->getRealPath().DIRECTORY_SEPARATOR.'config';
+
+            if(is_dir($configDir))
+            {
+                $this->configs->offsetSet($configDir, $configDir);
+            }
+        }
     }
 }
