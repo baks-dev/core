@@ -51,25 +51,25 @@ class SearchDTO
      */
     public function getQuery(): ?string
     {
-        if($this->request)
-        {
-            $session = $this->request->getSession();
-
-            if($session->get('statusCode') === 307)
-            {
-                $this->request->getSession()->remove($this->session);
-            }
-
-            if(time() - $session->getMetadataBag()->getLastUsed() > 30)
-            {
-                $session->remove($this->session);
-            }
-
-            if(!$this->query)
-            {
-                $this->query = $session->get($this->session);
-            }
-        }
+//        if($this->request)
+//        {
+//            $session = $this->request->getSession();
+//
+//            if($session->get('statusCode') === 307)
+//            {
+//                $this->request->getSession()->remove($this->session);
+//            }
+//
+//            if(time() - $session->getMetadataBag()->getLastUsed() > 30)
+//            {
+//                $session->remove($this->session);
+//            }
+//
+//            if(!$this->query)
+//            {
+//                $this->query = $session->get($this->session);
+//            }
+//        }
 
         return $this->query ? mb_strtolower(trim($this->query)) : null;
     }
@@ -87,10 +87,10 @@ class SearchDTO
 
     public function setQuery(string|int|null $query): void
     {
-        if($this->request && empty($query))
-        {
-            $this->request->getSession()->remove($this->session);
-        }
+//        if($this->request && empty($query))
+//        {
+//            $this->request->getSession()->remove($this->session);
+//        }
 
         $this->query = $query;
     }
