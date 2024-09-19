@@ -205,6 +205,7 @@ abstract class EntityDataMapper
     public function setEntity($dto): mixed
     {
 
+
         //        if($this->remove === null)
         //        {
         //            $this->remove = new ArrayCollection();
@@ -218,7 +219,6 @@ abstract class EntityDataMapper
         {
             // Проверяем, имеется ли метод маппинга
             $propertyName = $property->getName();
-
 
             if($dto instanceof $this)
             {
@@ -285,6 +285,7 @@ abstract class EntityDataMapper
 
             if($type instanceof Collection)
             {
+
                 // Если в сущности имеется одноименное свойство сущности
                 if(property_exists($this, $propertyName) && method_exists($dto, $getDtoMethod))
                 {
@@ -293,6 +294,8 @@ abstract class EntityDataMapper
 
                     if($o2m)
                     {
+
+
                         $o2oTargetEntity = current($o2m)->getArguments()['targetEntity'];
 
 
@@ -303,7 +306,6 @@ abstract class EntityDataMapper
                         }
 
                         $entityCollections = $this->getPropertyValue($propertyName, $this);
-
 
                         // Получаем коллекцию DTO
                         $dtoCollections = $this->getPropertyValue($propertyName, $dto); // $dto->$getDtoMethod();
@@ -356,99 +358,148 @@ abstract class EntityDataMapper
                                 }
                             }
 
-                            $countIdentifier = count($identifier);
-
-
                             /** Удаляем сущности, которые были удалены из коллекции */
 
-                            /** @var PersistentCollection $entityCollections */
-                            foreach($entityCollections as $entityCollection)
+                            /** @var PersistentCollection $entityElement */
+                            foreach($entityCollections as $entityElement)
                             {
-                                $isRemove = false;
+                                $removeEntityElement = $this->findRemoveElement($entityElement, $dtoCollections, $identifier);
 
-                                foreach($dtoCollections as $value)
+                                if($removeEntityElement !== false)
                                 {
-                                    foreach($identifier as $propertyEqual)
+                                    if(is_null($this->entityManager))
                                     {
-                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) !== (string) $this->getPropertyValue($propertyEqual, $value))
-                                        {
-                                            $isRemove = true;
-                                            break;
-                                        }
+                                        throw new InvalidArgumentException('Необходимо передать в сущность EntityManager методом ->setEntityManager($this->entityManager)');
                                     }
-                                }
 
-                                /** Удаляем сущность из коллекции */
-                                if($isRemove || $dtoCollections->isEmpty())
-                                {
-                                    $this->entityManager?->remove($entityCollection);
-                                    $entityCollections->removeElement($entityCollection);
+                                    $this->entityManager->remove($entityElement);
+                                    $entityCollections->removeElement($entityElement);
                                 }
                             }
 
 
-                            /** ОБНОВЛЯЕМ СУЩЕСТВУЮЩИЕ */
+                            //                            /** @var PersistentCollection $entityElement */
+                            //                            foreach($entityCollections as $entityElement)
+                            //                            {
+                            //                                // по умолчанию всегда удаляем элемент коллекции
+                            //                                $isRemove = false;
+                            //
+                            //                                // делаем поиск
+                            //                                foreach($dtoCollections as $dtoElement)
+                            //                                {
+                            //                                    foreach($identifier as $propertyEqual)
+                            //                                    {
+                            //                                        if((string) $this->getPropertyValue($propertyEqual, $entityElement) !== (string) $this->getPropertyValue($propertyEqual, $dtoElement))
+                            //                                        {
+                            //                                            $isRemove = true;
+                            //                                            break;
+                            //                                        }
+                            //                                    }
+                            //                                }
+                            //
+                            //                                dump($dto);
+                            //                                dump($isRemove);
+                            //                                dump($entityElement);
+                            //
+                            //                                /** Удаляем сущность из коллекции */
+                            //                                if($isRemove || $dtoCollections->isEmpty())
+                            //                                {
+                            //                                    $this->entityManager?->remove($entityElement);
+                            //                                    $entityCollections->removeElement($entityElement);
+                            //                                }
+                            //                            }
+
+
+                            /** Обновляем существующие (добавляем новые) элементы коллекции */
 
                             /** @var EntityState $entityCollection */
-                            foreach($dtoCollections as $value)
+                            foreach($dtoCollections as $dtoElement)
                             {
-                                foreach($entityCollections as $entityCollection)
+                                $updateEntityElement = $this->findUpdateOrCreateElement($dtoElement, $entityCollections, $identifier);
+
+                                if(is_null($this->entityManager))
                                 {
-                                    $isEqual = true;
-
-                                    foreach($identifier as $propertyEqual)
-                                    {
-
-                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) !== (string) $this->getPropertyValue($propertyEqual, $value))
-                                        {
-                                            $isEqual = false;
-                                            break;
-                                        }
-                                    }
-
-                                    /** Обновляем найденную сущность */
-                                    if($isEqual)
-                                    {
-                                        $entityCollection->setEntityManager($this->entityManager);
-                                        $entityCollection->setEntity($value);
-                                    }
-                                }
-                            }
-
-
-                            /** Добавляем новые объекты в коллекцию */
-                            foreach($dtoCollections as $value)
-                            {
-                                $isNew = true;
-                                $countNew = 0;
-
-                                foreach($entityCollections as $entityCollection)
-                                {
-                                    foreach($identifier as $propertyEqual)
-                                    {
-                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) === (string) $this->getPropertyValue($propertyEqual, $value))
-                                        {
-                                            ++$countNew;
-                                        }
-                                    }
-
-
-                                    if($countNew === $countIdentifier)
-                                    {
-                                        $isNew = false;
-                                    }
+                                    throw new InvalidArgumentException('Необходимо передать в сущность EntityManager методом ->setEntityManager($this->entityManager)');
                                 }
 
-                                if($isNew)
+                                if($updateEntityElement !== false)
                                 {
+                                    $updateEntityElement->setEntityManager($this->entityManager);
+                                    $updateEntityElement->setEntity($dtoElement);
 
-
+                                }
+                                else
+                                {
                                     $obj = new $o2oTargetEntity($this);
                                     $obj->setEntityManager($this->entityManager);
-                                    $obj->setEntity($value);
+                                    $obj->setEntity($dtoElement);
                                     $entityCollections->add($obj);
                                 }
                             }
+
+
+                            //                            /** @var EntityState $entityCollection */
+                            //                            foreach($dtoCollections as $value)
+                            //                            {
+                            //
+                            //
+                            //                                foreach($entityCollections as $entityCollection)
+                            //                                {
+                            //                                    $isEqual = true;
+                            //
+                            //                                    foreach($identifier as $propertyEqual)
+                            //                                    {
+                            //
+                            //                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) !== (string) $this->getPropertyValue($propertyEqual, $value))
+                            //                                        {
+                            //                                            $isEqual = false;
+                            //                                            break;
+                            //                                        }
+                            //                                    }
+                            //
+                            //                                    /** Обновляем найденную сущность */
+                            //                                    if($isEqual)
+                            //                                    {
+                            //                                        $entityCollection->setEntityManager($this->entityManager);
+                            //                                        $entityCollection->setEntity($value);
+                            //                                    }
+                            //                                }
+                            //                            }
+
+
+                            //                            /** Добавляем новые объекты в коллекцию */
+                            //                            foreach($dtoCollections as $value)
+                            //                            {
+                            //                                $isNew = true;
+                            //                                $countNew = 0;
+                            //
+                            //                                foreach($entityCollections as $entityCollection)
+                            //                                {
+                            //                                    foreach($identifier as $propertyEqual)
+                            //                                    {
+                            //                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) === (string) $this->getPropertyValue($propertyEqual, $value))
+                            //                                        {
+                            //                                            ++$countNew;
+                            //                                        }
+                            //                                    }
+                            //
+                            //
+                            //                                    if($countNew === $countIdentifier)
+                            //                                    {
+                            //                                        $isNew = false;
+                            //                                    }
+                            //                                }
+                            //
+                            //                                if($isNew)
+                            //                                {
+                            //
+                            //
+                            //                                    $obj = new $o2oTargetEntity($this);
+                            //                                    $obj->setEntityManager($this->entityManager);
+                            //                                    $obj->setEntity($value);
+                            //                                    $entityCollections->add($obj);
+                            //                                }
+                            //                            }
                         }
 
                     }
@@ -803,6 +854,79 @@ abstract class EntityDataMapper
     public function setEntityManager(?EntityManagerInterface $entityManager): void
     {
         $this->entityManager = $entityManager;
+    }
+
+
+    /** Метод возвращает элемент коллекции Entity, если он был удален из коллекции DTO */
+    public function findRemoveElement(object $entityElement, object $dtoCollection, array $properties): bool|object
+    {
+        // Конкатенируем свойства сущности создавая ключ сравнения
+        $entityKey = '';
+
+        foreach($properties as $property)
+        {
+            $entityKey .= $this->getPropertyValue($property, $entityElement);
+        }
+
+        foreach($dtoCollection as $dtoElement)
+        {
+            // Конкатенируем свойства DTO создавая ключ сравнения
+            $dtoKey = '';
+
+            foreach($properties as $property)
+            {
+                $dtoKey .= $this->getPropertyValue($property, $dtoElement);
+            }
+
+            /** Если ключи сравнения равны - в коллекции имеется элемент */
+            if($entityKey === $dtoKey)
+            {
+                return false;
+            }
+
+        }
+
+        /** Возвращаем элемент Entity для удаления, если ключи сравнения не найдены */
+        return $entityElement;
+    }
+
+
+    /** Метод возвращает элемент коллекции Entity для обновления, либо FALSE для создания */
+    public function findUpdateOrCreateElement(
+        object $dtoElement,
+        object $entityCollection,
+        array $properties
+    ): bool|object {
+
+        // Конкатенируем свойства сущности создавая ключ сравнения
+        $dtoKey = '';
+
+        foreach($properties as $property)
+        {
+            $dtoKey .= $this->getPropertyValue($property, $dtoElement);
+        }
+
+        foreach($entityCollection as $entityElement)
+        {
+            // Конкатенируем свойства DTO создавая ключ сравнения
+
+            $entityKey = '';
+
+            foreach($properties as $property)
+            {
+                $entityKey .= $this->getPropertyValue($property, $entityElement);
+            }
+
+            /** Если ключи сравнения равны - в коллекции имеется элемент, возвращаем для обновления */
+            if($dtoKey === $entityKey)
+            {
+                return $entityElement;
+            }
+
+        }
+
+        /** Возвращаем false ля создания нового элемента */
+        return false;
     }
 
 }
