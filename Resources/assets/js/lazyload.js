@@ -1597,7 +1597,7 @@ function reloadLazy(element = null)
 }
 
 /** Функция выполняется повторно, пока не верне TRUE  */
-function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 2000)
+function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 10000)
 {
     return new Promise((resolve, reject) =>
     {
