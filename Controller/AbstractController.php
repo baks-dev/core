@@ -472,7 +472,7 @@ abstract class AbstractController
      */
     protected function redirectToReferer(int $status = 302): ?Response
     {
-        $url = $this->requestStack->getCurrentRequest()->headers->get('referer') ?: '/';
+        $url = $this->requestStack->getCurrentRequest()->headers->get('referer');
 
         $this->requestStack->getSession()
             ->set('statusCode', $status);
