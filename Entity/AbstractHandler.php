@@ -38,9 +38,17 @@ abstract class AbstractHandler
 {
     private object|false $command = false;
 
+    /**
+     * Объекты событийной модели
+     *
+     * Для debug в обработчике можно использовать:
+     * dump($this->event);
+     * dd($this->main);
+     */
     protected ?object $main = null;
 
     protected ?object $event = null;
+
 
     protected EntityManagerInterface $entityManager;
 
@@ -209,19 +217,88 @@ abstract class AbstractHandler
 
         if(is_null($this->command->getEvent()) || $this->command->getEvent() === false)
         {
-            $this->prePersistEvent();
+            $this->persistEvent();
         }
         else
         {
-            $this->preUpdateEvent();
+            $this->updateEvent();
         }
+    }
+
+    /**
+     * Метод удаляет корень объекта события и сохраняет событие с новой версией
+     */
+    protected function preEventRemove(string|object $main, string|object $event): void
+    {
+        /**
+         * Проверка объекта DTO
+         */
+
+        if($this->command === false)
+        {
+            throw new InvalidArgumentException('Необходимо передать объект DTO через аргумент метода $this->setCommand($command)');
+        }
+
+        if(false === method_exists($this->command, 'getEvent'))
+        {
+            throw new InvalidArgumentException('Объект DTO не реализует метод getEvent()');
+        }
+
+
+        /**
+         * Проверка структуры корневой сущности
+         */
+
+        if(is_string($main) && class_exists($main))
+        {
+            $main = new $main();
+        }
+
+        if(false === method_exists($main, 'setEvent'))
+        {
+            throw new InvalidArgumentException(sprintf('Корень объекта сущности %s не реализует метод setEvent($event)', $main::class));
+        }
+
+        $this->main = $main;
+        $this->validatorCollection->add($this->main);
+
+        /**
+         * Проверка структуры событийной сущности
+         */
+
+        if(is_string($event) && class_exists($event))
+        {
+            $event = new $event();
+        }
+
+        if(false === ($event instanceof EntityEvent))
+        {
+            throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityEvent');
+        }
+
+        if(false === method_exists($event, 'setMain'))
+        {
+            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setMain()', $event::class));
+        }
+
+        if(false === method_exists($event, 'setEntity'))
+        {
+            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
+        }
+
+        $this->event = $event;
+        $this->validatorCollection->add($this->event);
+
+        $this->updateEvent();
+
+        $this->entityManager->remove($this->main);
     }
 
 
     /**
      * Метод создает новый объект события
      */
-    private function prePersistEvent(): void
+    private function persistEvent(): void
     {
         /** Гидрируем значения одноименных свойств объекта DTO к сущности и присваиваем идентификатор корня */
         $this->event->setMain($this->main);
@@ -239,7 +316,7 @@ abstract class AbstractHandler
     /**
      * Метод сохраняет объект события с новой версией
      */
-    private function preUpdateEvent(): void
+    private function updateEvent(): void
     {
         /** Получаем активное событие */
         $EventClass = $this->event::class;
@@ -292,6 +369,10 @@ abstract class AbstractHandler
     }
 
 
+    /**
+     * @deprecated используйте метод preEventPersistOrUpdate(string|object $main, string|object $event)
+     * @see preEventPersistOrUpdate
+     */
     protected function preUpdate(object $command, $clone = true): void
     {
         if(!$this->event)
@@ -361,6 +442,10 @@ abstract class AbstractHandler
         $this->validatorCollection->add($this->main);
     }
 
+    /**
+     * @deprecated используйте метод preEventPersistOrUpdate(string|object $main, string|object $event)
+     * @see preEventPersistOrUpdate
+     */
     protected function prePersist(object $command): void
     {
         if(!$this->event)
@@ -392,7 +477,10 @@ abstract class AbstractHandler
         $this->validatorCollection->add($this->main);
     }
 
-
+    /**
+     * @deprecated используйте метод preEventRemove(string|object $main, string|object $event)
+     * @see preEventRemove
+     */
     protected function preRemove(object $command): void
     {
 
