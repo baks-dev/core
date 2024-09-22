@@ -27,7 +27,7 @@ final class GpsLongitude
         $value = str_replace(',', '.', $value);
         $value = trim($value);
 
-        if(!empty($value) && !preg_match('{^-?[\d]+\.[\d]{3,}$}Di', (string) $value))
+        if(!empty($value) && !preg_match('{^-?[\d]+\.[\d]{2,}$}Di', (string) $value))
         {
             throw new InvalidArgumentException('Incorrect Gps Longitude '.$value);
         }
