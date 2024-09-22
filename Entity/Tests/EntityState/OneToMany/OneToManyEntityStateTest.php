@@ -3,6 +3,7 @@
 namespace BaksDev\Core\Entity\Tests\EntityState\OneToMany;
 
 use BaksDev\Users\User\Type\Id\UserUid;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -73,6 +74,7 @@ final class OneToManyEntityStateTest extends KernelTestCase
     public function testEntityStateCloneEdit(): void
     {
         $Entity = new Entity();
+
         $Collection = new EntityOneToMany($Entity);
         $Collection->setValueObject(new UserUid());
         $Entity->addCollection($Collection);

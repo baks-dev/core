@@ -30,10 +30,8 @@ use Closure;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\OneToMany;
-use Doctrine\ORM\Mapping\OneToOne;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -137,7 +135,7 @@ abstract class EntityDataMapper
 
                 /** Если связь OneToOne */
                 $modifiers = new ReflectionProperty($this, $propertyName);
-                $attr = $modifiers->getAttributes(OneToOne::class);
+                $attr = $modifiers->getAttributes(ORM\OneToOne::class);
                 $OneToOneAttribute = current($attr);
 
                 if($OneToOneAttribute)
@@ -293,7 +291,7 @@ abstract class EntityDataMapper
                 if(property_exists($this, $propertyName) && method_exists($dto, $getDtoMethod))
                 {
                     // $entityReflectionPropertyByName = new ReflectionProperty($this, $propertyName);
-                    $o2m = $entityReflectionPropertyByName->getAttributes(OneToMany::class);
+                    $o2m = $entityReflectionPropertyByName->getAttributes(ORM\OneToMany::class);
 
                     if($o2m)
                     {
@@ -341,6 +339,18 @@ abstract class EntityDataMapper
                         /** Если сущность статическая */
                         else
                         {
+
+                            if(is_null($this->entityManager))
+                            {
+                                $thisReflectionClass = new ReflectionClass($this);
+                                $isClassEntity = $thisReflectionClass->getAttributes(ORM\Entity::class);
+
+                                if(!empty($isClassEntity))
+                                {
+                                    throw new InvalidArgumentException('Необходимо передать в сущность EntityManager методом ->setEntityManager($this->entityManager)');
+                                }
+                            }
+
                             $currentCollections = $entityCollections->current();
 
                             /**
@@ -353,7 +363,7 @@ abstract class EntityDataMapper
                             foreach($collectionReflectionClass->getProperties() as $propertyCollection)
                             {
                                 /** @var ReflectionAttribute $Attr */
-                                $Attr = $propertyCollection->getAttributes(Id::class);
+                                $Attr = $propertyCollection->getAttributes(ORM\Id::class);
 
                                 if($Attr)
                                 {
@@ -370,47 +380,10 @@ abstract class EntityDataMapper
 
                                 if($removeEntityElement !== false)
                                 {
-                                    if(is_null($this->entityManager))
-                                    {
-                                        throw new InvalidArgumentException('Необходимо передать в сущность EntityManager методом ->setEntityManager($this->entityManager)');
-                                    }
-
-                                    $this->entityManager->remove($entityElement);
+                                    $this->entityManager?->remove($entityElement);
                                     $entityCollections->removeElement($entityElement);
                                 }
                             }
-
-
-                            //                            /** @var PersistentCollection $entityElement */
-                            //                            foreach($entityCollections as $entityElement)
-                            //                            {
-                            //                                // по умолчанию всегда удаляем элемент коллекции
-                            //                                $isRemove = false;
-                            //
-                            //                                // делаем поиск
-                            //                                foreach($dtoCollections as $dtoElement)
-                            //                                {
-                            //                                    foreach($identifier as $propertyEqual)
-                            //                                    {
-                            //                                        if((string) $this->getPropertyValue($propertyEqual, $entityElement) !== (string) $this->getPropertyValue($propertyEqual, $dtoElement))
-                            //                                        {
-                            //                                            $isRemove = true;
-                            //                                            break;
-                            //                                        }
-                            //                                    }
-                            //                                }
-                            //
-                            //                                dump($dto);
-                            //                                dump($isRemove);
-                            //                                dump($entityElement);
-                            //
-                            //                                /** Удаляем сущность из коллекции */
-                            //                                if($isRemove || $dtoCollections->isEmpty())
-                            //                                {
-                            //                                    $this->entityManager?->remove($entityElement);
-                            //                                    $entityCollections->removeElement($entityElement);
-                            //                                }
-                            //                            }
 
 
                             /** Обновляем существующие (добавляем новые) элементы коллекции */
@@ -420,17 +393,15 @@ abstract class EntityDataMapper
                             {
                                 $updateEntityElement = $this->findUpdateOrCreateElement($dtoElement, $entityCollections, $identifier);
 
-                                if(is_null($this->entityManager))
-                                {
-                                    throw new InvalidArgumentException('Необходимо передать в сущность EntityManager методом ->setEntityManager($this->entityManager)');
-                                }
-
+                                /** Обновляем элемент */
                                 if($updateEntityElement !== false)
                                 {
                                     $updateEntityElement->setEntityManager($this->entityManager);
                                     $updateEntityElement->setEntity($dtoElement);
 
                                 }
+
+                                /** Добавляем новый элемент */
                                 else
                                 {
                                     $obj = new $o2oTargetEntity($this);
@@ -517,7 +488,7 @@ abstract class EntityDataMapper
             */
             if(class_exists($property->getType()?->getName()) && property_exists($this, $propertyName))
             {
-                $o2o = $entityReflectionPropertyByName->getAttributes(OneToOne::class);
+                $o2o = $entityReflectionPropertyByName->getAttributes(ORM\OneToOne::class);
 
 
                 if($o2o)
@@ -637,7 +608,7 @@ abstract class EntityDataMapper
             foreach($oReflectionClass->getProperties() as $property)
             {
                 /** @var ReflectionAttribute $Attr */
-                $Attr = $property->getAttributes(Id::class);
+                $Attr = $property->getAttributes(ORM\Id::class);
 
                 if($Attr)
                 {
@@ -706,11 +677,11 @@ abstract class EntityDataMapper
 
             // Если свойство O2O (один к одному)
 
-            $reference = $entityReflectionPropertyByName->getAttributes(OneToMany::class);
+            $reference = $entityReflectionPropertyByName->getAttributes(ORM\OneToMany::class);
 
             if(!$reference)
             {
-                $reference = $entityReflectionPropertyByName->getAttributes(OneToOne::class);
+                $reference = $entityReflectionPropertyByName->getAttributes(ORM\OneToOne::class);
             }
 
             if($reference)
