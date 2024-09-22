@@ -41,13 +41,16 @@ use ReflectionProperty;
 
 abstract class EntityDataMapper
 {
-    private ?object $dto = null;
+    private object|false $dto = false;
 
     //protected ?ArrayCollection $remove = null;
 
     private ?EntityManagerInterface $entityManager = null;
 
-    public function getEntityDto(): mixed
+    /**
+     * Метод возвращает присваиваемую DTO к сущности
+     */
+    public function getEntityDto(): object|false
     {
         return $this->dto;
     }

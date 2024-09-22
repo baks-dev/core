@@ -47,8 +47,7 @@ use Twig\Environment;
 abstract class AbstractController
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private string $project_dir,
+        #[Autowire('%kernel.project_dir%')] private string $project_dir,
         private RouterInterface $router,
         private AuthorizationCheckerInterface $authorizationChecker,
         private Environment $environment,
@@ -293,8 +292,6 @@ abstract class AbstractController
         $fileName = str_replace('.', '/', $routingName).'/'.$file;
 
 
-
-
         $content = null;
 
 
@@ -338,7 +335,6 @@ abstract class AbstractController
         }
 
 
-
         /**
          * Подключаем шаблон в директории модуля
          */
@@ -363,7 +359,6 @@ abstract class AbstractController
         //            $this->requestStack->getCurrentRequest()->headers->get('x-device'),
         //            (bool) $this->getUsr()
         //        );
-
 
 
         $response->setContent($content);
@@ -477,7 +472,7 @@ abstract class AbstractController
      */
     protected function redirectToReferer(int $status = 302): ?Response
     {
-        $url = $this->requestStack->getCurrentRequest()->headers->get('referer');
+        $url = $this->requestStack->getCurrentRequest()->headers->get('referer') ?: '/';
 
         $this->requestStack->getSession()
             ->set('statusCode', $status);

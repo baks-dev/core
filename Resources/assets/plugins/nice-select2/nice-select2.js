@@ -466,16 +466,32 @@ NiceSelect.prototype._onClicked = function(e)
             search.focus();
         }
 
-        var t = this.dropdown.querySelector(".focus");
-        removeClass(t, "focus");
+        this.dropdown.querySelectorAll(".focus").forEach(e =>
+        {
+            removeClass(e, "focus");
+        });
 
-        t = this.dropdown.querySelector(".selected");
-        addClass(t, "focus");
 
+        var t = this.dropdown.querySelector(".selected");
         var list = this.dropdown.querySelector('.nice-select-dropdown .list');
+
 
         if(t && list)
         {
+            if(t.tagName === 'SMALL')
+            {
+                this.dropdown.querySelectorAll(".selected").forEach(e =>
+                {
+                    removeClass(e, "selected");
+                });
+
+                addClass(t.parentElement, "focus");
+                addClass(t.parentElement, "selected");
+            } else
+            {
+                addClass(t, "focus");
+            }
+
             const targetPosition = t.offsetTop;
             const parentScrollTop = list.scrollTop;
             parent.scrollTop = targetPosition - parentScrollTop;

@@ -31,13 +31,16 @@ use BaksDev\Files\Resources\Upload\File\FileUploadInterface;
 use BaksDev\Files\Resources\Upload\Image\ImageUploadInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
+use InvalidArgumentException;
 use LogicException;
 
 abstract class AbstractHandler
 {
-    protected ?object $event = null;
+    private object|false $command = false;
 
     protected ?object $main = null;
+
+    protected ?object $event = null;
 
     protected EntityManagerInterface $entityManager;
 
@@ -61,6 +64,231 @@ abstract class AbstractHandler
         $this->validatorCollection = $validatorCollection;
         $this->imageUpload = $imageUpload;
         $this->fileUpload = $fileUpload;
+    }
+
+
+    /**
+     * Присваивает свойство $command
+     */
+    public function setCommand(object $command): self
+    {
+        /** Добавляем к валидации объект DTO */
+        $this->validatorCollection->add($command);
+        $this->command = $command;
+        return $this;
+    }
+
+    /**
+     * @note Перед вызовом данного метода необходимо передать DTO через вызов метода $this->setCommand($command)
+     * @see setCommand
+     *
+     * Метод определяет по переданным параметрам объект сущности:
+     * - если объект сущности не найден - создает новый объект
+     * - гидрирует переданные через метод setCommand значения свойств DTO на объект сущности
+     * - добавляет объект сущности в коллекцию валидации
+     */
+    protected function prePersistOrUpdate(string $entity, array $criteria): object
+    {
+        if($this->command === false)
+        {
+            throw new InvalidArgumentException('Необходимо передать объект DTO через аргумент метода $this->setCommand($command)');
+        }
+
+        $this->entityManager->clear();
+
+        $EntityRepo = $this->entityManager
+            ->getRepository($entity)
+            ->findOneBy($criteria);
+
+        /** Создаем новый объект сущности если не найдено по переданным параметрам */
+        if(false === ($EntityRepo instanceof $entity))
+        {
+            $EntityRepo = new $entity();
+            $this->entityManager->persist($EntityRepo);
+        }
+
+        /** В некоторых случаях возможно обновление EntityEvent без создания нового события */
+        if(false === ($EntityRepo instanceof EntityState) && false === ($EntityRepo instanceof EntityEvent))
+        {
+            throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityState');
+        }
+
+        if(false === method_exists($EntityRepo, 'setEntity'))
+        {
+            throw new InvalidArgumentException(sprintf('Класс сущности %s не реализует метод setEntity($dto)', $EntityRepo::class));
+        }
+
+        /** Гидрируем значения одноименных свойств объекта DTO к сущности */
+        $EntityRepo->setEntityManager($this->entityManager);
+        $EntityRepo->setEntity($this->command);
+
+        /** Добавляем к валидации объект сущности */
+        $this->validatorCollection->add($EntityRepo);
+
+        return $EntityRepo;
+    }
+
+
+    /**
+     * @note Перед вызовом данного метода необходимо передать DTO через вызов метода $this->setCommand($command)
+     * @see setCommand
+     *
+     * Метод обновляет либо создает объект события:
+     * - корневая сущность должна реализовать метод setEvent
+     * - событийная сущность должна расширяться от EntityEvent и реализовать метод setMain
+     *
+     * @note DTO должна реализовать метод getEvent который возвращает идентификатор обновляемого события либо NULL
+     * - если getEvent возвращает NULL - создает новый объект события
+     * - если getEvent возвращает идентификатор - обновляет событие и присваивает и сохраняет его новую версию
+     */
+    protected function preEventPersistOrUpdate(string|object $main, string|object $event): void
+    {
+        /**
+         * Проверка объекта DTO
+         */
+
+        if($this->command === false)
+        {
+            throw new InvalidArgumentException('Необходимо передать объект DTO через аргумент метода $this->setCommand($command)');
+        }
+
+        if(false === method_exists($this->command, 'getEvent'))
+        {
+            throw new InvalidArgumentException('Объект DTO не реализует метод getEvent()');
+        }
+
+
+        /**
+         * Проверка структуры корневой сущности
+         */
+
+        if(is_string($main) && class_exists($main))
+        {
+            $main = new $main();
+        }
+
+        if(false === method_exists($main, 'setEvent'))
+        {
+            throw new InvalidArgumentException(sprintf('Корень объекта сущности %s не реализует метод setEvent($event)', $main::class));
+        }
+
+        $this->main = $main;
+        $this->validatorCollection->add($this->main);
+
+        /**
+         * Проверка структуры событийной сущности
+         */
+
+        if(is_string($event) && class_exists($event))
+        {
+            $event = new $event();
+        }
+
+        if(false === ($event instanceof EntityEvent))
+        {
+            throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityEvent');
+        }
+
+        if(false === method_exists($event, 'setMain'))
+        {
+            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setMain()', $event::class));
+        }
+
+        if(false === method_exists($event, 'setEntity'))
+        {
+            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
+        }
+
+
+        $this->event = $event;
+        $this->validatorCollection->add($this->event);
+
+        /**
+         * Если getEvent не является идентификатором - создаем новый объект
+         */
+
+        if(is_null($this->command->getEvent()) || $this->command->getEvent() === false)
+        {
+            $this->prePersistEvent();
+        }
+        else
+        {
+            $this->preUpdateEvent();
+        }
+    }
+
+
+    /**
+     * Метод создает новый объект события
+     */
+    private function prePersistEvent(): void
+    {
+        /** Гидрируем значения одноименных свойств объекта DTO к сущности и присваиваем идентификатор корня */
+        $this->event->setMain($this->main);
+        $this->event->setEntity($this->command);
+
+        /** Присваиваем корню идентификатор активного события */
+        $this->main->setEvent($this->event);
+
+        /** Добавляем объекты в UOW */
+        $this->entityManager->clear();
+        $this->entityManager->persist($this->event);
+        $this->entityManager->persist($this->main);
+    }
+
+    /**
+     * Метод сохраняет объект события с новой версией
+     */
+    private function preUpdateEvent(): void
+    {
+        /** Получаем активное событие */
+        $EventClass = $this->event::class;
+        $EventRepo = $this->entityManager
+            ->getRepository($EventClass)
+            ->find($this->command->getEvent());
+
+        if(
+            !$EventRepo || false === $this->validatorCollection->add($EventRepo, context: [
+                self::class.':'.__LINE__,
+                'class' => $EventClass,
+                'id' => $this->command->getEvent(),
+            ])
+        ) {
+            throw new DomainException($this->validatorCollection->getErrorUniqid());
+        }
+
+        /** Присваиваем одноименные свойства DTO */
+        $EventRepo->setEntityManager($this->entityManager);
+        $EventRepo->setEntity($this->command);
+
+        /**
+         * Через метод клонирования создаем новое событие
+         * в методе __clone в событийной сущности при необходимости генерируется новый идентификатор
+         */
+        $this->entityManager->clear();
+        $this->event = $EventRepo->cloneEntity();
+
+        /**
+         * Получаем корень после clear (для контроля объекта UOW)
+         * до сохранения состояния - корневая сущность доступна по идентификатору предыдущего события
+         */
+        $MainClass = $this->main::class;
+        $this->main = $this->entityManager
+            ->getRepository($MainClass)
+            ->findOneBy(['event' => $this->command->getEvent()]);
+
+        if(
+            false === $this->validatorCollection->add($this->main, context: [
+                self::class.':'.__LINE__,
+                'class' => $MainClass,
+                'event' => $this->command->getEvent(),
+            ])
+        ) {
+            throw new DomainException($this->validatorCollection->getErrorUniqid());
+        }
+
+        /** Обновляем событие в корне и добавляем Событие в коллекцию валидации  */
+        $this->main->setEvent($this->event);
     }
 
 
@@ -106,7 +334,6 @@ abstract class AbstractHandler
         {
             $this->event = $EventRepo;
         }
-
 
         /**
          * Получаем корень после clear (для контроля объекта UOW)
@@ -225,6 +452,15 @@ abstract class AbstractHandler
         /** Добавляем валидацию в коллекцию */
         $this->validatorCollection->add($this->event);
         $this->validatorCollection->add($this->main);
+    }
+
+    /**
+     * Сохраняет все изменения объектов в базу данных, которые находились в UnitOfWork
+     * @see UnitOfWork
+     */
+    public function flush(): void
+    {
+        $this->entityManager->flush();
     }
 
 }
