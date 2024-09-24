@@ -549,7 +549,7 @@ abstract class EntityDataMapper
                             /** Если свойство допускает присваивание NULL - удаляем Target объект */
                             if($isSetPropertyNull && is_object($thisProperty))
                             {
-                                $this->entityManager->remove($thisProperty);
+                                $this->entityManager?->remove($thisProperty);
                             }
 
                         }

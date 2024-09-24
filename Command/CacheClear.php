@@ -202,6 +202,15 @@ class CacheClear extends Command
         $appCache = $this->appCache->init($module);
         $appCache->clear();
 
+        /** Сбрасываем кеш адаптера AppCache метаданных */
+        if(method_exists($this->appCache, 'notRestricted'))
+        {
+            $appCacheRestricted = $this->appCache
+                ->notRestricted()
+                ->init($module);
+            $appCacheRestricted->clear();
+        }
+
         if(function_exists('apcu_enabled') && apcu_enabled())
         {
             $apcuCache = new ApcuAdapter($module);
