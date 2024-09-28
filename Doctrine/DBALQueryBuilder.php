@@ -256,6 +256,14 @@ final class DBALQueryBuilder extends QueryBuilder
         }
     }
 
+    public function iterateAssociative(): Generator|false
+    {
+        /** @var Generator $iterate */
+        $iterate = $this->executeDBALQuery()->iterateAssociative();
+        return $iterate->valid() ? $iterate : false;
+    }
+
+
     public function fetchAllIndexHydrate(string $class): array|false
     {
         $result = $this->executeDBALQuery()->fetchAllAssociativeIndexed();
