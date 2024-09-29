@@ -49,29 +49,20 @@ abstract class AbstractHandler
 
     protected ?object $event = null;
 
-
-    protected EntityManagerInterface $entityManager;
-
-    protected MessageDispatchInterface $messageDispatch;
-
-    protected ValidatorCollectionInterface $validatorCollection;
-
-    protected ImageUploadInterface $imageUpload;
-
-    protected FileUploadInterface $fileUpload;
+    /**
+     * @deprecated свойство entityManager станет приватным, используйте метод абстракции $this->flush()
+     * @see self::flush
+     */
+    protected readonly EntityManagerInterface $entityManager;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        MessageDispatchInterface $messageDispatch,
-        ValidatorCollectionInterface $validatorCollection,
-        ImageUploadInterface $imageUpload,
-        FileUploadInterface $fileUpload,
+        protected readonly MessageDispatchInterface $messageDispatch,
+        protected readonly ValidatorCollectionInterface $validatorCollection,
+        protected readonly ImageUploadInterface $imageUpload,
+        protected readonly FileUploadInterface $fileUpload,
     ) {
         $this->entityManager = $entityManager;
-        $this->messageDispatch = $messageDispatch;
-        $this->validatorCollection = $validatorCollection;
-        $this->imageUpload = $imageUpload;
-        $this->fileUpload = $fileUpload;
     }
 
 
