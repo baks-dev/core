@@ -31,6 +31,7 @@ use BaksDev\Core\Lock\AppLockInterface;
 use DateInterval;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class Deduplicator implements DeduplicatorInterface
@@ -45,16 +46,15 @@ final class Deduplicator implements DeduplicatorInterface
 
     private CacheInterface $cache;
 
-
     private DateInterval $expires;
 
     public function __construct(
+        #[Autowire(env: 'APP_ENV')] $environment,
         private readonly AppCacheInterface $appCache,
-        private readonly AppLockInterface $appLock
+        private readonly AppLockInterface $appLock,
     ) {
-
-        /* Время жизни дедубликации по умолчанию 1 неделя */
-        $this->expires = DateInterval::createFromDateString(Kernel::isTestEnvironment() ? '1 seconds' : '30 days');
+        /* Время жизни дедубликации по умолчанию 30 дней */
+        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '30 days' : '1 seconds');
     }
 
     /**
@@ -96,7 +96,7 @@ final class Deduplicator implements DeduplicatorInterface
 
         /* получаем из кеша результат */
         $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
-        $this->item = $this->cache->getItem($key);
+        $this->item = $this->cache->getItem(md5($key));
 
         $this->init = true;
 
@@ -145,7 +145,7 @@ final class Deduplicator implements DeduplicatorInterface
         $this->item->expiresAfter($this->expires);
         $this->cache->save($this->item);
 
-        usleep(100);
+        usleep(500);
 
         /* Снимаем лок с процесса */
         $this->lock->release();
@@ -162,5 +162,13 @@ final class Deduplicator implements DeduplicatorInterface
         }
 
         return $this->cache->deleteItem($this->item->getKey());
+    }
+
+    /**
+     * Метод возвращает идентификатор ключа дедубликатора
+     */
+    public function getKey(): string
+    {
+        return $this->item->getKey();
     }
 }

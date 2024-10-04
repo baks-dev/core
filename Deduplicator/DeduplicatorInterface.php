@@ -61,4 +61,8 @@ interface DeduplicatorInterface
 
     /** Метод удаляет результат выполненного процесса */
     public function delete(): bool;
+
+    /** Метод возвращает идентификатор ключа дедубликатора */
+    public function getKey(): string;
+
 }
