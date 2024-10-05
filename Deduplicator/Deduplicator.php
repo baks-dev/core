@@ -80,7 +80,23 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function deduplication(string|array $keys): self
     {
-        $key = is_array($keys) ? implode('.', $keys) : $keys;
+        $key = $keys;
+
+        if(is_array($keys))
+        {
+            $key = '';
+
+            foreach($keys as $item)
+            {
+                if(is_object($item))
+                {
+                    $key .= '.'.var_export($item, true);
+                    continue;
+                }
+
+                $key .= '.'.$item;
+            }
+        }
 
         /* Если не присвоено пространство имен - присваиваем из стека вызовов */
         if($this->namespace === null)
