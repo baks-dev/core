@@ -26,8 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Core\Deduplicator\Tests;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
+use BaksDev\Products\Product\Type\Id\ProductUid;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\Uid\UuidV7;
 
 /**
  * @group core
@@ -47,7 +49,9 @@ class DeduplicatorEndTest extends KernelTestCase
             ->namespace('DeduplicatorTest')
             ->deduplication([
                 'key1',
-                'key2'
+                'key2',
+                new ProductUid(),
+                ['key3' => 'value']
             ]);
 
         self::assertTrue($Deduplicator->isExecuted());
