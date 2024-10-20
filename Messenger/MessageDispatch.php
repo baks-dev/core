@@ -72,12 +72,27 @@ final class MessageDispatch implements MessageDispatchInterface
             return null;
         }
 
+        foreach($stamps as $key => $stamp)
+        {
+            /** Если передана марка MessageDelay - преобразуем её в марку DelayStamp */
+            if($stamp instanceof MessageDelay)
+            {
+                $stamps[] = $stamp->getDelayStamp();
+                unset($stamps[$key]);
+            }
+        }
+
         /**
          * Если указан транспорт - пробуем отправить в очередь
          */
 
         if($this->transport)
         {
+            if($this->transport === 'test')
+            {
+                return null;
+            }
+
             /* Делаем пинг на указанный транспорт */
             $isRunning = $this->isConsumer();
 
