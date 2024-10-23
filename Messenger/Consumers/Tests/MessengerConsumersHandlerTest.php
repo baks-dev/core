@@ -23,38 +23,29 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Cache;
+namespace BaksDev\Core\Messenger\Consumers\Tests;
 
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Cache\Marshaller\MarshallerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\Cache\CacheInterface;
+use BaksDev\Core\Messenger\Consumers\MessengerConsumersMessage;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-final class AppCache implements AppCacheInterface
+
+/**
+ * @group messenger-consumers-handler-test
+ */
+#[When(env: 'test')]
+class MessengerConsumersHandlerTest extends KernelTestCase
 {
-    private string $type = FilesystemAdapter::class;
 
-    public function __construct(
-        #[Autowire(env: 'HOST')]
-        private readonly string $HOST,
-    ) {}
-
-    public function init(
-        ?string $namespace = null,
-        int $defaultLifetime = 0,
-        ?MarshallerInterface $marshaller = null
-    ): CacheInterface {
-
-        $namespace = $namespace ? $this->HOST.'.'.$namespace : $this->HOST;
-
-        $cache = (function_exists('apcu_enabled') && apcu_enabled()) ? ApcuAdapter::class : FilesystemAdapter::class;
-
-        return new $cache($namespace, $defaultLifetime, marshaller: $marshaller);
-    }
-
-    public function getCacheType(): string
+    public function testUseCase(): void
     {
-        return $this->type;
+        /** @var MessageDispatchInterface $MessageDispatch */
+        $MessageDispatch = self::getContainer()->get(MessageDispatchInterface::class);
+        $dispatch = $MessageDispatch->dispatch(new MessengerConsumersMessage());
+
+        self::assertNotNull($dispatch);
     }
+
+
 }
