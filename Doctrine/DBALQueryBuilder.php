@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -100,7 +100,8 @@ final class DBALQueryBuilder extends QueryBuilder
         TranslatorInterface $translator,
         AppCacheInterface $cache,
         #[Autowire(env: 'APP_ENV')] string $env = 'test',
-    ) {
+    )
+    {
         $this->connection = $connection;
         $this->switcher = $switcher;
         $this->translator = $translator;
@@ -151,7 +152,7 @@ final class DBALQueryBuilder extends QueryBuilder
      * Кешируем результат DBAL
      */
 
-    public function enableCache(string $namespace = null, int $ttl = 86400, $refresh = true): self
+    public function enableCache(?string $namespace = null, int $ttl = 86400, bool $refresh = true): self
     {
         $Randomizer = new Randomizer();
 
@@ -169,17 +170,17 @@ final class DBALQueryBuilder extends QueryBuilder
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
 
-        $this->cacheKey .= '.'.implode('.', array_map(static function ($value) {
+        $this->cacheKey .= '.'.implode('.', array_map(static function($value) {
 
-            if($value instanceof DateTimeImmutable)
-            {
-                $value = $value->getTimestamp();
-            }
+                if($value instanceof DateTimeImmutable)
+                {
+                    $value = $value->getTimestamp();
+                }
 
-            return is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : $value;
+                return is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : $value;
 
 
-        }, $this->getParameters()));
+            }, $this->getParameters()));
 
         $this->cacheKey = 'dbal-'.md5($this->cacheKey);
 
@@ -555,7 +556,7 @@ final class DBALQueryBuilder extends QueryBuilder
     }
 
 
-    public function allGroupByExclude(string|array $exclude = null): void
+    public function allGroupByExclude(string|array|null $exclude = null): void
     {
 
         $array = [
@@ -732,7 +733,8 @@ final class DBALQueryBuilder extends QueryBuilder
         $identifier = 'id',
         $sort = null,
         $desc = 'DESC'
-    ) {
+    )
+    {
         $leftOneJoin = new QueryBuilder($this->connection);
 
         $leftOneJoin

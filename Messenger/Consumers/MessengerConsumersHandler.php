@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,22 +27,50 @@ namespace BaksDev\Core\Messenger\Consumers;
 
 use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 #[AsMessageHandler]
 final readonly class MessengerConsumersHandler
 {
-    public function __construct(private AppCacheInterface $cache) {}
+    private const COMMAND = 'ps aux | grep php | grep messenger:consume';
+
+    private LoggerInterface $logger;
+
+    public function __construct(
+        private AppCacheInterface $cache,
+        LoggerInterface $coreLogger
+    )
+    {
+        $this->logger = $coreLogger;
+    }
 
     /** Сохраняем информацию о запущенных воркерах */
     public function __invoke(MessengerConsumersMessage $message): void
     {
-        $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume');
-        $process->setTimeout(1);
-        $process->run();
+        $process = Process::fromShellCommandline(self::COMMAND);
+        $process->setTimeout(5);
+
+        try
+        {
+            $process->mustRun();
+        }
+        catch(ProcessFailedException $exception)
+        {
+            $this->logger->critical(sprintf('messenger: %s', $exception->getMessage()), [self::class.':'.__LINE__]);
+            return;
+        }
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
+
+        if(empty($result))
+        {
+            $this->logger->critical('messenger: Не возможно определить ни одного запущенного воркера', [self::class.':'.__LINE__]);
+            return;
+        }
+
         $result = explode(PHP_EOL, $result);
 
         $cache = $this->cache->init('core');

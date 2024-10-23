@@ -25,7 +25,7 @@ namespace BaksDev\Core\Messenger;
 
 interface MessageDispatchInterface
 {
-    public function dispatch(object $message, array $stamps = [], string $transport = null): mixed;
+    public function dispatch(object $message, array $stamps = [], ?string $transport = null): mixed;
 
     public function transport(string $transport): self;
 
