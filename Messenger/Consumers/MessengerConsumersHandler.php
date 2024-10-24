@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Core\Messenger\Consumers;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Messenger\MessageDispatch;
 use DateInterval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -59,7 +60,7 @@ final readonly class MessengerConsumersHandler
         }
         catch(ProcessFailedException $exception)
         {
-            $this->logger->critical(sprintf('messenger: %s', $exception->getMessage()), [self::class.':'.__LINE__]);
+            $this->logger->critical(sprintf('messenger-consume: %s', $exception->getMessage()), [self::class.':'.__LINE__]);
             return;
         }
 
@@ -67,13 +68,13 @@ final readonly class MessengerConsumersHandler
 
         if(empty($result))
         {
-            $this->logger->critical('messenger: Не возможно определить ни одного запущенного воркера', [self::class.':'.__LINE__]);
+            $this->logger->critical('messenger-consume: Не возможно определить ни одного запущенного воркера', [self::class.':'.__LINE__]);
             return;
         }
 
         $result = explode(PHP_EOL, $result);
 
-        $cache = $this->cache->init('core');
+        $cache = $this->cache->init(MessageDispatch::CONSUMER_NAMESPACE);
 
         foreach($result as $consumers)
         {

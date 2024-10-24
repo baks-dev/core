@@ -35,6 +35,8 @@ use Symfony\Component\Process\Process;
 
 final class MessageDispatch implements MessageDispatchInterface
 {
+    public const string CONSUMER_NAMESPACE = 'dispatch';
+
     private bool $dispatch = true;
 
     private ?string $transport = null;
@@ -156,7 +158,7 @@ final class MessageDispatch implements MessageDispatchInterface
             return false;
         }
 
-        $cache = $this->cache->init('dispatch');
+        $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
         $cacheConsume = $cache->getItem('consume-'.$this->transport);
 
         if($cacheConsume->isHit())
