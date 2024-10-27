@@ -169,7 +169,7 @@ final class MessageDispatch implements MessageDispatchInterface
         /** Процесс проверки воркера указанного транспорта */
 
         $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume | grep '.$this->transport);
-        $process->setTimeout(1);
+        $process->setTimeout(30);
         $process->run();
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();

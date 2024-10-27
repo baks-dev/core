@@ -52,7 +52,7 @@ final readonly class MessengerConsumersHandler
     public function __invoke(MessengerConsumersMessage $message): void
     {
         $process = Process::fromShellCommandline(self::COMMAND);
-        $process->setTimeout(5);
+        $process->setTimeout(30);
 
         try
         {
