@@ -36,15 +36,15 @@ final class AppCache implements AppCacheInterface
     private string $type = FilesystemAdapter::class;
 
     public function __construct(
-        #[Autowire(env: 'HOST')]
-        private readonly string $HOST,
+        #[Autowire(env: 'HOST')] private readonly string $HOST,
     ) {}
 
     public function init(
         ?string $namespace = null,
         int $defaultLifetime = 0,
         ?MarshallerInterface $marshaller = null
-    ): CacheInterface {
+    ): CacheInterface
+    {
 
         $namespace = $namespace ? $this->HOST.'.'.$namespace : $this->HOST;
 

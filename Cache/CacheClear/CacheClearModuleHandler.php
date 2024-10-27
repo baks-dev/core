@@ -25,24 +25,45 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Cache\CacheClear;
 
-final readonly class CacheClearMessage
+use BaksDev\Core\Cache\AppCacheInterface;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+
+#[AsMessageHandler]
+final readonly class CacheClearModuleHandler
 {
-    /** Идентификатор кеша */
-    public function __construct(private string|null $cache = null, private bool $restricted = true) {}
+    public function __construct(private AppCacheInterface $appCache) {}
 
     /**
-     * Cache
+     * Метод чистит кеш указанного модуля
      */
-    public function getCache(): ?string
+    public function __invoke(CacheClearMessage $message): void
     {
-        return $this->cache;
-    }
 
-    /**
-     * Restricted
-     */
-    public function isRestricted(): bool
-    {
-        return $this->restricted;
+        if(empty($message->getCache()) || false === $message->isRestricted())
+        {
+            return;
+        }
+
+        $module = $message->getCache();
+
+        if($module === 'template')
+        {
+            return;
+        }
+
+        /** Сбрасываем кеш адаптера AppCache */
+        $appCache = $this->appCache->init($module);
+        $appCache->clear();
+
+        if(function_exists('apcu_enabled') && apcu_enabled())
+        {
+            $apcuCache = new ApcuAdapter($module);
+            $apcuCache->clear();
+        }
+
+        $fileCache = new FilesystemAdapter($module);
+        $fileCache->clear();
     }
 }

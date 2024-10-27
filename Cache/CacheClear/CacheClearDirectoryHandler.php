@@ -25,24 +25,31 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Cache\CacheClear;
 
-final readonly class CacheClearMessage
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Process\Process;
+
+#[AsMessageHandler]
+final readonly class CacheClearDirectoryHandler
 {
-    /** Идентификатор кеша */
-    public function __construct(private string|null $cache = null, private bool $restricted = true) {}
+    public function __construct(
+        #[Autowire(env: 'HOST')] private string $HOST,
+        #[Autowire('%kernel.project_dir%')] private string $project_dir,
+
+    ) {}
 
     /**
-     * Cache
+     * Метод чистит кеш диреткории
      */
-    public function getCache(): ?string
+    public function __invoke(CacheClearMessage $message): void
     {
-        return $this->cache;
-    }
+        if(false === empty($message->getCache()))
+        {
+            return;
+        }
 
-    /**
-     * Restricted
-     */
-    public function isRestricted(): bool
-    {
-        return $this->restricted;
+        $process = Process::fromShellCommandline(sprintf('curl https://%s -o /dev/null', $this->HOST));
+        $process->setTimeout(30);
+        $process->mustRun();
     }
 }

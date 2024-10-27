@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,14 +26,13 @@ declare(strict_types=1);
 namespace BaksDev\Core\Command;
 
 use BaksDev\Centrifugo\BaksDevCentrifugoBundle;
-use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Cache\CacheClear\CacheClearMessage;
+use BaksDev\Core\Messenger\Consumers\MessengerConsumersRestart;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Nginx\Unit\BaksDevNginxUnitBundle;
 use DirectoryIterator;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,18 +40,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 
-// the name of the command is what users type after "php bin/console"
 #[AsCommand(name: 'baks:cache:clear')]
-class CacheClear extends Command
+class CacheClearCommand extends Command
 {
     public function __construct(
         #[Autowire('%kernel.project_dir%')] private readonly string $project_dir,
-        private readonly AppCacheInterface $appCache,
-        private readonly Filesystem $filesystem
-    ) {
+        private readonly MessageDispatchInterface $messageDispatch,
+        private readonly Filesystem $filesystem,
+        private readonly MessengerConsumersRestart $consumersRestart
+    )
+    {
         parent::__construct();
     }
-
 
     protected function configure(): void
     {
@@ -65,7 +64,6 @@ class CacheClear extends Command
         $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'vendor', 'baks-dev', null]);
 
         $io = new SymfonyStyle($input, $output);
-
 
         $module = $input->getOption('module');
         $exclude = $input->getOption('exclude');
@@ -83,18 +81,18 @@ class CacheClear extends Command
                 $target = $origin.'_'.time();
 
                 /** Удаляем директорию при завершении работы */
-                register_shutdown_function(function () use ($origin, $target) {
+                register_shutdown_function(function() use ($origin, $target) {
                     $this->filesystem->rename($origin, $target);
                     $this->filesystem->remove($target);
                     opcache_reset();
                 });
             }
 
-
             $io->success('Кеш шаблонов успешно удален');
             return Command::SUCCESS;
         }
 
+        $io->text(PHP_EOL);
 
         $unknown = true;
 
@@ -118,7 +116,7 @@ class CacheClear extends Command
                     continue;
                 }
 
-                // если указан модуль и он имеет вхождение в директорию модуля - удаляем
+                // если указан модуль и он не имеет вхождение в директорию модуля - пропускаем
                 if(isset($module) && stripos($moduleDir->getFilename(), $module) === false)
                 {
                     continue;
@@ -126,25 +124,30 @@ class CacheClear extends Command
 
                 $unknown = false;
 
-                $result = $this->clearModule($moduleDir->getFilename());
+                $output->writeln(sprintf('<info>Сбросили кеш модуля %s</info>', $moduleDir->getFilename()));
 
-                $output->writeln(sprintf('<info>Сбросили кеш модуля %s</info>', $result));
+                $this->messageDispatch->dispatch(
+                    new CacheClearMessage($moduleDir->getFilename()),
+                    transport: 'async'
+                );
             }
         }
 
-        if(!empty($module))
+
+        /**
+         * Если передан модуль, но директории модуля не найдено - пробуем сбросить как метаданные без привязки к домену
+         */
+        if(!empty($module) && $unknown === true)
         {
-            if($unknown)
-            {
-                /** Сбрасываем кеш c namespace */
-                $result = $this->clearModule($module);
-                $output->writeln(sprintf('<info>Сбросили кеш c namespace %s</info>', $result));
-            }
+            /** Сбрасываем кеш c namespace */
+            $this->messageDispatch->dispatch(
+                new CacheClearMessage($module, restricted: false),
+                transport: 'async'
+            );
 
             $io->success('Кеш модулей успешно удален');
             return Command::SUCCESS;
         }
-
 
         // Указываем абсолютный путь к директории кеша
         $path = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', null]);
@@ -164,7 +167,7 @@ class CacheClear extends Command
             $target = $cache->getRealPath().'_'.time();
 
             /** Запускаем асинхронную команду на удаление директории  */
-            register_shutdown_function(function () use ($origin, $target) {
+            register_shutdown_function(function() use ($origin, $target) {
 
                 $this->filesystem->rename($origin, $target);
                 $this->filesystem->remove($target);
@@ -174,9 +177,19 @@ class CacheClear extends Command
 
         }
 
+        /** Перезапускаем воркеры сообщений */
+        $this->consumersRestart->restart();
 
+        /** Отправляем сообщение на прогрев */
+        $this->messageDispatch->dispatch(
+            new CacheClearMessage(),
+            //stamps: [new MessageDelay(\DateInterval::createFromDateString('3 seconds'))],
+            transport: 'async'
+        );
+
+
+        $io->success('Кеш модулей успешно удален');
         $io->warning('Рекомендуется выполнить комманду:');
-
         $io->text('sudo -u unit php bin/console cache:warmup');
 
         if(class_exists(BaksDevNginxUnitBundle::class))
@@ -194,33 +207,4 @@ class CacheClear extends Command
 
         return Command::SUCCESS;
     }
-
-
-    public function clearModule(string $module): string
-    {
-        /** Сбрасываем кеш адаптера AppCache */
-        $appCache = $this->appCache->init($module);
-        $appCache->clear();
-
-        /** Сбрасываем кеш адаптера AppCache метаданных */
-        if(method_exists($this->appCache, 'notRestricted'))
-        {
-            $appCacheRestricted = $this->appCache
-                ->notRestricted()
-                ->init($module);
-            $appCacheRestricted->clear();
-        }
-
-        if(function_exists('apcu_enabled') && apcu_enabled())
-        {
-            $apcuCache = new ApcuAdapter($module);
-            $apcuCache->clear();
-        }
-
-        $fileCache = new FilesystemAdapter($module);
-        $fileCache->clear();
-
-        return $module;
-    }
-
 }

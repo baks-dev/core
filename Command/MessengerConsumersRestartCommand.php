@@ -23,26 +23,35 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Cache\CacheClear;
+namespace BaksDev\Core\Command;
 
-final readonly class CacheClearMessage
+
+use BaksDev\Core\Messenger\Consumers\MessengerConsumersRestart;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+#[AsCommand(
+    name: 'baks:messenger:restart',
+    description: 'Перезапускает все запущенные воркеры Messenger'
+)]
+class MessengerConsumersRestartCommand extends Command
 {
-    /** Идентификатор кеша */
-    public function __construct(private string|null $cache = null, private bool $restricted = true) {}
-
-    /**
-     * Cache
-     */
-    public function getCache(): ?string
+    public function __construct(private readonly MessengerConsumersRestart $consumersRestart)
     {
-        return $this->cache;
+        parent::__construct();
     }
 
-    /**
-     * Restricted
-     */
-    public function isRestricted(): bool
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        return $this->restricted;
+        $this->consumersRestart->restart();
+
+        $io = new SymfonyStyle($input, $output);
+
+        $io->success('Messenger Consumers успешно перезапущены');
+
+        return Command::SUCCESS;
     }
 }

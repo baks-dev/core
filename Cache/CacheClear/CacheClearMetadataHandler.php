@@ -25,24 +25,43 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Cache\CacheClear;
 
-final readonly class CacheClearMessage
+use BaksDev\Core\Cache\AppCacheInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+
+#[AsMessageHandler]
+final readonly class CacheClearMetadataHandler
 {
-    /** Идентификатор кеша */
-    public function __construct(private string|null $cache = null, private bool $restricted = true) {}
+    public function __construct(private AppCacheInterface $appCache) {}
 
     /**
-     * Cache
+     * Метод чистит кеш указанного модуля
      */
-    public function getCache(): ?string
+    public function __invoke(CacheClearMessage $message): void
     {
-        return $this->cache;
-    }
 
-    /**
-     * Restricted
-     */
-    public function isRestricted(): bool
-    {
-        return $this->restricted;
+        if(empty($message->getCache()))
+        {
+            return;
+        }
+
+        if(true === $message->isRestricted())
+        {
+            return;
+        }
+
+        if(false === method_exists($this->appCache, 'notRestricted'))
+        {
+            return;
+        }
+
+        /**
+         * Сбрасываем кеш адаптера AppCache метаданных
+         */
+
+        $appCacheRestricted = $this->appCache
+            ->notRestricted()
+            ->init($message->getCache());
+        $appCacheRestricted->clear();
+
     }
 }
