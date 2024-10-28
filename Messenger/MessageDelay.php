@@ -35,13 +35,16 @@ final class MessageDelay
 
 
     /**
+     *
+     * По умолчанию отложенное сообщение на 2 секунды
+     *
      * Пример использования:
      *
      * - объект: new DateInterval('3 seconds')
      * - строка: '3 seconds' ('minutes', 'hours')
      * - число в секундах: 3
      */
-    public function __construct(DateInterval|int|string $interval)
+    public function __construct(DateInterval|string|int $interval = 2)
     {
         if($interval instanceof DateInterval)
         {
@@ -49,49 +52,15 @@ final class MessageDelay
             return;
         }
 
-        /* Маркер по умолчанию - секунды */
-        $marker = 'seconds';
-
         if(is_string($interval))
         {
-            $intervals = explode(' ', $interval);
-
-            $current = current($intervals);
-
-            /** Число */
-            if($current)
-            {
-                $current = trim($current);
-                $interval = (int) $current;
-            }
-            else
-            {
-                $interval = 3;
-            }
-
-            /** Присваиваем маркер (seconds|minutes) */
-            $end = end($intervals);
-
-            if($end)
-            {
-                $end = trim($end);
-
-                // Задержка отложенного сообщения не может быть больше одних суток
-                if(in_array($end, ['second', 'seconds', 'minute', 'minutes', 'hour', 'hours']))
-                {
-                    $marker = $end;
-                }
-            }
+            $this->interval = DateInterval::createFromDateString($interval);
+            return;
         }
 
-        /**
-         * Генерируем рандомное число
-         */
-        $Randomizer = new Randomizer();
-        $jit = $Randomizer->getInt($interval, ($interval * 2));
 
-        $delay = sprintf('%s %s', $jit, $marker);
-        $this->interval = new DateInterval($delay);
+        $this->interval = DateInterval::createFromDateString($interval.' seconds');
+
     }
 
     public function getMilliseconds(): int
@@ -109,6 +78,12 @@ final class MessageDelay
         {
             $totalSeconds = 86400;
         }
+
+        /**
+         * Генерируем рандомное число
+         */
+        $Randomizer = new Randomizer();
+        $totalSeconds = $Randomizer->getInt($totalSeconds, ($totalSeconds * 2));
 
         return $totalSeconds * 1000;
     }
