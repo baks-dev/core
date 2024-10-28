@@ -26,15 +26,72 @@ declare(strict_types=1);
 namespace BaksDev\Core\Messenger;
 
 use DateInterval;
+use Random\Randomizer;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 final class MessageDelay
 {
     private DateInterval $interval;
 
-    public function __construct(DateInterval $interval)
+
+    /**
+     * Пример использования:
+     *
+     * - объект: new DateInterval('3 seconds')
+     * - строка: '3 seconds' ('minutes', 'hours')
+     * - число в секундах: 3
+     */
+    public function __construct(DateInterval|int|string $interval)
     {
-        $this->interval = $interval;
+        if($interval instanceof DateInterval)
+        {
+            $this->interval = $interval;
+            return;
+        }
+
+        /* Маркер по умолчанию - секунды */
+        $marker = 'seconds';
+
+        if(is_string($interval))
+        {
+            $intervals = explode(' ', $interval);
+
+            $current = current($intervals);
+
+            /** Число */
+            if($current)
+            {
+                $current = trim($current);
+                $interval = (int) $current;
+            }
+            else
+            {
+                $interval = 3;
+            }
+
+            /** Присваиваем маркер (seconds|minutes) */
+            $end = end($intervals);
+
+            if($end)
+            {
+                $end = trim($end);
+
+                // Задержка отложенного сообщения не может быть больше одних суток
+                if(in_array($end, ['second', 'seconds', 'minute', 'minutes', 'hour', 'hours']))
+                {
+                    $marker = $end;
+                }
+            }
+        }
+
+        /**
+         * Генерируем рандомное число
+         */
+        $Randomizer = new Randomizer();
+        $jit = $Randomizer->getInt($interval, ($interval * 2));
+
+        $delay = sprintf('%s %s', $jit, $marker);
+        $this->interval = new DateInterval($delay);
     }
 
     public function getMilliseconds(): int

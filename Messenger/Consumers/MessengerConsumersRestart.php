@@ -38,7 +38,7 @@ final readonly class MessengerConsumersRestart
     {
         $process = Process::fromShellCommandline(self::COMMAND);
         $process->setTimeout(30);
-        $process->mustRun();
+        $process->run();
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
 
