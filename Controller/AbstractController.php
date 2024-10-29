@@ -152,7 +152,8 @@ abstract class AbstractController
         string $domain = 'messages',
         array|string|object|null $arguments = null,
         int $status = 302
-    ): ?Response {
+    ): ?Response
+    {
 
         if(is_object($arguments))
         {
@@ -260,7 +261,8 @@ abstract class AbstractController
         ?string $routingName = null,
         ?string $file = null,
         ?Response $response = null,
-    ): Response {
+    ): Response
+    {
 
         $request = $this->requestStack;
 
@@ -487,6 +489,11 @@ abstract class AbstractController
             return $jsonResponse;
         }
 
+        if(empty($url))
+        {
+            $url = '/';
+        }
+
         return new RedirectResponse($url, $status);
     }
 
@@ -500,7 +507,8 @@ abstract class AbstractController
         string $route,
         array $parameters = [],
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH,
-    ): string {
+    ): string
+    {
         return $this->router->generate($route, $parameters, $referenceType);
     }
 
@@ -511,7 +519,8 @@ abstract class AbstractController
             $this->requestStack
                 ->getMainRequest()
                 ?->isXmlHttpRequest()
-        ) {
+        )
+        {
 
             $referer = $this->requestStack->getCurrentRequest()->headers->get('referer');
 
