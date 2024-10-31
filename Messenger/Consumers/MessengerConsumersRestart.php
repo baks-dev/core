@@ -37,7 +37,7 @@ final readonly class MessengerConsumersRestart
     public function restart(): void
     {
         $process = Process::fromShellCommandline(self::COMMAND);
-        $process->setTimeout(30);
+        $process->setTimeout(60);
         $process->run();
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
@@ -58,7 +58,7 @@ final readonly class MessengerConsumersRestart
                 }
 
                 $process = Process::fromShellCommandline(sprintf('systemctl restart %s.service', $name));
-                $process->setTimeout(30);
+                $process->setTimeout(60);
                 $process->run();
             }
         }

@@ -159,7 +159,7 @@ final class MessageDispatch implements MessageDispatchInterface
         }
 
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
-        $cacheConsume = $cache->getItem('consume-'.$this->transport);
+        $cacheConsume = $cache->getItem('consume-'.trim($this->transport));
 
         if($cacheConsume->isHit())
         {
@@ -178,7 +178,7 @@ final class MessageDispatch implements MessageDispatchInterface
         /** Кешируем результат для следующих сообщений транспорта */
 
         $cacheConsume->set($isRunning);
-        $cacheConsume->expiresAfter(DateInterval::createFromDateString('5 minutes'));
+        $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
         $cache->save($cacheConsume);
 
         return $isRunning;

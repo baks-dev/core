@@ -61,6 +61,7 @@ final readonly class CacheClearMetadataHandler
         $appCacheRestricted = $this->appCache
             ->notRestricted()
             ->init($message->getCache());
+
         $appCacheRestricted->clear();
 
     }

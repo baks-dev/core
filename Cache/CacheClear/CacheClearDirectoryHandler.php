@@ -32,11 +32,7 @@ use Symfony\Component\Process\Process;
 #[AsMessageHandler]
 final readonly class CacheClearDirectoryHandler
 {
-    public function __construct(
-        #[Autowire(env: 'HOST')] private string $HOST,
-        #[Autowire('%kernel.project_dir%')] private string $project_dir,
-
-    ) {}
+    public function __construct(#[Autowire(env: 'HOST')] private string $HOST) {}
 
     /**
      * Метод чистит кеш диреткории

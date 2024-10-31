@@ -42,6 +42,7 @@ final readonly class MessengerConsumersHandler
 
     public function __construct(
         private AppCacheInterface $cache,
+        private MessengerConsumersRestart $consumersRestart,
         LoggerInterface $coreLogger
     )
     {
@@ -52,7 +53,7 @@ final readonly class MessengerConsumersHandler
     public function __invoke(MessengerConsumersMessage $message): void
     {
         $process = Process::fromShellCommandline(self::COMMAND);
-        $process->setTimeout(30);
+        $process->setTimeout(60);
 
         try
         {
@@ -61,6 +62,7 @@ final readonly class MessengerConsumersHandler
         catch(ProcessFailedException $exception)
         {
             $this->logger->critical(sprintf('messenger-consume: %s', $exception->getMessage()), [self::class.':'.__LINE__]);
+
             return;
         }
 
@@ -68,7 +70,11 @@ final readonly class MessengerConsumersHandler
 
         if(empty($result))
         {
-            $this->logger->critical('messenger-consume: Не возможно определить ни одного запущенного воркера', [self::class.':'.__LINE__]);
+            /** Если возникла ситуация, что воркер нельзя определить - пробуем перезапустить */
+            $this->consumersRestart->restart();
+
+            $this->logger->critical('messenger-consume: Не возможно определить ни одного запущенного воркера. Пробуем перезапустить.', [self::class.':'.__LINE__]);
+
             return;
         }
 
@@ -86,9 +92,9 @@ final readonly class MessengerConsumersHandler
 
                     if(!empty($consumer))
                     {
-                        $cacheConsume = $cache->getItem('consume-'.$consumer);
+                        $cacheConsume = $cache->getItem('consume-'.trim($consumer));
                         $cacheConsume->set(true);
-                        $cacheConsume->expiresAfter(DateInterval::createFromDateString('5 minutes'));
+                        $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
                         $cache->save($cacheConsume);
                     }
                 }
