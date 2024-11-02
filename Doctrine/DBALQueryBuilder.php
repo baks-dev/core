@@ -31,7 +31,6 @@ use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use BaksDev\Core\Type\Locale\Locale;
 use DateInterval;
-use DateTimeImmutable;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Connection;
@@ -77,36 +76,21 @@ final class DBALQueryBuilder extends QueryBuilder
     private ?string $recursive = null;
     private ?string $recursive_alias = null;
 
-
-    private SwitcherInterface $switcher;
-
     /** Строка поиска */
     private SearchDTO $query;
-
-    private TranslatorInterface $translator;
 
     /** Количество результатов */
     private ?int $counter = null;
 
-    private string $env;
-
-
-    private AppCacheInterface $cache;
-
-
     public function __construct(
+        #[Autowire(env: 'APP_ENV')] private readonly string $env,
+        private readonly SwitcherInterface $switcher,
+        private readonly TranslatorInterface $translator,
+        private readonly AppCacheInterface $cache,
         Connection $connection,
-        SwitcherInterface $switcher,
-        TranslatorInterface $translator,
-        AppCacheInterface $cache,
-        #[Autowire(env: 'APP_ENV')] string $env = 'test',
     )
     {
         $this->connection = $connection;
-        $this->switcher = $switcher;
-        $this->translator = $translator;
-        $this->env = $env;
-        $this->cache = $cache;
 
         parent::__construct($this->connection);
     }
@@ -114,11 +98,11 @@ final class DBALQueryBuilder extends QueryBuilder
     public function createQueryBuilder(object|string $class): self
     {
         $newInstance = new self(
-            $this->connection,
-            $this->switcher,
-            $this->translator,
-            $this->cache,
-            $this->env
+            env: $this->env,
+            switcher: $this->switcher,
+            translator: $this->translator,
+            cache: $this->cache,
+            connection: $this->connection
         );
 
         //$newInstance->resetQueryParts();
@@ -130,59 +114,51 @@ final class DBALQueryBuilder extends QueryBuilder
         $newInstance->setParameters([]);
 
         $classNamespace = is_object($class) ? $class::class : $class;
+        $newInstance->cacheKey = $classNamespace;
 
-        $newInstance->namespace = $classNamespace;
-        $newInstance->cacheKey = md5($classNamespace);
-
-        if(class_exists($classNamespace))
-        {
-            /** Выделяем из namespace класса название модуля */
-            $reflect = new ReflectionClass($classNamespace);
-
-            if(preg_match('/vendor\/baks-dev\/([^\/]+)\//', $reflect->getFileName(), $matches))
-            {
-                $newInstance->namespace = $matches[1];
-            }
-        }
+        $newInstance->namespace = $this->getCacheNamespace($classNamespace);
 
         return $newInstance;
     }
+
+    private function getCacheNamespace(string $class)
+    {
+        if(class_exists($class))
+        {
+            /** Выделяем из namespace класса название модуля */
+            $reflect = new ReflectionClass($class);
+
+            if(preg_match('/vendor\/baks-dev\/([^\/]+)\//', $reflect->getFileName(), $matches))
+            {
+                return $matches[1];
+            }
+        }
+
+        return $class;
+    }
+
 
     /**
      * Кешируем результат DBAL
      */
 
-    public function enableCache(?string $namespace = null, int $ttl = 86400, bool $refresh = true): self
+    public function enableCache(?string $namespace = null, int|string $ttl = '1 day', bool $refresh = true): self
     {
-        $Randomizer = new Randomizer();
-
         $this->isCache = true;
-        $this->ttl = $ttl + $Randomizer->getInt(0, $ttl); // разбрасываем время кеша
 
-        /** Переопределяем кеш модуля */
-        if($namespace && $this->namespace !== $namespace)
-        {
-            $this->namespace = $namespace;
-        }
-
-        /** Кешируем в редис */
+        $ttl = $this->getTimeToLive($ttl);
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
 
+        $this->ttl = $this->getTimeToLive($ttl);
+
+        /** Переопределяем кеш модуля */
+        if($namespace)
+        {
+            $this->namespace = $this->getCacheNamespace($namespace);
+        }
+
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
-
-        $this->cacheKey .= '.'.implode('.', array_map(static function($value) {
-
-                if($value instanceof DateTimeImmutable)
-                {
-                    $value = $value->getTimestamp();
-                }
-
-                return is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : $value;
-
-
-            }, $this->getParameters()));
-
-        $this->cacheKey = 'dbal-'.md5($this->cacheKey);
+        $this->cacheKey .= '.'.md5(var_export($this->getParameters(), true));
 
         if($refresh)
         {
@@ -194,6 +170,7 @@ final class DBALQueryBuilder extends QueryBuilder
             if($lastDatetime === null || time() > $lastDatetime)
             {
                 /* Перезаписываем метку времени запроса */
+                $Randomizer = new Randomizer();
                 $lastDatetimeCache->set(time() + $Randomizer->getInt(3, 10));
                 $lastDatetimeCache->expiresAfter($this->ttl);
                 $DatetimeCache->save($lastDatetimeCache);
@@ -201,8 +178,16 @@ final class DBALQueryBuilder extends QueryBuilder
                 if($lastDatetime)
                 {
                     /* Сбрасываем кеш для последующего запроса */
-                    register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
-                    register_shutdown_function([$this, 'resetCounter'], 'throw');
+                    //register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
+                    //register_shutdown_function([$this, 'resetCounter'], 'throw');
+
+                    register_shutdown_function(function() {
+                        $this->resetCacheQuery();
+                    });
+
+                    register_shutdown_function(function() {
+                        $this->resetCounter();
+                    });
                 }
             }
         }
@@ -211,6 +196,40 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $this;
     }
+
+
+    private function getTimeToLive(string|int $seconds): int
+    {
+        if(is_string($seconds))
+        {
+            $interval = DateInterval::createFromDateString($seconds);
+
+            $seconds =
+                ($interval->d * 86400) + // дни в секундах
+                ($interval->h * 3600) +  // часы в секундах
+                ($interval->i * 60) +    // минуты в секундах
+                $interval->s;            // секунды
+        }
+
+        $seconds = (int) $seconds;
+
+        /**
+         * Отключаем кеширование быть больше одних суток
+         */
+        if(empty($seconds) || $seconds > 86400)
+        {
+            $seconds = 86400;
+        }
+
+        /**
+         * Делаем разброс по времени
+         */
+        $Randomizer = new Randomizer();
+        $seconds = $Randomizer->getInt($seconds, ($seconds * 2));
+
+        return $seconds;
+    }
+
 
     /**
      * Перезаписываем кеш
@@ -223,8 +242,9 @@ final class DBALQueryBuilder extends QueryBuilder
             return true;
         }
 
-        $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
+        $this->connection->getConfiguration()->setResultCache($this->cacheQueries);
         $this->deleteCacheQueries(); // Удаляем
+
         return true;
 
         //$this->executeCacheQuery(); // Сохраняем
@@ -369,19 +389,20 @@ final class DBALQueryBuilder extends QueryBuilder
     public function deleteCacheQueries(): void
     {
         $this->cacheQueries->deleteItem($this->cacheKey);
-        //$this->cacheQueries->clear();
     }
 
     public function resetCacheCounter(): void
     {
-        /* Не сбрасываем кеш если тестовая среда */
-        if(Kernel::isTestEnvironment())
+        if($this->env === 'test')
         {
             return;
         }
 
         /* Сбрасываем кеш для последующего запроса */
-        register_shutdown_function([$this, 'resetCounter'], 'throw');
+        register_shutdown_function(function() {
+            $this->resetCounter();
+        });
+
     }
 
     public function resetCounter()
@@ -390,11 +411,10 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
 
-
         $lastDatetimeCache = $DatetimeCache->getItem($counterKey);
 
         /** @var CacheItem $lastDatetime */
-        if(!$lastDatetimeCache->isHit())
+        if(false === $lastDatetimeCache->isHit())
         {
             $this->select('COUNT(*)');
             $this->setMaxResults(null);
@@ -403,13 +423,12 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->resetOrderBy();
             $this->resetGroupBy();
 
-
             $counterCache = $this->cacheQueries->getItem($counterKey);
             $counterCache->set($this->fetchOne());
             $counterCache->expiresAfter(DateInterval::createFromDateString('1 day'));
             $this->cacheQueries->save($counterCache);
 
-            // $lastDatetimeCache->expiresAfter(\DateInterval::createFromDateString('5 minutes'));
+
             $lastDatetimeCache->expiresAfter(DateInterval::createFromDateString('5 seconds'));
             $lastDatetimeCache->set(true);
             $DatetimeCache->save($lastDatetimeCache);
@@ -436,16 +455,13 @@ final class DBALQueryBuilder extends QueryBuilder
             }
         }
 
-
         if(is_int($this->query->query) || $this->query->isUid())
         {
             $this->setParameter('equal', $this->query->query);
         }
-        //else
-        //{
+
         $this->setParameter('query', '%'.$this->switcher->toRus($this->query->query).'%');
         $this->setParameter('switcher', '%'.$this->switcher->toEng($this->query->query).'%');
-        //}
 
         $this->search = new QueryBuilder($this->connection);
 
@@ -459,15 +475,7 @@ final class DBALQueryBuilder extends QueryBuilder
      */
     public function joinRecursive($fromAlias, $join, $alias, $condition = null): self
     {
-        //$this->recursive = new QueryBuilder($this->connection);
         $this->recursive_alias = $alias;
-
-        //        $this->recursive = sprintf(
-        //            ' INNER JOIN %s %s ON %s ',
-        //            $this->table($join),
-        //            $alias,
-        //            $condition
-        //        );
 
         $this->join(
             $fromAlias,
@@ -485,8 +493,6 @@ final class DBALQueryBuilder extends QueryBuilder
      * @param $parent - идентификатор свойства на основную сущность
      * @throws Exception
      */
-    //public function findAllRecursive(string $id, string $parent)
-
     public function findAllRecursive(array $condition): array|false
     {
         $parent = key($condition);
@@ -505,7 +511,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
 
         $dbal_union->resetWhere();
-
 
         $sql = "WITH RECURSIVE recursive_table AS (";
         $sql .= $this->getSQL();
@@ -582,125 +587,14 @@ final class DBALQueryBuilder extends QueryBuilder
                 }
             }
 
-
             preg_match_all('/\b(\w+\.\w+)\b/', $field, $matches);
             $result = $matches[1];
 
             foreach($result as $r)
             {
-                //                if(stripos('exist_move_event', $r) !== false)
-                //                {
-                //                    continue;
-                //                }
-
                 $addGroupBy[] = $r;
-                //dump($r);
             }
-
-
-            continue;
-
-
-            $field = str_replace(array(PHP_EOL, "\t"), ' ', $field);
-            $field = trim($field);
-            $case = stripos($field, "CASE");
-
-
-            if($case !== false)
-            {
-                $arrWhen = explode('WHEN', $field);
-
-
-                foreach($arrWhen as $item)
-                {
-                    $fieldWhen = trim($item);
-
-                    if($fieldWhen === 'CASE')
-                    {
-                        continue;
-                    }
-
-                    $fieldWhen = substr($fieldWhen, 0, strpos($fieldWhen, ' '));
-
-                    //$this->addGroupBy(trim($fieldWhen));
-
-                    $addGroupBy[] = trim($fieldWhen);
-                }
-
-
-                $arrThen = explode('THEN', $field);
-
-                foreach($arrThen as $item)
-                {
-                    $item = trim($item);
-
-                    $CONCAT = stripos($item, "CONCAT");
-
-                    if($CONCAT)
-                    {
-                        continue;
-                    }
-
-                    $item = trim(str_replace(array(PHP_EOL, "(", ")"), ' ', $item));
-                    $stripos = strpos($item, ' ');
-
-                    if(!$stripos)
-                    {
-                        continue;
-                    }
-
-                    $fieldThen = substr($item, 0, $stripos);
-
-                    $fieldThen = trim($fieldThen);
-
-                    if($fieldThen === 'CASE' || $fieldThen === 'CONCAT')
-                    {
-                        continue;
-                    }
-
-                    if($fieldThen)
-                    {
-                        $addGroupBy[] = $fieldThen;
-                        //$this->addGroupBy($fieldThen);
-                    }
-                }
-
-                continue;
-            }
-
-
-            $endAs = stripos($field, "END");
-
-            if($endAs)
-            {
-                $field = substr($field, strpos($field, "END") + 3);
-                $field = trim(str_ireplace(' AS', '', $field));
-
-                $dot = stripos($field, '.');
-
-                if(!$dot)
-                {
-                    continue;
-                }
-
-            }
-
-            $as = stripos($field, " AS ");
-
-            if($as)
-            {
-                $field = trim(substr($field, 0, $as));
-            }
-
-            if($field === $exclude)
-            {
-                continue;
-            }
-
-            $addGroupBy[] = $field;
-            //$this->addGroupBy($field);
         }
-
 
         if($addGroupBy)
         {

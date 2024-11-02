@@ -23,36 +23,32 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Command;
+namespace BaksDev\Core\Schedule\MessengerConsumers;
 
-use BaksDev\Core\Messenger\MessengerConsumers;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use BaksDev\Core\Schedule\ScheduleInterface;
+use DateInterval;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AsCommand(
-    name: 'baks:messenger:restart',
-    description: 'Перезапускает все запущенные воркеры Messenger'
-)]
-class MessengerConsumersRestartCommand extends Command
+/**
+ * Проверяем каждую минуту Messenger Consumers
+ */
+#[AutoconfigureTag('baks.schedule')]
+final class MessengerConsumersSchedule implements ScheduleInterface
 {
-    public function __construct(
-        private readonly MessengerConsumers $MessengerConsumers
-    )
+    /**
+     * Возвращает класс сообщение
+     */
+    public function getMessage(): object
     {
-        parent::__construct();
+        return new MessengerConsumersMessage();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    /**
+     * Интервал повтора
+     * @see https://www.php.net/manual/en/dateinterval.createfromdatestring.php
+     */
+    public function getInterval(): DateInterval
     {
-        $this->MessengerConsumers->restart();
-
-        $io = new SymfonyStyle($input, $output);
-
-        $io->success('Messenger Consumers успешно перезапущены');
-
-        return Command::SUCCESS;
+        return DateInterval::createFromDateString('1 minutes');
     }
 }

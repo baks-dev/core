@@ -10,7 +10,7 @@
 # systemctl stop baks-async@1.service
 
 [Unit]
-Description=Symfony messenger async %i
+Description=async
 StartLimitBurst=5
 StartLimitIntervalSec=0
 

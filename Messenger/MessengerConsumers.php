@@ -23,34 +23,20 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Messenger\Consumers;
+namespace BaksDev\Core\Messenger;
 
-use BaksDev\Core\Cache\AppCacheInterface;
-use BaksDev\Core\Messenger\MessageDispatch;
-use DateInterval;
+use Exception;
+use Generator;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-#[AsMessageHandler]
-final readonly class MessengerConsumersHandler
+final class MessengerConsumers
 {
-    private const COMMAND = 'ps aux | grep php | grep messenger:consume';
+    private const COMMAND = 'systemctl list-units --type=service  | grep baks | grep active | grep running';
 
-    private LoggerInterface $logger;
+    public function __construct(private readonly LoggerInterface $logger) {}
 
-    public function __construct(
-        private AppCacheInterface $cache,
-        private MessengerConsumersRestart $consumersRestart,
-        LoggerInterface $coreLogger
-    )
-    {
-        $this->logger = $coreLogger;
-    }
-
-    /** Сохраняем информацию о запущенных воркерах */
-    public function __invoke(MessengerConsumersMessage $message): void
+    public function getServices(): Generator|false
     {
         $process = Process::fromShellCommandline(self::COMMAND);
         $process->setTimeout(60);
@@ -59,11 +45,11 @@ final readonly class MessengerConsumersHandler
         {
             $process->mustRun();
         }
-        catch(ProcessFailedException $exception)
+        catch(Exception $exception)
         {
             $this->logger->critical(sprintf('messenger-consume: %s', $exception->getMessage()), [self::class.':'.__LINE__]);
 
-            return;
+            return false;
         }
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
@@ -71,34 +57,43 @@ final readonly class MessengerConsumersHandler
         if(empty($result))
         {
             /** Если возникла ситуация, что воркер нельзя определить - пробуем перезапустить */
-            $this->consumersRestart->restart();
-
             $this->logger->critical('messenger-consume: Не возможно определить ни одного запущенного воркера. Пробуем перезапустить.', [self::class.':'.__LINE__]);
 
+            return false;
+        }
+
+        $services = explode(PHP_EOL, $result);
+
+        foreach($services as $service)
+        {
+            yield trim($service);
+        }
+    }
+
+    public function restart(): void
+    {
+        $services = $this->getServices();
+
+        if(false === $services || false === $services->valid())
+        {
             return;
         }
 
-        $result = explode(PHP_EOL, $result);
-
-        $cache = $this->cache->init(MessageDispatch::CONSUMER_NAMESPACE);
-
-        foreach($result as $consumers)
+        foreach($services as $service)
         {
-            if(!empty($consumers) && strripos($consumers, 'bin/console') !== false)
-            {
-                if(preg_match('/messenger:consume (.*?) /', $consumers, $matches))
-                {
-                    $consumer = $matches[1] ?? null;
+            $name = explode('.service', $service);
+            $name = current($name);
+            $name = trim($name);
 
-                    if(!empty($consumer))
-                    {
-                        $cacheConsume = $cache->getItem('consume-'.trim($consumer));
-                        $cacheConsume->set(true);
-                        $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
-                        $cache->save($cacheConsume);
-                    }
-                }
+            if(empty($name) || $name === 'systemd')
+            {
+                continue;
             }
+
+            $process = Process::fromShellCommandline(sprintf('systemctl restart %s.service', $name));
+            $process->setTimeout(60);
+            $process->run();
         }
+
     }
 }

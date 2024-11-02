@@ -23,36 +23,6 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Command;
+namespace BaksDev\Core\Schedule\MessengerConsumers;
 
-use BaksDev\Core\Messenger\MessengerConsumers;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-
-#[AsCommand(
-    name: 'baks:messenger:restart',
-    description: 'Перезапускает все запущенные воркеры Messenger'
-)]
-class MessengerConsumersRestartCommand extends Command
-{
-    public function __construct(
-        private readonly MessengerConsumers $MessengerConsumers
-    )
-    {
-        parent::__construct();
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->MessengerConsumers->restart();
-
-        $io = new SymfonyStyle($input, $output);
-
-        $io->success('Messenger Consumers успешно перезапущены');
-
-        return Command::SUCCESS;
-    }
-}
+final class MessengerConsumersMessage { }

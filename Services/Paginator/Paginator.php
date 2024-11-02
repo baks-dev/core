@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2022-2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,6 @@ final class Paginator implements PaginatorInterface
         $this->path = $this->request->get('_route') ?: 'core';
         $this->namespace = substr($this->path, 0, strpos($this->path, ':'));
 
-
         $this->session = $this->request->hasPreviousSession() ? $this->request->getSession() : null;
 
         /** Получаем limit */
@@ -140,6 +139,7 @@ final class Paginator implements PaginatorInterface
         if($this->pagination)
         {
             $cacheKey = 'counter.'.$qb->getCacheKey();
+            $qb->resetCacheCounter();
 
             if($this->session?->get('statusCode') === 307)
             {
@@ -156,7 +156,6 @@ final class Paginator implements PaginatorInterface
             {
                 if($qb->getCacheQueries()?->hasItem($cacheKey))
                 {
-
                     $this->counter = ($qb->getCacheQueries()->getItem($cacheKey))->get();
                 }
                 else
@@ -164,8 +163,6 @@ final class Paginator implements PaginatorInterface
                     $this->counter = 'более '.$this->limit;
                 }
             }
-
-            $qb->resetCacheCounter();
         }
         else
         {

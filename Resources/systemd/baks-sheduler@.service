@@ -10,7 +10,7 @@
 # systemctl stop baks-scheduler@1.service
 
 [Unit]
-Description=Symfony messenger scheduler_default %i
+Description=scheduler_default
 StartLimitBurst=5
 StartLimitIntervalSec=0
 

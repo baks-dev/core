@@ -23,44 +23,48 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Messenger\Consumers;
+namespace BaksDev\Core\Messenger\MessengerConsumers;
 
-use Symfony\Component\Process\Process;
+use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Messenger\MessageDispatch;
+use BaksDev\Core\Messenger\MessengerConsumers;
+use DateInterval;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-final readonly class MessengerConsumersRestart
+#[AsMessageHandler(priority: 0)]
+final readonly class ConsumerRunningHandler
 {
-    private const COMMAND = 'systemctl list-units --type=service  | grep baks | grep active | grep running';
+    public function __construct(
+        private AppCacheInterface $cache,
+        private MessengerConsumers $MessengerConsumers,
+    ) {}
 
-    /**
-     * Метод получает все сервисы c воркерами, и перезапускает запущенные
-     */
-    public function restart(): void
+    public function __invoke(ConsumerRunningMessage $message): void
     {
-        $process = Process::fromShellCommandline(self::COMMAND);
-        $process->setTimeout(60);
-        $process->run();
+        $cache = $this->cache->init(MessageDispatch::CONSUMER_NAMESPACE);
 
-        $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
+        $services = $this->MessengerConsumers->getServices();
 
-        if(!empty($result))
+        if(false === $services || false === $services->valid())
         {
-            $result = explode(PHP_EOL, $result);
+            return;
+        }
 
-            foreach($result as $service)
+        foreach($services as $service)
+        {
+            $name = explode('running', $service);
+            $name = end($name);
+            $consumer = trim($name);
+
+            if(empty($consumer))
             {
-                $name = explode('.service', $service);
-                $name = current($name);
-                $name = trim($name);
-
-                if(empty($name))
-                {
-                    continue;
-                }
-
-                $process = Process::fromShellCommandline(sprintf('systemctl restart %s.service', $name));
-                $process->setTimeout(60);
-                $process->run();
+                continue;
             }
+
+            $cacheConsume = $cache->getItem('consume-'.$consumer);
+            $cacheConsume->set(true);
+            $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
+            $cache->save($cacheConsume);
         }
     }
 }

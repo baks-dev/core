@@ -27,8 +27,8 @@ namespace BaksDev\Core\Command;
 
 use BaksDev\Centrifugo\BaksDevCentrifugoBundle;
 use BaksDev\Core\Cache\CacheClear\CacheClearMessage;
-use BaksDev\Core\Messenger\Consumers\MessengerConsumersRestart;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Core\Messenger\MessengerConsumers;
 use BaksDev\Nginx\Unit\BaksDevNginxUnitBundle;
 use DirectoryIterator;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -47,7 +47,7 @@ class CacheClearCommand extends Command
         #[Autowire('%kernel.project_dir%')] private readonly string $project_dir,
         private readonly MessageDispatchInterface $messageDispatch,
         private readonly Filesystem $filesystem,
-        private readonly MessengerConsumersRestart $consumersRestart
+        private readonly MessengerConsumers $MessengerConsumers
     )
     {
         parent::__construct();
@@ -178,7 +178,7 @@ class CacheClearCommand extends Command
         }
 
         /** Перезапускаем воркеры сообщений */
-        $this->consumersRestart->restart();
+        $this->MessengerConsumers->restart();
 
         /** Отправляем сообщение на прогрев */
         $this->messageDispatch->dispatch(

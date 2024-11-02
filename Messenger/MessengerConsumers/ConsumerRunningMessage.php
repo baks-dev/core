@@ -23,29 +23,9 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Core\Messenger\Consumers\Tests;
-
-use BaksDev\Core\Messenger\Consumers\MessengerConsumersMessage;
-use BaksDev\Core\Messenger\MessageDispatchInterface;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\Attribute\When;
+namespace BaksDev\Core\Messenger\MessengerConsumers;
 
 
-/**
- * @group messenger-consumers-handler-test
- */
-#[When(env: 'test')]
-class MessengerConsumersHandlerTest extends KernelTestCase
+final class ConsumerRunningMessage
 {
-
-    public function testUseCase(): void
-    {
-        /** @var MessageDispatchInterface $MessageDispatch */
-        $MessageDispatch = self::getContainer()->get(MessageDispatchInterface::class);
-        $dispatch = $MessageDispatch->dispatch(new MessengerConsumersMessage());
-
-        self::assertNotNull($dispatch);
-    }
-
-
 }
