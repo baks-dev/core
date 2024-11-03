@@ -118,6 +118,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $newInstance->namespace = $this->getCacheNamespace($classNamespace);
 
+        $this->isCache = false;
+
         return $newInstance;
     }
 
