@@ -34,7 +34,12 @@ final class MessengerConsumers
 {
     private const COMMAND = 'systemctl list-units --type=service  | grep baks | grep active | grep running';
 
-    public function __construct(private readonly LoggerInterface $logger) {}
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $coreLogger)
+    {
+        $this->logger = $coreLogger;
+    }
 
     public function getServices(): Generator|false
     {
@@ -85,15 +90,26 @@ final class MessengerConsumers
             $name = current($name);
             $name = trim($name);
 
-            if(empty($name) || $name === 'systemd')
+            if(empty($name) || stripos($name, 'systemd') !== false)
             {
                 continue;
             }
 
             $process = Process::fromShellCommandline(sprintf('systemctl restart %s.service', $name));
             $process->setTimeout(60);
-            $process->run();
-        }
 
+            try
+            {
+                $process->mustRun();
+
+                $this->logger->info(sprintf('Перезапустили consumer %s', $name), [self::class.':'.__LINE__]);
+
+            }
+            catch(Exception $exception)
+            {
+                $this->logger->critical(sprintf('messenger-consume: Ошибка при перезапуске consumer %s', $name), [self::class.':'.__LINE__, $exception->getMessage()]);
+            }
+
+        }
     }
 }

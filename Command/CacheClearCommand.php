@@ -178,7 +178,7 @@ class CacheClearCommand extends Command
         }
 
         /** Перезапускаем воркеры сообщений */
-        $this->MessengerConsumers->restart();
+        //$this->MessengerConsumers->restart();
 
         /** Отправляем сообщение на прогрев */
         $this->messageDispatch->dispatch(
@@ -191,6 +191,7 @@ class CacheClearCommand extends Command
         $io->success('Кеш модулей успешно удален');
         $io->warning('Рекомендуется выполнить комманду:');
         $io->text('sudo -u unit php bin/console cache:warmup');
+        $io->text('php bin/console baks:messenger:restart');
 
         if(class_exists(BaksDevNginxUnitBundle::class))
         {

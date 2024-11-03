@@ -33,7 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'baks:messenger:restart',
+    name: 'baks:consumers:restart',
     description: 'Перезапускает все запущенные воркеры Messenger'
 )]
 class MessengerConsumersRestartCommand extends Command
