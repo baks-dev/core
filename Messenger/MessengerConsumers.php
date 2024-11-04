@@ -32,7 +32,7 @@ use Symfony\Component\Process\Process;
 
 final class MessengerConsumers
 {
-    private const COMMAND = 'systemctl list-units --type=service  | grep baks | grep active | grep running';
+    private const COMMAND = 'systemctl list-units --type=service  | grep baks | grep active';
 
     private LoggerInterface $logger;
 
@@ -77,6 +77,16 @@ final class MessengerConsumers
 
     public function restart(): void
     {
+        $this->systemctl('restart');
+    }
+
+    public function stop(): void
+    {
+        $this->systemctl('stop');
+    }
+
+    private function systemctl(string $action): void
+    {
         $services = $this->getServices();
 
         if(false === $services || false === $services->valid())
@@ -95,7 +105,45 @@ final class MessengerConsumers
                 continue;
             }
 
-            $process = Process::fromShellCommandline(sprintf('systemctl restart %s.service', $name));
+            $process = Process::fromShellCommandline(sprintf('systemctl %s %s.service', $action, $name));
+            $process->setTimeout(60);
+
+            try
+            {
+                $process->mustRun();
+
+                $this->logger->info(sprintf('Перезапустили consumer %s', $name), [self::class.':'.__LINE__]);
+
+            }
+            catch(Exception $exception)
+            {
+                $this->logger->critical(sprintf('messenger-consume: Ошибка при перезапуске consumer %s', $name), [self::class.':'.__LINE__, $exception->getMessage()]);
+            }
+
+        }
+    }
+
+    public function stop(): void
+    {
+        $services = $this->getServices();
+
+        if(false === $services || false === $services->valid())
+        {
+            return;
+        }
+
+        foreach($services as $service)
+        {
+            $name = explode('.service', $service);
+            $name = current($name);
+            $name = trim($name);
+
+            if(empty($name) || stripos($name, 'systemd') !== false)
+            {
+                continue;
+            }
+
+            $process = Process::fromShellCommandline(sprintf('systemctl stop %s.service', $name));
             $process->setTimeout(60);
 
             try
