@@ -146,18 +146,18 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function enableCache(?string $namespace = null, int|string $ttl = '1 day', bool $refresh = true): self
     {
+        /** Переопределяем кеш модуля */
+        if($namespace)
+        {
+            $this->namespace = $this->getCacheNamespace($namespace);
+        }
+
         $this->isCache = true;
 
         $ttl = $this->getTimeToLive($ttl);
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
 
         $this->ttl = $this->getTimeToLive($ttl);
-
-        /** Переопределяем кеш модуля */
-        if($namespace)
-        {
-            $this->namespace = $this->getCacheNamespace($namespace);
-        }
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
         $this->cacheKey .= '.'.md5(var_export($this->getParameters(), true));

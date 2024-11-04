@@ -186,7 +186,7 @@ class CacheClearCommand extends Command
         $io->success('Кеш модулей успешно удален');
         $io->warning('Рекомендуется выполнить комманду:');
 
-        $io->text('sudo php bin/console baks:messenger:restart');
+        $io->text('sudo php bin/console baks:consumers:restart');
 
         if(class_exists(BaksDevNginxUnitBundle::class))
         {
