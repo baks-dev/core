@@ -49,7 +49,7 @@ final class Deduplicator implements DeduplicatorInterface
     private DateInterval $expires;
 
     public function __construct(
-        #[Autowire(env: 'APP_ENV')] $environment,
+        #[Autowire(env: 'APP_ENV')] private $environment,
         private readonly AppCacheInterface $appCache,
         private readonly AppLockInterface $appLock,
     )
@@ -63,6 +63,13 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function expiresAfter(DateInterval|string $time): self
     {
+        /** Время жизни дедубликации в окружении кроме PROD - 1 seconds */
+        if($this->environment !== 'prod')
+        {
+            $this->expires = DateInterval::createFromDateString('1 seconds');
+            return $this;
+        }
+
         if($time instanceof DateInterval)
         {
             $this->expires = $time;

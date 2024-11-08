@@ -27,23 +27,28 @@ namespace BaksDev\Core\Messenger;
 
 use Exception;
 use Generator;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Process\Process;
 
 final class MessengerConsumers
 {
-    private const COMMAND = 'systemctl list-units --type=service  | grep baks | grep active | grep running';
+    private const COMMAND = 'systemctl list-units --type=service  | grep baks ';
 
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $coreLogger)
+    public function __construct(
+        private readonly CacheItemPoolInterface $restartSignalCachePool,
+        LoggerInterface $coreLogger
+    )
     {
         $this->logger = $coreLogger;
     }
 
-    public function getServices(): Generator|false
+    private function getServices($grep = ['active', 'running']): Generator|false
     {
-        $process = Process::fromShellCommandline(self::COMMAND);
+        $process = Process::fromShellCommandline(self::COMMAND.' | grep '.implode(' | grep ', $grep));
         $process->setTimeout(60);
 
         try
@@ -75,14 +80,17 @@ final class MessengerConsumers
         }
     }
 
-    public function restart(): void
+
+    public function toArray($grep = ['active', 'running']): array|false
     {
-        $services = $this->getServices();
+        $services = $this->getServices($grep);
 
         if(false === $services || false === $services->valid())
         {
-            return;
+            return false;
         }
+
+        $names = null;
 
         foreach($services as $service)
         {
@@ -90,26 +98,49 @@ final class MessengerConsumers
             $name = current($name);
             $name = trim($name);
 
-            if(empty($name) || stripos($name, 'systemd') !== false)
+            if(empty($name))
             {
                 continue;
             }
 
-            $process = Process::fromShellCommandline(sprintf('systemctl restart %s.service', $name));
+            $names[] = $name;
+        }
+
+        return $names ?: false;
+    }
+
+    public function restart(): void
+    {
+        $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
+        $cacheItem->set(microtime(true));
+        $this->restartSignalCachePool->save($cacheItem);
+    }
+
+    public function stop(): void
+    {
+        $services = $this->toArray();
+
+        if(false === $services)
+        {
+            return;
+        }
+
+        foreach($services as $name)
+        {
+            $process = Process::fromShellCommandline(sprintf('systemctl stop %s.service', $name));
             $process->setTimeout(60);
 
             try
             {
                 $process->mustRun();
 
-                $this->logger->info(sprintf('Перезапустили consumer %s', $name), [self::class.':'.__LINE__]);
+                $this->logger->info(sprintf('Завершили consumer %s', $name), [self::class.':'.__LINE__]);
 
             }
             catch(Exception $exception)
             {
-                $this->logger->critical(sprintf('messenger-consume: Ошибка при перезапуске consumer %s', $name), [self::class.':'.__LINE__, $exception->getMessage()]);
+                $this->logger->critical(sprintf('messenger-consume: Ошибка при завершении consumer %s', $name), [self::class.':'.__LINE__, $exception->getMessage()]);
             }
-
         }
     }
 }

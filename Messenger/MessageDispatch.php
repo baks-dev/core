@@ -27,6 +27,7 @@ namespace BaksDev\Core\Messenger;
 
 use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -79,6 +80,11 @@ final class MessageDispatch implements MessageDispatchInterface
             /** Если передана марка MessageDelay - преобразуем её в марку DelayStamp */
             if($stamp instanceof MessageDelay)
             {
+                if(is_null($this->transport))
+                {
+                    throw new InvalidArgumentException('Транспорт сообщений не установлен');
+                }
+
                 $stamps[] = $stamp->getDelayStamp();
                 unset($stamps[$key]);
             }

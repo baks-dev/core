@@ -43,19 +43,15 @@ final readonly class ConsumerRunningHandler
     {
         $cache = $this->cache->init(MessageDispatch::CONSUMER_NAMESPACE);
 
-        $services = $this->MessengerConsumers->getServices();
+        $services = $this->MessengerConsumers->toArray();
 
-        if(false === $services || false === $services->valid())
+        if(false === $services)
         {
             return;
         }
 
-        foreach($services as $service)
+        foreach($services as $consumer)
         {
-            $name = explode('running', $service);
-            $name = end($name);
-            $consumer = trim($name);
-
             if(empty($consumer))
             {
                 continue;

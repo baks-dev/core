@@ -28,18 +28,17 @@ namespace BaksDev\Core\Cache\CacheClear;
 use BaksDev\Core\Cache\AppCacheInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 10)]
 final readonly class CacheClearMetadataHandler
 {
     public function __construct(private AppCacheInterface $appCache) {}
 
     /**
-     * Метод чистит кеш указанного модуля
+     * Метод чистит кеш метаданных
      */
     public function __invoke(CacheClearMessage $message): void
     {
-
-        if(empty($message->getCache()))
+        if(true === empty($message->getCache()))
         {
             return;
         }

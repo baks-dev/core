@@ -28,7 +28,6 @@ namespace BaksDev\Core\Command;
 use BaksDev\Centrifugo\BaksDevCentrifugoBundle;
 use BaksDev\Core\Cache\CacheClear\CacheClearMessage;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Core\Messenger\MessengerConsumers;
 use BaksDev\Nginx\Unit\BaksDevNginxUnitBundle;
 use DirectoryIterator;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -46,8 +45,7 @@ class CacheClearCommand extends Command
     public function __construct(
         #[Autowire('%kernel.project_dir%')] private readonly string $project_dir,
         private readonly MessageDispatchInterface $messageDispatch,
-        private readonly Filesystem $filesystem,
-        private readonly MessengerConsumers $MessengerConsumers
+        private readonly Filesystem $filesystem
     )
     {
         parent::__construct();
@@ -67,6 +65,7 @@ class CacheClearCommand extends Command
 
         $module = $input->getOption('module');
         $exclude = $input->getOption('exclude');
+
 
         /**
          * Сбрасываем только кеш шаблонов
@@ -163,6 +162,11 @@ class CacheClearCommand extends Command
                 continue;
             }
 
+            if(in_array($cache->getFilename(), ['cache', 'prod']))
+            {
+                continue;
+            }
+
             $origin = $cache->getRealPath();
             $target = $cache->getRealPath().'_'.time();
 
@@ -177,7 +181,8 @@ class CacheClearCommand extends Command
 
         }
 
-        /** Отправляем сообщение на прогрев */
+
+        /** Отправляем сообщение */
         $this->messageDispatch->dispatch(
             new CacheClearMessage(),
             transport: 'systemd'
@@ -198,6 +203,7 @@ class CacheClearCommand extends Command
             $io->text('sudo service centrifugo restart');
             $io->text('');
         }
+
 
         $io->text(PHP_EOL);
 

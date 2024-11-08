@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 10)]
 final readonly class CacheClearTemplateHandler
 {
     public function __construct(#[Autowire('%kernel.project_dir%')] private string $project_dir) {}
@@ -40,7 +40,7 @@ final readonly class CacheClearTemplateHandler
     public function __invoke(CacheClearMessage $message): void
     {
 
-        if(empty($message->getCache()))
+        if(true === empty($message->getCache()))
         {
             return;
         }
@@ -66,7 +66,7 @@ final readonly class CacheClearTemplateHandler
             $filesystem->rename($origin, $target);
             $filesystem->remove($target);
 
-            opcache_reset();
+            //opcache_reset();
 
         }
     }

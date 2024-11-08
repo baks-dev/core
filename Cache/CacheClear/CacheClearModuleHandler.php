@@ -30,7 +30,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 10)]
 final readonly class CacheClearModuleHandler
 {
     public function __construct(private AppCacheInterface $appCache) {}
@@ -41,7 +41,7 @@ final readonly class CacheClearModuleHandler
     public function __invoke(CacheClearMessage $message): void
     {
 
-        if(empty($message->getCache()) || false === $message->isRestricted())
+        if(true === empty($message->getCache()) || false === $message->isRestricted())
         {
             return;
         }
