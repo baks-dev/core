@@ -63,13 +63,6 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function expiresAfter(DateInterval|string $time): self
     {
-        /** Время жизни дедубликации в окружении кроме PROD - 1 seconds */
-        if($this->environment !== 'prod')
-        {
-            $this->expires = DateInterval::createFromDateString('1 seconds');
-            return $this;
-        }
-
         if($time instanceof DateInterval)
         {
             $this->expires = $time;
