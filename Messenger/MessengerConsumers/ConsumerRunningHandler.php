@@ -50,12 +50,17 @@ final readonly class ConsumerRunningHandler
             return;
         }
 
-        foreach($services as $consumer)
+        foreach($services as $service)
         {
-            if(empty($consumer))
+            if(empty($service))
             {
                 continue;
             }
+
+            $consumers = explode('@', $service);
+            $consumer = current($consumers);
+            $consumer = str_replace('baks-', '', $consumer);
+            $consumer = trim($consumer);
 
             $cacheConsume = $cache->getItem('consume-'.$consumer);
             $cacheConsume->set(true);
