@@ -27,9 +27,9 @@ use InvalidArgumentException;
 
 final class GpsLatitude
 {
-    public const TYPE = 'latitude';
+    public const string TYPE = 'latitude';
 
-    public const TEST = 41.40338;
+    public const float TEST = 41.40338;
 
     private ?string $value = null;
 

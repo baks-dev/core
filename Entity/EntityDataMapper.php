@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,13 +25,12 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Entity;
 
-use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\Section\Fields\SectionFieldDTO;
 use Closure;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use InvalidArgumentException;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -206,7 +205,6 @@ abstract class EntityDataMapper
     public function setEntity($dto): mixed
     {
 
-
         //        if($this->remove === null)
         //        {
         //            $this->remove = new ArrayCollection();
@@ -287,6 +285,7 @@ abstract class EntityDataMapper
             if($type instanceof Collection)
             {
 
+
                 // Если в сущности имеется одноименное свойство сущности
                 if(property_exists($this, $propertyName) && method_exists($dto, $getDtoMethod))
                 {
@@ -353,6 +352,7 @@ abstract class EntityDataMapper
 
                             $currentCollections = $entityCollections->current();
 
+
                             /**
                              * Получаем свойства сущности, которые являются идентификаторами
                              */
@@ -380,6 +380,8 @@ abstract class EntityDataMapper
 
                                 if($removeEntityElement !== false)
                                 {
+
+
                                     $this->entityManager?->remove($entityElement);
                                     $entityCollections->removeElement($entityElement);
                                 }
@@ -567,7 +569,8 @@ abstract class EntityDataMapper
                     $entityReflectionPropertyByName->isReadOnly() && $entityReflectionPropertyByName->isInitialized(
                         $this
                     )
-                ) {
+                )
+                {
                     continue;
                 }
 
@@ -588,11 +591,12 @@ abstract class EntityDataMapper
 
     public function cloneEntity($entity = null)
     {
+
+
         if($this instanceof EntityState)
         {
             return $entity ?: $this;
         }
-
 
         $clone = clone $this;
 
@@ -657,7 +661,8 @@ abstract class EntityDataMapper
             // Если свойство является коллекцией
             if(
                 interface_exists($instanceClassCollection) && $instanceClassCollection === Collection::class
-            ) {
+            )
+            {
                 $newColl = new ArrayCollection();
 
                 $cloneCollection = $this->getPropertyValue($propertyName, $clone);
@@ -783,7 +788,7 @@ abstract class EntityDataMapper
             return 'not_initialized';
         }
 
-        $getPropertyEntity = Closure::bind(static function ($object, $property) {
+        $getPropertyEntity = Closure::bind(static function($object, $property) {
             return $object->{$property};
         }, null, $object);
 
@@ -816,7 +821,7 @@ abstract class EntityDataMapper
             return false;
         }
 
-        $setPropertyDto = Closure::bind(static function (object $object, string $property, mixed $value) {
+        $setPropertyDto = Closure::bind(static function(object $object, string $property, mixed $value) {
             return $object->{$property} = $value;
         }, null, $object);
 
@@ -870,7 +875,8 @@ abstract class EntityDataMapper
         object $dtoElement,
         object $entityCollection,
         array $properties
-    ): bool|object {
+    ): bool|object
+    {
 
         // Конкатенируем свойства сущности создавая ключ сравнения
         $dtoKey = '';

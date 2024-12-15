@@ -21,53 +21,28 @@
  *  THE SOFTWARE.
  */
 
-namespace BaksDev\Core\Type\Gps;
+namespace BaksDev\Core\Twig;
 
-use InvalidArgumentException;
+use Symfony\Component\Uid\UuidV7;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
-final class GpsLongitude
+final class UuidFormatDateExtension extends AbstractExtension
 {
-    public const string TYPE = 'longitude';
-
-    public const float TEST = 2.17403;
-
-    private ?string $value = null;
-
-    public function __construct(self|string|float|null $value = null)
+    /**
+     * Получает из строки формата Uuid дату в указанном формате
+     */
+    public function getFilters(): array
     {
-        if($value === null)
-        {
-            return;
-        }
-
-        if($value instanceof self)
-        {
-            $this->value = $value->getValue();
-        }
-
-        $value = str_replace(',', '.', $value);
-        $value = trim($value);
-
-        if(!empty($value) && !preg_match('{^-?[\d]+\.[\d]{2,}$}Di', (string) $value))
-        {
-            throw new InvalidArgumentException('Incorrect Gps Longitude '.$value);
-        }
-
-        $this->value = $value;
+        return [
+            new TwigFilter('uuid_format_date', $this->formatDateTime(...)),
+        ];
     }
 
-    public function __toString(): string
+    public function formatDateTime(mixed $uuid, ?string $format = 'Y-m-d H:i:s'): string
     {
-        return $this->value ?: '';
-    }
+        $uid = new UuidV7((string) $uuid);
 
-    public function getValue(): string
-    {
-        return $this->value ?: '';
-    }
-
-    public function getFloat(): float
-    {
-        return (float) $this->value;
+        return $uid->getDateTime()->format($format);
     }
 }
