@@ -54,6 +54,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DBALQueryBuilder extends QueryBuilder
 {
+
+    private string|bool $reset = false;
+
     private array $select = [];
 
     private Connection $connection;
@@ -179,10 +182,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 if($lastDatetime)
                 {
-                    /* Сбрасываем кеш для последующего запроса */
-                    //register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
-                    //register_shutdown_function([$this, 'resetCounter'], 'throw');
-
                     register_shutdown_function(function() {
                         $this->resetCacheQuery();
                     });
@@ -239,13 +238,18 @@ final class DBALQueryBuilder extends QueryBuilder
     public function resetCacheQuery(): bool
     {
         /* Не сбрасываем кеш если тестовая среда */
-        if($this->env === 'test')
+        if($this->env === 'test' || $this->isCache === false)
         {
             return true;
         }
 
         $this->connection->getConfiguration()->setResultCache($this->cacheQueries);
         $this->deleteCacheQueries(); // Удаляем
+
+        if($this->reset)
+        {
+            $this->executeDBALQuery()->{$this->reset}();
+        }
 
         return true;
 
@@ -256,6 +260,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociative(): array
     {
+        $this->reset = 'fetchAllAssociative';
+
         $result = $this->executeDBALQuery()->fetchAllAssociative();
 
         return $result ?: [];
@@ -263,6 +269,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllGenerator(): Generator|false
     {
+        $this->reset = 'iterateAssociative';
+
         $result = $this->executeDBALQuery()->iterateAssociative();
 
         return $result->valid() ? $result : false;
@@ -271,6 +279,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
+        $this->reset = 'iterateAssociative';
+
         $result = $this->executeDBALQuery()->iterateAssociative();
 
         foreach($result as $item)
@@ -281,6 +291,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllIndexHydrate(string $class): array|false
     {
+        $this->reset = 'fetchAllAssociativeIndexed';
+
         $result = $this->executeDBALQuery()->fetchAllAssociativeIndexed();
 
         foreach($result as $key => $item)
@@ -293,6 +305,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchHydrate(string $class, ?string $method = null): mixed
     {
+        $this->reset = 'fetchAssociative';
+
         $result = $this->executeDBALQuery()->fetchAssociative();
 
         if(empty($result))
@@ -306,6 +320,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAssociative(): array|false
     {
+        $this->reset = 'fetchAssociative';
+
         $result = $this->executeDBALQuery()->fetchAssociative();
 
         return $result ?: false;
@@ -313,6 +329,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociativeIndexed(?string $class = null): array
     {
+        $this->reset = 'fetchAllAssociative';
 
         $result = $this->executeDBALQuery()->fetchAllAssociative();
 
@@ -341,6 +358,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchOne(): mixed
     {
+        $this->reset = 'fetchOne';
+
         $result = $this->executeDBALQuery()->fetchOne();
 
         return $result ?: false;
