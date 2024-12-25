@@ -189,6 +189,11 @@ final class DBALQueryBuilder extends QueryBuilder
         {
             register_shutdown_function(function() {
 
+                if($this->env === 'test')
+                {
+                    return;
+                }
+
                 if(false === $this->reset)
                 {
                     return;
@@ -206,23 +211,23 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 $Deduplicator->save();
 
-                $old = $this->cacheQueries->getItem($this->cacheKey.'.old');
+                $old = $this->cacheQueries->getItem($this->cacheKey.'.refresh');
 
                 if($old->isHit())
                 {
-                    /** Присваиваем активный кеш */
+                    /** Присваиваем АКТИВНЫЙ кеш */
                     $current = $this->cacheQueries->getItem($this->cacheKey);
                     $current->set($old->get());
                     $this->cacheQueries->save($current);
                 }
 
-                /** Прогреваем кеш новый кеш */
-                $this->cacheKey .= '.old';
+                /** Прогреваем кеш REFRESH кеш */
+                $this->cacheKey .= '.refresh';
                 $this->deleteCacheQueries(); // Удаляем
                 $this->{$this->reset}();
 
                 /* Сбрасываем кеш для последующего запроса */
-                $this->cacheKey = str_replace('.old', '', $this->cacheKey);
+                $this->cacheKey = str_replace('.refresh', '', $this->cacheKey);
                 $this->logger->critical('Сбрасываем кеш для последующего запроса', [$this->reset, $this->cacheKey]);
 
                 $Deduplicator->unlock();
