@@ -122,6 +122,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         //$newInstance->resetQueryParts();
 
+
         $newInstance->resetOrderBy();
         $newInstance->resetGroupBy();
         $newInstance->resetWhere();
@@ -175,6 +176,11 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
 
         $this->ttl = $this->getTimeToLive($ttl);
+
+        if(empty($this->select))
+        {
+            $this->select('*');
+        }
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
         $this->cacheKey .= '.'.md5(var_export([$this->getSQL(), $this->getParameters()], true));
