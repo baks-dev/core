@@ -189,6 +189,11 @@ final class DBALQueryBuilder extends QueryBuilder
         {
             register_shutdown_function(function() {
 
+                if(false === $this->reset)
+                {
+                    return;
+                }
+
                 $Deduplicator = $this->deduplicator
                     ->namespace($this->namespace)
                     ->expiresAfter('1 minutes')
@@ -216,9 +221,8 @@ final class DBALQueryBuilder extends QueryBuilder
                 $this->deleteCacheQueries(); // Удаляем
                 $this->{$this->reset}();
 
-                $this->cacheKey = str_replace('.old', '', $this->cacheKey);
-
                 /* Сбрасываем кеш для последующего запроса */
+                $this->cacheKey = str_replace('.old', '', $this->cacheKey);
                 $this->logger->critical('Сбрасываем кеш для последующего запроса', [$this->reset, $this->cacheKey]);
 
                 $Deduplicator->unlock();
@@ -226,7 +230,6 @@ final class DBALQueryBuilder extends QueryBuilder
             });
 
         }
-
 
         return $this;
     }
@@ -242,8 +245,7 @@ final class DBALQueryBuilder extends QueryBuilder
             return false;
         }
 
-        /* Не сбрасываем кеш если тестовая среда */
-        if($this->isCache !== false)
+        if($this->isCache === false)
         {
             return false;
         }
@@ -301,7 +303,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllGenerator(): Generator|false
     {
-        $this->reset = 'iterateAssociative';
+        $this->reset = 'fetchAllGenerator';
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
             $item->expiresAfter($this->ttl);
@@ -315,7 +317,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
-        $this->reset = 'iterateAssociative';
+        $this->reset = false;
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
             $item->expiresAfter($this->ttl);
@@ -332,7 +334,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllIndexHydrate(string $class): array|false
     {
-        $this->reset = 'fetchAllAssociativeIndexed';
+        $this->reset = false;
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
             $item->expiresAfter($this->ttl);
@@ -350,8 +352,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchHydrate(string $class, ?string $method = null): mixed
     {
-        $this->reset = 'fetchAssociative';
-
+        $this->reset = 'fetchHydrate';
 
         //$result = $this->executeDBALQuery()->fetchAssociative();
         $result = $this->fetchAssociative();
@@ -378,7 +379,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociativeIndexed(?string $class = null): array
     {
-        $this->reset = 'fetchAllAssociative';
+        $this->reset = $class ? false : 'fetchAllAssociativeIndexed';
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
             $item->expiresAfter($this->ttl);
