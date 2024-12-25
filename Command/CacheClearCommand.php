@@ -171,6 +171,7 @@ class CacheClearCommand extends Command
             $target = $cache->getRealPath().'_'.time();
 
             /** Запускаем асинхронную команду на удаление директории  */
+
             register_shutdown_function(function() use ($origin, $target) {
 
                 $this->filesystem->rename($origin, $target);

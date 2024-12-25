@@ -138,37 +138,29 @@ final class Paginator implements PaginatorInterface
         /** Если количество больше лимита - считаем количество  */
         if($this->pagination)
         {
-            $cacheKey = 'counter.'.$qb->getCacheKey();
-            $qb->resetCacheCounter();
+            $qb->select('COUNT(*)');
+            $qb->setMaxResults(null);
+            $qb->resetGroupBy();
+            $qb->resetOrderBy();
+            $qb->enableCache($this->namespace);
+
+            //$cacheKey = $qb->getCacheKey();
+
+            //$cacheKey = 'counter.'.$qb->getCacheKey();
+            //
 
             if($this->session?->get('statusCode') === 307)
             {
-                /** Сбрасываем кеш ключа запроса */
-                $qb->select('COUNT(*)');
-                $qb->setMaxResults(null);
-
-                $qb->resetGroupBy();
-                $qb->resetOrderBy();
-
-                $this->counter = $qb->fetchOne();
+                $qb->deleteCacheQueries(); // ->getCacheQueries()->deleteCacheQueries($cacheKey);
             }
-            else
-            {
-                if($qb->getCacheQueries()?->hasItem($cacheKey))
-                {
-                    $this->counter = ($qb->getCacheQueries()->getItem($cacheKey))->get();
-                }
-                else
-                {
-                    $this->counter = 'более '.$this->limit;
-                }
-            }
+
+            $this->counter = $qb->fetchOne() ?: null;
+
         }
         else
         {
             $this->counter = count($this->data);
         }
-
 
         if($this->request && $this->session?->get('statusCode') === 307)
         {

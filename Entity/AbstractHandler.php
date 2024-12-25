@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -61,7 +61,8 @@ abstract class AbstractHandler
         protected readonly ValidatorCollectionInterface $validatorCollection,
         protected readonly ImageUploadInterface $imageUpload,
         protected readonly FileUploadInterface $fileUpload,
-    ) {
+    )
+    {
         $this->entityManager = $entityManager;
     }
 
@@ -140,7 +141,7 @@ abstract class AbstractHandler
      * - если getEvent возвращает NULL - создает новый объект события
      * - если getEvent возвращает идентификатор - обновляет событие и присваивает и сохраняет его новую версию
      */
-    protected function preEventPersistOrUpdate(string|object $main, string|object $event): void
+    protected function preEventPersistOrUpdate(string|object $main, string|object|false $event): void
     {
         /**
          * Проверка объекта DTO
@@ -151,7 +152,12 @@ abstract class AbstractHandler
             throw new InvalidArgumentException('Необходимо передать объект DTO через аргумент метода $this->setCommand($command)');
         }
 
-        if(false === method_exists($this->command, 'getEvent'))
+        if(false === $event && false === method_exists($this->command, 'getMain'))
+        {
+            throw new InvalidArgumentException('Объект DTO не реализует метод getMain()');
+        }
+
+        if(false !== $event && false === method_exists($this->command, 'getEvent'))
         {
             throw new InvalidArgumentException('Объект DTO не реализует метод getEvent()');
         }
@@ -166,53 +172,75 @@ abstract class AbstractHandler
             $main = new $main();
         }
 
-        if(false === method_exists($main, 'setEvent'))
+        if(false !== $event && false === method_exists($main, 'setEvent'))
         {
             throw new InvalidArgumentException(sprintf('Корень объекта сущности %s не реализует метод setEvent($event)', $main::class));
         }
 
+        if(false === $event && false === method_exists($main, 'setEntity'))
+        {
+            throw new InvalidArgumentException(sprintf('Корень объекта сущности %s не реализует метод setEntity($event)', $main::class));
+        }
+
+
         $this->main = $main;
         $this->validatorCollection->add($this->main);
 
-        /**
-         * Проверка структуры событийной сущности
-         */
 
-        if(is_string($event) && class_exists($event))
+        if(false !== $event)
         {
-            $event = new $event();
+            /**
+             * Проверка структуры событийной сущности
+             */
+
+            if(is_string($event) && class_exists($event))
+            {
+                $event = new $event();
+            }
+
+            if(false === ($event instanceof EntityEvent))
+            {
+                throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityEvent');
+            }
+
+            if(false === method_exists($event, 'setMain'))
+            {
+                throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setMain()', $event::class));
+            }
+
+            if(false === method_exists($event, 'setEntity'))
+            {
+                throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
+            }
+
+
+            $this->event = $event;
+            $this->validatorCollection->add($this->event);
+
+            /**
+             * Если getEvent не является идентификатором - создаем новый объект
+             */
+
+            if(is_null($this->command->getEvent()) || $this->command->getEvent() === false)
+            {
+                $this->persistEvent();
+            }
+            else
+            {
+                $this->updateEvent();
+            }
+
+            return;
         }
 
-        if(false === ($event instanceof EntityEvent))
+
+        if(is_null($this->command->getMain()) || $this->command->getMain() === false)
         {
-            throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityEvent');
-        }
-
-        if(false === method_exists($event, 'setMain'))
-        {
-            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setMain()', $event::class));
-        }
-
-        if(false === method_exists($event, 'setEntity'))
-        {
-            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
-        }
-
-
-        $this->event = $event;
-        $this->validatorCollection->add($this->event);
-
-        /**
-         * Если getEvent не является идентификатором - создаем новый объект
-         */
-
-        if(is_null($this->command->getEvent()) || $this->command->getEvent() === false)
-        {
-            $this->persistEvent();
+            $this->persistMain();
         }
         else
         {
-            $this->updateEvent();
+            $this->updateMain();
         }
     }
 
@@ -289,6 +317,49 @@ abstract class AbstractHandler
     /**
      * Метод создает новый объект события
      */
+    private function persistMain(): void
+    {
+        /** Присваиваем корню идентификатор активного события */
+        $this->main->setEntity($this->command);
+
+        /** Добавляем объекты в UOW */
+        $this->entityManager->clear();
+        $this->entityManager->persist($this->main);
+    }
+
+    /**
+     * Метод сохраняет объект события с новой версией
+     */
+    private function updateMain(): void
+    {
+        /**
+         * Получаем корень после clear (для контроля объекта UOW)
+         * до сохранения состояния - корневая сущность доступна по идентификатору предыдущего события
+         */
+        $MainClass = $this->main::class;
+        $this->main = $this->entityManager
+            ->getRepository($MainClass)
+            ->find($this->command->getMain());
+
+        if(
+            false === $this->validatorCollection->add($this->main, context: [
+                self::class.':'.__LINE__,
+                'class' => $MainClass,
+                'event' => $this->command->getMain(),
+            ])
+        )
+        {
+            throw new DomainException($this->validatorCollection->getErrorUniqid());
+        }
+
+        /** Обновляем событие в корне и добавляем Событие в коллекцию валидации  */
+        $this->main->setEntity($this->command);
+    }
+
+
+    /**
+     * Метод создает новый объект события
+     */
     private function persistEvent(): void
     {
         /** Гидрируем значения одноименных свойств объекта DTO к сущности и присваиваем идентификатор корня */
@@ -321,7 +392,8 @@ abstract class AbstractHandler
                 'class' => $EventClass,
                 'id' => $this->command->getEvent(),
             ])
-        ) {
+        )
+        {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -351,7 +423,8 @@ abstract class AbstractHandler
                 'class' => $MainClass,
                 'event' => $this->command->getEvent(),
             ])
-        ) {
+        )
+        {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -390,7 +463,8 @@ abstract class AbstractHandler
                 'class' => $EventClass,
                 'id' => $command->getEvent(),
             ])
-        ) {
+        )
+        {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -421,7 +495,8 @@ abstract class AbstractHandler
                 'class' => $MainClass,
                 'event' => $command->getEvent(),
             ])
-        ) {
+        )
+        {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -499,7 +574,8 @@ abstract class AbstractHandler
                 'class' => $EventClass,
                 'id' => $command->getEvent(),
             ])
-        ) {
+        )
+        {
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
@@ -522,7 +598,8 @@ abstract class AbstractHandler
                 'class' => $MainClass,
                 'event' => $command->getEvent(),
             ])
-        ) {
+        )
+        {
             throw new DomainException($this->validatorCollection->getErrorUniqid().': '.$command->getEvent());
         }
 

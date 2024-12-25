@@ -26,13 +26,16 @@ declare(strict_types=1);
 namespace BaksDev\Core\Doctrine\Tests;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** @group core */
@@ -50,6 +53,8 @@ final class DBALQueryBuilderTest extends TestCase
     private SwitcherInterface $switcher;
     private int $counter;
     private AppCacheInterface $cache;
+    private LoggerInterface $logger;
+    private HttpClientInterface $client;
 
     protected function setUp(): void
     {
@@ -63,6 +68,9 @@ final class DBALQueryBuilderTest extends TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->switcher = $this->createMock(SwitcherInterface::class);
         $this->cache = $this->createMock(AppCacheInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->deduplicatop = $this->createMock(DeduplicatorInterface::class);
+        $this->client = $this->createMock(HttpClientInterface::class);
         $this->counter = 0;
     }
 
@@ -71,9 +79,11 @@ final class DBALQueryBuilderTest extends TestCase
     {
         $dbalQueryBuilder = new DBALQueryBuilder(
             env: 'test',
+            logger: $this->logger,
             switcher: $this->switcher,
             translator: $this->translator,
             cache: $this->cache,
+            deduplicator: $this->deduplicatop,
             connection: $this->connection,
         );
 
