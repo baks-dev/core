@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,13 @@
 
 namespace BaksDev\Core\Twig;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class TemplateExtension extends AbstractExtension
 {
-    public function __construct(private readonly ParameterBagInterface $parameter) {}
+    public function __construct(#[Autowire('%kernel.project_dir%')] private readonly string $project_dir) {}
 
 
     public function getFunctions(): array
@@ -60,13 +60,13 @@ final class TemplateExtension extends AbstractExtension
         }
 
         /** Если переопределен шаблон модуля в директории templates */
-        if(isset($module) && file_exists($this->parameter->get('kernel.project_dir').'/templates/'.$module.'/'.$string))
+        if(isset($module) && file_exists($this->project_dir.'/templates/'.$module.'/'.$string))
         {
             return '@Template/'.$module.'/'.$string;
         }
 
         /** Если модуль не определен и имеется шаблон в директории templates/Template */
-        if(file_exists($this->parameter->get('kernel.project_dir').'/templates/Template/'.$string))
+        if(file_exists($this->project_dir.'/templates/Template/'.$string))
         {
             return '@Template/Template/'.$string;
         }
