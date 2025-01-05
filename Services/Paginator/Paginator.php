@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -108,15 +108,14 @@ final class Paginator implements PaginatorInterface
 
         if($namespace)
         {
-            $qb->enableCache($namespace, 3600);
+            $qb->enableCache($namespace);
         }
 
-        if($this->request && $this->session?->get('statusCode') === 307)
+        if(($this->request && $this->session?->get('statusCode') === 307) || $this->request->query->getInt('limit'))
         {
             /** Сбрасываем кеш ключа запроса */
-            $qb->deleteCacheQueries();
-            $qb->disableResultCache();
             $qb->resetCacheQuery();
+            $this->request->getSession()->remove('statusCode');
         }
 
         if($qb->getMaxResults())
@@ -130,10 +129,9 @@ final class Paginator implements PaginatorInterface
 
         $qb->setFirstResult($this->page * $this->limit);
 
-
         $this->data = $qb->fetchAllAssociative();
-
         $this->pagination = count($this->data) >= $this->limit;
+        $this->counter = count($this->data);
 
         /** Если количество больше лимита - считаем количество  */
         if($this->pagination)
@@ -144,28 +142,10 @@ final class Paginator implements PaginatorInterface
             $qb->resetOrderBy();
             $qb->enableCache($this->namespace);
 
-            //$cacheKey = $qb->getCacheKey();
-
-            //$cacheKey = 'counter.'.$qb->getCacheKey();
-            //
-
-            if($this->session?->get('statusCode') === 307)
+            if($qb->fetchOne())
             {
-                $qb->deleteCacheQueries(); // ->getCacheQueries()->deleteCacheQueries($cacheKey);
+                $this->counter = $qb->fetchOne();
             }
-
-            $this->counter = $qb->fetchOne() ?: null;
-
-        }
-        else
-        {
-            $this->counter = count($this->data);
-        }
-
-        if($this->request && $this->session?->get('statusCode') === 307)
-        {
-            /** Сбрасываем кеш ключа запроса */
-            $this->session?->remove('statusCode');
         }
 
         return $this;
@@ -180,10 +160,10 @@ final class Paginator implements PaginatorInterface
             $qb->enableCache($namespace, 3600);
         }
 
-        if($this->request && $this->session->get('statusCode') === 307)
+        if(($this->request && $this->session->get('statusCode') === 307) || $this->request->query->getInt('limit'))
         {
             /** Сбрасываем кеш ключа запроса */
-            $qb->deleteCacheQueries();
+            $qb->resetCacheQuery();
             $this->request->getSession()->remove('statusCode');
 
             $qb->disableResultCache();
@@ -203,6 +183,7 @@ final class Paginator implements PaginatorInterface
 
         $this->data = $qb->fetchAllAssociativeIndexed();
         $this->pagination = count($this->data) >= $this->limit;
+
 
         return $this;
     }

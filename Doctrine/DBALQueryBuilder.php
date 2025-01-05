@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Doctrine;
 
-use App\Kernel;
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Form\Search\SearchDTO;
@@ -97,7 +96,6 @@ final class DBALQueryBuilder extends QueryBuilder
         private readonly AppCacheInterface $cache,
         private readonly DeduplicatorInterface $deduplicator,
         Connection $connection,
-
     )
     {
         $this->connection = $connection;
@@ -199,10 +197,15 @@ final class DBALQueryBuilder extends QueryBuilder
                     return;
                 }
 
+                if(str_contains($this->cacheKey, '.refresh'))
+                {
+                    return;
+                }
+
                 $Deduplicator = $this->deduplicator
                     ->namespace($this->namespace)
                     ->expiresAfter('1 minutes')
-                    ->deduplication($this->cacheKey);
+                    ->deduplication([$this->reset, $this->cacheKey]);
 
                 if($Deduplicator->isExecuted())
                 {
@@ -223,15 +226,26 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 /** Прогреваем кеш REFRESH кеш */
                 $this->cacheKey .= '.refresh';
-                $this->deleteCacheQueries(); // Удаляем
+                $this->resetCacheQuery(); // Удаляем
                 $this->{$this->reset}();
 
-                /* Сбрасываем кеш для последующего запроса */
                 $this->cacheKey = str_replace('.refresh', '', $this->cacheKey);
-                $this->logger->critical('Сбрасываем кеш для последующего запроса', [$this->reset, $this->cacheKey]);
 
-                $Deduplicator->unlock();
-                $Deduplicator->delete();
+                /* Сбрасываем кеш для последующего запроса */
+                // $this->logger->critical('Сбрасываем кеш для последующего запроса', [$this->reset, $this->cacheKey]);
+
+                register_shutdown_function(function() {
+
+                    $Deduplicator = $this->deduplicator
+                        ->namespace($this->namespace)
+                        ->deduplication([$this->reset, $this->cacheKey]);
+
+                    $Deduplicator->unlock();
+                    $Deduplicator->delete();
+
+                    /* Сбрасываем кеш для последующего запроса */
+                    //$this->logger->critical('СБРОСИЛИ кеш для последующего запроса', [$this->cacheKey]);
+                });
             });
 
         }
@@ -472,10 +486,10 @@ final class DBALQueryBuilder extends QueryBuilder
     //    }
 
 
-    public function deleteCacheQueries(): void
-    {
-        $this->cacheQueries->deleteItem($this->cacheKey);
-    }
+    //    public function deleteCacheQueries(): void
+    //    {
+    //        $this->cacheQueries->deleteItem($this->cacheKey);
+    //    }
 
     //    public function resetCacheCounter(): void
     //    {
