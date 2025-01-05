@@ -20,4 +20,4 @@
  *  THE SOFTWARE.
  */
 
-function _()
+function _(){}
