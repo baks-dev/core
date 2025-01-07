@@ -53,39 +53,37 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class DBALQueryBuilder extends QueryBuilder
 {
-
-    private string|bool $reset = false;
+    private Connection $connection;
 
     private array $select = [];
 
-    private Connection $connection;
+    /**  Кеш запросов */
 
     private CacheInterface|CacheItemPoolInterface $cacheQueries;
 
     private string $cacheKey;
 
-    private int $ttl;
-
-    /**  Флаг кеширования запроса  */
-    private bool $isCache = false;
-
     private ?string $namespace;
 
-    /** Билдер поиска */
+    private int $ttl;
+
+    /**  Флаг кеширования запроса */
+    private bool $isCache = false;
+
+    /** Метод, который вызывается для обновления кеша */
+    private string|bool $methodReset = false;
+
+    /** Флаг, сбрасывающий deduplicator при shutdown */
+    private bool $refresh = true;
+
+
+    /** Поиск */
+    private SearchDTO $query;
     private ?QueryBuilder $search = null;
 
     /** Билдер рекурсии */
     private ?string $recursive = null;
     private ?string $recursive_alias = null;
-
-    /** Строка поиска */
-    private SearchDTO $query;
-
-    /** Количество результатов */
-    private ?int $counter = null;
-
-
-    private $exitCode = null;
 
 
     public function __construct(
@@ -105,9 +103,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function createQueryBuilder(object|string $class): self
     {
-
-        $this->exitCode = null;
-
         $newInstance = new self(
             env: $this->env,
             logger: $this->logger,
@@ -118,23 +113,17 @@ final class DBALQueryBuilder extends QueryBuilder
             connection: $this->connection
         );
 
-        //$newInstance->resetQueryParts();
-
+        $this->isCache = false;
 
         $newInstance->resetOrderBy();
         $newInstance->resetGroupBy();
         $newInstance->resetWhere();
-
         $newInstance->setParameters([]);
 
         $classNamespace = is_object($class) ? $class::class : $class;
-        $newInstance->cacheKey = $classNamespace;
 
         $newInstance->namespace = $this->getCacheNamespace($classNamespace);
-
-        $this->isCache = false;
-
-        //dump($newInstance->cacheKey);
+        $newInstance->cacheKey = $classNamespace;
 
         return $newInstance;
     }
@@ -169,6 +158,7 @@ final class DBALQueryBuilder extends QueryBuilder
         }
 
         $this->isCache = true;
+        $this->refresh = $refresh;
 
         $ttl = $this->getTimeToLive($ttl);
         $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
@@ -183,72 +173,73 @@ final class DBALQueryBuilder extends QueryBuilder
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
         $this->cacheKey .= '.'.md5(var_export([$this->getSQL(), $this->getParameters()], true));
 
-        if($refresh)
-        {
-            register_shutdown_function(function() {
+        register_shutdown_function(function() {
 
-                if($this->env === 'test')
-                {
-                    return;
-                }
+            if(false === $this->isCache)
+            {
+                return;
+            }
 
-                if(false === $this->reset)
-                {
-                    return;
-                }
+            if('test' === $this->env)
+            {
+                return;
+            }
 
-                if(str_contains($this->cacheKey, '.refresh'))
-                {
-                    return;
-                }
+            if(false === $this->methodReset)
+            {
+                return;
+            }
 
-                $Deduplicator = $this->deduplicator
-                    ->namespace($this->namespace)
-                    ->expiresAfter('1 minutes')
-                    ->deduplication([$this->reset, $this->cacheKey]);
+            $Randomizer = new Randomizer();
+            $max = (int) ($this->ttl / 2);
+            $max = max($max, 5);
+            $expires = $Randomizer->getInt(3, $max);
 
-                if($Deduplicator->isExecuted())
-                {
-                    return;
-                }
+            $Deduplicator = $this->deduplicator
+                ->namespace($this->namespace)
+                ->expiresAfter(sprintf('%s seconds', $expires))
+                ->deduplication([$this->methodReset, $this->cacheKey]);
 
-                $Deduplicator->save();
+            if($Deduplicator->isExecuted())
+            {
+                $this->logger->critical('КЕШ ЕЩЕ ОБНОВЛЯЕТСЯ', [$this->cacheKey]);
+                return;
+            }
 
-                $old = $this->cacheQueries->getItem($this->cacheKey.'.refresh');
+            $Deduplicator->save();
 
-                if($old->isHit())
-                {
-                    /** Присваиваем АКТИВНЫЙ кеш */
-                    $current = $this->cacheQueries->getItem($this->cacheKey);
-                    $current->set($old->get());
-                    $this->cacheQueries->save($current);
-                }
+            /** Прогреваем кеш REFRESH кеш */
 
-                /** Прогреваем кеш REFRESH кеш */
-                $this->cacheKey .= '.refresh';
-                $this->resetCacheQuery(); // Удаляем
-                $this->{$this->reset}();
+            $this->isCache = false;
+            $data = $this->{$this->methodReset}();
+            $this->isCache = true;
 
-                $this->cacheKey = str_replace('.refresh', '', $this->cacheKey);
 
-                /* Сбрасываем кеш для последующего запроса */
-                // $this->logger->critical('Сбрасываем кеш для последующего запроса', [$this->reset, $this->cacheKey]);
+            /** Присваиваем АКТИВНЫЙ кеш */
+            $current = $this->cacheQueries->getItem($this->cacheKey);
 
+            $current
+                ->expiresAfter($this->ttl)
+                ->set($data);
+
+            $this->logger->critical('ОБНОВИЛИ РЕЗУЛЬТАТ', [$this->cacheKey]);
+
+            $this->cacheQueries->save($current);
+
+            if($this->refresh)
+            {
                 register_shutdown_function(function() {
 
-                    $Deduplicator = $this->deduplicator
+                    $this->deduplicator
                         ->namespace($this->namespace)
-                        ->deduplication([$this->reset, $this->cacheKey]);
+                        ->deduplication([$this->methodReset, $this->cacheKey])
+                        ->delete();
 
-                    $Deduplicator->unlock();
-                    $Deduplicator->delete();
-
-                    /* Сбрасываем кеш для последующего запроса */
-                    //$this->logger->critical('СБРОСИЛИ кеш для последующего запроса', [$this->cacheKey]);
+                    $this->logger->critical('СБРОСИЛИ дедубликтор для последующего обновления', [$this->cacheKey]);
                 });
-            });
+            }
+        });
 
-        }
 
         return $this;
     }
@@ -308,9 +299,10 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociative(): array
     {
-        $this->reset = 'fetchAllAssociative';
+        $this->methodReset = 'fetchAllAssociative';
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
+            $this->methodReset = false;
             $item->expiresAfter($this->ttl);
             return $this->executeDBALQuery()->fetchAllAssociative();
         }) : $this->executeDBALQuery()->fetchAllAssociative();
@@ -320,30 +312,13 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result ?: [];
     }
 
-    public function fetchAllGenerator(): Generator|false
-    {
-        $this->reset = 'fetchAllGenerator';
-
-        $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
-            $item->expiresAfter($this->ttl);
-            return $this->executeDBALQuery()->iterateAssociative();
-        }) : $this->executeDBALQuery()->iterateAssociative();
-
-        //$result = $this->executeDBALQuery()->iterateAssociative();
-
-        return $result->valid() ? $result : false;
-    }
+    /**
+     * Метод гидрации
+     */
 
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
-        $this->reset = false;
-
-        $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
-            $item->expiresAfter($this->ttl);
-            return $this->executeDBALQuery()->iterateAssociative();
-        }) : $this->executeDBALQuery()->iterateAssociative();
-
-        //$result = $this->executeDBALQuery()->iterateAssociative();
+        $result = $this->fetchAllGenerator();
 
         foreach($result as $item)
         {
@@ -353,13 +328,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllIndexHydrate(string $class): array|false
     {
-        $this->reset = false;
-
-        $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
-            $item->expiresAfter($this->ttl);
-            return $this->executeDBALQuery()->fetchAllAssociativeIndexed();
-        }) : $this->executeDBALQuery()->fetchAllAssociativeIndexed();
-
+        $result = $this->fetchAllAssociativeIndexed();
 
         foreach($result as $key => $item)
         {
@@ -371,9 +340,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchHydrate(string $class, ?string $method = null): mixed
     {
-        $this->reset = 'fetchHydrate';
-
-        //$result = $this->executeDBALQuery()->fetchAssociative();
         $result = $this->fetchAssociative();
 
         if(empty($result))
@@ -384,11 +350,29 @@ final class DBALQueryBuilder extends QueryBuilder
         return $method ? (new $class())->{$method}(...$result) : new $class(...$result);
     }
 
-    public function fetchAssociative(): array|false
+    /**
+     * Метод результатов запросов
+     */
+
+    public function fetchAllGenerator(): Generator|false
     {
-        $this->reset = 'fetchAssociative';
+        $this->methodReset = 'fetchAllGenerator';
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
+            $this->methodReset = false;
+            $item->expiresAfter($this->ttl);
+            return $this->executeDBALQuery()->iterateAssociative();
+        }) : $this->executeDBALQuery()->iterateAssociative();
+
+        return $result->valid() ? $result : false;
+    }
+
+    public function fetchAssociative(): array|false
+    {
+        $this->methodReset = 'fetchAssociative';
+
+        $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
+            $this->methodReset = false;
             $item->expiresAfter($this->ttl);
             return $this->executeDBALQuery()->fetchAssociative();
         }) : $this->executeDBALQuery()->fetchAssociative();
@@ -398,12 +382,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociativeIndexed(?string $class = null): array
     {
-        $this->reset = $class ? false : 'fetchAllAssociativeIndexed';
-
-        $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
-            $item->expiresAfter($this->ttl);
-            return $this->executeDBALQuery()->fetchAllAssociative();
-        }) : $this->executeDBALQuery()->fetchAllAssociative();
+        $result = $this->fetchAllAssociative();
 
         $data = [];
 
@@ -431,9 +410,10 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchOne(): mixed
     {
-        $this->reset = 'fetchOne';
+        $this->methodReset = 'fetchOne';
 
         $result = $this->isCache ? $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): mixed {
+            $this->methodReset = false;
             $item->expiresAfter($this->ttl);
             return $this->executeDBALQuery()->fetchOne();
         }) : $this->executeDBALQuery()->fetchOne();
@@ -472,69 +452,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $this->executeQuery();
 
-        // return $this->isCache && !$this->search ? $this->executeCacheQuery() : $this->executeQuery();
     }
-
-    //    private function executeCacheQuery(): Result
-    //    {
-    //        return $this->connection->executeCacheQuery(
-    //            $this->getSQL(),
-    //            $this->getParameters(),
-    //            $this->getParameterTypes(),
-    //            new QueryCacheProfile($this->ttl, $this->cacheKey)
-    //        );
-    //    }
-
-
-    //    public function deleteCacheQueries(): void
-    //    {
-    //        $this->cacheQueries->deleteItem($this->cacheKey);
-    //    }
-
-    //    public function resetCacheCounter(): void
-    //    {
-    //        if($this->env === 'test')
-    //        {
-    //            return;
-    //        }
-    //
-    //        /* Сбрасываем кеш для последующего запроса */
-    //        register_shutdown_function(function() {
-    //            $this->resetCounter();
-    //        });
-    //
-    //    }
-
-    //    public function resetCounter()
-    //    {
-    //        $counterKey = 'counter.'.$this->cacheKey;
-    //
-    //        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
-    //
-    //        $lastDatetimeCache = $DatetimeCache->getItem($counterKey);
-    //
-    //        /** @var CacheItem $lastDatetime */
-    //        if(false === $lastDatetimeCache->isHit())
-    //        {
-    //            $this->select('COUNT(*)');
-    //            $this->setMaxResults(null);
-    //
-    //            //$this->resetQueryParts(['orderBy', 'groupBy']);
-    //            $this->resetOrderBy();
-    //            $this->resetGroupBy();
-    //
-    //            $counterCache = $this->cacheQueries->getItem($counterKey);
-    //            $counterCache->set($this->fetchOne());
-    //            $counterCache->expiresAfter(DateInterval::createFromDateString('1 day'));
-    //            $this->cacheQueries->save($counterCache);
-    //
-    //
-    //            $lastDatetimeCache->expiresAfter(DateInterval::createFromDateString('5 seconds'));
-    //            $lastDatetimeCache->set(true);
-    //            $DatetimeCache->save($lastDatetimeCache);
-    //        }
-    //    }
-
 
     /**
      * Создает SearchQueryBuilder для поиска, и добавляет в открытый запрос
