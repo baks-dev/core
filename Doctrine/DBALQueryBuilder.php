@@ -316,9 +316,14 @@ final class DBALQueryBuilder extends QueryBuilder
      * Метод гидрации
      */
 
-    public function fetchAllHydrate(string $class, ?string $method = null): Generator
+    public function fetchAllHydrate(string $class, ?string $method = null): Generator|false
     {
         $result = $this->fetchAllGenerator();
+
+        if(false === $result)
+        {
+            return false;
+        }
 
         foreach($result as $item)
         {
