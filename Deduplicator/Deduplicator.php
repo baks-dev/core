@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Deduplicator;
 
-use App\Kernel;
 use BaksDev\Core\Cache\AppCacheInterface;
-use BaksDev\Core\Lock\AppLockInterface;
 use DateInterval;
 use InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
@@ -40,7 +38,6 @@ final class Deduplicator implements DeduplicatorInterface
 
     private ?string $namespace = null;
 
-    private AppLockInterface $lock;
 
     private CacheItem $item;
 
@@ -49,9 +46,8 @@ final class Deduplicator implements DeduplicatorInterface
     private DateInterval $expires;
 
     public function __construct(
-        #[Autowire(env: 'APP_ENV')] private $environment,
+        #[Autowire(env: 'APP_ENV')] $environment,
         private readonly AppCacheInterface $appCache,
-        private readonly AppLockInterface $appLock,
     )
     {
         /* Время жизни дедубликации по умолчанию 30 дней */
@@ -98,10 +94,6 @@ final class Deduplicator implements DeduplicatorInterface
             $this->namespace = md5(implode('', $classes));
         }
 
-        /* блокируем одновременное выполнение скрипта (по умолчанию 1 мин) */
-        $this->lock = $this->appLock->createLock($key);
-        $this->lock->wait();
-
         /* получаем из кеша результат */
         $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
         $this->item = $this->cache->getItem(md5($key));
@@ -109,14 +101,6 @@ final class Deduplicator implements DeduplicatorInterface
         $this->init = true;
 
         return $this;
-    }
-
-    /**
-     * Метод снимает лок с процесса
-     */
-    public function unlock(): void
-    {
-        $this->lock->release();
     }
 
     /**
@@ -131,7 +115,6 @@ final class Deduplicator implements DeduplicatorInterface
 
         if($this->item->isHit() && trim($this->item->get()) === 'executed')
         {
-            $this->lock->release();
             return true;
         }
 
@@ -152,11 +135,6 @@ final class Deduplicator implements DeduplicatorInterface
         $this->item->set('executed');
         $this->item->expiresAfter($this->expires);
         $this->cache->save($this->item);
-
-        usleep(500);
-
-        /* Снимаем лок с процесса */
-        $this->lock->release();
     }
 
     /**

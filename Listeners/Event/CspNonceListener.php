@@ -26,13 +26,17 @@ declare(strict_types=1);
 namespace BaksDev\Core\Listeners\Event;
 
 use BaksDev\Core\Twig\CspNonceGenerator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 #[AsEventListener(event: ResponseEvent::class)]
 final readonly class CspNonceListener
 {
-    public function __construct(private CspNonceGenerator $CspNonceGenerator) {}
+    public function __construct(
+        #[Autowire(env: 'APP_ENV')] private string $environment,
+        private CspNonceGenerator $CspNonceGenerator
+    ) {}
 
     /** Создает правила Content-Security-Policy */
     public function onKernelResponse(ResponseEvent $event)
@@ -54,7 +58,7 @@ final readonly class CspNonceListener
             child-src 'self' blob: ".$strict.";
             frame-src 'self' blob: ".$strict.";
             
-            script-src 'nonce-".$nonce."' 'strict-dynamic';
+            script-src 'nonce-".$nonce."' 'strict-dynamic'".('dev' === $this->environment ? " 'unsafe-eval'" : '').";
 
             img-src 'self' data: https:;
             

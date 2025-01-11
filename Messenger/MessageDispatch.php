@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -164,8 +164,10 @@ final class MessageDispatch implements MessageDispatchInterface
             return false;
         }
 
+        $transport = str_replace('-low', '', $this->transport);
+
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
-        $cacheConsume = $cache->getItem('consume-'.trim($this->transport));
+        $cacheConsume = $cache->getItem('consume-'.trim($transport));
 
         if($cacheConsume->isHit())
         {
@@ -174,12 +176,12 @@ final class MessageDispatch implements MessageDispatchInterface
 
         /** Процесс проверки воркера указанного транспорта */
 
-        $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume | grep '.$this->transport);
+        $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume | grep '.$transport);
         $process->setTimeout(30);
         $process->run();
 
         $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
-        $isRunning = (!empty($result) && strripos($result, 'messenger:consume '.$this->transport.' '));
+        $isRunning = (!empty($result) && strripos($result, 'messenger:consume '.$transport.' '));
 
         /** Кешируем результат для следующих сообщений транспорта */
 

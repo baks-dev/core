@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,10 @@ return static function(FrameworkConfig $framework) {
 
     $messenger = $framework->messenger();
 
+    $messenger->transport('sync')->dsn('sync://');
+
+    /** ASYNC */
+
     $messenger
         ->transport('async')
         ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
@@ -41,13 +45,29 @@ return static function(FrameworkConfig $framework) {
         ->multiplier(3)
         ->service(null);
 
-    $messenger->transport('sync')->dsn('sync://');
+
+    $messenger
+        ->transport('async-low')
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+        ->options(['queue_name' => 'async'])
+        ->failureTransport('failed')
+        ->retryStrategy()
+        ->maxRetries(1)
+        ->delay(1000)
+        ->maxDelay(1)
+        ->multiplier(2)
+        ->service(null);
+
+
 
     $failure = $framework->messenger();
 
     $failure->transport('failed')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
         ->options(['queue_name' => 'failed']);
+
+
+    /** SYSTEMD  */
 
     $systemd = $framework->messenger();
 

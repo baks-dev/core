@@ -28,6 +28,7 @@ namespace BaksDev\Core\Doctrine\Tests;
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -43,56 +44,42 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DBALQueryBuilderTest extends TestCase
 {
     private Connection $connection;
-    private CacheItemPoolInterface $cacheQueries;
-    private string $cacheKey;
-    private int $ttl;
-    private bool $isCache;
-    private string $namespace;
-    private QueryBuilder $search;
     private TranslatorInterface $translator;
     private SwitcherInterface $switcher;
-    private int $counter;
     private AppCacheInterface $cache;
-    private LoggerInterface $logger;
-    private HttpClientInterface $client;
-    private DeduplicatorInterface $deduplicatop;
+    private DeduplicatorInterface $deduplicator;
+    private MessageDispatchInterface $dispatch;
 
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
-        $this->cacheQueries = $this->createMock(CacheItemPoolInterface::class);
-        $this->cacheKey = 'test_cache_key';
-        $this->ttl = 900;
-        $this->isCache = false;
-        $this->namespace = 'DBALCache';
-        $this->search = $this->createMock(QueryBuilder::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->switcher = $this->createMock(SwitcherInterface::class);
         $this->cache = $this->createMock(AppCacheInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
-        $this->deduplicatop = $this->createMock(DeduplicatorInterface::class);
-        $this->client = $this->createMock(HttpClientInterface::class);
-        $this->counter = 0;
+        $this->deduplicator = $this->createMock(DeduplicatorInterface::class);
+        $this->dispatch = $this->createMock(MessageDispatchInterface::class);
     }
 
 
     public function testCreateQueryBuilder(): void
     {
+
         $dbalQueryBuilder = new DBALQueryBuilder(
             env: 'test',
-            logger: $this->logger,
+            connection: $this->connection,
             switcher: $this->switcher,
             translator: $this->translator,
             cache: $this->cache,
-            deduplicator: $this->deduplicatop,
-            connection: $this->connection,
+            deduplicator: $this->deduplicator,
+            dispatch: $this->dispatch,
         );
 
         $newInstance = $dbalQueryBuilder->createQueryBuilder('test-class');
 
         $this->assertInstanceOf(DBALQueryBuilder::class, $newInstance);
         $this->assertNotSame($dbalQueryBuilder, $newInstance);
-        $this->assertEquals('test-class', $newInstance->getCacheKey());
+        $this->assertEquals(md5('test-class'), $newInstance->getCacheKey());
+
 
     }
 
