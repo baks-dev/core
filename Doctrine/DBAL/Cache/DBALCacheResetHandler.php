@@ -32,6 +32,7 @@ use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 #[AsMessageHandler(priority: 0)]
 final readonly class DBALCacheResetHandler
@@ -88,7 +89,6 @@ final readonly class DBALCacheResetHandler
                 continue;
             }
 
-            $this->logger->critical('Обновляем кеш запроса '.$result['query']);
 
             /** Получаем результат кеширования */
 
@@ -98,9 +98,23 @@ final readonly class DBALCacheResetHandler
 
             $tmpCacheKey = $tmpCache->getCacheKey();
 
-            $tmpCache
-                ->executeCacheQuery($result['query'], $result['params'], $result['types'])//->fetchAllAssociative()
-            ;
+            /** Замеряем время выполнения запроса */
+            $stopwatch = new Stopwatch();
+            $stopwatch->start($tmpCacheKey);
+
+            $tmpCache->executeCacheQuery($result['query'], $result['params'], $result['types']);
+
+            /** Сохраняем время выполнения запроса */
+            $event = $stopwatch->stop($tmpCacheKey);
+            $endTime = $event->getEndTime();
+
+            // Удаляем символы \t, \r, \n и заменяем двойные пробелы на одинарные
+            $query = preg_replace("/[\t\r\n]+/", '', $result['query']);
+            $query = preg_replace('/ +/', ' ', $query);
+
+            $log = sprintf('%s: %s', $event->getEndTime(), $query);
+            $endTime > 1000 ? $this->logger->warning($log, $result['params']) : $this->logger->debug($log, $result['params']);
+
 
             $tmpCacheQueries = $tmpCache->getCacheQueries();
             $tmpCache = $tmpCacheQueries->getItem($tmpCacheKey)->get();

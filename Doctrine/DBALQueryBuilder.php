@@ -130,7 +130,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $classNamespace = is_object($class) ? $class::class : $class;
 
         $newInstance->namespace = $this->getCacheNamespace($classNamespace);
-        $newInstance->cacheKey = md5($newInstance->namespace);
+        $newInstance->cacheKey = md5($classNamespace);
 
         $this->isCache = false;
 
@@ -175,8 +175,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->ttl = $this->getTimeToLive($ttl);
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
-        $this->cacheKey .= '.'.md5(var_export($this->getParameters(), true));
-
+        $this->cacheKey = md5($this->cacheKey.var_export($this->getParameters(), true));
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
 
 
@@ -250,7 +249,6 @@ final class DBALQueryBuilder extends QueryBuilder
                     transport: $this->namespace.'-low'
                 );
             }
-
 
             return $this->executeCacheQuery();
         }
