@@ -59,8 +59,13 @@ final readonly class DBALCacheResetHandler
             return;
         }
 
+        $isUpdate = false;
+
         foreach($cacheUpdate as $key => $item)
         {
+
+            /** Формируем данные выполняемого запроса */
+
             $requests = explode('&', $key);
 
             $result = null;
@@ -83,12 +88,10 @@ final readonly class DBALCacheResetHandler
                 }
             }
 
-
             if(is_null($result))
             {
                 continue;
             }
-
 
             /** Получаем результат кеширования */
 
@@ -99,29 +102,42 @@ final readonly class DBALCacheResetHandler
             $tmpCacheKey = $tmpCache->getCacheKey();
 
             /** Замеряем время выполнения запроса */
+
             $stopwatch = new Stopwatch();
             $stopwatch->start($tmpCacheKey);
 
             $tmpCache->executeCacheQuery($result['query'], $result['params'], $result['types']);
 
-            /** Сохраняем время выполнения запроса */
             $event = $stopwatch->stop($tmpCacheKey);
             $endTime = $event->getEndTime();
+
+            /** Сохраняем в лог информацию о запросе и времени его выполнения */
 
             // Удаляем символы \t, \r, \n и заменяем двойные пробелы на одинарные
             $query = preg_replace("/[\t\r\n]+/", '', $result['query']);
             $query = preg_replace('/ +/', ' ', $query);
-
             $log = sprintf('%s: %s', $event->getEndTime(), $query);
-            $endTime > 1000 ? $this->logger->warning($log, $result['params']) : $this->logger->debug($log, $result['params']);
 
+            match (true)
+            {
+                // Допустимое время выполнения запроса
+                $endTime < 1000 => $this->logger->debug($log, $result['params']),
+
+                // Время выполнения запроса, на которое стоит обратить внимание
+                $endTime < 5000 => $this->logger->notice($log, $result['params']),
+
+                // Запрос, который требует внимание и анализа
+                default => $this->logger->warning($log, $result['params']),
+            };
+
+            /** Обновляем массив результатом */
 
             $tmpCacheQueries = $tmpCache->getCacheQueries();
             $tmpCache = $tmpCacheQueries->getItem($tmpCacheKey)->get();
 
             if(is_array($tmpCache))
             {
-                /** Обновляем кеш */
+                $isUpdate = true;
                 $cacheUpdate[$key] = current($tmpCache);
             }
 
@@ -129,40 +145,16 @@ final readonly class DBALCacheResetHandler
 
         }
 
-        $cacheItem->set($cacheUpdate);
-        $cache->save($cacheItem);
+        if($isUpdate)
+        {
+            $cacheItem->set($cacheUpdate);
+            $cache->save($cacheItem);
+        }
 
         $this->deduplicator
             ->namespace($message->getNamespace())
             ->deduplication([$message->getKey()])
             ->delete();
-
-
-        return;
-
-        //        dd($cacheUpdate);
-        //
-        //
-        //        $dbal = $DBALQueryBuilderOld->createQueryBuilder(self::class);
-        //
-        //        $dbal
-        //            ->addSelect('usr.usr')
-        //            ->from(User::class, 'usr')
-        //            //->where('usr = :id')
-        //            //->setParameter('id', '018d306f-a32e-7f26-ab25-93c724f0b814', UserUid::TYPE)
-        //        ;
-        //
-        //
-        //        $data = $dbal
-        //            ->enableCache('user-users')
-        //            ->fetchAllAssociative();
-        //
-        //
-        //        dd($dbal->getCacheKey());
-        //
-        //
-        //        self::assertNotEquals('018d306f-a32e-7f26-ab25-93c724f0b814', $data['usr']);
-
 
     }
 }

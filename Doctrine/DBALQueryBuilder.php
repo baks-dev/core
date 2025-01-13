@@ -29,6 +29,7 @@ use App\Kernel;
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Doctrine\DBAL\Cache\DBALCacheResetMessage;
+use BaksDev\Core\Doctrine\DBAL\Delay\DBALDelayMessage;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
@@ -49,9 +50,6 @@ use Psr\Cache\CacheItemPoolInterface;
 use Random\Randomizer;
 use ReflectionAttribute;
 use ReflectionClass;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -166,6 +164,11 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->namespace = $this->getCacheNamespace($namespace);
         }
 
+        if(empty($this->select))
+        {
+            $this->select('*');
+        }
+
         $this->isCache = true;
         $this->refresh = $refresh;
 
@@ -175,46 +178,13 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->ttl = $this->getTimeToLive($ttl);
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
-        $this->cacheKey = md5($this->cacheKey.var_export($this->getParameters(), true));
+        $this->cacheKey = md5($this->cacheKey.var_export($this->getParameters(), true).$this->getMaxResults().$this->getFirstResult());
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
-
 
         return $this;
 
-        //        if($refresh)
-        //        {
-        //            $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
-        //
-        //            $lastDatetimeCache = $DatetimeCache->getItem('date.'.$this->cacheKey);
-        //            $lastDatetime = $lastDatetimeCache->get();
-        //
-        //            if($lastDatetime === null || time() > $lastDatetime)
-        //            {
-        //                /* Перезаписываем метку времени запроса */
-        //                $Randomizer = new Randomizer();
-        //                $lastDatetimeCache->set(time() + $Randomizer->getInt(3, 10));
-        //                $lastDatetimeCache->expiresAfter($this->ttl);
-        //                $DatetimeCache->save($lastDatetimeCache);
-        //
-        //                if($lastDatetime)
-        //                {
-        //                    /* Сбрасываем кеш для последующего запроса */
-        //                    //register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
-        //                    //register_shutdown_function([$this, 'resetCounter'], 'throw');
-        //
-        //                    register_shutdown_function(function() {
-        //                        $this->resetCacheQuery();
-        //                    });
-        //
-        //                    register_shutdown_function(function() {
-        //                        $this->resetCounter();
-        //                    });
-        //                }
-        //            }
-        //        }
-
-
     }
+
 
     /**
      * Метод включает кеш результата запроса и добавляет комманду для обновления с низким приоритетом
@@ -293,9 +263,8 @@ final class DBALQueryBuilder extends QueryBuilder
         return $seconds;
     }
 
-
     /**
-     * Перезаписываем кеш
+     * Сбрасываем тек ключа запроса
      */
     public function resetCacheQuery(): bool
     {
@@ -405,6 +374,62 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result ?: false;
     }
 
+    public function count(bool $delay = false): int|null
+    {
+        $this->select('COUNT(*)');
+
+        $this->setMaxResults(null);
+        $this->setFirstResult(0);
+
+        $this->resetGroupBy();
+        $this->resetOrderBy();
+
+        $this->enableCache();
+
+        $cache = $this->cacheQueries->getItem($this->cacheKey);
+
+        if($delay)
+        {
+            $Deduplicator = $this->deduplicator
+                ->namespace($this->namespace)
+                ->expiresAfter(sprintf('%d seconds', $this->ttl))
+                ->deduplication([$this->cacheKey]);
+
+
+            /** Обновляем кеш результата запроса */
+            if(false === $cache->isHit() || false === $Deduplicator->isExecuted())
+            {
+                $Deduplicator->save();
+
+                $stamps = [];
+
+                if($cache->isHit())
+                {
+                    $Randomise = new Randomizer();
+                    $ttl = $Randomise->getInt(5, (int) ($this->ttl / 2));
+                    $stamps = [new MessageDelay(sprintf('%d seconds', ($ttl)))];
+                }
+
+                $DBALDelayMessage = new DBALDelayMessage(
+                    $this->namespace,
+                    $this->cacheKey,
+                    $this->getSQL(),
+                    $this->getParameters(),
+                    $this->getParameterTypes()
+                );
+
+                $this->dispatch->dispatch(
+                    message: $DBALDelayMessage,
+                    stamps: $stamps,
+                    transport: $this->namespace.'-low'
+                );
+            }
+        }
+
+        return false === $delay || $cache->isHit() ? (int) $this->fetchOne() : null;
+    }
+
+
     public function fetchExist($not = false): bool
     {
         $this->select('1');
@@ -450,51 +475,6 @@ final class DBALQueryBuilder extends QueryBuilder
     public function deleteCacheQueries(): void
     {
         $this->cacheQueries->deleteItem($this->cacheKey);
-    }
-
-
-    public function resetCacheCounter(): void
-    {
-        if($this->env === 'test')
-        {
-            return;
-        }
-
-        /* Сбрасываем кеш для последующего запроса */
-        register_shutdown_function(function() {
-            $this->resetCounter();
-        });
-
-    }
-
-    public function resetCounter()
-    {
-        $counterKey = 'counter.'.$this->cacheKey;
-
-        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
-
-        $lastDatetimeCache = $DatetimeCache->getItem($counterKey);
-
-        /** @var CacheItem $lastDatetime */
-        if(false === $lastDatetimeCache->isHit())
-        {
-            $this->select('COUNT(*)');
-            $this->setMaxResults(null);
-
-            //$this->resetQueryParts(['orderBy', 'groupBy']);
-            $this->resetOrderBy();
-            $this->resetGroupBy();
-
-            $counterCache = $this->cacheQueries->getItem($counterKey);
-            $counterCache->set($this->fetchOne());
-            $counterCache->expiresAfter(DateInterval::createFromDateString('1 day'));
-            $this->cacheQueries->save($counterCache);
-
-
-            $lastDatetimeCache->expiresAfter(DateInterval::createFromDateString('5 seconds'));
-            $lastDatetimeCache->set(true);
-            $DatetimeCache->save($lastDatetimeCache);
-        }
     }
 
 
@@ -563,11 +543,11 @@ final class DBALQueryBuilder extends QueryBuilder
         $string = $this->recursive_alias.'.'.$id.'::varchar AS groups';
 
         // Удаляем символы \t, \r, \n и заменяем двойные пробелы на одинарные
-        $string = preg_replace("/[\t\r\n]+/", '', $string); // Удаляем \t, \r, \n
-        $string = preg_replace('/ +/', ' ', $string); // Заменяем несколько пробелов на один
+        //$string = preg_replace("/[\t\r\n]+/", '', $string); // Удаляем \t, \r, \n
+        //$string = preg_replace('/ +/', ' ', $string); // Заменяем несколько пробелов на один
 
         // Удаляем пробелы в начале и конце строки
-        $string = trim($string);
+        //$string = trim($string);
 
         $this->addSelect($string);
         $this->addSelect('1 AS level');
@@ -828,7 +808,7 @@ final class DBALQueryBuilder extends QueryBuilder
     /**
      * CacheQueries
      */
-    public function getCacheQueries(): CacheItemPoolInterface
+    public function getCacheQueries(): CacheItemPoolInterface|false
     {
         return $this->cacheQueries;
     }
@@ -840,6 +820,13 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         return $this->cacheKey;
     }
+
+    public function setCacheKey(string $key): self
+    {
+        $this->cacheKey = $key;
+        return $this;
+    }
+
 
     public function from(string $table, $alias = null): self
     {

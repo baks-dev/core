@@ -106,18 +106,6 @@ final class Paginator implements PaginatorInterface
     {
         $namespace = $namespace ?: $this->namespace;
 
-        if($namespace)
-        {
-            $qb->enableCache($namespace);
-        }
-
-        if(($this->request && $this->session?->get('statusCode') === 307) || $this->request->query->getInt('limit'))
-        {
-            /** Сбрасываем кеш ключа запроса */
-            $qb->resetCacheQuery();
-            $this->request->getSession()->remove('statusCode');
-        }
-
         if($qb->getMaxResults())
         {
             $this->limit = $qb->getMaxResults();
@@ -129,41 +117,51 @@ final class Paginator implements PaginatorInterface
 
         $qb->setFirstResult($this->page * $this->limit);
 
+        if($namespace)
+        {
+            $qb->enableCache($namespace);
+        }
+
+        if(($this->request && $this->session?->get('statusCode') === 307))
+        {
+            /** Сбрасываем кеш ключа запроса */
+            $qb->resetCacheQuery();
+            $this->request->getSession()->remove('statusCode');
+        }
+
         $this->data = $qb->fetchAllAssociative();
-        $this->pagination = count($this->data) >= $this->limit;
+
+        /** По умолчанию COUNTER присваиваем равным количеству возвращаемых элементов  */
         $this->counter = count($this->data);
+
+        /** Включаем пагинацию, если количество возвращаемых элементов больше либо равно лимиту */
+        $this->pagination = $this->counter >= $this->limit;
 
         /** Если количество больше лимита - считаем количество  */
         if($this->pagination)
         {
-            $qb->select('COUNT(*)');
-            $qb->setMaxResults(null);
-            $qb->resetGroupBy();
-            $qb->resetOrderBy();
-            $qb->enableCache($this->namespace);
+            $counter = $qb->count(true);
+            $this->counter = is_null($counter) ? 'более '.$this->limit : $counter;
 
-            if($qb->fetchOne())
+            if($this->request && $this->session?->get('statusCode') === 307)
             {
-                $this->counter = $qb->fetchOne();
+                /** Сбрасываем кеш COUNTER */
+                $qb->deleteCacheQueries();
             }
         }
 
         return $this;
     }
 
+
     public function fetchAllAssociativeIndexed(DBALQueryBuilder $qb, ?string $namespace = null): self
     {
         $namespace = $namespace ?: $this->namespace;
 
-        if($namespace)
-        {
-            $qb->enableCache($namespace, 3600);
-        }
-
         if(($this->request && $this->session->get('statusCode') === 307) || $this->request->query->getInt('limit'))
         {
             /** Сбрасываем кеш ключа запроса */
-            $qb->resetCacheQuery();
+            //$qb->resetCacheQuery();
             $this->request->getSession()->remove('statusCode');
 
             $qb->disableResultCache();
@@ -180,6 +178,10 @@ final class Paginator implements PaginatorInterface
 
         $qb->setFirstResult($this->page * $this->limit);
 
+        if($namespace)
+        {
+            $qb->enableCache($namespace);
+        }
 
         $this->data = $qb->fetchAllAssociativeIndexed();
         $this->pagination = count($this->data) >= $this->limit;

@@ -171,7 +171,7 @@ final class MessageDispatch implements MessageDispatchInterface
 
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
 
-        if(str_replace('-low', '', $this->transport))
+        if(str_contains($this->transport, '-low'))
         {
             $cacheConsume = $cache->getItem('consume-'.trim(str_replace('-low', '', $this->transport)));
 

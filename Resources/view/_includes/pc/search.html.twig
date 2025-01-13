@@ -13,7 +13,12 @@
         </div>
     </div>
 
-    {{ form_widget(search.query, { attr: { class : 'border-light w-100 ps-5', style : 'min-width: 100%;' } }) }}
+    {{ form_widget(search.query, {
+        attr: {
+            class : 'border-light w-100 ps-5',
+            style : 'min-width: 100%;'
+        }
+    }) }}
 
     <div class="w-100 position-relative">
         <button class="btn position-absolute top-0 end-0" type="submit" aria-label="Поиск">
