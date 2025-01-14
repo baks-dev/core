@@ -35,7 +35,7 @@ return static function(FrameworkConfig $framework) {
 
     $messenger
         ->transport('async')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
+        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?dbindex=%env(REDIS_TABLE)&auto_setup=true')
         ->options(['stream' => 'async'])
         ->failureTransport('failed')
         ->retryStrategy()
@@ -73,7 +73,7 @@ return static function(FrameworkConfig $framework) {
 
     $systemd
         ->transport('systemd')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?auto_setup=true')
+        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?dbindex=%env(REDIS_TABLE)&auto_setup=true')
         ->options(['stream' => 'systemd'])
         ->failureTransport('failed-systemd')
         ->retryStrategy()

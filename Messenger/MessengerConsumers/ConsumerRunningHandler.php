@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +29,14 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Messenger\MessageDispatch;
 use BaksDev\Core\Messenger\MessengerConsumers;
 use DateInterval;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
 final readonly class ConsumerRunningHandler
 {
     public function __construct(
+        #[Autowire(env: 'HOST')] private string $HOST,
         private AppCacheInterface $cache,
         private MessengerConsumers $MessengerConsumers,
     ) {}
@@ -59,7 +61,8 @@ final readonly class ConsumerRunningHandler
 
             $consumers = explode('@', $service);
             $consumer = current($consumers);
-            $consumer = str_replace('baks-', '', $consumer);
+
+            $consumer = str_replace(array('baks-', $this->HOST.'-'), '', $consumer);
             $consumer = trim($consumer);
 
             $cacheConsume = $cache->getItem('consume-'.$consumer);

@@ -77,13 +77,18 @@ final class MessageDispatch implements MessageDispatchInterface
 
         foreach($stamps as $key => $stamp)
         {
-            /** Если передана марка MessageDelay - преобразуем её в марку DelayStamp */
+            /**
+             * Если передана марка MessageDelay - преобразуем её в марку DelayStamp
+             */
             if($stamp instanceof MessageDelay)
             {
                 if(is_null($this->transport))
                 {
                     throw new InvalidArgumentException('Транспорт сообщений не установлен');
                 }
+
+                /* Отправляем отложенные сообщения в транспорт LOW (низкий приоритет) */
+                $this->transport .= '-low';
 
                 $stamps[] = $stamp->getDelayStamp();
                 unset($stamps[$key]);
@@ -164,12 +169,16 @@ final class MessageDispatch implements MessageDispatchInterface
             return false;
         }
 
+        /** Переопределяем транспорт, если передан в качестве аргумента */
+
         if(false === is_null($transport))
         {
             $this->transport = $transport;
         }
 
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
+
+        /** Если транспорт LOW и воркер модуля не запущен - передаем его в транспорт async-low */
 
         if(str_contains($this->transport, '-low'))
         {
