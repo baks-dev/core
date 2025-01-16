@@ -87,12 +87,6 @@ final class MessageDispatch implements MessageDispatchInterface
                     throw new InvalidArgumentException('Транспорт сообщений не установлен');
                 }
 
-                if($transport !== 'test')
-                {
-                    /* Отправляем отложенные сообщения в транспорт LOW (низкий приоритет) */
-                    $this->transport = str_replace('-low', '', $this->transport).'-low';
-                }
-
                 $stamps[] = $stamp->getDelayStamp();
                 unset($stamps[$key]);
             }

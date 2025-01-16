@@ -50,6 +50,7 @@ final readonly class CspNonceListener
             'yandex.ru',
             '*.yandex.com',
             '*.yandex.ru',
+            '*.yandex.net',
             $this->HOST,
             $this->CDN_HOST,
         ];

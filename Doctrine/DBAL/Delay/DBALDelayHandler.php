@@ -60,7 +60,7 @@ final class DBALDelayHandler
             $message->getTypes()
         );
 
-        $this->logger->critical($message->getSql());
+        $this->logger->debug($message->getSql());
 
         $this->deduplicator
             ->namespace($message->getNamespace())
