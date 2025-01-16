@@ -90,7 +90,7 @@ final class MessageDispatch implements MessageDispatchInterface
                 if($transport !== 'test')
                 {
                     /* Отправляем отложенные сообщения в транспорт LOW (низкий приоритет) */
-                    $this->transport .= '-low';
+                    $this->transport = str_replace('-low', '', $this->transport).'-low';
                 }
 
                 $stamps[] = $stamp->getDelayStamp();

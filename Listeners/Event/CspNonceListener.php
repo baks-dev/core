@@ -35,7 +35,9 @@ final readonly class CspNonceListener
 {
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private string $environment,
-        private CspNonceGenerator $CspNonceGenerator
+        private CspNonceGenerator $CspNonceGenerator,
+        #[Autowire(env: 'HOST')] private ?string $HOST,
+        #[Autowire(env: 'CDN_HOST')] private ?string $CDN_HOST,
     ) {}
 
     /** Создает правила Content-Security-Policy */
@@ -48,19 +50,21 @@ final readonly class CspNonceListener
             'yandex.ru',
             '*.yandex.com',
             '*.yandex.ru',
+            $this->HOST,
+            $this->CDN_HOST,
         ];
 
         $strict = implode(' ', $domains);
 
         $cspHeader = "
-            connect-src 'self' https: ws: ".$strict.";
+            connect-src 'self' wss: 'nonce-".$nonce."' ".$strict.";
             
             child-src 'self' blob: ".$strict.";
             frame-src 'self' blob: ".$strict.";
             
             script-src 'nonce-".$nonce."' 'strict-dynamic'".('dev' === $this->environment ? " 'unsafe-eval'" : '').";
 
-            img-src 'self' data: https:;
+            img-src 'self' data: 'nonce-".$nonce."' ".$strict.";
             
             object-src 'none';
             base-uri 'none';
