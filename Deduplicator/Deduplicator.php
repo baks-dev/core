@@ -38,12 +38,13 @@ final class Deduplicator implements DeduplicatorInterface
 
     private ?string $namespace = null;
 
-
     private CacheItem $item;
 
     private CacheInterface $cache;
 
     private DateInterval $expires;
+
+    private string|false $key = false;
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] $environment,
@@ -84,8 +85,6 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function deduplication(string|array $keys): self
     {
-        $key = var_export($keys, true);
-
         /* Если не присвоено пространство имен - присваиваем из стека вызовов */
         if($this->namespace === null)
         {
@@ -94,13 +93,16 @@ final class Deduplicator implements DeduplicatorInterface
             $this->namespace = md5(implode('', $classes));
         }
 
+        $key = var_export($keys, true);
+
         /* получаем из кеша результат */
         $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
         $this->item = $this->cache->getItem(md5($key));
+        $this->key = $this->item->getKey();
 
         $this->init = true;
 
-        return $this;
+        return clone $this;
     }
 
     /**
@@ -113,12 +115,7 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication');
         }
 
-        if($this->item->isHit() && trim($this->item->get()) === 'executed')
-        {
-            return true;
-        }
-
-        return false;
+        return $this->item->isHit() && trim($this->item->get()) === 'executed';
     }
 
     /**
@@ -147,7 +144,7 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication');
         }
 
-        return $this->cache->deleteItem($this->item->getKey());
+        return $this->cache->deleteItem($this->getKey());
     }
 
     /**
@@ -155,6 +152,11 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function getKey(): string
     {
-        return $this->item->getKey();
+        if(false === $this->key)
+        {
+            throw new InvalidArgumentException('Invalid Argument cache key');
+        }
+
+        return $this->key;
     }
 }
