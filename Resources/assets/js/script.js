@@ -448,7 +448,7 @@ function modaHidden()
     bootstrap.Modal.getInstance(ModalElement).hide();
 }
 
-'[data-bs-toggle="popover"]'
+
 /* вешаем события на модальные ссылки */
 document.querySelectorAll('[data-bs-toggle="modal"]')
     .forEach(function(item, i, arr)
@@ -613,7 +613,20 @@ function modalLink(item)
                 modal.addEventListener('hidden.bs.modal', function(event)
                 {
                     this.innerHTML = '<div class="modal-dialog modal-dialog-centered"><div class="d-flex justify-content-center w-100"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div></div>';
-                })
+                });
+
+
+                /** Пересобирваем tooltip */
+                modal.addEventListener('shown.bs.modal', function(event)
+                {
+                    var tooltipTriggerList = [].slice.call(modal.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+                    tooltipTriggerList.map(function(tooltipTriggerEl)
+                    {
+                        return new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                });
+
 
                 /* Если в модальном окне присутствует select2 */
                 modal.querySelectorAll('[data-select="select2"]').forEach(function(item)

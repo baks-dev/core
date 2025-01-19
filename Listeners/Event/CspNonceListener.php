@@ -55,6 +55,7 @@ final readonly class CspNonceListener
             $this->CDN_HOST,
         ];
 
+
         $strict = implode(' ', $domains);
 
         $cspHeader = "
