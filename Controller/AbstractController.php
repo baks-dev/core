@@ -438,13 +438,13 @@ abstract class AbstractController
         return $usr?->getProfile();
     }
 
-
-    /** Возвращает идентификатор профиля либо NULL если администратор ресурса */
-    protected function getAdminFilterProfile(): ?UserProfileUid
+    /**
+     * Метод возвращает TRUE в случае если пользователь является администратором ресурса
+     */
+    public function isAdmin(): bool
     {
-        return $this->authorizationChecker->isGranted('ROLE_ADMIN') ? null : $this->getProfileUid();
+        return $this->authorizationChecker->isGranted('ROLE_ADMIN');
     }
-
 
     /**
      * Создает и возвращает экземпляр формы.
