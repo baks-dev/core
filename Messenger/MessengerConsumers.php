@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ use Exception;
 use Generator;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Process\Process;
 
@@ -36,15 +37,10 @@ final class MessengerConsumers
 {
     private const COMMAND = 'systemctl list-units --type=service  | grep baks ';
 
-    private LoggerInterface $logger;
-
     public function __construct(
+        #[Target('coreLogger')] private readonly LoggerInterface $logger,
         private readonly CacheItemPoolInterface $restartSignalCachePool,
-        LoggerInterface $coreLogger
-    )
-    {
-        $this->logger = $coreLogger;
-    }
+    ) {}
 
     private function getServices($grep = ['active', 'running']): Generator|false
     {

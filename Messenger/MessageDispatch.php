@@ -29,6 +29,7 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
@@ -42,16 +43,12 @@ final class MessageDispatch implements MessageDispatchInterface
 
     private ?string $transport = null;
 
-    private LoggerInterface $logger;
-
     public function __construct(
+        #[Target('messageDispatchLogger')] private readonly LoggerInterface $logger,
         private readonly MessageBusInterface $messageBus,
         private readonly AppCacheInterface $cache,
-        LoggerInterface $messageDispatchLogger,
-    )
-    {
-        $this->logger = $messageDispatchLogger;
-    }
+
+    ) {}
 
     /**
      * Метод добавляет сообщение в очередь:

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ namespace BaksDev\Core\Validator;
 use ArrayObject;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class ValidatorCollection extends ArrayObject implements ValidatorCollectionInterface
@@ -36,22 +37,17 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
 
     private bool $validate = false;
 
-    private ValidatorInterface $validator;
-
-    private LoggerInterface $logger;
-
     private ArrayObject $errors;
 
     public function __construct(
-        ValidatorInterface $validator,
-        LoggerInterface $validatorLogger,
+        #[Target('validatorLogger')] private readonly LoggerInterface $logger,
+        private readonly ValidatorInterface $validator,
+
     ) {
         parent::__construct();
-        $this->validator = $validator;
-        $this->logger = $validatorLogger;
+
         $this->uniqid = uniqid('', false);
         $this->errors = new ArrayObject();
-
     }
 
     public function add(?object $item, ?string $message = null, ?array $context = []): bool|string
