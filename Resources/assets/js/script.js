@@ -1,4 +1,3 @@
-
 //eventEmitter = new EventTarget();
 $html = false;
 
@@ -541,7 +540,7 @@ async function offcanvasLink(offcanvas)
                 /** Обновляем Preload */
 
                 let lazy = document.createElement('script');
-                lazy.src = '/assets/js/lazyload.min.js?v={{ version }}';
+                lazy.src = '/assets/js/lazyload.min.js?v=' + Date.now();
                 document.head.appendChild(lazy);
             }
         });
@@ -661,17 +660,12 @@ function modalLink(item)
                     $html = request.responseText;
                 }
 
-                //window.lazyLoadOptions = {};
-                //LazyLoad.reset()
-
-
                 let lazy = document.createElement('script');
-                lazy.src = '/assets/js/lazyload.min.js?v={{ version }}';
+                lazy.src = '/assets/js/lazyload.min.js?v=' + Date.now();
                 document.head.appendChild(lazy);
 
             } else
             {
-
 
                 if(request.status === 302)
                 {
@@ -681,14 +675,6 @@ function modalLink(item)
                         window.location.href = requestJson.redirect;
                     }
                 }
-
-
-                // console.log(request.responseText);
-
-                /* Закрываем модальное окно */
-                //let myModalEl = document.querySelector('#modal')
-                //let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-                //modal.hide();
             }
         });
 
