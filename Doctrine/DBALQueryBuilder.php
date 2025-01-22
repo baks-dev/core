@@ -659,12 +659,12 @@ final class DBALQueryBuilder extends QueryBuilder
     /**  Example Builder:
      * $qb->leftJoin(
      * 'part_event',
-     * ManufacturePartProduct::TABLE,
+     * ManufacturePartProduct::class,
      * 'part_product',
      * 'part_product.id =
      * (
      * SELECT tmp.id
-     * FROM '.ManufacturePartProduct::TABLE.' tmp WHERE tmp.event = part_event.id
+     * FROM '.ManufacturePartProduct::class.' tmp WHERE tmp.event = part_event.id
      * ORDER BY tmp.id DESC
      * LIMIT 1
      * )

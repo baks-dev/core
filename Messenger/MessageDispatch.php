@@ -29,6 +29,7 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -65,6 +66,9 @@ final class MessageDispatch implements MessageDispatchInterface
             /* Чистим кеш модуля (транспорта) */
             $cache = $this->cache->init($transport);
             $cache->clear();
+
+            new FilesystemAdapter($transport)
+                ->clear();
         }
 
         if($this->dispatch === false)
