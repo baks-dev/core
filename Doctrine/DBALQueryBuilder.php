@@ -502,8 +502,9 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->setParameter('equal', $this->query->query);
         }
 
-        $this->setParameter('query', '%'.$this->switcher->toRus($this->query->query).'%');
-        $this->setParameter('switcher', '%'.$this->switcher->toEng($this->query->query).'%');
+        $bind = str_replace('?', '%', $this->query->query);
+        $this->setParameter('query', '%'.$this->switcher->toRus($bind).'%');
+        $this->setParameter('switcher', '%'.$this->switcher->toEng($bind).'%');
 
         $this->search = new QueryBuilder($this->connection);
 
