@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,10 @@ abstract class AbstractHandler
     protected ?object $main = null;
 
     protected ?object $event = null;
+
+    private bool $persist = false;
+
+
 
     /**
      * @deprecated свойство entityManager станет приватным, используйте метод абстракции $this->flush()
@@ -325,6 +329,7 @@ abstract class AbstractHandler
         /** Добавляем объекты в UOW */
         $this->entityManager->clear();
         $this->entityManager->persist($this->main);
+
     }
 
     /**
@@ -619,4 +624,11 @@ abstract class AbstractHandler
         $this->entityManager->flush();
     }
 
+    /**
+     * Метод возвращает TRUE в случае, если добавлен новый объект Main
+     */
+    public function isPersist(): bool
+    {
+        return $this->persist;
+    }
 }

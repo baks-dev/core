@@ -53,7 +53,7 @@ final class Paginator implements PaginatorInterface
     /**
      * Лимит результатов запроса
      */
-    private int $limit;
+    private int $limit = 24;
 
     /**
      * Идентификатор, переданный атрибутом или параметром GET
@@ -80,18 +80,19 @@ final class Paginator implements PaginatorInterface
 
         /** Получаем limit */
 
-        if($this->request->query->getInt('limit'))
+        if($this->session)
         {
-            $this->session?->set($this->namespace.':limit', $this->request->query->getInt('limit'));
+            if($this->request->query->getInt('limit'))
+            {
+                $this->session->set(
+                    $this->namespace.':limit',
+                    min($this->request->query->getInt('limit'), 500) // ограничение 500
+                );
+            }
+
+            $this->limit = $this->session->get($this->namespace.':limit') ?: self::LIMIT;
         }
 
-        $this->limit = $this->session?->get($this->namespace.':limit') ?: 0;
-
-        if(!$this->limit)
-        {
-            $this->limit = self::LIMIT;
-            $this->session?->set($this->namespace.':limit', self::LIMIT);
-        }
 
         $this->id = $this->request->attributes->get('id') ?: $this->request->get('id');
 

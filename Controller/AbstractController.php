@@ -152,7 +152,7 @@ abstract class AbstractController
         mixed $message,
         string $domain = 'messages',
         array|string|object|null $arguments = null,
-        int $status = 302
+        int $status = 200
     ): ?Response
     {
 
