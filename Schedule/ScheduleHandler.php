@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Schedule;
 
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
@@ -35,10 +34,7 @@ use Symfony\Component\Scheduler\ScheduleProviderInterface;
 #[AsSchedule('default')]
 final readonly class ScheduleHandler implements ScheduleProviderInterface
 {
-    public function __construct(
-        #[AutowireIterator('baks.schedule')] private iterable $schedule,
-        #[Autowire(env: 'APP_ENV')] private string $environment,
-    ) {}
+    public function __construct(#[AutowireIterator('baks.schedule')] private iterable $schedule) {}
 
     /**
      * Возвращает объект сообщения
@@ -47,14 +43,10 @@ final readonly class ScheduleHandler implements ScheduleProviderInterface
     {
         $Schedule = new Schedule();
 
-        /** Планировщик только в окружении PROD */
-        if($this->environment === 'prod')
+        /** @var ScheduleInterface $message */
+        foreach($this->schedule as $message)
         {
-            /** @var ScheduleInterface $message */
-            foreach($this->schedule as $message)
-            {
-                $Schedule->add(RecurringMessage::every($message->getInterval(), $message->getMessage()));
-            }
+            $Schedule->add(RecurringMessage::every($message->getInterval(), $message->getMessage()));
         }
 
         return $Schedule;

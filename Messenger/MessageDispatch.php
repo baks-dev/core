@@ -26,7 +26,6 @@ declare(strict_types=1);
 namespace BaksDev\Core\Messenger;
 
 use BaksDev\Core\Cache\AppCacheInterface;
-use DateInterval;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -198,22 +197,7 @@ final class MessageDispatch implements MessageDispatchInterface
             return $cacheConsume->get();
         }
 
-        /** Процесс проверки воркера указанного транспорта */
-
-        $process = Process::fromShellCommandline('ps aux | grep php | grep messenger:consume | grep '.$this->transport);
-        $process->setTimeout(30);
-        $process->run();
-
-        $result = $process->getIterator($process::ITER_SKIP_ERR | $process::ITER_KEEP_OUTPUT)->current();
-        $isRunning = (!empty($result) && strripos($result, 'messenger:consume '.$this->transport.' '));
-
-        /** Кешируем результат для следующих сообщений транспорта */
-
-        $cacheConsume->set($isRunning);
-        $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
-        $cache->save($cacheConsume);
-
-        return $isRunning;
+        return false;
     }
 
     /**

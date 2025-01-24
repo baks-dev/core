@@ -26,23 +26,37 @@ declare(strict_types=1);
 namespace BaksDev\Core\Messenger\MessengerConsumers;
 
 use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatch;
 use BaksDev\Core\Messenger\MessengerConsumers;
 use DateInterval;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
-final readonly class ConsumerRunningHandler
+final class ConsumerRunningHandler
 {
+    private bool $isSystemd = false;
+
+    private bool $isAsync = false;
+
+    private bool $isSchedule = false;
+
     public function __construct(
-        #[Autowire(env: 'HOST')] private string $HOST,
-        private AppCacheInterface $cache,
-        private MessengerConsumers $MessengerConsumers,
-    ) {}
+        #[Autowire(env: 'HOST')] private readonly string $HOST,
+        private readonly AppCacheInterface $cache,
+        private readonly MessengerConsumers $MessengerConsumers,
+        private readonly LoggerInterface $logger,
+        private readonly DeduplicatorInterface $deduplicator
+    )
+    {
+        $deduplicator->namespace('core')->expiresAfter('1 minute');
+    }
 
     public function __invoke(ConsumerRunningMessage $message): void
     {
+
         $cache = $this->cache->init(MessageDispatch::CONSUMER_NAMESPACE);
 
         $services = $this->MessengerConsumers->toArray();
@@ -65,10 +79,51 @@ final readonly class ConsumerRunningHandler
             $consumer = str_replace(array('baks-', $this->HOST.'-'), '', $consumer);
             $consumer = trim($consumer);
 
+            if($consumer === 'systemd')
+            {
+                $this->isSystemd = true;
+            }
+
+            if($consumer === 'async')
+            {
+                $this->isAsync = true;
+            }
+
+            if($consumer === 'scheduler')
+            {
+                $this->isSchedule = true;
+            }
+
             $cacheConsume = $cache->getItem('consume-'.$consumer);
             $cacheConsume->set(true);
             $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
             $cache->save($cacheConsume);
+
         }
+
+        $deduplicator = $this->deduplicator->deduplication(['systemd', self::class]);
+
+        if(false === $this->isSystemd && false === $deduplicator->isExecuted())
+        {
+            $deduplicator->save();
+            $this->logger->critical('Воркер Systemd проекта не найден');
+        }
+
+        $deduplicator = $this->deduplicator->deduplication(['async', self::class]);
+
+        if(false === $this->isAsync && false === $deduplicator->isExecuted())
+        {
+            $deduplicator->save();
+            $this->logger->critical('Воркер Async проекта не найден');
+        }
+
+        $deduplicator = $this->deduplicator->deduplication(['schedule', self::class]);
+
+        if(false === $this->isSchedule && false === $deduplicator->isExecuted())
+        {
+            $deduplicator->save();
+            $this->logger->critical('Воркер Schedule проекта не найден');
+        }
+
     }
 }

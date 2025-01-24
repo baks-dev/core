@@ -115,7 +115,11 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication');
         }
 
-        return $this->item->isHit() && trim($this->item->get()) === 'executed';
+        $executed = $this->item->isHit() && trim($this->item->get()) === 'executed';
+
+        !$executed ?: usleep(1000);
+
+        return $executed;
     }
 
     /**
