@@ -199,8 +199,11 @@ abstract class AbstractController
 
                 $label = $this->translator->trans($type, [], $domain);
 
+                /**
+                 * Если запрос передан AJAX и статус не 200 - возвращаем JsonResponse c сообщением
+                 */
 
-                if($status != 302 && $this->requestStack->getMainRequest()?->isXmlHttpRequest())
+                if($status !== 302 && $this->requestStack->getMainRequest()?->isXmlHttpRequest())
                 {
                     return new JsonResponse(
                         [
@@ -208,7 +211,7 @@ abstract class AbstractController
                             'status' => $status,
                             'header' => $label,
                             'message' => $message,
-                            'arguments' => is_array($arguments) ? json_encode($arguments) : $arguments,
+                            'arguments' => is_array($arguments) ? json_encode($arguments, JSON_THROW_ON_ERROR, 512) : $arguments,
                         ],
                         status: $status
                     );
@@ -217,6 +220,8 @@ abstract class AbstractController
                 $this->requestStack->getSession()
                     ->getFlashBag()
                     ->add($label, $message);
+
+                return $this->redirectToReferer();
             }
             catch(SessionNotFoundException $e)
             {
