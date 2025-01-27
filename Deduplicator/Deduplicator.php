@@ -34,17 +34,17 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 final class Deduplicator implements DeduplicatorInterface
 {
-    private bool $init = false;
-
-    private ?string $namespace = null;
+    private string|false $namespace = false;
 
     private CacheItem $item;
 
-    private CacheInterface $cache;
+    private CacheInterface|false $cache = false;
 
     private DateInterval $expires;
 
     private string|false $key = false;
+
+    private bool $executed = false;
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] $environment,
@@ -77,6 +77,8 @@ final class Deduplicator implements DeduplicatorInterface
     public function namespace(string $namespace): self
     {
         $this->namespace = $namespace;
+        $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
+
         return $this;
     }
 
@@ -86,23 +88,21 @@ final class Deduplicator implements DeduplicatorInterface
     public function deduplication(string|array $keys): self
     {
         /* Если не присвоено пространство имен - присваиваем из стека вызовов */
-        if($this->namespace === null)
+        if(false === $this->namespace)
         {
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $classes = array_column($backtrace, 'class');
-            $this->namespace = md5(implode('', $classes));
+            $this->namespace = md5(var_export($classes, true));
+            $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
         }
 
-        $key = var_export($keys, true);
+        $inst = clone $this;
 
         /* получаем из кеша результат */
-        $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
-        $this->item = $this->cache->getItem(md5($key));
-        $this->key = $this->item->getKey();
+        $inst->key = md5(var_export($keys, true));
+        $inst->item = $this->cache->getItem($inst->key);
 
-        $this->init = true;
-
-        return clone $this;
+        return $inst;
     }
 
     /**
@@ -110,32 +110,37 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function isExecuted(): bool
     {
-        if($this->init === false)
+        if($this->cache === false)
         {
-            throw new InvalidArgumentException('Invalid Argument: call method deduplication');
+            throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
-        $executed = $this->item->isHit() && trim($this->item->get()) === 'executed';
+        if(false === $this->executed)
+        {
+            $this->executed = $this->item->isHit() && trim($this->item->get()) === 'executed';
+        }
 
-        !$executed ?: usleep(1000);
+        return $this->executed;
 
-        return $executed;
+
+        //return $this->item->isHit() && trim($this->item->get()) === 'executed';
     }
+
 
     /**
      * Метод сохраняет результат выполнения
      */
     public function save(): void
     {
-        if($this->init === false)
+        if($this->cache === false)
         {
-            throw new InvalidArgumentException('Invalid Argument: call method deduplication');
+            throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
         /* Сохраняем ключ дедубликации */
         $this->item->set('executed');
         $this->item->expiresAfter($this->expires);
-        $this->cache->save($this->item);
+        $this->executed = $this->cache->save($this->item);
     }
 
     /**
@@ -143,12 +148,15 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function delete(): bool
     {
-        if($this->init === false)
+        if($this->cache === false)
         {
-            throw new InvalidArgumentException('Invalid Argument: call method deduplication');
+            throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
-        return $this->cache->deleteItem($this->getKey());
+        $delete = $this->cache->deleteItem($this->getKey());
+        $this->executed = !$delete;
+
+        return $delete;
     }
 
     /**

@@ -102,8 +102,9 @@
 
 {% block javascript %}{% endblock %}
 
+
 {# TOAST УВЕДОМЛЕНИЯ ****************************************************** #}
-{% include Template('/user/'~baks_settings.device~'/includes/flash.html.twig') %}
+{% include Template('@core:user/'~baks_settings.device~'/includes/flash.html.twig') %}
 
 {# Блок модального окна #}
 <div class="modal fade" tabindex="-1" id="modal">

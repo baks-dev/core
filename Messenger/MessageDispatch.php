@@ -33,7 +33,6 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
-use Symfony\Component\Process\Process;
 
 final class MessageDispatch implements MessageDispatchInterface
 {
@@ -58,10 +57,10 @@ final class MessageDispatch implements MessageDispatchInterface
      */
     public function dispatch(object $message, array $stamps = [], ?string $transport = null): ?Envelope
     {
+        $this->transport = $transport;
+
         if($transport)
         {
-            $this->transport = $transport;
-
             /* Чистим кеш модуля (транспорта) */
             $cache = $this->cache->init($transport);
             $cache->clear();
@@ -130,7 +129,12 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($transportRequire)
             {
-                $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport));
+
+                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+                $classes = array_column($backtrace, 'class');
+
+                $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport), $classes);
+
                 return null;
             }
         }

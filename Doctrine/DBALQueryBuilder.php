@@ -215,14 +215,12 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 $this->dispatch->dispatch(
                     $DBALCacheResetMessage,
-                    stamps: $this->refresh ? [] : [new MessageDelay(sprintf('%d seconds', ($this->ttl / 2)))],
                     transport: $this->namespace.'-low'
                 );
             }
 
             return $this->executeCacheQuery();
         }
-
 
         return $this->executeQuery();
     }
@@ -341,7 +339,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllAssociativeIndexed(?string $class = null): array
     {
-
         $result = $this->executeDBALQuery()->fetchAllAssociative();
 
         $data = [];
@@ -395,20 +392,10 @@ final class DBALQueryBuilder extends QueryBuilder
                 ->expiresAfter(sprintf('%d seconds', $this->ttl))
                 ->deduplication([$this->cacheKey]);
 
-
             /** Обновляем кеш результата запроса */
             if(false === $cache->isHit() || false === $Deduplicator->isExecuted())
             {
                 $Deduplicator->save();
-
-                $stamps = [];
-
-                if($cache->isHit())
-                {
-                    $Randomise = new Randomizer();
-                    $ttl = $Randomise->getInt(5, (int) ($this->ttl / 2));
-                    $stamps = [new MessageDelay(sprintf('%d seconds', ($ttl)))];
-                }
 
                 $DBALDelayMessage = new DBALDelayMessage(
                     $this->namespace,
@@ -420,7 +407,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 $this->dispatch->dispatch(
                     message: $DBALDelayMessage,
-                    stamps: $stamps,
+                    stamps: [new MessageDelay('5 seconds')],
                     transport: $this->namespace.'-low'
                 );
             }

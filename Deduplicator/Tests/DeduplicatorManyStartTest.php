@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -42,20 +42,48 @@ class DeduplicatorManyStartTest extends KernelTestCase
         /** @var DeduplicatorInterface $DeduplicatorInterface */
         $DeduplicatorInterface = self::getContainer()->get(DeduplicatorInterface::class);
 
-        $Deduplicator = $DeduplicatorInterface
-            ->namespace('DeduplicatorManyTest')
-            ->expiresAfter(DateInterval::createFromDateString('1 seconds'));
+        /** Предварительная настройка */
+        $DeduplicatorInterface
+            ->namespace('DeduplicatorManyTest');
 
-        $Deduplicator->deduplication(['fccb643e-3fb1-7b5a-9d23-27df53865c44']);
+
+        $Deduplicator = $DeduplicatorInterface
+            ->expiresAfter(DateInterval::createFromDateString('1 seconds'))
+            ->deduplication(['fccb643e-3fb1-7b5a-9d23-27df53865c44']);
         $Deduplicator->save();
 
-        $Deduplicator
+
+        $Deduplicator = $DeduplicatorInterface
             ->expiresAfter(DateInterval::createFromDateString('10 seconds'))
             ->deduplication(['13068500-fd2c-7596-99f4-18e435910881']);
         $Deduplicator->save();
 
 
-        $Deduplicator
+        for($i = 0; $i <= 100; $i++)
+        {
+            $Deduplicator = $DeduplicatorInterface
+                ->expiresAfter(DateInterval::createFromDateString('10 seconds'))
+                ->deduplication(['test', $i]);
+
+            $Deduplicator->save();
+
+            self::assertTrue($Deduplicator->isExecuted());
+
+            if(empty($i))
+            {
+                continue;
+            }
+
+            $Deduplicator = $DeduplicatorInterface
+                ->expiresAfter(DateInterval::createFromDateString('10 seconds'))
+                ->deduplication(['test', ($i - 1)]);
+
+            self::assertTrue(($Deduplicator)->isExecuted());
+
+        }
+
+
+        $Deduplicator = $DeduplicatorInterface
             ->expiresAfter(DateInterval::createFromDateString('1 seconds'))
             ->deduplication(['739d51a9-7b3c-74cc-8600-8b9b66ccc121']);
         $Deduplicator->save();
