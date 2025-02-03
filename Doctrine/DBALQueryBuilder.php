@@ -633,6 +633,28 @@ final class DBALQueryBuilder extends QueryBuilder
                 }
             }
 
+            if(false === is_null($exclude))
+            {
+                if(is_string($exclude))
+                {
+                    if(strpos($field, $exclude) !== false)
+                    {
+                        continue;
+                    }
+                }
+
+                if(is_array($exclude))
+                {
+                    foreach($exclude as $exclud)
+                    {
+                        if(strpos($field, $exclud) !== false)
+                        {
+                            continue 2;
+                        }
+                    }
+                }
+            }
+
             preg_match_all('/\b(\w+\.\w+)\b/', $field, $matches);
             $result = $matches[1];
 

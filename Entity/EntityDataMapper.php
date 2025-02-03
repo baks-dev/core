@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ use InvalidArgumentException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
+use ReflectionUnionType;
 
 abstract class EntityDataMapper
 {
@@ -255,20 +256,25 @@ abstract class EntityDataMapper
                 $dto->{$getDtoMethod}();
             }
 
+            /**
+             * Из рефлексии получаем typehint
+             */
+
+            $ReflectionType = $property->getType();
+
+            // если typehint union (множественный) - выбираем всегда current (первый элемент)
+            if($ReflectionType instanceof ReflectionUnionType)
+            {
+                $ReflectionType = current($ReflectionType->getTypes());
+            }
+
 
             $type = null;
 
-            if(method_exists($property->getType(), 'getTypes'))
-            {
-                throw new InvalidArgumentException(
-                    sprintf('Свойство %s не может содержать двойное значение typehint', $property)
-                );
-            }
-
             // Если тайпхинт свойства - класс, инициируем мимо конструктора
-            if(class_exists($property->getType()?->getName()))
+            if(class_exists($ReflectionType->getName()))
             {
-                $instanceClass = new ReflectionClass($property->getType()?->getName());
+                $instanceClass = new ReflectionClass($ReflectionType->getName());
 
                 // Если класс Enum
                 if($instanceClass->isEnum())
@@ -284,8 +290,6 @@ abstract class EntityDataMapper
 
             if($type instanceof Collection)
             {
-
-
                 // Если в сущности имеется одноименное свойство сущности
                 if(property_exists($this, $propertyName) && method_exists($dto, $getDtoMethod))
                 {
@@ -294,8 +298,6 @@ abstract class EntityDataMapper
 
                     if($o2m)
                     {
-
-
                         $o2oTargetEntity = current($o2m)->getArguments()['targetEntity'];
 
 
@@ -488,7 +490,7 @@ abstract class EntityDataMapper
             /*
                 Если односторонняя связь на сущность или кастомный тип
             */
-            if(class_exists($property->getType()?->getName()) && property_exists($this, $propertyName))
+            if(class_exists($ReflectionType->getName()) && property_exists($this, $propertyName))
             {
                 $o2o = $entityReflectionPropertyByName->getAttributes(ORM\OneToOne::class);
 
