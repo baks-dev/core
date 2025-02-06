@@ -20,96 +20,10 @@
  *  THE SOFTWARE.
  */
 
-//printer = document.querySelector('#printer');
-//
-//if (printer)
-//{
-//    printer.addEventListener('click', printOne);
-//
-//    function printOne() {
-//
-//        setTimeout(function () {
-//
-//            /* Закрываем модальное окно */
-//            let myModalEl = document.querySelector('#modal');
-//
-//            if (myModalEl)
-//            {
-//                let modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
-//                modal.hide();
-//            }
-//
-//        }, 500);
-//
-//        window.print();
-//    }
-//}
-//else
-//{
-//    print_all = document.querySelector('#print_all');
-//
-//    if (print_all)
-//    {
-//        print_all.classList.remove('d-none');
-//
-//        print_all.addEventListener('click', printAll);
-//
-//        function printAll() {
-//
-//            setTimeout(function () {
-//
-//                /* Закрываем модальное окно */
-//                let myModalEl = document.querySelector('#modal');
-//
-//                if (myModalEl)
-//                {
-//                    let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-//                    modal.hide();
-//                }
-//
-//            }, 500);
-//
-//            window.print();
-//
-//        }
-//
-//    }
-//}
-
-
-//print_all = document.querySelector('#print_all');
-//
-//if (print_all)
-//{
-//    print_all.classList.remove('d-none');
-//
-//    print_all.addEventListener('click', printAll);
-//
-//    function printAll() {
-//
-//        setTimeout(function () {
-//
-//            /* Закрываем модальное окно */
-//            let myModalEl = document.querySelector('#modal');
-//
-//            if (myModalEl)
-//            {
-//                let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
-//                modal.hide();
-//            }
-//
-//        }, 500);
-//
-//        window.print();
-//
-//    }
-//
-//}
-
 
 document.querySelectorAll('.prnt').forEach(function(element, i, arr)
 {
-    element.classList.remove('prnt');
+    element.classList.replace('prnt', 'print');
     element.classList.remove('d-none');
     element.classList.remove('disabled');
 
@@ -117,7 +31,6 @@ document.querySelectorAll('.prnt').forEach(function(element, i, arr)
     {
         element.addEventListener('click', printElement);
     }
-
 });
 
 function printElement()

@@ -558,7 +558,7 @@ async function offcanvasLink(offcanvas)
 function modalLink(item)
 {
     // Обрываем запрос если имеется класс prnt
-    if(item.classList.contains('prnt') === true)
+    if(item.classList.contains('prnt') === true || item.classList.contains('print') === true)
     {
         return;
     }
