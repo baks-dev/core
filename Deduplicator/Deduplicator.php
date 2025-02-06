@@ -28,6 +28,7 @@ namespace BaksDev\Core\Deduplicator;
 use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
 use InvalidArgumentException;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -77,7 +78,10 @@ final class Deduplicator implements DeduplicatorInterface
     public function namespace(string $namespace): self
     {
         $this->namespace = $namespace;
-        $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
+
+        // TODO: временно смотрим дедубликатор на файлах
+        // $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
+        $this->cache = new FilesystemAdapter($namespace, 86400, 'var/deduplicator');
 
         return $this;
     }
@@ -92,8 +96,7 @@ final class Deduplicator implements DeduplicatorInterface
         {
             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $classes = array_column($backtrace, 'class');
-            $this->namespace = md5(var_export($classes, true));
-            $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
+            $this->namespace(md5(var_export($classes, true)));
         }
 
         $inst = clone $this;
