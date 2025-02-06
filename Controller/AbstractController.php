@@ -291,6 +291,16 @@ abstract class AbstractController
 
         $fileDefault = 'template.html.twig';
 
+
+        if($request->getCurrentRequest()?->get('print') !== null)
+        {
+            if(file_exists($this->project_dir.'/templates/'.$module.'/print/content.html.twig'))
+            {
+                $fileDefault = 'print/content.html.twig';
+            }
+        }
+
+
         if(!$file)
         {
             // Если AJAX подключаем content.html.twig иначе template.html.twig

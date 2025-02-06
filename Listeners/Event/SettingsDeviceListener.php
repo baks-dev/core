@@ -80,6 +80,12 @@ final readonly class SettingsDeviceListener
             }
         }
 
+        if($event->getRequest()->get('print') !== null)
+        {
+            $device = 'print';
+        }
+
+
         $event->getRequest()->headers->set('x-device', $device);
 
         $globals = $this->twig->getGlobals();

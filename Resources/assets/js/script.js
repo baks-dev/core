@@ -557,6 +557,11 @@ async function offcanvasLink(offcanvas)
 /** сплывающее модальное окно */
 function modalLink(item)
 {
+    // Обрываем запрос если имеется класс prnt
+    if(item.classList.contains('prnt') === true)
+    {
+        return;
+    }
 
     item.addEventListener('click', function(event)
     {
@@ -653,6 +658,21 @@ function modalLink(item)
                         submitModalForm(forms);
                         return false;
                     });
+                });
+
+
+                var tooltipTriggerList = [].slice.call(modal.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+                tooltipTriggerList.map(function(tooltipTriggerEl)
+                {
+                    const tooltipInstance = new bootstrap.Tooltip(tooltipTriggerEl);
+
+                    tooltipTriggerEl.addEventListener('click', event =>
+                    {
+                        tooltipInstance.hide();
+                    });
+
+                    return tooltipInstance;
                 });
 
                 if($html)

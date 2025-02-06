@@ -76,9 +76,39 @@
 //    }
 //}
 
+
+//print_all = document.querySelector('#print_all');
+//
+//if (print_all)
+//{
+//    print_all.classList.remove('d-none');
+//
+//    print_all.addEventListener('click', printAll);
+//
+//    function printAll() {
+//
+//        setTimeout(function () {
+//
+//            /* Закрываем модальное окно */
+//            let myModalEl = document.querySelector('#modal');
+//
+//            if (myModalEl)
+//            {
+//                let modal = bootstrap.Modal.getOrCreateInstance(myModalEl) // Returns a Bootstrap modal instance
+//                modal.hide();
+//            }
+//
+//        }, 500);
+//
+//        window.print();
+//
+//    }
+//
+//}
+
+
 document.querySelectorAll('.prnt').forEach(function(element, i, arr)
 {
-
     element.classList.remove('prnt');
     element.classList.remove('d-none');
     element.classList.remove('disabled');
@@ -92,9 +122,15 @@ document.querySelectorAll('.prnt').forEach(function(element, i, arr)
 
 function printElement()
 {
+    this.classList.add('disabled');
 
     /* Отключаем дефолтный переход по ссылке если */
     event.preventDefault();
+
+    /** Показываем прелоад модального окна */
+    document.querySelector('#modal .spinner-border')
+        ?.classList
+        .remove('d-none');
 
     /* Создаём объект класса XMLHttpRequest */
     const request = new XMLHttpRequest();
@@ -125,12 +161,9 @@ function printElement()
     /* Получаем ответ от сервера на запрос*/
     request.addEventListener("readystatechange", function(evemnt)
     {
-
-
         /* request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) */
         if(request.readyState === 4 && request.status === 200)
         {
-
             const prnt = document.getElementById('prnt');
 
             if(prnt)
@@ -155,10 +188,13 @@ function printElement()
                 }
             }
         }
+
     });
 
     /*Выполняем запрос*/
     request.send();
+
+    this.classList.remove('disabled');
 
     return false;
 
