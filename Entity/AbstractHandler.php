@@ -30,6 +30,7 @@ use BaksDev\Core\Validator\ValidatorCollectionInterface;
 use BaksDev\Files\Resources\Upload\File\FileUploadInterface;
 use BaksDev\Files\Resources\Upload\Image\ImageUploadInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -630,5 +631,15 @@ abstract class AbstractHandler
     public function isPersist(): bool
     {
         return $this->persist;
+    }
+
+    public function getRepository(string $class): EntityRepository
+    {
+        if(false === class_exists($class))
+        {
+            throw new InvalidArgumentException('Invalid Argument Class Entity');
+        }
+
+        return $this->entityManager->getRepository($class);
     }
 }
