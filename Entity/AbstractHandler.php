@@ -626,6 +626,15 @@ abstract class AbstractHandler
     }
 
     /**
+     * Сохраняет все изменения объектов в базу данных, которые находились в UnitOfWork
+     * @see UnitOfWork
+     */
+    public function clear(): void
+    {
+        $this->entityManager->clear();
+    }
+
+    /**
      * Метод возвращает TRUE в случае, если добавлен новый объект Main
      */
     public function isPersist(): bool

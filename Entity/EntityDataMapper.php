@@ -735,22 +735,6 @@ abstract class EntityDataMapper
     }
 
 
-    public function clearEntity(): void
-    {
-        // TODO: Implement __clone() method.
-    }
-
-    //    public function setRemove(?ArrayCollection $remove): void
-    //    {
-    //        $this->remove = $remove;
-    //    }
-    //
-    //    public function getRemoveEntity(): ?ArrayCollection
-    //    {
-    //        return $this->remove;
-    //    }
-
-
     /**
      * Создает новый экземпляр класса без вызова конструктора.
      */

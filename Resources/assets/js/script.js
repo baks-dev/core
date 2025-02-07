@@ -1437,8 +1437,6 @@ function enableElementsForm(ChangeForm)
 }
 
 
-/* TODO RESET */
-
 /*document.querySelectorAll('[type="reset"]').forEach(function (reset) {
  reset.addEventListener('click', function (event) {
  let elements_form = reset.closest('form').elements;

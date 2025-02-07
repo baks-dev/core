@@ -1251,7 +1251,7 @@
                 return;
             }
 
-            element.setAttribute("loading", "lazy"); //TODO: Переместитесь внутрь метода loadNative
+            element.setAttribute("loading", "lazy");
 
             loadNative(element, settings, instance);
         });

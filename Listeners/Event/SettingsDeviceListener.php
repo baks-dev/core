@@ -65,9 +65,7 @@ final readonly class SettingsDeviceListener
 
                     if($browscap->istablet)
                     {
-                        /** TODO: */
                         $device = 'tablet';
-                        //$device = 'pc';
                     }
                 }
 

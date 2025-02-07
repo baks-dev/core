@@ -263,3 +263,19 @@
     outline: 0 !important;
     font-size: 14px
 }
+
+.nice-select.select-revers {
+    margin-bottom: 0 !important;
+}
+
+.select-revers .nice-select-dropdown {
+    display: flex;
+    flex-direction: column;
+    top: auto !important;
+    bottom: 40px;
+}
+
+.select-revers .nice-select-dropdown .nice-select-search-box {
+    order: 1;
+}
+
