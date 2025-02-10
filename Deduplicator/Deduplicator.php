@@ -28,7 +28,6 @@ namespace BaksDev\Core\Deduplicator;
 use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
 use InvalidArgumentException;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -77,11 +76,8 @@ final class Deduplicator implements DeduplicatorInterface
      */
     public function namespace(string $namespace): self
     {
-        $this->namespace = $namespace;
-
-        // TODO: временно смотрим дедубликатор на файлах
-        // $this->cache = $this->appCache->init('deduplicator-'.$this->namespace);
-        $this->cache = new FilesystemAdapter($namespace, 86400, 'var/deduplicator');
+        $this->namespace = $this->namespace ?: $namespace;
+        $this->cache = $this->cache ?: $this->appCache->init('deduplicator-'.$this->namespace);
 
         return $this;
     }
@@ -118,17 +114,8 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
-        if(false === $this->executed)
-        {
-            $this->executed = $this->item->isHit() && trim($this->item->get()) === 'executed';
-        }
-
-        return $this->executed;
-
-
-        //return $this->item->isHit() && trim($this->item->get()) === 'executed';
+        return $this->item->isHit() && trim($this->item->get()) === 'executed';
     }
-
 
     /**
      * Метод сохраняет результат выполнения
@@ -140,10 +127,12 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
-        /* Сохраняем ключ дедубликации */
-        $this->item->set('executed');
-        $this->item->expiresAfter($this->expires);
-        $this->executed = $this->cache->save($this->item);
+        $item = $this->cache
+            ->getItem($this->key)
+            ->expiresAfter($this->expires)
+            ->set('executed');
+
+        $this->cache->save($item);
     }
 
     /**
@@ -156,10 +145,7 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
-        $delete = $this->cache->deleteItem($this->getKey());
-        $this->executed = !$delete;
-
-        return $delete;
+        return $this->cache->deleteItem($this->getKey());
     }
 
     /**

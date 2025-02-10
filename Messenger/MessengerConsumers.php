@@ -35,7 +35,7 @@ use Symfony\Component\Process\Process;
 
 final class MessengerConsumers
 {
-    private const COMMAND = 'systemctl list-units --type=service  | grep baks ';
+    private const string COMMAND = 'systemctl list-units --type=service  | grep baks ';
 
     public function __construct(
         #[Target('coreLogger')] private readonly LoggerInterface $logger,

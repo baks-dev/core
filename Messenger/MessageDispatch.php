@@ -133,7 +133,7 @@ final class MessageDispatch implements MessageDispatchInterface
                 $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
                 $classes = array_column($backtrace, 'class');
 
-                $this->logger->critical(sprintf('Messanger Транспорт %s не найден', $this->transport), $classes);
+                $this->logger->warning(sprintf('Messanger Транспорт %s не найден', $this->transport), $classes);
 
                 return null;
             }
