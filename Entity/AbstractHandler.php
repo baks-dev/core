@@ -635,6 +635,11 @@ abstract class AbstractHandler
         $this->entityManager->persist($object);
     }
 
+    public function remove(object $object): void
+    {
+        $this->entityManager->remove($object);
+    }
+
 
     /**
      * Метод возвращает TRUE в случае, если добавлен новый объект Main
