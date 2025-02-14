@@ -297,13 +297,15 @@ abstract class AbstractController
             $file = 'print/content.html.twig';
         }
 
-
         if(!$file)
         {
             // Если AJAX подключаем content.html.twig иначе template.html.twig
             $file = $fileDefault;
 
-            if($request->getCurrentRequest()->headers->get('X-Requested-With') === 'XMLHttpRequest')
+            if(
+                $request->getCurrentRequest()->headers->get('X-Requested-With') === 'XMLHttpRequest' ||
+                $request->getCurrentRequest()->headers->get('hx-request') === true
+            )
             {
                 $file = 'content.html.twig';
             }
