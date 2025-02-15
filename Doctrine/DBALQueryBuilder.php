@@ -318,7 +318,7 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result ?: false;
     }
 
-    public function fetchHydrate(string $class, ?string $method = null): mixed
+    public function fetchHydrate(string $class, ?string $method = null): object|false
     {
         $result = $this->executeDBALQuery()->fetchAssociative();
 

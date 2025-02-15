@@ -292,7 +292,7 @@ abstract class AbstractController
         $fileDefault = 'template.html.twig';
 
 
-        if($request->getCurrentRequest()?->get('print') !== null)
+        if(is_null($file) && $request->getCurrentRequest()?->get('print') !== null)
         {
             $file = 'print/content.html.twig';
         }
