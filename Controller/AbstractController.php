@@ -304,7 +304,7 @@ abstract class AbstractController
 
             if(
                 $request->getCurrentRequest()->headers->get('X-Requested-With') === 'XMLHttpRequest' ||
-                $request->getCurrentRequest()->headers->get('hx-request') === true
+                $request->getCurrentRequest()->headers->get('hx-request') !== null
             )
             {
                 $file = 'content.html.twig';
