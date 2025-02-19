@@ -669,6 +669,11 @@ abstract class EntityDataMapper
 
                 $cloneCollection = $this->getPropertyValue($propertyName, $clone);
 
+                if(is_string($cloneCollection) && $cloneCollection === 'not_initialized')
+                {
+                    continue;
+                }
+
                 foreach($cloneCollection as $coll)
                 {
                     //$coll->setRemove($this->remove);
