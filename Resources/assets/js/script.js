@@ -639,8 +639,11 @@ function modalLink(item)
                 });
 
 
-                /* Если в модальном окне присутствуют модальные ссылки */
-                modal.querySelectorAll('[data-bs-toggle="modal"]').forEach(function(item, i, arr)
+                /*
+                 * Если в модальном окне присутствуют модальные ссылки
+                 * Важно! Внутри модальных окон должен отсутствовать аттрибут data-bs-toggle !!!
+                 */
+                modal.querySelectorAll('[data-bs-target="#modal"]').forEach(function(item, i, arr)
                 {
                     modalLink(item);
                 });
@@ -761,7 +764,8 @@ async function submitModalForm(forms)
         .then((response) =>
         {
             closeProgress();
-            btn.type = 'submit';
+
+            typeof btn === 'undefined' ? '' : btn.type = 'submit';
 
             const contentType = response.headers.get('content-type');
 
