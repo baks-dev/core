@@ -102,11 +102,13 @@ return static function(FrameworkConfig $framework) {
             continue;
         }
 
+        $table_name = 'messenger_'.str_replace('-', '_', $module->getBasename());
+
         $messenger
-            ->transport($module)
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-'.$module)
+            ->transport($module->getBasename())
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name='.$table_name)
             ->options(['queue_name' => 'high'])
-            ->failureTransport($module.'-failed')
+            ->failureTransport($module->getBasename().'-failed')
             ->retryStrategy()
             ->maxRetries(3)
             ->delay(1000)
@@ -115,10 +117,10 @@ return static function(FrameworkConfig $framework) {
             ->service(null);
 
         $messenger
-            ->transport($module.'-low')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-'.$module)
+            ->transport($module->getBasename().'-low')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name='.$table_name)
             ->options(['queue_name' => 'low'])
-            ->failureTransport($module.'-failed')
+            ->failureTransport($module->getBasename().'-failed')
             ->retryStrategy()
             ->maxRetries(3)
             ->delay(1000)
@@ -127,8 +129,8 @@ return static function(FrameworkConfig $framework) {
             ->service(null);
 
         $messenger
-            ->transport($module.'-failed')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-'.$module)
+            ->transport($module->getBasename().'-failed')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name='.$table_name)
             ->options(['queue_name' => 'failed']);
 
     }
