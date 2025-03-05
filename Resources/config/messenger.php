@@ -128,7 +128,7 @@ return static function(FrameworkConfig $framework) {
 
         $messenger
             ->transport($module.'-failed')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-orders-order')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-'.$module)
             ->options(['queue_name' => 'failed']);
 
     }
