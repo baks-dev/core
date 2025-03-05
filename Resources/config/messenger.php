@@ -23,6 +23,8 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use BaksDev\Core\BaksDevCoreBundle;
+use DirectoryIterator;
 use Symfony\Config\FrameworkConfig;
 
 return static function(FrameworkConfig $framework) {
@@ -47,7 +49,6 @@ return static function(FrameworkConfig $framework) {
         ->multiplier(3)
         ->service(null);
 
-
     $messenger
         ->transport('async-low')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
@@ -59,8 +60,6 @@ return static function(FrameworkConfig $framework) {
         ->maxDelay(1)
         ->multiplier(2)
         ->service(null);
-
-
 
     $failure = $framework->messenger();
 
@@ -89,5 +88,48 @@ return static function(FrameworkConfig $framework) {
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
         ->options(['queue_name' => 'failed-systemd']);
 
+    /**
+     * Создаем список транспортов модулей
+     */
 
+    $BAKS = str_replace('core/', '', BaksDevCoreBundle::PATH);
+
+    /** @var DirectoryIterator $module */
+    foreach(new DirectoryIterator($BAKS) as $module)
+    {
+        if($module->isDot() || !$module->isDir())
+        {
+            continue;
+        }
+
+        $messenger
+            ->transport($module)
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-'.$module)
+            ->options(['queue_name' => 'high'])
+            ->failureTransport($module.'-failed')
+            ->retryStrategy()
+            ->maxRetries(3)
+            ->delay(1000)
+            ->maxDelay(1)
+            ->multiplier(3)
+            ->service(null);
+
+        $messenger
+            ->transport($module.'-low')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-'.$module)
+            ->options(['queue_name' => 'low'])
+            ->failureTransport($module.'-failed')
+            ->retryStrategy()
+            ->maxRetries(3)
+            ->delay(1000)
+            ->maxDelay(1)
+            ->multiplier(3)
+            ->service(null);
+
+        $messenger
+            ->transport($module.'-failed')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name=messenger-orders-order')
+            ->options(['queue_name' => 'failed']);
+
+    }
 };
