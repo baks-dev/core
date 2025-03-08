@@ -39,14 +39,15 @@ return static function(FrameworkConfig $framework) {
 
     $messenger
         ->transport('async')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?dbindex=%env(REDIS_TABLE)%&auto_setup=true')
-        ->options(['stream' => 'async'])
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+        ->options(['auto_setup' => true, 'queue_name' => 'async'])
         ->failureTransport('failed')
         ->retryStrategy()
-        ->maxRetries(3)
+        ->maxRetries(5)
         ->delay(1000)
         ->maxDelay(0)
-        ->multiplier(3)
+        ->multiplier(2)
+        ->jitter(0.1)
         ->service(null);
 
     $messenger
@@ -57,8 +58,9 @@ return static function(FrameworkConfig $framework) {
         ->retryStrategy()
         ->maxRetries(1)
         ->delay(1000)
-        ->maxDelay(1)
+        ->maxDelay(0)
         ->multiplier(2)
+        ->jitter(0.1)
         ->service(null);
 
     $failure = $framework->messenger();
@@ -74,14 +76,15 @@ return static function(FrameworkConfig $framework) {
 
     $systemd
         ->transport('systemd')
-        ->dsn('redis://%env(REDIS_PASSWORD)%@%env(REDIS_HOST)%:%env(REDIS_PORT)%?dbindex=%env(REDIS_TABLE)%&auto_setup=true')
-        ->options(['stream' => 'systemd'])
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+        ->options(['queue_name' => 'systemd'])
         ->failureTransport('failed-systemd')
         ->retryStrategy()
-        ->maxRetries(3)
+        ->maxRetries(5)
         ->delay(1000)
         ->maxDelay(0)
-        ->multiplier(3) // увеличиваем задержку перед каждой повторной попыткой
+        ->multiplier(2)
+        ->jitter(0.1)
         ->service(null);
 
     $failure->transport('failed-systemd')
@@ -106,31 +109,33 @@ return static function(FrameworkConfig $framework) {
 
         $messenger
             ->transport($module->getBasename())
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name='.$table_name)
-            ->options(['queue_name' => 'high'])
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+            ->options(['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'high'])
             ->failureTransport($module->getBasename().'-failed')
             ->retryStrategy()
-            ->maxRetries(3)
+            ->maxRetries(5)
             ->delay(1000)
-            ->maxDelay(1)
-            ->multiplier(3)
+            ->maxDelay(0)
+            ->multiplier(2)
+            ->jitter(0.1)
             ->service(null);
 
         $messenger
             ->transport($module->getBasename().'-low')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name='.$table_name)
-            ->options(['queue_name' => 'low'])
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+            ->options(['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'low'])
             ->failureTransport($module->getBasename().'-failed')
             ->retryStrategy()
-            ->maxRetries(3)
+            ->maxRetries(5)
             ->delay(1000)
-            ->maxDelay(1)
-            ->multiplier(3)
+            ->maxDelay(0)
+            ->multiplier(2)
+            ->jitter(0.1)
             ->service(null);
 
         $messenger
             ->transport($module->getBasename().'-failed')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%&table_name='.$table_name)
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
             ->options(['queue_name' => 'failed']);
 
     }
