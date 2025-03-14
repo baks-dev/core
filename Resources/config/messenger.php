@@ -100,7 +100,7 @@ return static function(FrameworkConfig $framework) {
     /** @var DirectoryIterator $module */
     foreach(new DirectoryIterator($BAKS) as $module)
     {
-        if($module->isDot() || !$module->isDir())
+        if($module->isDot() || !$module->isDir() || $module->getBasename() === 'core')
         {
             continue;
         }

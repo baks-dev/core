@@ -107,14 +107,16 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function createQueryBuilder(object|string $class): self
     {
+        $inst = clone $this;
+
         $newInstance = new self(
-            env: $this->env,
-            connection: $this->connection,
-            switcher: $this->switcher,
-            translator: $this->translator,
-            cache: $this->cache,
-            deduplicator: $this->deduplicator,
-            dispatch: $this->dispatch,
+            env: $inst->env,
+            connection: $inst->connection,
+            switcher: $inst->switcher,
+            translator: $inst->translator,
+            cache: $inst->cache,
+            deduplicator: $inst->deduplicator,
+            dispatch: $inst->dispatch,
         );
 
         //$newInstance->resetQueryParts();
@@ -127,10 +129,10 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $classNamespace = is_object($class) ? $class::class : $class;
 
-        $newInstance->namespace = $this->getCacheNamespace($classNamespace);
+        $newInstance->namespace = $inst->getCacheNamespace($classNamespace);
         $newInstance->cacheKey = md5($classNamespace);
 
-        $this->isCache = false;
+        $inst->isCache = false;
 
         return $newInstance;
     }
@@ -296,9 +298,21 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result->valid() ? $result : false;
     }
 
+    public function fetchHydrate(string $class, ?string $method = null): object|false
+    {
+        $result = $this->executeQuery()->fetchAssociative();
+
+        if(empty($result))
+        {
+            return false;
+        }
+
+        return $method ? (new $class())->{$method}(...$result) : new $class(...$result);
+    }
+
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
-        $result = $this->executeDBALQuery()->iterateAssociative();
+        $result = $this->executeQuery()->iterateAssociative();
 
         foreach($result as $item)
         {
@@ -318,17 +332,7 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result ?: false;
     }
 
-    public function fetchHydrate(string $class, ?string $method = null): object|false
-    {
-        $result = $this->executeDBALQuery()->fetchAssociative();
 
-        if(empty($result))
-        {
-            return false;
-        }
-
-        return $method ? (new $class())->{$method}(...$result) : new $class(...$result);
-    }
 
     public function fetchAssociative(): array|false
     {

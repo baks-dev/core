@@ -218,9 +218,7 @@ abstract class AbstractHandler
                 throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
             }
 
-
             $this->event = $event;
-            $this->validatorCollection->add($this->event);
 
             /**
              * Если getEvent не является идентификатором - создаем новый объект
@@ -234,6 +232,9 @@ abstract class AbstractHandler
             {
                 $this->updateEvent();
             }
+
+            /** Добавляем к валидации объект сущности после гидрации */
+            $this->validatorCollection->add($this->event);
 
             return;
         }
