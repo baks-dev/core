@@ -127,12 +127,13 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $newInstance->setParameters([]);
 
+
         $classNamespace = is_object($class) ? $class::class : $class;
 
         $newInstance->namespace = $inst->getCacheNamespace($classNamespace);
         $newInstance->cacheKey = md5($classNamespace);
 
-        $inst->isCache = false;
+        $newInstance->isCache = false;
 
         return $newInstance;
     }
