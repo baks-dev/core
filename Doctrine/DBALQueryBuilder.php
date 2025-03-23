@@ -661,6 +661,13 @@ final class DBALQueryBuilder extends QueryBuilder
                 }
             }
 
+            if(str_starts_with($field, 'DATE'))
+            {
+                $field = explode(' AS ', $field);
+                $addGroupBy[] = current($field);
+                continue;
+            }
+
             preg_match_all('/\b(\w+\.\w+)\b/', $field, $matches);
             $result = $matches[1];
 
