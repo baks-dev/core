@@ -53,6 +53,11 @@ final readonly class ClientBlockListener
      */
     public function onKernelRequest(RequestEvent $event): void
     {
+        if($event->getRequest()->isMethod('POST'))
+        {
+            return;
+        }
+
         $ip = $event->getRequest()->getClientIp();
 
         $item = $this->cache->getItem($ip);
