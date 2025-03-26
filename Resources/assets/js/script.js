@@ -915,7 +915,7 @@ async function submitLink(href, id = null)
 
             if(data.status !== 200)
             {
-                return;
+                return true;
             }
 
             if(typeof success !== undefined && id !== null)
