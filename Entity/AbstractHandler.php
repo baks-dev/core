@@ -148,6 +148,8 @@ abstract class AbstractHandler
      */
     protected function preEventPersistOrUpdate(string|object $main, string|object|false $event): void
     {
+        $this->entityManager->clear();
+
         /**
          * Проверка объекта DTO
          */
@@ -166,7 +168,6 @@ abstract class AbstractHandler
         {
             throw new InvalidArgumentException('Объект DTO не реализует метод getEvent()');
         }
-
 
         /**
          * Проверка структуры корневой сущности

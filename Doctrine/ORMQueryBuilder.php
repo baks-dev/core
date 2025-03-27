@@ -81,6 +81,8 @@ final class ORMQueryBuilder extends QueryBuilder
 
     public function createQueryBuilder(object|string $class): self
     {
+        $this->entityManager->clear();
+
         $newInstance = new self(
             $this->entityManager,
             $this->translator,
@@ -88,7 +90,6 @@ final class ORMQueryBuilder extends QueryBuilder
             $this->env
         );
 
-        $this->entityManager->clear();
 
         $newInstance->resetDQLParts();
         $newInstance->setParameters(new ArrayCollection());
