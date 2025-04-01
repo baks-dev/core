@@ -734,9 +734,6 @@ async function submitModalForm(forms)
         }
     }
 
-    const data = new FormData(forms);
-    let resolved = 100;
-
     // /* показываем индикатор */
     let indicator = forms.querySelector('.spinner-border');
 
@@ -747,7 +744,15 @@ async function submitModalForm(forms)
         indicator.classList.remove('d-none');
         btn.disabled = true;
         btn.type = 'button';
+    } else
+    {
+        forms.submit();
+        modaHidden();
+        return true;
     }
+
+    const data = new FormData(forms);
+    let resolved = 100;
 
     await fetch(forms.action, {
         method: forms.method, // *GET, POST, PUT, DELETE, etc.
