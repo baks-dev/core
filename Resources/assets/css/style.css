@@ -399,6 +399,7 @@ small, .small, .help-text {
 .bg-cover {
     background-repeat: no-repeat;
     background-size: cover !important;
+    background-position: center;
     border: 0;
 }
 
