@@ -24,12 +24,18 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Core\BaksDevCoreBundle;
+use BaksDev\Core\Messenger\MessageHandleMiddleware;
 use DirectoryIterator;
 use Symfony\Config\FrameworkConfig;
 
 return static function(FrameworkConfig $framework) {
 
     $messenger = $framework->messenger();
+
+    $messenger
+        ->bus('messenger.bus.default')
+        ->middleware(MessageHandleMiddleware::class);
+
 
     $messenger->transport('sync')->dsn('sync://');
 
