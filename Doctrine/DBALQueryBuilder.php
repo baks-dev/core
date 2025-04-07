@@ -313,7 +313,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
     {
-        $result = $this->executeQuery()->iterateAssociative();
+        $result = $this->executeDBALQuery()->iterateAssociative();
 
         foreach($result as $item)
         {
