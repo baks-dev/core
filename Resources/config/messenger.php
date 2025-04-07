@@ -40,7 +40,7 @@ return static function(FrameworkConfig $framework) {
     $messenger
         ->transport('failed')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['table_name' => 'messenger_failed', 'queue_name' => 'failed']);
+        ->options(['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => 'failed']);
 
 
     $messenger
@@ -49,7 +49,7 @@ return static function(FrameworkConfig $framework) {
     $messenger
         ->transport('async')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['auto_setup' => true, 'queue_name' => 'async'])
+        ->options(['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async'])
         ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(5)
@@ -62,7 +62,7 @@ return static function(FrameworkConfig $framework) {
     $messenger
         ->transport('async-low')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'async'])
+        ->options(['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async-low'])
         ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(1)
@@ -78,7 +78,7 @@ return static function(FrameworkConfig $framework) {
     $messenger
         ->transport('systemd')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'systemd'])
+        ->options(['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'systemd'])
         ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(5)
@@ -97,11 +97,6 @@ return static function(FrameworkConfig $framework) {
     /** @var DirectoryIterator $module */
     foreach(new DirectoryIterator($BAKS) as $module)
     {
-        if($module->isDot() || !$module->isDir() || $module->getBasename() === 'core')
-        {
-            continue;
-        }
-
         $table_name = 'messenger_'.str_replace('-', '_', $module->getBasename());
 
         $messenger
@@ -133,6 +128,6 @@ return static function(FrameworkConfig $framework) {
         $messenger
             ->transport($module->getBasename().'-failed')
             ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options(['table_name' => 'messenger_failed', 'queue_name' => $module->getBasename()]);
+            ->options(['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => $module->getBasename()]);
     }
 };
