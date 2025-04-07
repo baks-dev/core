@@ -97,6 +97,11 @@ return static function(FrameworkConfig $framework) {
     /** @var DirectoryIterator $module */
     foreach(new DirectoryIterator($BAKS) as $module)
     {
+        if($module->isDot() || !$module->isDir())
+        {
+            continue;
+        }
+
         $table_name = 'messenger_'.str_replace('-', '_', $module->getBasename());
 
         $messenger
