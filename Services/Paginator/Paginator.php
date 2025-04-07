@@ -30,9 +30,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class Paginator implements PaginatorInterface
 {
-    public const LIMIT_ARRAY = [1, 24, 50, 100, 200, 500];
+    public const array LIMIT_ARRAY = [1, 24, 50, 100, 200, 500];
 
-    private const LIMIT = 24;
+    private const int LIMIT = 24;
 
     private ?Request $request;
 
@@ -102,6 +102,58 @@ final class Paginator implements PaginatorInterface
         $this->previous = $previous < 0 ? null : $previous;
 
     }
+
+    public function fetchAllHydrate(DBALQueryBuilder $qb, string $class, ?string $namespace = null): self
+    {
+        $namespace = $namespace ?: $this->namespace;
+
+        if($qb->getMaxResults())
+        {
+            $this->limit = $qb->getMaxResults();
+        }
+        else
+        {
+            $qb->setMaxResults($this->limit);
+        }
+
+        $qb->setFirstResult($this->page * $this->limit);
+
+        if($namespace)
+        {
+            $qb->enableCache($namespace);
+        }
+
+        if(($this->request && $this->session?->get('statusCode') === 307))
+        {
+            /** Сбрасываем кеш ключа запроса */
+            $qb->resetCacheQuery();
+            $this->request->getSession()->remove('statusCode');
+        }
+
+        $this->data = iterator_to_array($qb->fetchAllHydrate($class));
+
+        /** По умолчанию COUNTER присваиваем равным количеству возвращаемых элементов  */
+        $this->counter = count($this->data);
+
+        /** Включаем пагинацию, если количество возвращаемых элементов больше либо равно лимиту */
+        $this->pagination = $this->counter >= $this->limit;
+
+        /** Если количество больше лимита - считаем количество  */
+        if($this->pagination)
+        {
+            $counter = $qb->count(true);
+            $this->counter = is_null($counter) ? 'более '.$this->limit : $counter;
+
+            if($this->request && $this->session?->get('statusCode') === 307)
+            {
+                /** Сбрасываем кеш COUNTER */
+                $qb->deleteCacheQueries();
+            }
+        }
+
+        return $this;
+    }
+
 
     public function fetchAllAssociative(DBALQueryBuilder $qb, ?string $namespace = null): self
     {

@@ -37,11 +37,14 @@ return static function(FrameworkConfig $framework) {
         ->middleware(MessageHandleMiddleware::class);
 
 
-    $messenger->transport('sync')->dsn('sync://');
+    $messenger
+        ->transport('failed')
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
+        ->options(['table_name' => 'messenger_failed', 'queue_name' => 'failed']);
 
-    /** ASYNC */
-    // redis://%s@%s:%s?dbindex=%s
-    // ?auto_setup=true&serializer=1&stream_max_entries=0&dbindex=0
+
+    $messenger
+        ->transport('sync')->dsn('sync://');
 
     $messenger
         ->transport('async')
@@ -69,22 +72,14 @@ return static function(FrameworkConfig $framework) {
         ->jitter(0.1)
         ->service(null);
 
-    $failure = $framework->messenger();
-
-    $failure->transport('failed')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'failed']);
-
 
     /** SYSTEMD  */
 
-    $systemd = $framework->messenger();
-
-    $systemd
+    $messenger
         ->transport('systemd')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
         ->options(['queue_name' => 'systemd'])
-        ->failureTransport('failed-systemd')
+        ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(5)
         ->delay(1000)
@@ -92,10 +87,6 @@ return static function(FrameworkConfig $framework) {
         ->multiplier(2)
         ->jitter(0.1)
         ->service(null);
-
-    $failure->transport('failed-systemd')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'failed-systemd']);
 
     /**
      * Создаем список транспортов модулей
@@ -142,7 +133,6 @@ return static function(FrameworkConfig $framework) {
         $messenger
             ->transport($module->getBasename().'-failed')
             ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options(['queue_name' => 'failed']);
-
+            ->options(['table_name' => 'messenger_failed', 'queue_name' => $module->getBasename()]);
     }
 };
