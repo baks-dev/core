@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,6 +28,7 @@ namespace BaksDev\Core\Type\UidType\Tests;
 use BaksDev\Core\Type\UidType\Uid;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Uid\UuidV7;
 
 /**
  * @group core
@@ -73,14 +74,21 @@ final class UidTest extends TestCase
 
     public function testMd5()
     {
-        $md5 = md5('different-uid');
-        $uid3 = (new UidClass())->md5($md5);
+        $uid = new UidClass()->stringToUuid('different-uid');
 
-        $UidMd5 = explode('-', (string) $uid3);
+        $UidMd5 = explode('-', (string) $uid);
+        $md5 = md5('different-uid');
+
         $this->assertEquals($UidMd5[0], substr($md5, 0, 8));
         $this->assertEquals($UidMd5[1], substr($md5, 8, 4));
         $this->assertEquals($UidMd5[2], '7'.substr($md5, 12, 3));
-        $this->assertEquals($UidMd5[3], '9cb9');
-        $this->assertEquals($UidMd5[4], substr($md5, 20));
+
+        $clock_seq_hi = substr($md5, 15, 1);
+        $clock_seq_hi_and_reserved = dechex(hexdec($clock_seq_hi) | 0x80);
+        $clock_seq_low = substr($md5, 16, 2);
+
+        $this->assertEquals($UidMd5[3], $clock_seq_hi_and_reserved.$clock_seq_low);
+        $this->assertEquals($UidMd5[4], substr($md5, 18, 12));
     }
+
 }

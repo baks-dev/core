@@ -35,15 +35,9 @@ abstract class Uid implements ValueResolverInterface
 {
     private Uuid $value;
 
-    public function __construct(AbstractUid|Uid|string|null $value = null)
+    public function __construct(AbstractUid|Uid|string|null|false $value = null)
     {
-        /* Применяем фильтр UID */
-        if($value !== null && self::isUid($value) === false)
-        {
-            throw new InvalidArgumentException(sprintf('Invalid Argument Uid: %s', $value));
-        }
-
-        if($value === null)
+        if(is_null($value))
         {
             $this->value = Uuid::v7();
 
@@ -53,6 +47,12 @@ abstract class Uid implements ValueResolverInterface
             }
 
             return;
+        }
+
+        /* Применяем фильтр UID */
+        if(self::isUid($value) === false)
+        {
+            throw new InvalidArgumentException(sprintf('Invalid Argument Uid: %s', $value));
         }
 
         $this->value = new Uuid((string) $value);
@@ -73,6 +73,10 @@ abstract class Uid implements ValueResolverInterface
         return $this->value;
     }
 
+    /**
+     * @deprecated используйте метод stringToUuid
+     * @see stringToUuid
+     */
     public function md5(string $string): self
     {
         $md5 = md5($string);
@@ -90,11 +94,57 @@ abstract class Uid implements ValueResolverInterface
         return $this;
     }
 
+    /**
+     * Метод приводит переданную строку в Uuid методом расчета дайджеста md5
+     */
+    public function stringToUuid(string $input): self
+    {
+        $md5 = md5($input);
+
+        // Разбиваем хеш на части
+        $time_low = substr($md5, 0, 8);
+        $time_mid = substr($md5, 8, 4);
+
+        // Создаем time_hi_and_version (устанавливаем версию 7)
+        $time_hi = substr($md5, 12, 3);
+        $time_hi_and_version = dechex(hexdec($time_hi) | 0x7000);
+
+        // Создаем clock_seq_hi_and_reserved (устанавливаем вариант)
+        $clock_seq_hi = substr($md5, 15, 1);
+        $clock_seq_hi_and_reserved = dechex(hexdec($clock_seq_hi) | 0x80);
+
+        $clock_seq_low = substr($md5, 16, 2);
+        $node = substr($md5, 18, 12);
+
+        // Собираем UUID
+        $uuid = sprintf('%s-%s-%s-%s%s-%s',
+            $time_low,
+            $time_mid,
+            $time_hi_and_version,
+            $clock_seq_hi_and_reserved,
+            $clock_seq_low,
+            $node
+        );
+
+        $this->value = new Uuid($uuid);
+
+        return $this;
+
+    }
+
+    /**
+     * Метод сравнивает два значения Uuid
+     */
     public function equals(mixed $value): bool
     {
         if($value === null)
         {
             return false;
+        }
+
+        if(is_string($value) && class_exists($value) && method_exists($value, '__toString'))
+        {
+            $value = (string) new $value();
         }
 
         if(is_string($value))
@@ -107,7 +157,12 @@ abstract class Uid implements ValueResolverInterface
 
     public static function isUid(mixed $value): bool
     {
-        return preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $value);
+        if(empty($value))
+        {
+            return false;
+        }
+
+        return preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', (string) $value);
     }
 
 

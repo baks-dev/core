@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,29 +23,13 @@
 
 namespace BaksDev\Core\Form\Search;
 
-use Symfony\Component\HttpFoundation\Request;
-
 class SearchDTO
 {
-    public ?string $session = null;
-
     /**
      * Строка поиска
      */
     public string|int|null $query = null;
 
-    private ?Request $request;
-
-    public function __construct(?Request $request = null)
-    {
-        if($request)
-        {
-            $route = $request->attributes->get('_route');
-            $this->session = substr($route, 0, strpos($route, ':'));
-        }
-
-        $this->request = $request;
-    }
 
     public function isUid(): bool
     {
@@ -57,26 +41,6 @@ class SearchDTO
      */
     public function getQuery(): ?string
     {
-//        if($this->request)
-//        {
-//            $session = $this->request->getSession();
-//
-//            if($session->get('statusCode') === 307)
-//            {
-//                $this->request->getSession()->remove($this->session);
-//            }
-//
-//            if(time() - $session->getMetadataBag()->getLastUsed() > 30)
-//            {
-//                $session->remove($this->session);
-//            }
-//
-//            if(!$this->query)
-//            {
-//                $this->query = $session->get($this->session);
-//            }
-//        }
-
         return $this->query ? mb_strtolower(trim($this->query)) : null;
     }
 
@@ -86,18 +50,13 @@ class SearchDTO
      * \p{N} - любой цифре
      * \s - пробел
      */
-    public function getQueryFilter()
+    public function getQueryFilter(): array|string|null
     {
         return preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $this->getQuery());
     }
 
     public function setQuery(string|int|null $query): void
     {
-//        if($this->request && empty($query))
-//        {
-//            $this->request->getSession()->remove($this->session);
-//        }
-
         $this->query = $query;
     }
 

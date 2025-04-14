@@ -476,7 +476,8 @@ abstract class AbstractController
     {
         $url = $this->router->generate($route, $parameters);
 
-        $this->requestStack->getSession()
+        $this
+            ->requestStack->getSession()
             ->set('statusCode', $status);
 
         /** Если запрос был AJAX - возвращаем на предыдущую страницу */
@@ -494,9 +495,13 @@ abstract class AbstractController
      */
     protected function redirectToReferer(int $status = 302): ?Response
     {
-        $url = $this->requestStack->getCurrentRequest()->headers->get('referer');
+        $url = $this
+            ->requestStack->getCurrentRequest()
+            ->headers->get('referer');
 
-        $this->requestStack->getSession()
+        $this
+            ->requestStack
+            ->getSession()
             ->set('statusCode', $status);
 
         if($jsonResponse = $this->responseXmlHttpRequest($url, $status))
