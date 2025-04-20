@@ -32,6 +32,7 @@ use BaksDev\Core\Messenger\MessengerConsumers;
 use DateInterval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
@@ -44,19 +45,20 @@ final class ConsumerRunningHandler
     private bool $isSchedule = false;
 
     public function __construct(
+        #[Target('coreLogger')] private readonly LoggerInterface $logger,
         #[Autowire(env: 'HOST')] private readonly string $HOST,
         private readonly AppCacheInterface $cache,
         private readonly MessengerConsumers $MessengerConsumers,
-        private readonly LoggerInterface $logger,
         private readonly DeduplicatorInterface $deduplicator
     )
     {
-        $deduplicator->namespace('core')->expiresAfter('1 minute');
+        $deduplicator
+            ->namespace('core')
+            ->expiresAfter('1 minute');
     }
 
     public function __invoke(ConsumerRunningMessage $message): void
     {
-
         $cache = $this->cache->init(MessageDispatch::CONSUMER_NAMESPACE);
 
         $services = $this->MessengerConsumers->toArray();
@@ -99,7 +101,12 @@ final class ConsumerRunningHandler
             $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
             $cache->save($cacheConsume);
 
+            $this->logger->info(sprintf('%s: Consumer running', $consumer));
         }
+
+        /**
+         * Делаем проверку запущенных воркеров
+         */
 
         $deduplicator = $this->deduplicator->deduplication(['systemd', self::class]);
 
@@ -124,6 +131,5 @@ final class ConsumerRunningHandler
             $deduplicator->save();
             $this->logger->critical('Воркер Schedule проекта не найден');
         }
-
     }
 }

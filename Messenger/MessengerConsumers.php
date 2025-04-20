@@ -42,6 +42,9 @@ final class MessengerConsumers
         private readonly CacheItemPoolInterface $restartSignalCachePool,
     ) {}
 
+    /**
+     * Метод возвращает генератор запущенных воркеров Systemd
+     */
     private function getServices($grep = ['active', 'running']): Generator|false
     {
         $process = Process::fromShellCommandline(self::COMMAND.' | grep '.implode(' | grep ', $grep));

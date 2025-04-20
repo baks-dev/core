@@ -65,8 +65,7 @@ final class MessageDispatch implements MessageDispatchInterface
             $cache = $this->cache->init($transport);
             $cache->clear();
 
-            new FilesystemAdapter($transport)
-                ->clear();
+            new FilesystemAdapter($transport)->clear();
         }
 
         if($this->dispatch === false)
@@ -110,7 +109,7 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($transport === 'files-res' && $isRunning === false)
             {
-                $this->logger->critical('Messanger Транспорт files-res не найден');
+                $this->logger->critical('Messenger Транспорт files-res не найден');
                 return null;
             }
 
@@ -165,7 +164,7 @@ final class MessageDispatch implements MessageDispatchInterface
      */
     public function isConsumer(?string $transport = null): bool
     {
-        if(!$this->transport && !$transport)
+        if(is_null($this->transport) && is_null($transport))
         {
             return false;
         }
@@ -179,8 +178,9 @@ final class MessageDispatch implements MessageDispatchInterface
 
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
 
-        /** Если транспорт LOW и воркер модуля не запущен - передаем его в транспорт async-low */
-
+        /**
+         * Если транспорт LOW и воркер модуля не запущен - передаем его в транспорт async-low
+         */
         if(str_contains($this->transport, '-low'))
         {
             $cacheConsume = $cache->getItem('consume-'.trim(str_replace('-low', '', $this->transport)));
@@ -213,8 +213,7 @@ final class MessageDispatch implements MessageDispatchInterface
     }
 
     /**
-     * При вызове диспатчера сообщения - можно передать особый модуль (отличающийся от сообщения) для сброса кеша
-     * addClearCacheOther
+     * При вызове диспетчера сообщения - можно передать особый модуль (отличающийся от сообщения) для сброса кеша
      */
     public function addClearCacheOther(string $module): self
     {
