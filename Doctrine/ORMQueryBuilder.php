@@ -28,18 +28,19 @@ namespace BaksDev\Core\Doctrine;
 
 use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Type\Locale\Locale;
+use DateInterval;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Cache\CacheItemPoolInterface;
+use Random\Randomizer;
 use ReflectionAttribute;
 use ReflectionClass;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ORMQueryBuilder extends QueryBuilder
@@ -90,11 +91,10 @@ final class ORMQueryBuilder extends QueryBuilder
             $this->env
         );
 
-
         $newInstance->resetDQLParts();
         $newInstance->setParameters(new ArrayCollection());
 
-        //$this->isCache = false;
+        $this->isCache = false;
         $newInstance->cacheKey = str_replace('\\', '.', is_object($class) ? $class::class : $class);
         $newInstance->namespace = 'ORMCache';
 
@@ -105,61 +105,49 @@ final class ORMQueryBuilder extends QueryBuilder
      * Кешируем результат ORM
      */
 
-    public function enableCache(?string $namespace = null, int $ttl = 60)
+    public function enableCache(?string $namespace = null, int|string $ttl = 60)
     {
-        $this->isCache = true;
-        $this->ttl = $ttl + random_int(0, $ttl); // разбрасываем время кеша
-
         if($namespace)
         {
             $this->namespace = $namespace;
         }
 
-
-        $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
-
-        $this->query = $this->getEntityManager()->createQuery($this->getDQL());
-
-        $this->cacheKey .= '.'.implode('.', array_map(function($value) {
-                return is_array($value->getValue()) ?
-                    json_encode($value->getValue(), JSON_THROW_ON_ERROR) :
-                    $value->getValue();
-            }, $this->getParameters()->toArray()));
-
-
-        /** Сохраняем метку времени в APCU */
-        $DatetimeCache = (function_exists('apcu_enabled') && apcu_enabled()) ? new ApcuAdapter() : new FilesystemAdapter();
-
-        $lastDatetimeCache = $DatetimeCache->getItem('date.'.$this->cacheKey);
-        $lastDatetime = $lastDatetimeCache->get();
-
-        if($lastDatetime === null || time() > $lastDatetime)
-        {
-            /* Перезаписываем метку времени запроса */
-            $lastDatetimeCache->set(time() + 10);
-            $lastDatetimeCache->expiresAfter($this->ttl);
-            $DatetimeCache->save($lastDatetimeCache);
-
-            if(time() > $lastDatetime)
-            {
-                /* Сбрасываем кеш для последующего запроса */
-                register_shutdown_function([$this, 'resetCacheQuery'], 'throw');
-            }
-        }
-
-        $this->query
-            ->setQueryCache($this->cacheQueries)
-            ->setResultCache($this->cacheQueries)
-            ->enableResultCache($this->ttl, $this->cacheKey) // 60 - 1 минута
-            ->setParameters($this->getParameters());
-
-        if($this->getMaxResults())
-        {
-            $this->query->setMaxResults($this->getMaxResults());
-        }
-
+        $this->isCache = true;
+        $this->ttl = $this->getTimeToLive($ttl);
+        $this->cacheKey .= '.'.md5(var_export($this->getParameters()->toArray(), true));
+        $this->cacheQueries = $this->cache->init($this->namespace, $this->ttl);
 
         return $this;
+    }
+
+
+    /**
+     * Метод возвращает время в секундах с разбросом * 2
+     */
+    private function getTimeToLive(string|int $seconds): int
+    {
+        if(is_string($seconds))
+        {
+            $interval = DateInterval::createFromDateString($seconds);
+
+            $seconds =
+                ($interval->d * 86400) + // дни в секундах
+                ($interval->h * 3600) +  // часы в секундах
+                ($interval->i * 60) +    // минуты в секундах
+                $interval->s;            // секунды
+        }
+
+        $seconds = (int) $seconds;
+
+        /**
+         * Ограничиваем кеширование больше одних суток
+         */
+        if(empty($seconds) || $seconds > 86400)
+        {
+            $seconds = 86400;
+        }
+
+        return new Randomizer()->getInt($seconds, ($seconds * 2));
     }
 
     /**
@@ -169,11 +157,19 @@ final class ORMQueryBuilder extends QueryBuilder
     {
         if($this->isCache)
         {
-            $this->methodResult = 'getOneOrNullResult';
-            return $this->query->getOneOrNullResult() ?: null;
+            return $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): ?object {
+
+                $item->expiresAfter($this->ttl);
+
+                return $this
+                    ->getQuery()
+                    ->getOneOrNullResult() ?: null;
+            });
         }
 
-        return $this->getQuery()->getOneOrNullResult() ?: null;
+        return $this
+            ->getQuery()
+            ->getOneOrNullResult() ?: null;
     }
 
 

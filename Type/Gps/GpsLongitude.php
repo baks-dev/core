@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -45,10 +45,10 @@ final class GpsLongitude
             $this->value = $value->getValue();
         }
 
-        $value = str_replace(',', '.', $value);
+        $value = str_replace(',', '.', (string) $value);
         $value = trim($value);
 
-        if(!empty($value) && !preg_match('{^-?[\d]+\.[\d]{2,}$}Di', (string) $value))
+        if(!empty($value) && !preg_match('{^-?[\d]+\.[\d]{1,}$}Di', $value))
         {
             throw new InvalidArgumentException('Incorrect Gps Longitude '.$value);
         }
