@@ -120,7 +120,6 @@ final class ORMQueryBuilder extends QueryBuilder
         return $this;
     }
 
-
     /**
      * Метод возвращает время в секундах с разбросом * 2
      */
@@ -187,20 +186,25 @@ final class ORMQueryBuilder extends QueryBuilder
     {
         if($this->isCache)
         {
-            $this->methodResult = 'getResult';
-            return $this->query->getResult();
+            return $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): ?object {
+
+                $item->expiresAfter(DateInterval::createFromDateString('1 seconds'));
+
+                $result = $this
+                    ->getQuery()
+                    ->getResult() ?: null;
+
+                if($result)
+                {
+                    $item->expiresAfter($this->ttl);
+                }
+
+                return $result;
+            });
         }
 
         return $this->getQuery()->getResult() ?: null;
     }
-
-    //    public function join($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
-    //    {
-    //        parent::join($join, $alias, $conditionType, $condition, $indexBy);
-    //
-    //        return $this;
-    //    }
-
 
     public function flush(): void
     {
