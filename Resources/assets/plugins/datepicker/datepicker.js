@@ -243,24 +243,44 @@
                         isOpening: !1,
                         isClosing: !1,
                         isBluring: !1,
-                        open: function(n)
+                        open : function(n)
                         {
                             var i = this;
-                            this.isClosing || (r = a && a._id === n._id, this.isOpening = !0, clearTimeout(t), function(e,
-                                t)
+
+                            // 🛑 УЖЕ ОТКРЫТО — ничего не делать
+                            if(this.opened || this.isOpening || this.isClosing)
                             {
-                                e.dispatchEvent(new CustomEvent(c, {bubbles: !0, detail: {instance: t}}))
-                            }(e, n), t = setTimeout((function()
+                                return;
+                            }
+
+                            r = a && a._id === n._id;
+                            this.isOpening = true;
+
+                            clearTimeout(t);
+
+                            (function(e, t)
                             {
-                                i.isOpening = !1, i.opened = !0, i.closed = !1, a = n
-                            }), 200))
+                                e.dispatchEvent(new CustomEvent(c, {
+                                    bubbles : true,
+                                    detail : {instance : t},
+                                }));
+                            })(e, n);
+
+                            t = setTimeout(function()
+                            {
+                                i.isOpening = false;
+                                i.opened = true;
+                                i.closed = false;
+                                a = n;
+                            }, 200);
                         },
                         close: function()
                         {
                             var t = this;
                             this.closed || this.isOpening || this.isClosing || (r = !1, this.isClosing = !0, clearTimeout(n), e.dispatchEvent(new CustomEvent(i, {bubbles: !0})), n = setTimeout((function()
                             {
-                                t.isClosing = !1, t.opened = !1, t.closed = !0
+                                t.isClosing = !1, t.opened = !1, t.closed = !0;
+                                document.activeElement.blur();
                             }), 200))
                         },
                         blur: function()
