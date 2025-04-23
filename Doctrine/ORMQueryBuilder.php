@@ -186,7 +186,7 @@ final class ORMQueryBuilder extends QueryBuilder
     {
         if($this->isCache)
         {
-            return $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): ?object {
+            return $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): ?array {
 
                 $item->expiresAfter(DateInterval::createFromDateString('1 seconds'));
 
