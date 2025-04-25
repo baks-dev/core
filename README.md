@@ -25,7 +25,7 @@ HOST=domain.example
 
 #### - systemd
 
-В директори vendor/baks-dev/core/Resources/systemd находяится примеры сервисов (воркеров) messenger:consume,
+В директори vendor/baks-dev/core/Resources/systemd находятся примеры сервисов (воркеров) messenger:consume,
 контролируемых systemd. Название должно в себе содержать название модуля.
 
 Пример допустимых названий на примере модуля «Core»:
