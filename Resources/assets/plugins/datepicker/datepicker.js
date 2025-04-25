@@ -1444,34 +1444,42 @@ datapickerLang = {
     }
 }
 
-
-document.querySelectorAll('.js-datepicker').forEach((datepicker) =>
+function initDatepicker()
 {
-
-    let $elementDate = document.getElementById(datepicker.id).value;
-
-    if($elementDate)
+    document.querySelectorAll(".js-datepicker").forEach((datepicker) =>
     {
-        const [day, month, year] = $elementDate.split('.');
-        $selectedDate = new Date(+year, month - 1, +day);
-    } else
-    {
-        $selectedDate = new Date();
-    }
+        let $elementDate = document.getElementById(datepicker.id).value;
 
-    MCDatepicker.create({
-        el: '#' + datepicker.id,
-        bodyType: 'modal', // ‘modal’, ‘inline’, or ‘permanent’.
-        autoClose: false,
-        closeOndblclick: true,
-        closeOnBlur: true,
-        customOkBTN: 'OK',
-        customClearBTN: datapickerLang[$locale].customClearBTN,
-        customCancelBTN: datapickerLang[$locale].customCancelBTN,
-        firstWeekday: datapickerLang[$locale].firstWeekday,
-        dateFormat: 'DD.MM.YYYY',
-        customWeekDays: datapickerLang[$locale].customWeekDays,
-        customMonths: datapickerLang[$locale].customMonths,
-        selectedDate: $selectedDate == 'Invalid Date' ? new Date() : $selectedDate,
+        if($elementDate)
+        {
+            const [day, month, year] = $elementDate.split(".");
+            $selectedDate = new Date(+year, month - 1, +day);
+        }
+        else
+        {
+            $selectedDate = new Date();
+        }
+
+        MCDatepicker.create({
+            el : "#" + datepicker.id,
+            bodyType : "modal", // ‘modal’, ‘inline’, or ‘permanent’.
+            autoClose : false,
+            closeOndblclick : true,
+            closeOnBlur : false,
+            customOkBTN : "OK",
+            customClearBTN : datapickerLang[$locale].customClearBTN,
+            customCancelBTN : datapickerLang[$locale].customCancelBTN,
+            firstWeekday : datapickerLang[$locale].firstWeekday,
+            dateFormat : "DD.MM.YYYY",
+            customWeekDays : datapickerLang[$locale].customWeekDays,
+            customMonths : datapickerLang[$locale].customMonths,
+            selectedDate : $selectedDate == "Invalid Date" ? new Date() : $selectedDate,
+        });
+
     });
+}
+
+document.addEventListener("DOMContentLoaded", function()
+{
+    initDatepicker();
 });

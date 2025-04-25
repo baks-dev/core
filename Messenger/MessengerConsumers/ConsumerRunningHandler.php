@@ -101,7 +101,7 @@ final class ConsumerRunningHandler
             $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));
             $cache->save($cacheConsume);
 
-            $this->logger->info(sprintf('%s: Consumer running', $consumer));
+            //$this->logger->info(sprintf('%s: Consumer running', $consumer));
         }
 
         /**

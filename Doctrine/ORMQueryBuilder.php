@@ -109,12 +109,12 @@ final class ORMQueryBuilder extends QueryBuilder
     {
         if($namespace)
         {
-            $this->namespace = $namespace;
+            $this->namespace = 'orm-'.$namespace;
         }
 
         $this->isCache = true;
         $this->ttl = $this->getTimeToLive($ttl);
-        $this->cacheKey .= '.'.md5(var_export($this->getParameters()->toArray(), true));
+        $this->cacheKey .= '.'.md5($this->getDQL().var_export($this->getParameters()->toArray(), true));
         $this->cacheQueries = $this->cache->init($this->namespace, $this->ttl);
 
         return $this;
