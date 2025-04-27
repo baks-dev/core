@@ -109,7 +109,7 @@ final class ORMQueryBuilder extends QueryBuilder
     {
         if($namespace)
         {
-            $this->namespace = 'orm-'.$namespace;
+            $this->namespace = $namespace;
         }
 
         $this->isCache = true;
