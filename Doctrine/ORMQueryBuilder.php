@@ -154,57 +154,19 @@ final class ORMQueryBuilder extends QueryBuilder
      */
     public function getOneOrNullResult(): ?object
     {
-        if($this->isCache)
-        {
-            return $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): ?object {
-
-                $item->expiresAfter(DateInterval::createFromDateString('1 seconds'));
-
-                $result = $this
-                    ->getQuery()
-                    ->getOneOrNullResult() ?: null;
-
-                if($result)
-                {
-                    $item->expiresAfter($this->ttl);
-                }
-
-                return $result;
-            });
-        }
-
         return $this
             ->getQuery()
             ->getOneOrNullResult() ?: null;
     }
-
 
     /**
      * Возвращает массив сущностей.
      */
     public function getResult(): ?array
     {
-        if($this->isCache)
-        {
-            return $this->cacheQueries->get($this->cacheKey, function(ItemInterface $item): ?array {
-
-                $item->expiresAfter(DateInterval::createFromDateString('1 seconds'));
-
-                $result = $this
-                    ->getQuery()
-                    ->getResult() ?: null;
-
-                if($result)
-                {
-                    $item->expiresAfter($this->ttl);
-                }
-
-                return $result;
-            });
-        }
-
         return $this->getQuery()->getResult() ?: null;
     }
+
 
     public function flush(): void
     {
