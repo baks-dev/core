@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -39,9 +39,13 @@ final class JsonDecodeExtension extends AbstractExtension
         ];
     }
 
-
     public function jsonDecode($string, bool $associative = false): array
     {
+        if(false === json_validate($string))
+        {
+            return [];
+        }
+
         return json_decode($string, $associative, 512, JSON_THROW_ON_ERROR);
     }
 
