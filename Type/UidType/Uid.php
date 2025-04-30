@@ -35,13 +35,19 @@ abstract class Uid implements ValueResolverInterface
 {
     private Uuid $value;
 
-    public function __construct(AbstractUid|Uid|string|null|false $value = null)
+    public function __construct(AbstractUid|Uid|string|null|false $value = null, bool $test = true)
     {
         if(is_null($value))
         {
             $this->value = Uuid::v7();
 
-            if(method_exists(Kernel::class, 'isTestEnvironment') && Kernel::isTestEnvironment())
+            /** Присваиваем тестовый идентификатор в тестовом окружении */
+            if(
+                true === $test &&
+                class_exists(Kernel::class) &&
+                method_exists(Kernel::class, 'isTestEnvironment') &&
+                Kernel::isTestEnvironment()
+            )
             {
                 $this->value = new Uuid(static::TEST);
             }
