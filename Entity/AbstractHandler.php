@@ -77,9 +77,13 @@ abstract class AbstractHandler
      */
     public function setCommand(object $command): self
     {
-        /** Добавляем к валидации объект DTO */
-        $this->validatorCollection->add($command);
+        /** Инициируем и добавляем к валидации объект DTO */
+        $this->validatorCollection
+            ->init()
+            ->add($command);
+
         $this->command = $command;
+
         return $this;
     }
 

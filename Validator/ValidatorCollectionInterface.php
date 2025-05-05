@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,10 @@ namespace BaksDev\Core\Validator;
 
 interface ValidatorCollectionInterface
 {
+
+    /** Инициирует и сбрасывает объект коллекции ошибок */
+    public function init(): self;
+
     /**
      * Добавляет в коллекцию объекты для валидации
      */

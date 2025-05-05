@@ -50,6 +50,14 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
         $this->errors = new ArrayObject();
     }
 
+    public function init(): self
+    {
+        $this->uniqid = uniqid('', false);
+        $this->errors = new ArrayObject();
+
+        return $this;
+    }
+
     public function add(?object $item, ?string $message = null, ?array $context = []): bool|string
     {
         $this->validate = true;
