@@ -35,6 +35,8 @@ use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
 use BaksDev\Core\Type\Locale\Locale;
+use BaksDev\Users\Profile\UserProfile\Repository\UserProfileTokenStorage\UserProfileTokenStorageInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use DateInterval;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
@@ -92,13 +94,14 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $env,
-        #[Autowire(env: 'HOST')] private readonly string $host,
         Connection $connection,
         private readonly SwitcherInterface $switcher,
         private readonly TranslatorInterface $translator,
         private readonly AppCacheInterface $cache,
         private readonly DeduplicatorInterface $deduplicator,
         private readonly MessageDispatchInterface $dispatch,
+        private readonly UserProfileTokenStorageInterface $UserProfileTokenStorageInterface,
+        #[Autowire(env: 'PROFILE')] private readonly ?string $projectProfile = null,
     )
     {
         $this->connection = $connection;
@@ -112,13 +115,14 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $newInstance = new self(
             env: $inst->env,
-            host: $inst->host,
             connection: $inst->connection,
             switcher: $inst->switcher,
             translator: $inst->translator,
             cache: $inst->cache,
             deduplicator: $inst->deduplicator,
             dispatch: $inst->dispatch,
+            UserProfileTokenStorageInterface: $this->UserProfileTokenStorageInterface,
+            projectProfile: $inst->projectProfile
         );
 
         //$newInstance->resetQueryParts();
@@ -128,7 +132,6 @@ final class DBALQueryBuilder extends QueryBuilder
         $newInstance->resetWhere();
 
         $newInstance->setParameters([]);
-
 
         $classNamespace = is_object($class) ? $class::class : $class;
 
@@ -836,18 +839,45 @@ final class DBALQueryBuilder extends QueryBuilder
     }
 
     /**
-     * Метод создает параметр домена для запроса согласно
+     * Метод создает bind параметр профиля проекта для запроса
      */
-    public function bindHost(): self
+    public function bindProjectProfile(): self
     {
-        if(!isset($this->host) && false === filter_var($this->host, FILTER_VALIDATE_DOMAIN))
+        if($this->projectProfile)
         {
-            throw new InvalidArgumentException('Incorrect Host');
+            $this->setParameter(
+                key: 'project_profile',
+                value: new UserProfileUid($this->projectProfile),
+                type: UserProfileUid::TYPE
+            );
         }
 
-        $this->setParameter('host', $this->host);
-
         return $this;
+    }
+
+    /**
+     * Метод проверяет что идентификатор авторизованного пользователя не равен идентификатору профиля проекта
+     * @note если профиль авторизованного пользователя равен профилю проекта - не применять двойную скидку
+     */
+    public function isProjectProfile(): bool
+    {
+        /**
+         * Если пользователь не авторизован
+         */
+        if(false === $this->UserProfileTokenStorageInterface->isUser())
+        {
+            return false;
+        }
+
+        /**
+         * Если не указан идентификатор проекта
+         */
+        if(is_null($this->projectProfile))
+        {
+            return false;
+        }
+
+        return $this->UserProfileTokenStorageInterface->getProfileCurrent()->equals($this->projectProfile);
     }
 
     /**
