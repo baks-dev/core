@@ -92,6 +92,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $env,
+        #[Autowire(env: 'HOST')] private readonly string $host,
         Connection $connection,
         private readonly SwitcherInterface $switcher,
         private readonly TranslatorInterface $translator,
@@ -111,6 +112,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $newInstance = new self(
             env: $inst->env,
+            host: $inst->host,
             connection: $inst->connection,
             switcher: $inst->switcher,
             translator: $inst->translator,
@@ -830,6 +832,21 @@ final class DBALQueryBuilder extends QueryBuilder
     public function bindLocal(): self
     {
         $this->setParameter('local', new Locale($this->translator->getLocale()), Locale::TYPE);
+        return $this;
+    }
+
+    /**
+     * Метод создает параметр домена для запроса согласно
+     */
+    public function bindHost(): self
+    {
+        if(!isset($this->host) && false === filter_var($this->host, FILTER_VALIDATE_DOMAIN))
+        {
+            throw new InvalidArgumentException('Incorrect Host');
+        }
+
+        $this->setParameter('host', $this->host);
+
         return $this;
     }
 
