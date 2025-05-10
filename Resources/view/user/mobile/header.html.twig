@@ -85,7 +85,7 @@
                         {% else %}
 
                             <li class="nav-item">
-                                <a href="{{ path('auth-email:user.login') }}"
+                                <a href="{{ path('auth-email:public.login') }}"
                                    class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
                                    title="Войти в кабинет"
                                 >
@@ -134,7 +134,7 @@
                                         >
 
                                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg"
-                                                 xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                 x="0px" y="0px"
                                                  width="16" height="16" fill="currentColor"
                                                  viewBox="0 0 254.532 254.532"
                                             >
@@ -249,7 +249,7 @@
                         {% if app.user %}
                             <li class="nav-item">
 
-                                <a href="{{ path('auth-email:user.logout') }}"
+                                <a href="{{ path('auth-email:public.logout') }}"
                                    class="btn nav-link btn-primary active rounded-4 px-2 text-start w-100"
                                    title="Контакты">
 

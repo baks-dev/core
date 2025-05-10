@@ -142,7 +142,7 @@
             {% endif %}
 
             <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-                <a href="{{ path('auth-email:user.logout') }}" class="text-decoration-none text-dark w-100"
+                <a href="{{ path('auth-email:public.logout') }}" class="text-decoration-none text-dark w-100"
                    title="Выход">
                     Выход</a>
             </li>
@@ -154,12 +154,12 @@
 
 {% else %}
 
-    <a href="{{ exist_path('auth-email:user.login') }}"
+    <a href="{{ exist_path('auth-email:public.login') }}"
        class="btn btn-link btn-sm h-25 lh-1 text-decoration-none modal-link disabled w-75"
        data-bs-toggle="modal"
        data-bs-target="#modal"
        style="width: 150px;"
-       title="{{ 'user.link.breadcrumb.page'|trans({}, 'user.login') }}"
+       title="{{ 'user.link.breadcrumb.page'|trans({}, 'public.login') }}"
 
     >
 

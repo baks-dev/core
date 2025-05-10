@@ -2,6 +2,6 @@
 
 </footer>
 
-{% if app.user == null and route != 'auth-email:user.login' %}
+{% if app.user == null and route != 'auth-email:public.login' %}
     {{ include(_self|replace({ "footer.html.twig": "modal/autotization.html.twig" })) }}
 {% endif %}
