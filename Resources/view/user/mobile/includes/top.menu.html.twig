@@ -10,7 +10,7 @@
         </a>
 
         {#  <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.catalog.category' ? ' active' }}"
-               href="{{ path('products-product:user.catalog.category') }}">Продукция</a> #}
+               href="{{ path('products-product:public.catalog.category') }}">Продукция</a> #}
 
 
 
@@ -65,7 +65,7 @@
 
                                 >
 
-                                    <a href="{{ path('products-product:user.catalog.category', { category : menu.category_url }) }}"
+                                    <a href="{{ path('products-product:public.catalog.category', { category : menu.category_url }) }}"
                                        class="text-decoration-none text-dark d-flex gap-3 align-items-center w-100 justify-content-start">
 
                                         {# Обложка  #}
@@ -112,7 +112,7 @@
                                         {% for parent in parent_category %}
 
                                             {% if parent.parent_category_counter %}
-                                                <a href="{{ path('products-product:user.catalog.category', { category : parent.parent_category_url }) }}"
+                                                <a href="{{ path('products-product:public.catalog.category', { category : parent.parent_category_url }) }}"
                                                    class="text-decoration-none text-dark justify-content-start small text-decoration-none"
                                                    style='width: 23%;'>
                                                     {{ parent.parent_category_name }}
@@ -137,7 +137,7 @@
 							<li class="list-group-item bg-transparent border-0 text-truncate rounded-5"
 									style='width: 32%;'>
 
-								<a href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}"
+								<a href="{{ path('products-product:public.catalog.category', { url : menu.category_url }) }}"
 										class="text-decoration-none text-dark d-flex gap-3 align-items-center w-100 justify-content-start"
 										title="{{ menu.category_name }}">
 
@@ -164,7 +164,7 @@
             {% else %}
                 {% for menu in baks_user_menu %}
                     {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.catalog.category' ? ' active' }}"
-               href="{{ path('products-product:user.catalog.category', { url : menu.category_url }) }}">{{ menu.category_name }}</a> #}
+               href="{{ path('products-product:public.catalog.category', { url : menu.category_url }) }}">{{ menu.category_name }}</a> #}
                 {% endfor %}
             {% endif %}
 
@@ -173,16 +173,16 @@
 
         {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.about' ? ' active' }}"
        href="{{ path('pages:user.about') }}">О компании</a> #}
-        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'delivery:user.delivery' ? ' active' }}"
-       href="{{ path('delivery:user.delivery') }}">Доставка</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'delivery:public.delivery' ? ' active' }}"
+       href="{{ path('delivery:public.delivery') }}">Доставка</a> #}
         {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.wholesale' ? ' active' }}"
        href="{{ path('pages:user.wholesale') }}">Опт</a> #}
         {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.guaranty' ? ' active' }}"
        href="{{ path('pages:user.guaranty') }}">Гарантия</a> #}
         {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'pages:user.calc' ? ' active' }}"
        href="{{ path('pages:user.calc') }}">Шинный калькулятор</a> #}
-        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'contacts-region:user.contact' ? ' active' }}"
-       href="{{ path('contacts-region:user.contact') }}">Контакты</a> #}
+        {# <a class="nav-link rounded-3 px-3 text-white{{ route == 'contacts-region:public.contact' ? ' active' }}"
+       href="{{ path('contacts-region:public.contact') }}">Контакты</a> #}
     </div>
 
 </nav>

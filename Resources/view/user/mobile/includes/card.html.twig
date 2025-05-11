@@ -46,7 +46,7 @@
             {% endif %}
 
 
-            <a href="{{ path('products-product:user.detail', { url: card.url,
+            <a href="{{ path('products-product:public.detail', { url: card.url,
                 offer : card.product_offer_value,
                 variation : card.product_variation_value,
                 modification : card.product_modification_value
@@ -97,7 +97,7 @@
 
             <div class="small lh-normal fw-bolder" style='min-height: 1.8rem;'>
 
-                <a href="{{ path('products-product:user.detail', { url: card.url,
+                <a href="{{ path('products-product:public.detail', { url: card.url,
                     offer : card.product_offer_value,
                     variation : card.product_variation_value,
                     modification : card.product_modification_value
@@ -150,7 +150,7 @@
                     {% endfor %}
                 </div>
 
-                <a href="{{ path('orders-order:user.add', {
+                <a href="{{ path('orders-order:public.add', {
                     product: card.event,
                     offer : card.product_offer_uid,
                     variation : card.product_variation_uid,

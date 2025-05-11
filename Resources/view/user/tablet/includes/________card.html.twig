@@ -42,7 +42,7 @@
             {% endif %}
 
 
-            <a href="{{ path('products-product:user.detail', { url: card.url,
+            <a href="{{ path('products-product:public.detail', { url: card.url,
                 offer : card.product_offer_value,
                 variation : card.product_variation_value,
                 modification : card.product_modification_value
@@ -115,7 +115,7 @@
 
 
             <h2 class="card-title mb-2 h6">
-                <a href="{{ path('products-product:user.detail', { url: card.url,
+                <a href="{{ path('products-product:public.detail', { url: card.url,
                     offer : card.product_offer_value,
                     variation : card.product_variation_value,
                     modification : card.product_modification_value

@@ -19,7 +19,7 @@
     {% endif %}
 
     <li>
-        <a href="{{ path('products-product:user.model', {
+        <a href="{{ path('products-product:public.model', {
             category: item.category_url,
             url: item.search_url
         }) }}"
@@ -55,7 +55,7 @@
 {% endfor %}
 
 
-{# <a href="{{ path('products-product:user.detail', { url: card.url,
+{# <a href="{{ path('products-product:public.detail', { url: card.url,
     offer : product_offer.offer_value,
     variation : product_offer.variation_value,
     modification : product_offer.modification_value
