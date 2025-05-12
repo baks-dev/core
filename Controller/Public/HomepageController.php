@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
  *  THE SOFTWARE.
  */
 
-namespace BaksDev\Core\Controller\User;
+namespace BaksDev\Core\Controller\Public;
 
 use BaksDev\Core\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +31,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 final class HomepageController extends AbstractController
 {
-    #[Route('/', name: 'user.homepage')]
+    #[Route('/', name: 'public.homepage')]
     public function index(): Response
     {
         return new Response('Переопределите контроллер главной страницы');
