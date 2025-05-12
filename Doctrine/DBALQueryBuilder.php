@@ -92,6 +92,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
     private bool $refresh = true;
 
+    public const string PROJECT_PROFILE_KEY = 'project_profile';
+
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $env,
         Connection $connection,
@@ -101,7 +103,7 @@ final class DBALQueryBuilder extends QueryBuilder
         private readonly DeduplicatorInterface $deduplicator,
         private readonly MessageDispatchInterface $dispatch,
         private readonly UserProfileTokenStorageInterface $UserProfileTokenStorageInterface,
-        #[Autowire(env: 'PROFILE')] private readonly ?string $projectProfile = null,
+        #[Autowire(env: 'PROJECT_PROFILE')] private readonly ?string $projectProfile = null,
     )
     {
         $this->connection = $connection;
@@ -846,7 +848,7 @@ final class DBALQueryBuilder extends QueryBuilder
         if($this->projectProfile)
         {
             $this->setParameter(
-                key: 'project_profile',
+                key: self::PROJECT_PROFILE_KEY,
                 value: new UserProfileUid($this->projectProfile),
                 type: UserProfileUid::TYPE
             );
@@ -859,7 +861,7 @@ final class DBALQueryBuilder extends QueryBuilder
      * Метод проверяет что идентификатор авторизованного пользователя не равен идентификатору профиля проекта
      * @note если профиль авторизованного пользователя равен профилю проекта - не применять двойную скидку
      */
-    public function isProjectProfile(): bool
+    public function isNotProjectProfile(): bool
     {
         /**
          * Если пользователь не авторизован
