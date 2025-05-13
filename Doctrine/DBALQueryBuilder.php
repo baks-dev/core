@@ -504,7 +504,12 @@ final class DBALQueryBuilder extends QueryBuilder
 
         if(!empty($this->query->query) && is_string($this->query->query))
         {
-            $bind = str_replace('?', '%', $this->query->query ?: '');
+            // 1. Заменяем всё, кроме букв, цифр, пробелов и точек на %
+            $bind = preg_replace('/[^\w.]/', '%', $this->query->query);
+
+            // 2. Убираем повторяющиеся % (если их 2 и более подряд)
+            $bind = preg_replace('/%+/', '%', $bind);
+
         }
 
         $this->setParameter('query', '%'.$this->switcher->toRus($bind).'%');
