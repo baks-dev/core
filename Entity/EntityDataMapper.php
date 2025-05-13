@@ -152,6 +152,7 @@ abstract class EntityDataMapper
                         }
 
                         $this->setPropertyValue($propertyName, $dataOneToOneDto, $dto);
+
                         continue;
                     }
                 }
@@ -497,8 +498,6 @@ abstract class EntityDataMapper
 
                 if($o2o)
                 {
-
-
                     /** Получаем из аттрибута Target класс сущности */
                     $o2oTargetEntity = current($o2o)->getArguments()['targetEntity'];
                     // $getDtoMethod = 'get'.$propertyMethodName;
@@ -532,10 +531,17 @@ abstract class EntityDataMapper
                                 $thisProperty->setEntityManager($this->entityManager);
                                 $return = $thisProperty->setEntity($dto->{$getDtoMethod}());
 
-                                if($return === false && $setPropertyNull === true)
+                                // - if($return === false && $setPropertyNull === true)
+                                // + if($return === false)
+
+                                /** Если при связи OneToOne метод setEntity возвращает FALSE - не присваиваем объект */
+                                if($return === false)
                                 {
                                     // Снова присваиваем NULL
                                     $this->setPropertyValue($propertyName, null, $this);
+
+                                    $this->entityManager->detach($thisProperty);
+
                                 }
                             }
                         }
