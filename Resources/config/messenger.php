@@ -32,17 +32,37 @@ use Symfony\Config\FrameworkConfig;
 return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
 
 
-    /** Настройка подключения к базе данных с очередями  */
-
-    $doctrine
-        ->dbal()
-        ->connection('messenger', ['url' => '%env(resolve:MESSENGER_DATABASE_URL)%']);
+    /**
+     * Настройка подключения к базе данных с очередями
+     */
 
 
-    $transport = getenv('MESSENGER_TRANSPORT_DSN');
+    $transport = $_ENV['MESSENGER_TRANSPORT_DSN'];
+    $isDoctrine = str_starts_with($transport, 'doctrine');
 
 
-    $isDoctrine = str_starts_with('doctrine', $transport);
+    if($isDoctrine)
+    {
+        if(str_contains($transport, '?'))
+        {
+            preg_match('/^doctrine:\/\/(.*?)\?/', $transport, $matches);
+        }
+        else
+        {
+            preg_match('/^doctrine:\/\/(.*?)(?|$)/', $transport, $matches);
+        }
+
+
+        /**
+         * Если подключение не DEFAULT - указываем кастомное подключение
+         */
+        if(isset($matches[1]) && $matches[1] !== 'default')
+        {
+            $doctrine
+                ->dbal()
+                ->connection('messenger', ['url' => '%env(resolve:MESSENGER_DATABASE_URL)%']);
+        }
+    }
 
 
     $messenger = $framework->messenger();
@@ -52,21 +72,38 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->middleware(MessageHandleMiddleware::class);
 
 
-    $messenger
+    /**
+     * FAILED TRANSPORT
+     */
+
+
+    $failedTransport = $messenger
         ->transport('failed')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options($isDoctrine ? ['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => 'failed'] : []);
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
+    !$isDoctrine ?: $failedTransport->options([
+        'table_name' => 'messenger_failed',
+        'auto_setup' => true,
+        'queue_name' => 'failed',
+    ]);
 
 
-    $messenger
-        ->transport('sync')->dsn('sync://');
+    /**
+     * SYNC TRANSPORT
+     */
 
 
-    $messenger
-        ->transport('async')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options($isDoctrine ? ['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async'] : [])
-        ->failureTransport('failed')
+    $syncTransport = $messenger
+        ->transport('sync')
+        ->dsn('sync://');
+
+    !$isDoctrine ?: $syncTransport->options([
+        'table_name' => 'messenger_core',
+        'auto_setup' => true,
+        'queue_name' => 'async',
+    ]);
+
+    $syncTransport
         ->retryStrategy()
         ->maxRetries(5)
         ->delay(1000)
@@ -75,12 +112,26 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->jitter(0.1)
         ->service(null);
 
+    $syncTransport
+        ->failureTransport('failed');
 
-    $messenger
+
+    /**
+     * ASYNC LOW TRANSPORT
+     */
+
+
+    $asyncLowTransport = $messenger
         ->transport('async-low')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options($isDoctrine ? ['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async-low'] : [])
-        ->failureTransport('failed')
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
+    !$isDoctrine ?: $asyncLowTransport->options([
+        'table_name' => 'messenger_core',
+        'auto_setup' => true,
+        'queue_name' => 'low',
+    ]);
+
+    $asyncLowTransport
         ->retryStrategy()
         ->maxRetries(1)
         ->delay(1000)
@@ -89,14 +140,26 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->jitter(0.1)
         ->service(null);
 
+    $asyncLowTransport
+        ->failureTransport('failed');
 
-    /** SYSTEMD  */
 
-    $messenger
-        ->transport('systemd')
-        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options($isDoctrine ? ['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'systemd'] : [])
-        ->failureTransport('failed')
+    /**
+     * SYSTEMD TRANSPORT
+     */
+
+
+    $systemdTransport = $messenger
+        ->transport('async-low')
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
+    !$isDoctrine ?: $systemdTransport->options([
+        'table_name' => 'messenger_core',
+        'auto_setup' => true,
+        'queue_name' => 'systemd',
+    ]);
+
+    $systemdTransport
         ->retryStrategy()
         ->maxRetries(5)
         ->delay(1000)
@@ -105,9 +168,15 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->jitter(0.1)
         ->service(null);
 
+    $systemdTransport
+        ->failureTransport('failed');
+
+
+
     /**
      * Создаем список транспортов модулей
      */
+
 
     $BAKS = str_replace('core/', '', BaksDevCoreBundle::PATH);
 
@@ -121,11 +190,23 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
 
         $table_name = 'messenger_'.str_replace('-', '_', $module->getBasename());
 
-        $messenger
+
+        /**
+         * MODULE HIGH TRANSPORT
+         */
+
+
+        $moduleTransportHigh = $messenger
             ->transport($module->getBasename())
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options($isDoctrine ? ['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'high'] : [])
-            ->failureTransport($module->getBasename().'-failed')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
+        !$isDoctrine ?: $moduleTransportHigh->options([
+            'table_name' => $table_name,
+            'auto_setup' => true,
+            'queue_name' => 'high',
+        ]);
+
+        $moduleTransportHigh
             ->retryStrategy()
             ->maxRetries(5)
             ->delay(1000)
@@ -134,11 +215,23 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
             ->jitter(0.1)
             ->service(null);
 
-        $messenger
+
+        /**
+         * MODULE LOW TRANSPORT
+         */
+
+
+        $moduleTransportLow = $messenger
             ->transport($module->getBasename().'-low')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options($isDoctrine ? ['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'low'] : [])
-            ->failureTransport($module->getBasename().'-failed')
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
+        !$isDoctrine ?: $moduleTransportLow->options([
+            'table_name' => $table_name,
+            'auto_setup' => true,
+            'queue_name' => 'low',
+        ]);
+
+        $moduleTransportLow
             ->retryStrategy()
             ->maxRetries(5)
             ->delay(1000)
@@ -147,10 +240,30 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
             ->jitter(0.1)
             ->service(null);
 
-        $messenger
+
+        /**
+         * MODULE FAILED TRANSPORT
+         */
+
+
+        $moduleTransportFailed = $messenger
             ->transport($module->getBasename().'-failed')
-            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options($isDoctrine ? ['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => $module->getBasename()] : []);
+            ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
+        !$isDoctrine ?: $moduleTransportFailed->options([
+            'table_name' => 'messenger_failed',
+            'auto_setup' => true,
+            'queue_name' => $module->getBasename(),
+        ]);
+
+        // High
+        $moduleTransportHigh
+            ->failureTransport($module->getBasename().'-failed');
+
+        // Low
+        $moduleTransportLow
+            ->failureTransport($module->getBasename().'-failed');
+
     }
 
 };
