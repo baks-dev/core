@@ -137,6 +137,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $classNamespace = is_object($class) ? $class::class : $class;
 
+        /** По умолчанию присваиваем немспейс и ключ кеширования по классу билдера запроса */
         $newInstance->namespace = $inst->getCacheNamespace($classNamespace);
         $newInstance->cacheKey = md5($classNamespace);
 
@@ -168,11 +169,14 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function enableCache(?string $namespace = null, int|string $ttl = '1 day', bool $refresh = true): self
     {
-        /** Переопределяем кеш модуля */
+        /** Переопределяем кеш модуля если передан */
+
         if($namespace)
         {
             $this->namespace = $this->getCacheNamespace($namespace);
         }
+
+        /** Если не переделен селектор - указываем все  */
 
         if(empty($this->select))
         {
@@ -188,7 +192,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->ttl = $this->getTimeToLive($ttl);
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
-        $this->cacheKey = md5($this->cacheKey.var_export($this->getParameters(), true).$this->getSQL().$this->getMaxResults().$this->getFirstResult());
+        $this->cacheKey = sha1($this->cacheKey.var_export($this->getParameters(), true).$this->getSQL().$this->getMaxResults().$this->getFirstResult());
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
 
         return $this;
@@ -286,9 +290,6 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->deleteCacheQueries(); // Удаляем
 
         return true;
-
-        //$this->executeCacheQuery(); // Сохраняем
-        //return true;
     }
 
 
@@ -434,7 +435,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $exist = $this->connection->createQueryBuilder();
 
-        //$exist->resetQueryParts();
 
         $exist->resetOrderBy();
         $exist->resetGroupBy();

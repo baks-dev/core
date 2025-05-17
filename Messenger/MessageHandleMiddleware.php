@@ -64,9 +64,13 @@ readonly class MessageHandleMiddleware implements MiddlewareInterface
         }
         catch(Throwable $exception)
         {
+
             $this->logger->critical(
                 sprintf('%s: %s', $name, $exception->getMessage()),
-                [var_export($message, true)]
+                [
+                    $exception->getPrevious()?->getFile().':'.$exception->getPrevious()?->getLine(),
+                    'message' => var_export($message, true)
+                ]
             );
         }
 

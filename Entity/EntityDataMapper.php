@@ -540,7 +540,7 @@ abstract class EntityDataMapper
                                     // Снова присваиваем NULL
                                     $this->setPropertyValue($propertyName, null, $this);
 
-                                    $this->entityManager->detach($thisProperty);
+                                    $this->entityManager?->detach($thisProperty);
 
                                 }
                             }

@@ -26,9 +26,24 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Core\Messenger\MessageHandleMiddleware;
 use DirectoryIterator;
+use Symfony\Config\DoctrineConfig;
 use Symfony\Config\FrameworkConfig;
 
-return static function(FrameworkConfig $framework) {
+return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
+
+
+    /** Настройка подключения к базе данных с очередями  */
+
+    $doctrine
+        ->dbal()
+        ->connection('messenger', ['url' => '%env(resolve:MESSENGER_DATABASE_URL)%']);
+
+
+    $transport = getenv('MESSENGER_TRANSPORT_DSN');
+
+
+    $isDoctrine = str_starts_with('doctrine', $transport);
+
 
     $messenger = $framework->messenger();
 
@@ -40,16 +55,17 @@ return static function(FrameworkConfig $framework) {
     $messenger
         ->transport('failed')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => 'failed']);
+        ->options($isDoctrine ? ['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => 'failed'] : []);
 
 
     $messenger
         ->transport('sync')->dsn('sync://');
 
+
     $messenger
         ->transport('async')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async'])
+        ->options($isDoctrine ? ['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async'] : [])
         ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(5)
@@ -59,10 +75,11 @@ return static function(FrameworkConfig $framework) {
         ->jitter(0.1)
         ->service(null);
 
+
     $messenger
         ->transport('async-low')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async-low'])
+        ->options($isDoctrine ? ['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'async-low'] : [])
         ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(1)
@@ -78,7 +95,7 @@ return static function(FrameworkConfig $framework) {
     $messenger
         ->transport('systemd')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'systemd'])
+        ->options($isDoctrine ? ['table_name' => 'messenger_core', 'auto_setup' => true, 'queue_name' => 'systemd'] : [])
         ->failureTransport('failed')
         ->retryStrategy()
         ->maxRetries(5)
@@ -107,7 +124,7 @@ return static function(FrameworkConfig $framework) {
         $messenger
             ->transport($module->getBasename())
             ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options(['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'high'])
+            ->options($isDoctrine ? ['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'high'] : [])
             ->failureTransport($module->getBasename().'-failed')
             ->retryStrategy()
             ->maxRetries(5)
@@ -120,7 +137,7 @@ return static function(FrameworkConfig $framework) {
         $messenger
             ->transport($module->getBasename().'-low')
             ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options(['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'low'])
+            ->options($isDoctrine ? ['table_name' => $table_name, 'auto_setup' => true, 'queue_name' => 'low'] : [])
             ->failureTransport($module->getBasename().'-failed')
             ->retryStrategy()
             ->maxRetries(5)
@@ -133,6 +150,7 @@ return static function(FrameworkConfig $framework) {
         $messenger
             ->transport($module->getBasename().'-failed')
             ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-            ->options(['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => $module->getBasename()]);
+            ->options($isDoctrine ? ['table_name' => 'messenger_failed', 'auto_setup' => true, 'queue_name' => $module->getBasename()] : []);
     }
+
 };
