@@ -97,6 +97,15 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->transport('sync')
         ->dsn('sync://');
 
+
+    /**
+     * ASYNC TRANSPORT
+     */
+
+    $syncTransport = $messenger
+        ->transport('async')
+        ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
+
     !$isDoctrine ?: $syncTransport->options([
         'table_name' => 'messenger_core',
         'auto_setup' => true,
