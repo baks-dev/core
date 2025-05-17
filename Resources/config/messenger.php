@@ -150,7 +150,7 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
 
 
     $systemdTransport = $messenger
-        ->transport('async-low')
+        ->transport('systemd')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
 
     !$isDoctrine ?: $systemdTransport->options([
