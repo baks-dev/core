@@ -479,7 +479,7 @@ final class DBALQueryBuilder extends QueryBuilder
     /**
      * Создает SearchQueryBuilder для поиска, и добавляет в открытый запрос
      */
-    public function createSearchQueryBuilder(SearchDTO $query): self
+    public function createSearchQueryBuilder(SearchDTO $query, bool $strict = false): self
     {
         $this->query = $query;
 
@@ -502,7 +502,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
         $bind = $this->query->query ?: '';
 
-        if(!empty($this->query->query) && is_string($this->query->query))
+        if(false === $strict && !empty($this->query->query) && is_string($this->query->query))
         {
             // 1. Заменяем всё, кроме букв, цифр, пробелов и точек на %
             $bind = preg_replace('/[^\w.]/', '%', $this->query->query);
