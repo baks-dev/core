@@ -47,9 +47,9 @@ class EntityKeyValueCacheTest extends KernelTestCase
     public static function setUpBeforeClass(): void
     {
         self::$REDIS_HOST = $_SERVER['TEST_REDIS_HOST'];
-        self::$REDIS_PORT = $_SERVER['TEST_REDIS_PORT'];
+        self::$REDIS_PORT = (int) $_SERVER['TEST_REDIS_PORT'];
         self::$REDIS_PASSWORD = $_SERVER['TEST_REDIS_PASSWORD'];
-        self::$REDIS_TABLE = $_SERVER['TEST_REDIS_TABLE'];
+        self::$REDIS_TABLE = (int) $_SERVER['TEST_REDIS_TABLE'];
     }
 
     public function testUseCase(): void

@@ -30,11 +30,13 @@ use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Core\Services\Switcher\SwitcherInterface;
+use BaksDev\Users\Profile\UserProfile\Repository\UserProfileTokenStorage\UserProfileTokenStorageInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -49,6 +51,7 @@ final class DBALQueryBuilderTest extends TestCase
     private AppCacheInterface $cache;
     private DeduplicatorInterface $deduplicator;
     private MessageDispatchInterface $dispatch;
+    private UserProfileTokenStorageInterface $storage;
 
     protected function setUp(): void
     {
@@ -58,8 +61,8 @@ final class DBALQueryBuilderTest extends TestCase
         $this->cache = $this->createMock(AppCacheInterface::class);
         $this->deduplicator = $this->createMock(DeduplicatorInterface::class);
         $this->dispatch = $this->createMock(MessageDispatchInterface::class);
+        $this->storage = $this->createMock(UserProfileTokenStorageInterface::class);
     }
-
 
     public function testCreateQueryBuilder(): void
     {
@@ -72,6 +75,8 @@ final class DBALQueryBuilderTest extends TestCase
             cache: $this->cache,
             deduplicator: $this->deduplicator,
             dispatch: $this->dispatch,
+            UserProfileTokenStorageInterface: $this->storage,
+            projectProfile: null,
         );
 
         $newInstance = $dbalQueryBuilder->createQueryBuilder('test-class');
@@ -79,7 +84,6 @@ final class DBALQueryBuilderTest extends TestCase
         $this->assertInstanceOf(DBALQueryBuilder::class, $newInstance);
         $this->assertNotSame($dbalQueryBuilder, $newInstance);
         $this->assertEquals(md5('test-class'), $newInstance->getCacheKey());
-
 
     }
 
