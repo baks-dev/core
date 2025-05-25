@@ -52,7 +52,7 @@ final class Deduplicator implements DeduplicatorInterface
     )
     {
         /* Время жизни дедубликации по умолчанию 30 дней */
-        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '30 days' : '1 seconds');
+        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '1 seconds');
     }
 
     /**

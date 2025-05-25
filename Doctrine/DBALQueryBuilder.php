@@ -192,7 +192,15 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->ttl = $this->getTimeToLive($ttl);
 
         /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
-        $this->cacheKey = sha1($this->cacheKey.var_export($this->getParameters(), true).$this->getSQL().$this->getMaxResults().$this->getFirstResult());
+        $this->cacheKey = sha1(
+            $this->namespace.
+            $this->cacheKey.
+            md5(var_export($this->getParameters(), true)).
+            md5($this->getSQL()).
+            $this->getMaxResults().
+            $this->getFirstResult(),
+        );
+
         $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
 
         return $this;

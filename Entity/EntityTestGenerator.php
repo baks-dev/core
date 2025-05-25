@@ -109,10 +109,15 @@ final class EntityTestGenerator
                 /** @var ReflectionAttribute $Attribute */
                 $Attribute = current($reference);
 
-                if(isset($Attribute->getArguments()['inversedBy']))
+                if(array_key_exists('inversedBy', $Attribute->getArguments()))
                 {
                     continue;
                 }
+
+                //                if(isset($Attribute->getArguments()['inversedBy']))
+                //                {
+                //                    continue;
+                //                }
 
                 $class = $property->getType()?->getName();
 

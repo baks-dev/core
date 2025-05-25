@@ -24,6 +24,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Core\BaksDevCoreBundle;
+use BaksDev\Core\Listeners\Entity\EntityKeyValueCache;
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Repository\SettingsMain\SettingsMainRepository;
 use BaksDev\Core\Routing\BaksRoutingLoader;
