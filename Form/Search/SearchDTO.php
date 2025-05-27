@@ -30,6 +30,19 @@ class SearchDTO
      */
     public string|int|null $query = null;
 
+    private array $searchTags = [];
+
+    public function getSearchTags(): array
+    {
+        return $this->searchTags;
+    }
+
+    public function setSearchTags(array $searchTags): self
+    {
+        $this->searchTags = $searchTags;
+        return $this;
+    }
+
 
     public function isUid(): bool
     {
