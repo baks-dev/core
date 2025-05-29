@@ -221,6 +221,8 @@ final class DBALQueryBuilder extends QueryBuilder
 
         if($this->isCache && !$this->search)
         {
+            return $this->executeCacheQuery();
+
             $Deduplicator = $this->deduplicator
                 ->namespace($this->namespace)
                 ->expiresAfter(sprintf('%d seconds', $this->ttl))

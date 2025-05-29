@@ -112,7 +112,7 @@ abstract class AbstractHandler
         /** Создаем новый объект сущности если не найдено по переданным параметрам */
         if(false === ($EntityRepo instanceof $entity))
         {
-            $EntityRepo = new $entity();
+            $EntityRepo = new $entity(...$criteria);
             $this->entityManager->persist($EntityRepo);
         }
 

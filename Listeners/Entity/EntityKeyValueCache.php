@@ -59,6 +59,9 @@ final readonly class EntityKeyValueCache
 
     public function postFlush(PostFlushEventArgs $args): void
     {
+        /* TODO: временно заблокирован !!! */
+        return;
+
         /**
          * Создаем подключение Redis
          */
@@ -76,6 +79,8 @@ final readonly class EntityKeyValueCache
 
         foreach($UnitOfWork->getIdentityMap() as $map)
         {
+            $hMset = null;
+
             foreach($map as $key => $entity)
             {
                 $ref = new ReflectionClass($entity);
@@ -179,10 +184,12 @@ final readonly class EntityKeyValueCache
 
             }
 
-            $Redis->hMset($cacheHKey, $hMset);
-            $Redis->expire($cacheHKey, 60);
-
-            unset($hMset);
+            if(false === is_null($hMset))
+            {
+                $Redis->hMset($cacheHKey, $hMset);
+                $Redis->expire($cacheHKey, 360);
+                $hMset = null;
+            }
         }
 
         /** Сохраняем результат в Redis */

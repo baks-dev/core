@@ -110,4 +110,10 @@ return static function (ContainerConfigurator $container): void {
         ->set(BaksRoutingLoader::class)
         ->tag('routing.loader');
 
+
+    $services
+        ->set(EntityKeyValueCache::class)
+        ->tag('doctrine.event_listener', ['event' => 'postFlush']);
+
+
 };

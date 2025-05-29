@@ -82,7 +82,7 @@ final class MessageDispatch implements MessageDispatchInterface
             {
                 if(is_null($this->transport))
                 {
-                    throw new InvalidArgumentException('Транспорт сообщений не установлен');
+                    throw new InvalidArgumentException('Транспорт для отложенного сообщения не установлен');
                 }
 
                 $stamps[] = $stamp->getDelayStamp();
