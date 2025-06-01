@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -69,5 +69,26 @@ final readonly class CacheClearTemplateHandler
             //opcache_reset();
 
         }
+
+        // Кеш переводов сбрасываем только в PROD окружении
+        $origin = implode(DIRECTORY_SEPARATOR, [$this->project_dir, 'var', 'cache', 'prod', 'translations']);
+
+        if(is_dir($origin))
+        {
+
+            $filesystem = new Filesystem();
+
+            $target = $origin.'_'.time();
+
+            /** Удаляем директорию при завершении работы */
+            $filesystem->rename($origin, $target);
+            $filesystem->remove($target);
+
+            //opcache_reset();
+
+        }
+
+
+
     }
 }

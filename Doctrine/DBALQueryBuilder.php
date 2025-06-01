@@ -83,7 +83,6 @@ final class DBALQueryBuilder extends QueryBuilder
     private ?QueryBuilder $search = null;
 
     /** Билдер рекурсии */
-    private ?string $recursive = null;
     private ?string $recursive_alias = null;
 
 
@@ -573,6 +572,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->addSelect($string);
         $this->addSelect('1 AS level');
 
+
         $dbal_union = clone $this;
 
         $this->andWhere($this->recursive_alias.'.'.$parent.' IS NULL');
@@ -590,8 +590,8 @@ final class DBALQueryBuilder extends QueryBuilder
         $sql .= $this->getSQL();
         $sql .= ' UNION ';
 
-
         $groups = " CONCAT(groups, ':',  ".$this->recursive_alias.".".$id."::varchar) AS groups ";
+
 
         $sql .= str_replace(
             ['1 AS level', $string],
@@ -610,7 +610,8 @@ final class DBALQueryBuilder extends QueryBuilder
                 $sql,
                 $this->getParameters(),
                 $this->getParameterTypes()
-            )->fetchAllAssociative();
+            )
+            ->fetchAllAssociative();
 
         return $result;
     }
