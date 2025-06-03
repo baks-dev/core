@@ -23,13 +23,34 @@
 
 namespace BaksDev\Core\Contracts\Search;
 
-use BaksDev\Core\Services\Switcher\Switcher;
+use BaksDev\Search\RediSearch\Fields\TagField;
+use BaksDev\Search\RediSearch\Fields\TextField;
 
-interface ToIndexResultInterface
+interface EntityDocumentInterface
 {
     /**
-     * Метод возвращает строку для полнотекстового индекса
-     * Switcher для преобразования строки в ошибочной раскладке
+     *  Идентификатор сущности (UUID) для поиска результата по базе
      */
-    public function getTransformedValue(Switcher $switcher): string;
+    public function getId(): string;
+
+    /**
+     * Возвращает результат для полнотекстового поиска
+     */
+    public function getEntityIndex(): mixed;
+
+    /**
+     * Присваивает результат для полнотекстового поиска
+     */
+    public function setEntityIndex(string $entity_index): self;
+
+    /**
+     * Возвращаем тег (название модуля) для поиска
+     */
+    public function getSearchTag(): mixed;
+
+    /**
+     * Присваивает тег (название модуля), для поиска по найденным идентификаторам
+     */
+    public function setSearchTag(string $search_tag): self;
+
 }

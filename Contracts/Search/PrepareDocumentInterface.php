@@ -23,13 +23,12 @@
 
 namespace BaksDev\Core\Contracts\Search;
 
-use BaksDev\Core\Services\Switcher\Switcher;
+use BaksDev\Search\RedisSearchDocuments\EntityDocument;
 
-interface ToIndexResultInterface
+interface PrepareDocumentInterface
 {
     /**
-     * Метод возвращает строку для полнотекстового индекса
-     * Switcher для преобразования строки в ошибочной раскладке
+     *  Предподготавливает докумен для добавления в индексы
      */
-    public function getTransformedValue(Switcher $switcher): string;
+    public function prepareDocument(ToIndexResultInterface $item): EntityDocumentInterface;
 }
