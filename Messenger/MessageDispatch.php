@@ -125,15 +125,11 @@ final class MessageDispatch implements MessageDispatchInterface
 
             /**
              * Если транспорт не определяется и он является UID (обязательным)
+             *
+             * @note транспорт UID является профильным
              */
             if($transportRequire)
             {
-
-                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-                $classes = array_column($backtrace, 'class');
-
-                $this->logger->warning(sprintf('Messanger Транспорт %s не найден', $this->transport), $classes);
-
                 return null;
             }
         }
