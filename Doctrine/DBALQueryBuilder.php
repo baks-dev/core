@@ -514,7 +514,7 @@ final class DBALQueryBuilder extends QueryBuilder
         if(false === $strict && !empty($this->query->query) && is_string($this->query->query))
         {
             // 1. Заменяем всё, кроме букв, цифр, пробелов и точек на %
-            $bind = preg_replace('/[^\w.]/', '%', $this->query->query);
+            $bind = preg_replace('/[^\p{L}\p{N}\s.]/u', '%', $this->query->query);
 
             // 2. Убираем повторяющиеся % (если их 2 и более подряд)
             $bind = preg_replace('/%+/', '%', $bind);
