@@ -487,6 +487,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     /**
      * Создает SearchQueryBuilder для поиска, и добавляет в открытый запрос
+     * если strict=true - будет не строгий поиск, путем разделения предложения по пробелам и спецсимволам
      */
     public function createSearchQueryBuilder(SearchDTO $query, bool $strict = false): self
     {
