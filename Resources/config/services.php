@@ -62,6 +62,9 @@ return static function (ContainerConfigurator $container): void {
         ->autowire()
         ->autoconfigure();
 
+    /** Значение по умолчанию таблиц REDIS */
+    $container->parameters()->set('DEFAULT_REDIS_TABLE', '0');
+
     $NAMESPACE = BaksDevCoreBundle::NAMESPACE;
     $PATH = BaksDevCoreBundle::PATH;
 

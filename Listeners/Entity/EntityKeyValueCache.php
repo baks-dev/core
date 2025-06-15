@@ -54,7 +54,7 @@ final readonly class EntityKeyValueCache
         #[Autowire(env: 'REDIS_HOST')] private string $REDIS_HOST,
         #[Autowire(env: 'REDIS_PORT')] private string $REDIS_PORT,
         #[Autowire(env: 'REDIS_PASSWORD')] private string $REDIS_PASSWORD,
-        #[Autowire(env: 'REDIS_TABLE')] private string $REDIS_TABLE,
+        #[Autowire(env: 'default:DEFAULT_REDIS_TABLE:REDIS_TABLE')] private string $REDIS_TABLE,
     ) {}
 
     public function postFlush(PostFlushEventArgs $args): void
