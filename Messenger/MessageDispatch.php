@@ -73,6 +73,22 @@ final class MessageDispatch implements MessageDispatchInterface
             return null;
         }
 
+        foreach($stamps as $key => $stamp)
+        {
+            /**
+             * Если передана марка MessageDelay - преобразуем её в марку DelayStamp
+             */
+            if($stamp instanceof MessageDelay)
+            {
+                if(is_null($this->transport))
+                {
+                    throw new InvalidArgumentException('Транспорт для отложенного сообщения не установлен');
+                }
+
+                $stamps[] = $stamp->getDelayStamp();
+                unset($stamps[$key]);
+            }
+        }
 
         /**
          * Если указан транспорт - пробуем отправить в очередь
@@ -87,27 +103,6 @@ final class MessageDispatch implements MessageDispatchInterface
 
             /* Делаем пинг на указанный транспорт */
             $isRunning = $this->isConsumer();
-
-            if($isRunning)
-            {
-                foreach($stamps as $key => $stamp)
-                {
-                    /**
-                     * Если передана марка MessageDelay - преобразуем её в марку DelayStamp
-                     */
-                    if($stamp instanceof MessageDelay)
-                    {
-                        if(is_null($this->transport))
-                        {
-                            throw new InvalidArgumentException('Транспорт для отложенного сообщения не установлен');
-                        }
-
-                        $stamps[] = $stamp->getDelayStamp();
-                        unset($stamps[$key]);
-                    }
-                }
-            }
-
 
             /**
              * Транспорт resources (для отправки файлов на CDN) всегда должен быть запущен
