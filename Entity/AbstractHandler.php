@@ -34,6 +34,7 @@ use Doctrine\ORM\EntityRepository;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
+use ReflectionClass;
 
 abstract class AbstractHandler
 {
@@ -51,7 +52,6 @@ abstract class AbstractHandler
     protected ?object $event = null;
 
     private bool $persist = false;
-
 
 
     /**
@@ -112,7 +112,27 @@ abstract class AbstractHandler
         /** Создаем новый объект сущности если не найдено по переданным параметрам */
         if(false === ($EntityRepo instanceof $entity))
         {
-            $EntityRepo = new $entity(...$criteria);
+            /** Поиск среди критериев поиска соответствующих аргументов конструктора */
+            $reflectionEntityClass = new ReflectionClass($entity);
+            $constructor = $reflectionEntityClass->getConstructor();
+            $args = [];
+
+            if($constructor)
+            {
+                // Получаем параметры конструктора и и соответствующие ключи в массиве критериев
+                $parameters = $constructor->getParameters();
+
+                foreach($parameters as $param)
+                {
+
+                    if(isset($criteria[$param->getName()]))
+                    {
+                        $args[$param->getName()] = $criteria[$param->getName()];
+                    }
+                }
+            }
+
+            $EntityRepo = empty($args) ? new $entity() : new $entity(...$args);
             $this->entityManager->persist($EntityRepo);
         }
 
@@ -624,6 +644,7 @@ abstract class AbstractHandler
 
     /**
      * Сохраняет все изменения объектов в базу данных, которые находились в UnitOfWork
+     *
      * @see UnitOfWork
      */
     public function flush(): void
