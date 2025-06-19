@@ -208,12 +208,12 @@ executeFunc(bindBootstrapCarousel);
 
 function bindBootstrapCarousel()
 {
-    if(typeof bootstrap !== 'object')
+    if(typeof bootstrap !== "object")
     {
         return false;
     }
 
-    var carouselElList = [].slice.call(document.querySelectorAll('.carousel'));
+    var carouselElList = [].slice.call(document.querySelectorAll(".carousel"));
 
     carouselElList.map(function(carouselEl)
     {
@@ -229,18 +229,18 @@ executeFunc(bindBootstrapTooltip);
 
 function bindBootstrapTooltip()
 {
-    if(typeof bootstrap !== 'object')
+    if(typeof bootstrap !== "object")
     {
         return false;
     }
 
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
 
     tooltipTriggerList.map(function(tooltipTriggerEl)
     {
         const tooltipInstance = new bootstrap.Tooltip(tooltipTriggerEl);
 
-        tooltipTriggerEl.addEventListener('click', event =>
+        tooltipTriggerEl.addEventListener("click", event =>
         {
             tooltipInstance.hide();
         });
@@ -257,16 +257,16 @@ executeFunc(bindBootstrapToast);
 
 function bindBootstrapToast()
 {
-    if(typeof bootstrap !== 'object')
+    if(typeof bootstrap !== "object")
     {
         return false;
     }
 
-    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastElList = [].slice.call(document.querySelectorAll(".toast"));
 
     toastElList.map(function(toastEl)
     {
-        return new bootstrap.Toast(toastEl, {delay: 15000}).show();
+        return new bootstrap.Toast(toastEl, {delay : 15000}).show();
     });
 
     return true;
@@ -278,22 +278,22 @@ executeFunc(bindBootstrapTab);
 
 function bindBootstrapTab()
 {
-    if(typeof bootstrap !== 'object')
+    if(typeof bootstrap !== "object")
     {
         return false;
     }
 
-    const triggerTabList = document.querySelectorAll('.nav-mouse li')
+    const triggerTabList = document.querySelectorAll(".nav-mouse li");
 
     triggerTabList.forEach(triggerEl =>
     {
-        const tabTrigger = new bootstrap.Tab(triggerEl)
+        const tabTrigger = new bootstrap.Tab(triggerEl);
 
-        triggerEl.addEventListener('mouseover', event =>
+        triggerEl.addEventListener("mouseover", event =>
         {
-            event.preventDefault()
-            tabTrigger.show()
-        })
+            event.preventDefault();
+            tabTrigger.show();
+        });
     });
 
     return true;
@@ -306,24 +306,24 @@ executeFunc(bindBootstrapPopover);
 
 function bindBootstrapPopover()
 {
-    if(typeof bootstrap !== 'object')
+    if(typeof bootstrap !== "object")
     {
         return false;
     }
 
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"popover\"]"));
 
     popoverTriggerList.map(function(popoverTriggerEl)
     {
-        popoverTriggerEl.addEventListener('shown.bs.popover', function(event)
+        popoverTriggerEl.addEventListener("shown.bs.popover", function(event)
         {
-            let describedby = this.getAttribute('aria-describedby');
+            let describedby = this.getAttribute("aria-describedby");
 
             if(describedby)
             {
                 let elementDescribedby = document.getElementById(describedby);
 
-                document.addEventListener('click', HidePopover);
+                document.addEventListener("click", HidePopover);
 
                 function HidePopover(e)
                 {
@@ -336,34 +336,34 @@ function bindBootstrapPopover()
                     }
                 }
 
-                elementDescribedby.querySelectorAll('.modal-link').forEach(function(item, i, arr)
+                elementDescribedby.querySelectorAll(".modal-link").forEach(function(item, i, arr)
                 {
                     /* Добавляем атрибуты модального окна */
-                    item.dataset.bsTarget = '#modal';
-                    item.dataset.bsToggle = 'modal';
+                    item.dataset.bsTarget = "#modal";
+                    item.dataset.bsToggle = "modal";
                     modalLink(item);
                 });
 
 
-                elementDescribedby.querySelectorAll('.dropdown-toggle').forEach(function(item, i, arr)
+                elementDescribedby.querySelectorAll(".dropdown-toggle").forEach(function(item, i, arr)
                 {
                     /* Добавляем атрибуты модального окна */
-                    item.dataset.bsToggle = 'dropdown';
+                    item.dataset.bsToggle = "dropdown";
                     new bootstrap.Dropdown(item);
                 });
             }
-        })
+        });
 
 
         const pops = new bootstrap.Popover(popoverTriggerEl, {
-            html: true, sanitize: false,
+            html : true, sanitize : false,
 
-            content: function()
+            content : function()
             {
 
                 if(popoverTriggerEl.id)
                 {
-                    let content = document.getElementById(popoverTriggerEl.id + '-content');
+                    let content = document.getElementById(popoverTriggerEl.id + "-content");
 
                     if(content)
                     {
@@ -373,7 +373,7 @@ function bindBootstrapPopover()
 
                 if(popoverTriggerEl.dataset.id)
                 {
-                    let content = document.getElementById(popoverTriggerEl.dataset.id + '-content');
+                    let content = document.getElementById(popoverTriggerEl.dataset.id + "-content");
 
                     if(content)
                     {
@@ -382,11 +382,11 @@ function bindBootstrapPopover()
                 }
             },
 
-            title: function()
+            title : function()
             {
                 if(popoverTriggerEl.id)
                 {
-                    let title = document.getElementById(popoverTriggerEl.id + '-title');
+                    let title = document.getElementById(popoverTriggerEl.id + "-title");
                     if(title)
                     {
                         return title.innerHTML;
@@ -395,13 +395,13 @@ function bindBootstrapPopover()
 
                 if(popoverTriggerEl.dataset.id)
                 {
-                    let title = document.getElementById(popoverTriggerEl.dataset.id + '-title');
+                    let title = document.getElementById(popoverTriggerEl.dataset.id + "-title");
                     if(title)
                     {
                         return title.innerHTML;
                     }
                 }
-            }
+            },
         });
 
         return pops;
@@ -415,26 +415,29 @@ function bindBootstrapPopover()
 /** Функция отправки формы поиска */
 executeFunc(function uQnFyjnB()
 {
-    if(typeof formDebounce !== 'function')
+    if(typeof formDebounce !== "function")
     {
         return false;
     }
 
     const form = document.forms.search_form;
 
-    if(typeof form === 'undefined')
+    if(typeof form === "undefined")
     {
         return true;
     }
 
-    if(form.action.includes('search'))
+    if(form.action.includes("search"))
     {
         return true;
     }
 
-    const search = form.querySelector('#search_form_query');
+    const search = form.querySelector("#search_form_query");
 
-    search.addEventListener('input', formDebounce(() => { form.submit(); }, 1500));
+    search.addEventListener("input", formDebounce(() =>
+    {
+        form.submit();
+    }, 1500));
 
     return true;
 });
@@ -443,28 +446,26 @@ executeFunc(function uQnFyjnB()
 function modaHidden()
 {
     /* Скрываем модальное окно */
-    let ModalElement = document.getElementById('modal');
+    let ModalElement = document.getElementById("modal");
     bootstrap.Modal.getInstance(ModalElement).hide();
 }
 
 
 /* вешаем события на модальные ссылки */
-document.querySelectorAll('[data-bs-toggle="modal"]')
-    .forEach(function(item, i, arr)
-    {
-        modalLink(item);
-    });
+document.querySelectorAll("[data-bs-toggle=\"modal\"]").forEach(function(item, i, arr)
+{
+    modalLink(item);
+});
 
 
 /* вешаем события на OFFCANVAS */
-document.querySelectorAll('.offcanvas-link')
-    .forEach(function(item, i, arr)
+document.querySelectorAll(".offcanvas-link").forEach(function(item, i, arr)
+{
+    item.addEventListener("click", function()
     {
-        item.addEventListener('click', function()
-        {
-            offcanvasLink(item);
-        });
+        offcanvasLink(item);
     });
+});
 
 
 async function offcanvasLink(offcanvas)
@@ -473,14 +474,14 @@ async function offcanvasLink(offcanvas)
     //const data = new FormData(forms);
 
     await fetch(offcanvas.dataset.href, {
-        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        method : "GET", // *GET, POST, PUT, DELETE, etc.
         //mode: 'same-origin', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }, redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        cache : "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials : "same-origin", // include, *same-origin, omit
+        headers : {
+            "X-Requested-With" : "XMLHttpRequest",
+        }, redirect : "follow", // manual, *follow, error
+        referrerPolicy : "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
         //body: data // body data type must match "Content-Type" header
     })
 
@@ -494,9 +495,7 @@ async function offcanvasLink(offcanvas)
             }
 
             return response.text();
-        })
-
-        .then((data) =>
+        }).then((data) =>
         {
 
 
@@ -512,7 +511,7 @@ async function offcanvasLink(offcanvas)
                 //document.getElementById()
 
 
-                var myOffcanvas = document.getElementById('offcanvas');
+                var myOffcanvas = document.getElementById("offcanvas");
 
                 if(myOffcanvas === null)
                 {
@@ -539,8 +538,8 @@ async function offcanvasLink(offcanvas)
 
                 /** Обновляем Preload */
 
-                let lazy = document.createElement('script');
-                lazy.src = '/assets/js/lazyload.min.js?v=' + Date.now();
+                let lazy = document.createElement("script");
+                lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
             }
         });
@@ -558,17 +557,21 @@ async function offcanvasLink(offcanvas)
 function modalLink(item)
 {
     // Обрываем запрос если имеется класс prnt
-    if(item.classList.contains('prnt') === true || item.classList.contains('print') === true)
+    if(item.classList.contains("prnt") === true || item.classList.contains("print") === true)
     {
         return;
     }
 
-    item.addEventListener('click', function(event)
+
+    /** Инициализация FormData для обработки данных ссылок - например раздел Производственный процесс
+     *  и передачи в request.send
+     */
+    const modalData = new FormData();
+
+    item.addEventListener("click", function(event)
     {
         /** Показываем прелоад модального окна */
-        document.querySelector('#modal .spinner-border')
-            ?.classList
-            .remove('d-none');
+        document.querySelector("#modal .spinner-border")?.classList.remove("d-none");
 
         /* Отключаем дефолтный переход по ссылке */
         event.preventDefault();
@@ -582,9 +585,10 @@ function modalLink(item)
         if(this.href)
         {
             url = item.href;
-        } else
+        }
+        else
         {
-            url = item.dataset.href
+            url = item.dataset.href;
         }
 
         if(!url)
@@ -592,12 +596,83 @@ function modalLink(item)
             return;
         }
 
-        /* Указываем метод соединения GET и путь к файлу на сервере */
-        request.open('GET', url);
-        /* Указываем заголовки для сервера */
-        //request.setRequestHeader('Content-Type', 'application/x-www-form-url');
-        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        /** Указываем метод отправки запроса */
+        /* Пример задания data-method - baks-dev/manufacture-part/Resources/view/admin/index/pc/content.html.twig */
+        let METHOD = typeof item.dataset.method === "undefined" ? "GET" : item.dataset.method;
 
+        /** Обработка dataset и добавление в formData */
+        const processFormData = function(item, collection_form_name, i) {
+            if(typeof item.dataset.formname === "undefined")
+            {
+                return false;
+            }
+
+            const dataAttributes = item.dataset; // Получаем все data-атрибуты
+
+            // Перебираем все data-атрибуты
+            for(const name in dataAttributes)
+            {
+
+                /* Пропустить элемент formname */
+                if(name !== "formname")
+                {
+                    modalData.append(item.dataset.formname + "[" + collection_form_name + "]" + "[" + i + "][" + name + "]", dataAttributes[name]);
+                }
+            }
+        };
+
+
+
+        /** Обработка данных - dataset ссылок, пример - Производственный процесс baks-dev/manufacture-part
+         * Цель - возможность отправки данных в POST-запросе
+         */
+
+        /** Для реализации работы необходимо для элемента указать следующие атрибуты:
+         *  data-formname - здесь передается имя формы, передаем в контроллере, например:
+         *    baks-dev/manufacture-part/Controller/Admin/IndexController.php
+         *     $this->createForm(type: ManufactureSelectionPartProductsForm::class)->getName()
+         *  data-collection-form - название поля CollectionType формы, например:
+         *    baks-dev/manufacture-part/UseCase/Admin/AddProduct/ManufactureSelectionPartProductsForm.php
+         * А также атрибуты для передачи данных, например:
+         *   data-product
+         *   data-offer
+         *   data-variation
+         *   data-modification
+         */
+
+        /* Если имеются аттрибут data-formname - получаем данные для отправки */
+        /** Если передан data-post-class атрибут - проходимся циклом для формирования запроса  */
+        if(item.dataset.postClass)
+        {
+
+            let className = item.dataset.postClass;
+
+            // Получим атрибут элемента коллекции форм data-collection-form
+            const collection_form_name = item.dataset.collectionForm
+
+            /* Если выбран один товар (нажата ссылка) то добавляем только один элемент */
+            if(item.dataset.postClass === 'add-one-to-production')
+            {
+                processFormData(item, collection_form_name, 0);
+            }
+
+            // Если выбраны несколько товаров (checkboxes) - добавляем несколько выбранных элементов в FormData
+            else
+            {
+                /** Получаем все элементы по классу */
+                document.querySelectorAll("." + className + ':checked').forEach(function(item, i, arr)
+                {
+                    processFormData(item, collection_form_name, i);
+                });
+            }
+        }
+
+
+        /* Указываем метод соединения GET или POST и путь к файлу на сервере */
+        request.open(METHOD, url);
+
+        /* Указываем заголовки для сервера */
+        request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
         /* Получаем ответ от сервера на запрос*/
         request.addEventListener("readystatechange", function(evemnt)
@@ -606,24 +681,27 @@ function modalLink(item)
             if(request.readyState === 4 && request.status === 200)
             {
 
-                const modal = document.getElementById('modal');
+                const modal = document.getElementById("modal");
 
                 modal.innerHTML = request.responseText;
 
                 /* делаем глобальную отметку о завершении запроса */
                 //eventEmitter.dispatchEvent(new Event('complete'));
 
+                /////////////////////////////////////////////////////////////////////////////////////////
+
+
                 /* Сбрасываем содержимое модального окна при закрытии */
-                modal.addEventListener('hidden.bs.modal', function(event)
+                modal.addEventListener("hidden.bs.modal", function(event)
                 {
-                    this.innerHTML = '<div class="modal-dialog modal-dialog-centered"><div class="d-flex justify-content-center w-100"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div></div></div>';
+                    this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
                 });
 
 
                 /** Пересобирваем tooltip */
-                modal.addEventListener('shown.bs.modal', function(event)
+                modal.addEventListener("shown.bs.modal", function(event)
                 {
-                    var tooltipTriggerList = [].slice.call(modal.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                    var tooltipTriggerList = [].slice.call(modal.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
 
                     tooltipTriggerList.map(function(tooltipTriggerEl)
                     {
@@ -633,9 +711,9 @@ function modalLink(item)
 
 
                 /* Если в модальном окне присутствует select2 */
-                modal.querySelectorAll('[data-select="select2"]').forEach(function(item)
+                modal.querySelectorAll("[data-select=\"select2\"]").forEach(function(item)
                 {
-                    new NiceSelect(item, {searchable: true});
+                    new NiceSelect(item, {searchable : true});
                 });
 
 
@@ -643,19 +721,17 @@ function modalLink(item)
                  * Если в модальном окне присутствуют модальные ссылки
                  * Важно! Внутри модальных окон должен отсутствовать аттрибут data-bs-toggle !!!
                  */
-                modal.querySelectorAll('[data-bs-target="#modal"]').forEach(function(item, i, arr)
+                modal.querySelectorAll("[data-bs-target=\"#modal\"]").forEach(function(item, i, arr)
                 {
                     modalLink(item);
                 });
 
 
-                modal.querySelectorAll('form').forEach(function(forms)
+                modal.querySelectorAll("form").forEach(function(forms)
                 {
 
-                    //console.log(forms);
-
                     /* событие отправки формы */
-                    forms.addEventListener('submit', function(event)
+                    forms.addEventListener("submit", function(event)
                     {
                         event.preventDefault();
                         submitModalForm(forms);
@@ -664,13 +740,13 @@ function modalLink(item)
                 });
 
 
-                var tooltipTriggerList = [].slice.call(modal.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipTriggerList = [].slice.call(modal.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
 
                 tooltipTriggerList.map(function(tooltipTriggerEl)
                 {
                     const tooltipInstance = new bootstrap.Tooltip(tooltipTriggerEl);
 
-                    tooltipTriggerEl.addEventListener('click', event =>
+                    tooltipTriggerEl.addEventListener("click", event =>
                     {
                         tooltipInstance.hide();
                     });
@@ -683,11 +759,12 @@ function modalLink(item)
                     $html = request.responseText;
                 }
 
-                let lazy = document.createElement('script');
-                lazy.src = '/assets/js/lazyload.min.js?v=' + Date.now();
+                let lazy = document.createElement("script");
+                lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
 
-            } else
+            }
+            else
             {
 
                 if(request.status === 302)
@@ -702,7 +779,7 @@ function modalLink(item)
         });
 
         /*Выполняем запрос*/
-        request.send();
+        request.send(modalData);
 
         return false;
 
@@ -726,7 +803,7 @@ function modalLink(item)
 async function submitModalForm(forms)
 {
     /** Если в модальном окне присутствует ckeditor - обновляем элементы перд отправкой */
-    if(typeof ClassicEditor === 'function')
+    if(typeof ClassicEditor === "function")
     {
         for(editors in ckeditors)
         {
@@ -735,16 +812,17 @@ async function submitModalForm(forms)
     }
 
     // /* показываем индикатор */
-    let indicator = forms.querySelector('.spinner-border');
+    let indicator = forms.querySelector(".spinner-border");
 
     if(indicator)
     {
-        btn = indicator.closest('button');
+        btn = indicator.closest("button");
 
-        indicator.classList.remove('d-none');
+        indicator.classList.remove("d-none");
         btn.disabled = true;
-        btn.type = 'button';
-    } else
+        btn.type = "button";
+    }
+    else
     {
         forms.submit();
         modaHidden();
@@ -755,88 +833,84 @@ async function submitModalForm(forms)
     let resolved = 100;
 
     await fetch(forms.action, {
-        method: forms.method, // *GET, POST, PUT, DELETE, etc.
+        method : forms.method, // *GET, POST, PUT, DELETE, etc.
         //mode: 'same-origin', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }, redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: data // body data type must match "Content-Type" header
-    })
+        cache : "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials : "same-origin", // include, *same-origin, omit
+        headers : {
+            "X-Requested-With" : "XMLHttpRequest",
+        }, redirect : "follow", // manual, *follow, error
+        referrerPolicy : "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body : data, // body data type must match "Content-Type" header
+    }).then((response) =>
+    {
+        closeProgress();
 
-        .then((response) =>
+        typeof btn === "undefined" ? "" : btn.type = "submit";
+
+        const contentType = response.headers.get("content-type");
+
+        /* Закрываем модальное окно */
+        const modalElement = document.getElementById("modal");
+        bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+
+        if(!contentType || !contentType.includes("application/json"))
         {
-            closeProgress();
+            $errorFormHandler = "{ \"type\":\"danger\" , " + "\"header\":\"Ошибка\"  , " + "\"message\" : \"Возникла ошибка при заполнении\" }";
 
-            typeof btn === 'undefined' ? '' : btn.type = 'submit';
+            createToast(JSON.parse($errorFormHandler));
+            throw new TypeError("Oops, we haven't got JSON!");
+        }
 
-            const contentType = response.headers.get('content-type');
+        return response.json();
 
-            /* Закрываем модальное окно */
-            const modalElement = document.getElementById('modal');
-            bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+    }).then((data) =>
+    {
 
-            if(!contentType || !contentType.includes('application/json'))
-            {
-                $errorFormHandler = '{ "type":"danger" , ' + '"header":"Ошибка"  , ' + '"message" : "Возникла ошибка при заполнении" }';
-
-                createToast(JSON.parse($errorFormHandler));
-                throw new TypeError("Oops, we haven't got JSON!");
-            }
-
-            return response.json();
-
-        })
-
-        .then((data) =>
+        if(data === undefined)
         {
+            return false;
+        }
 
-            if(data === undefined)
+
+        if(data.status === 302 || data.status === 307)
+        {
+            if(data.redirect === undefined || data.redirect === null)
             {
-                return false;
-            }
-
-
-            if(data.status === 302 || data.status === 307)
-            {
-                if(data.redirect === undefined || data.redirect === null)
-                {
-                    window.location.href = data.status === 307 ? '/refresh' : '/referer';
-                    return;
-                }
-
-                window.location.href = data.redirect;
-                return false;
-            }
-
-
-            createToast(data);
-
-            if(data.status !== 200)
-            {
+                window.location.href = data.status === 307 ? "/refresh" : "/referer";
                 return;
             }
 
-            setTimeout(function initResolve()
+            window.location.href = data.redirect;
+            return false;
+        }
+
+
+        createToast(data);
+
+        if(data.status !== 200)
+        {
+            return;
+        }
+
+        setTimeout(function initResolve()
+        {
+            if(typeof resolve == "function")
             {
-                if(typeof resolve == 'function')
-                {
-                    resolve(data);
-                    return;
-                }
-                console.log('resolve not found');
+                resolve(data);
+                return;
+            }
+            console.log("resolve not found");
 
-                if(resolved > 1000)
-                {
-                    return;
-                }
-                resolved = resolved * 2;
-                setTimeout(initResolve, resolved);
+            if(resolved > 1000)
+            {
+                return;
+            }
+            resolved = resolved * 2;
+            setTimeout(initResolve, resolved);
 
-            }, 100);
-        });
+        }, 100);
+    });
 
 
     return false;
@@ -857,100 +931,96 @@ async function submitLink(href, id = null)
     //let indicator = forms.querySelector('.spinner-border');
 
     await fetch(href, {
-        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        method : "GET", // *GET, POST, PUT, DELETE, etc.
         //mode: 'same-origin', // no-cors, *cors, same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }, redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        cache : "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials : "same-origin", // include, *same-origin, omit
+        headers : {
+            "X-Requested-With" : "XMLHttpRequest",
+        }, redirect : "follow", // manual, *follow, error
+        referrerPolicy : "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
 
-    })
+    }).then((response) =>
+    {
+        const contentType = response.headers.get("content-type");
 
-        .then((response) =>
-        {
-            const contentType = response.headers.get('content-type');
-
-            if(!contentType || !contentType.includes('application/json'))
-            {
-
-                $errorFormHandler = '{ "type":"danger" , ' + '"header":"Ошибка"  , ' + '"message" : "Возникла ошибка при заполнении" }';
-
-                createToast(JSON.parse($errorFormHandler));
-
-                throw new TypeError("Oops, we haven't got JSON!");
-            }
-
-            return response.json();
-
-        })
-
-        .then((data) =>
+        if(!contentType || !contentType.includes("application/json"))
         {
 
-            if(data === undefined)
+            $errorFormHandler = "{ \"type\":\"danger\" , " + "\"header\":\"Ошибка\"  , " + "\"message\" : \"Возникла ошибка при заполнении\" }";
+
+            createToast(JSON.parse($errorFormHandler));
+
+            throw new TypeError("Oops, we haven't got JSON!");
+        }
+
+        return response.json();
+
+    }).then((data) =>
+    {
+
+        if(data === undefined)
+        {
+            return false;
+        }
+
+        if(data.status === 302 || data.status === 307)
+        {
+            if(data.redirect === undefined || data.redirect === null)
             {
-                return false;
+                window.location.href = data.status === 307 ? "/refresh" : "/referer";
+                return;
             }
 
-            if(data.status === 302 || data.status === 307)
+            window.location.href = data.redirect;
+            return false;
+        }
+
+        executeFunc(function HunLIOPGlZ()
+        {
+            if(typeof resolve == "function")
             {
-                if(data.redirect === undefined || data.redirect === null)
-                {
-                    window.location.href = data.status === 307 ? '/refresh' : '/referer';
-                    return;
-                }
-
-                window.location.href = data.redirect;
-                return false;
-            }
-
-            executeFunc(function HunLIOPGlZ()
-            {
-                if(typeof resolve == 'function')
-                {
-                    resolve(data);
-                    return true;
-                }
-            });
-
-
-            createToast(data);
-
-            if(data.status !== 200)
-            {
+                resolve(data);
                 return true;
             }
-
-            if(typeof success !== undefined && id !== null)
-            {
-                success(id);
-            }
         });
+
+
+        createToast(data);
+
+        if(data.status !== 200)
+        {
+            return true;
+        }
+
+        if(typeof success !== undefined && id !== null)
+        {
+            success(id);
+        }
+    });
 
 
     return false;
 }
 
 
-checked_item = document.querySelectorAll('.checked-item');
-all_usecase = document.getElementById('all_usecase');
+checked_item = document.querySelectorAll(".checked-item");
+all_usecase = document.getElementById("all_usecase");
 
 function checkedAll($this)
 {
 
 
-    all_usecase.classList.add('d-none');
+    all_usecase.classList.add("d-none");
 
     if($this.checked)
     {
-        all_usecase.classList.remove('d-none')
+        all_usecase.classList.remove("d-none");
     }
 
     if($this.dataset.id !== undefined)
     {
-        document.querySelectorAll('.checked-item-all').forEach(function(item, i, arr)
+        document.querySelectorAll(".checked-item-all").forEach(function(item, i, arr)
         {
             item.checked = $this.dataset.id === item.dataset.id;
         });
@@ -975,18 +1045,18 @@ function checkedAll($this)
 function checkedItem(checkedItem = null)
 {
 
-    all_usecase.classList.add('d-none');
+    all_usecase.classList.add("d-none");
 
     checked_item.forEach(function(item, i, arr)
     {
         if(item.checked)
         {
-            all_usecase.classList.remove('d-none');
+            all_usecase.classList.remove("d-none");
         }
 
         if(item.dataset.id !== undefined)
         {
-            document.querySelectorAll('.checked-item-all').forEach(function(itemAll, i, arr)
+            document.querySelectorAll(".checked-item-all").forEach(function(itemAll, i, arr)
             {
                 if(itemAll.dataset.id !== item.dataset.id)
                 {
@@ -998,7 +1068,7 @@ function checkedItem(checkedItem = null)
 
     if(checkedItem && checkedItem.dataset.id !== undefined)
     {
-        document.querySelectorAll('.checked-item').forEach(function(itemOther, i, arr)
+        document.querySelectorAll(".checked-item").forEach(function(itemOther, i, arr)
         {
             if(itemOther.dataset.id != checkedItem.dataset.id)
             {
@@ -1035,7 +1105,7 @@ function backToTop()
     const scrollingElement = (document.scrollingElement || document.body);
 
     window.scrollBy({
-        top: (scrollingElement.scrollTop * -1), behavior: 'smooth'
+        top : (scrollingElement.scrollTop * -1), behavior : "smooth",
     });
 
     return false;
@@ -1048,7 +1118,7 @@ function backToEnd()
 {
     const scrollingElement = (document.scrollingElement || document.body);
     window.scrollBy({
-        top: scrollingElement.scrollHeight, behavior: 'smooth'
+        top : scrollingElement.scrollHeight, behavior : "smooth",
     });
 }
 
@@ -1104,7 +1174,7 @@ if(backButtonTop || backButtonEnd)
 
 
 /* Прелоадер */
-document.querySelectorAll('.spinner-border').forEach(function(indicator)
+document.querySelectorAll(".spinner-border").forEach(function(indicator)
 {
     bindSpinner(indicator);
 });
@@ -1112,7 +1182,7 @@ document.querySelectorAll('.spinner-border').forEach(function(indicator)
 
 function bindSpinner(indicator)
 {
-    let btn = indicator.closest('.btn');
+    let btn = indicator.closest(".btn");
 
     if(btn === null)
     {
@@ -1120,13 +1190,13 @@ function bindSpinner(indicator)
         return false;
     }
 
-    btn.addEventListener('click', function()
+    btn.addEventListener("click", function()
     {
-        indicator.classList.remove('d-none');
+        indicator.classList.remove("d-none");
         this.disabled = true;
 
         /* Если спнер в форме - проверяем валидацию */
-        let spinnerForm = this.closest('form');
+        let spinnerForm = this.closest("form");
 
         if(spinnerForm === null)
         {
@@ -1137,7 +1207,7 @@ function bindSpinner(indicator)
         let frm = document.forms[spinnerForm.name];
 
         /* Блокируем событие отправки формы */
-        frm.addEventListener('submit', function(event)
+        frm.addEventListener("submit", function(event)
         {
             event.preventDefault();
             return false;
@@ -1162,22 +1232,23 @@ function bindSpinner(indicator)
                     setTimeout(closeProgress, 1000);
 
                     /* Поиск полей по LABEL */
-                    $label = document.querySelector('label[for="' + input.id + '"]');
+                    $label = document.querySelector("label[for=\"" + input.id + "\"]");
                     $placeholderText = $label ? $label.innerHTML : false;
 
                     if(!$placeholderText)
                     {
                         /* Поиск полей по Placeholder */
-                        $placeholderInput = document.querySelector('#' + input.id + '');
+                        $placeholderInput = document.querySelector("#" + input.id + "");
 
-                        if($placeholderInput.tagName === 'SELECT')
+                        if($placeholderInput.tagName === "SELECT")
                         {
                             /* если элемент SELECT - получаем placeholder по первому элементу списка в empty value  */
                             const firstOption = $placeholderInput.options[0];
-                            $placeholderText = firstOption.value === '' ? firstOption.textContent : false;
-                        } else
+                            $placeholderText = firstOption.value === "" ? firstOption.textContent : false;
+                        }
+                        else
                         {
-                            $placeholder = $placeholderInput.getAttribute('placeholder');
+                            $placeholder = $placeholderInput.getAttribute("placeholder");
                             $placeholderText = $placeholder ? $placeholder : false;
                         }
                     }
@@ -1189,7 +1260,7 @@ function bindSpinner(indicator)
 
                     if($placeholderText)
                     {
-                        $errorFormHandler = '{ "type":"danger" , ' + '"header":"Ошибка заполнения"   , ' + '"message" : "' + $placeholderText + '"}';
+                        $errorFormHandler = "{ \"type\":\"danger\" , " + "\"header\":\"Ошибка заполнения\"   , " + "\"message\" : \"" + $placeholderText + "\"}";
 
                         if($errorFormHandler !== false)
                         {
@@ -1201,14 +1272,14 @@ function bindSpinner(indicator)
             });
 
             /** Если форма добавления в корзину */
-            if(frm.classList.contains('order-basket'))
+            if(frm.classList.contains("order-basket"))
             {
                 return true;
             }
 
             if(formSubmit)
             {
-                frm.submit()
+                frm.submit();
             }
         }
 
@@ -1241,18 +1312,18 @@ function bindSpinner(indicator)
 /** Закрываем спинер */
 function closeProgress(indicator = null)
 {
-    const indicators = indicator ? [indicator] : document.querySelectorAll('.spinner-border');
+    const indicators = indicator ? [indicator] : document.querySelectorAll(".spinner-border");
 
     indicators.forEach(item =>
     {
-        item.classList.add('d-none');
+        item.classList.add("d-none");
 
-        const btn = item.closest('.btn');
+        const btn = item.closest(".btn");
 
         if(btn)
         {
             btn.disabled = false;
-            btn.removeAttribute('disabled');
+            btn.removeAttribute("disabled");
         }
     });
 }
@@ -1260,7 +1331,7 @@ function closeProgress(indicator = null)
 
 /** Отправляем форму пагинации при изменении LIMIT  */
 
-document.getElementById('select-pagination')?.addEventListener('change', function(event)
+document.getElementById("select-pagination")?.addEventListener("change", function(event)
 {
     this.form.submit();
 });
@@ -1275,19 +1346,19 @@ function createToast(data)
     let $href = data.href;
     let $name = data.name;
 
-    var toastDiv = document.getElementById('toast');
+    var toastDiv = document.getElementById("toast");
 
     if(toastDiv)
     {
         // class="alert alert-light" role="alert"
-        var toastEl = document.createElement('div');
-        toastEl.className = 'toast';
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('aria-live', 'assertive');
-        toastEl.setAttribute('aria-atomic', 'true');
+        var toastEl = document.createElement("div");
+        toastEl.className = "toast";
+        toastEl.setAttribute("role", "alert");
+        toastEl.setAttribute("aria-live", "assertive");
+        toastEl.setAttribute("aria-atomic", "true");
 
-        var tostHeader = document.createElement('div');
-        tostHeader.className = 'toast-header';
+        var tostHeader = document.createElement("div");
+        tostHeader.className = "toast-header";
         toastEl.append(tostHeader);
 
         /*var toastSpan = document.createElement('SPAN');
@@ -1300,13 +1371,13 @@ function createToast(data)
         //tostHeader.append(toastSpan);
 
         /* Заголовок */
-        var tostStrong = document.createElement('strong');
-        tostStrong.classList.add('me-auto');
-        tostStrong.classList.add('mt-1');
+        var tostStrong = document.createElement("strong");
+        tostStrong.classList.add("me-auto");
+        tostStrong.classList.add("mt-1");
 
-        if($type == 'danger' || $type == 'error')
+        if($type == "danger" || $type == "error")
         {
-            tostStrong.classList.add('text-danger');
+            tostStrong.classList.add("text-danger");
         }
 
         tostStrong.textContent = $header;
@@ -1315,37 +1386,37 @@ function createToast(data)
         // me-auto mt-1
 
         /* Кнопка закрыть */
-        var tostClosed = document.createElement('button');
-        tostClosed.type = 'button';
-        tostClosed.className = 'btn-close';
-        tostClosed.setAttribute('data-bs-dismiss', 'toast');
-        tostClosed.setAttribute('aria-label', 'Close');
+        var tostClosed = document.createElement("button");
+        tostClosed.type = "button";
+        tostClosed.className = "btn-close";
+        tostClosed.setAttribute("data-bs-dismiss", "toast");
+        tostClosed.setAttribute("aria-label", "Close");
         tostHeader.append(tostClosed);
 
 
         /* Текст сообщения */
-        var toastBody = document.createElement('div');
-        toastBody.className = 'toast-body';
+        var toastBody = document.createElement("div");
+        toastBody.className = "toast-body";
         toastEl.append(toastBody);
 
-        var toastText = document.createElement('p');
-        toastText.className = 'p-0';
-        toastText.className = 'm-0';
+        var toastText = document.createElement("p");
+        toastText.className = "p-0";
+        toastText.className = "m-0";
         toastText.textContent = $message;
         toastBody.append(toastText);
 
 
         if($href)
         {
-            var toastHref = document.createElement('a');
-            toastHref.classList.add('text-decoration-none');
-            toastHref.classList.add('ms-3');
+            var toastHref = document.createElement("a");
+            toastHref.classList.add("text-decoration-none");
+            toastHref.classList.add("ms-3");
             toastHref.href = $href;
             toastHref.textContent = $name;
             toastText.append(toastHref);
         }
 
-        document.getElementById('toast').appendChild(toastEl);
+        document.getElementById("toast").appendChild(toastEl);
         //document.getElementById('toast').appendChild(toastEl);
         //document.getElementById('toast').appendChild(toastEl);
 
@@ -1357,7 +1428,7 @@ function createToast(data)
 
             if(bootstrap)
             {
-                new bootstrap.Toast(toastEl, {delay: 15000}).show();
+                new bootstrap.Toast(toastEl, {delay : 15000}).show();
                 return;
             }
 
@@ -1396,17 +1467,17 @@ function disabledElementsForm(ChangeForm)
             return;
         }
 
-        if(input.tagName === 'SELECT')
+        if(input.tagName === "SELECT")
         {
-            input.classList.add('disabled');
-            document.getElementById(input.id + '_select2')?.classList.add('disabled');
+            input.classList.add("disabled");
+            document.getElementById(input.id + "_select2")?.classList.add("disabled");
         }
 
-        if(input.tagName === 'BUTTON')
+        if(input.tagName === "BUTTON")
         {
             /** Блокируем submit */
-            input.classList.add('disabled');
-            input.querySelector('.spinner-border')?.classList.remove('d-none');
+            input.classList.add("disabled");
+            input.querySelector(".spinner-border")?.classList.remove("d-none");
         }
 
     });
@@ -1426,17 +1497,17 @@ function enableElementsForm(ChangeForm)
         }
 
 
-        if(input.tagName === 'SELECT')
+        if(input.tagName === "SELECT")
         {
-            input.classList.remove('disabled');
-            document.getElementById(input.id + '_select2')?.classList.remove('disabled');
+            input.classList.remove("disabled");
+            document.getElementById(input.id + "_select2")?.classList.remove("disabled");
         }
 
-        if(input.tagName === 'BUTTON')
+        if(input.tagName === "BUTTON")
         {
             /** Блокируем submit */
-            input.classList.remove('disabled');
-            input.querySelector('.spinner-border')?.classList.add('d-none');
+            input.classList.remove("disabled");
+            input.querySelector(".spinner-border")?.classList.add("d-none");
         }
 
 
@@ -1465,4 +1536,3 @@ function enableElementsForm(ChangeForm)
  }
  });
  });*/
-
