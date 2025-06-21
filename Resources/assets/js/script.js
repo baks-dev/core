@@ -562,14 +562,14 @@ function modalLink(item)
         return;
     }
 
-
-    /** Инициализация FormData для обработки данных ссылок - например раздел Производственный процесс
-     *  и передачи в request.send
-     */
-    const modalData = new FormData();
-
     item.addEventListener("click", function(event)
     {
+        /** Инициализация FormData для обработки данных ссылок - например раздел Производственный процесс
+         *  и передачи в request.send
+         */
+        const modalData = new FormData();
+
+
         /** Показываем прелоад модального окна */
         document.querySelector("#modal .spinner-border")?.classList.remove("d-none");
 
