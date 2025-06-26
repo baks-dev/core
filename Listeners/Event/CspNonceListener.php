@@ -51,6 +51,10 @@ final readonly class CspNonceListener
             '*.yandex.com',
             '*.yandex.ru',
             '*.yandex.net',
+
+            'api.ipify.org',
+            'ipinfo.io',
+
             $this->HOST,
             $this->CDN_HOST,
         ];
