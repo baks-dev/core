@@ -80,6 +80,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     /** Поиск */
     private SearchDTO $query;
+
     private ?QueryBuilder $search = null;
 
     /** Билдер рекурсии */
@@ -92,6 +93,9 @@ final class DBALQueryBuilder extends QueryBuilder
     private bool $refresh = true;
 
     public const string PROJECT_PROFILE_KEY = 'project_profile';
+
+    public const string CURRENT_PROFILE_KEY = 'current_profile';
+
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $env,
@@ -123,7 +127,7 @@ final class DBALQueryBuilder extends QueryBuilder
             deduplicator: $inst->deduplicator,
             dispatch: $inst->dispatch,
             UserProfileTokenStorageInterface: $this->UserProfileTokenStorageInterface,
-            projectProfile: $inst->projectProfile
+            projectProfile: $inst->projectProfile,
         );
 
         //$newInstance->resetQueryParts();
@@ -238,7 +242,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 $this->dispatch->dispatch(
                     $DBALCacheResetMessage,
-                    transport: $this->namespace.'-low'
+                    transport: $this->namespace.'-low',
                 );
             }
 
@@ -423,13 +427,13 @@ final class DBALQueryBuilder extends QueryBuilder
                     $this->cacheKey,
                     $this->getSQL(),
                     $this->getParameters(),
-                    $this->getParameterTypes()
+                    $this->getParameterTypes(),
                 );
 
                 $this->dispatch->dispatch(
                     message: $DBALDelayMessage,
                     stamps: [new MessageDelay('5 seconds')],
-                    transport: $this->namespace.'-low'
+                    transport: $this->namespace.'-low',
                 );
             }
         }
@@ -469,7 +473,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $sql ?: $this->getSQL(),
             $params ?: $this->getParameters(),
             $types ?: $this->getParameterTypes(),
-            new QueryCacheProfile($this->ttl, $this->cacheKey)
+            new QueryCacheProfile($this->ttl, $this->cacheKey),
         );
     }
 
@@ -544,7 +548,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $fromAlias,
             $this->table($join),
             $alias,
-            $condition
+            $condition,
         );
 
         return $this;
@@ -554,6 +558,7 @@ final class DBALQueryBuilder extends QueryBuilder
     /**
      * @param $id - идентификатор сущности
      * @param $parent - идентификатор свойства на основную сущность
+     *
      * @throws Exception
      */
     public function findAllRecursive(array $condition): array|false
@@ -582,7 +587,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $this->recursive_alias,
             'recursive_table',
             '',
-            'recursive_table.'.$id.' = '.$this->recursive_alias.'.'.$parent
+            'recursive_table.'.$id.' = '.$this->recursive_alias.'.'.$parent,
         );
 
         $dbal_union->resetWhere();
@@ -597,7 +602,7 @@ final class DBALQueryBuilder extends QueryBuilder
         $sql .= str_replace(
             ['1 AS level', $string],
             ['level+1 AS level', $groups],
-            $dbal_union->getSQL()
+            $dbal_union->getSQL(),
         );
 
 
@@ -610,7 +615,7 @@ final class DBALQueryBuilder extends QueryBuilder
             ->executeCacheQuery(
                 $sql,
                 $this->getParameters(),
-                $this->getParameterTypes()
+                $this->getParameterTypes(),
             )
             ->fetchAllAssociative();
 
@@ -746,7 +751,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $fromAlias,
             $join,
             $alias,
-            $alias.'.'.$identifier.' = ('.$leftOneJoin->getSQL().')'
+            $alias.'.'.$identifier.' = ('.$leftOneJoin->getSQL().')',
         );
 
         return $this;
@@ -860,34 +865,8 @@ final class DBALQueryBuilder extends QueryBuilder
     /**
      * Метод создает bind параметр профиля проекта для запроса
      */
-    public function bindProjectProfile(): self
+    public function bindProjectProfile(): bool
     {
-        if($this->projectProfile)
-        {
-            $this->setParameter(
-                key: self::PROJECT_PROFILE_KEY,
-                value: new UserProfileUid($this->projectProfile),
-                type: UserProfileUid::TYPE
-            );
-        }
-
-        return $this;
-    }
-
-    /**
-     * Метод проверяет что идентификатор авторизованного пользователя не равен идентификатору профиля проекта
-     * @note если профиль авторизованного пользователя равен профилю проекта - не применять двойную скидку
-     */
-    public function isNotProjectProfile(): bool
-    {
-        /**
-         * Если пользователь не авторизован
-         */
-        if(false === $this->UserProfileTokenStorageInterface->isUser())
-        {
-            return false;
-        }
-
         /**
          * Если не указан идентификатор проекта
          */
@@ -896,7 +875,41 @@ final class DBALQueryBuilder extends QueryBuilder
             return false;
         }
 
-        return $this->UserProfileTokenStorageInterface->getProfileCurrent()->equals($this->projectProfile);
+        /**
+         * Если пользователь не авторизован
+         */
+        if(
+            true === $this->UserProfileTokenStorageInterface->isUser() &&
+            true === $this->UserProfileTokenStorageInterface->getProfileCurrent()->equals($this->projectProfile)
+        )
+        {
+            return false;
+        }
+
+        $this->setParameter(
+            key: self::PROJECT_PROFILE_KEY,
+            value: new UserProfileUid($this->projectProfile),
+            type: UserProfileUid::TYPE,
+        );
+
+        return true;
+    }
+
+
+    public function bindCurrentProfile(): bool
+    {
+        if(false === $this->UserProfileTokenStorageInterface->isUser())
+        {
+            return false;
+        }
+
+        $this->setParameter(
+            key: self::CURRENT_PROFILE_KEY,
+            value: $this->UserProfileTokenStorageInterface->getProfileCurrent(),
+            type: UserProfileUid::TYPE,
+        );
+
+        return true;
     }
 
     /**
@@ -981,7 +994,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $fromAlias,
             $table,
             $alias,
-            $condition
+            $condition,
         );
 
         return $this;
@@ -993,7 +1006,7 @@ final class DBALQueryBuilder extends QueryBuilder
             $fromAlias,
             $this->table($join),
             $alias,
-            $condition
+            $condition,
         );
 
         return $this;
