@@ -37,7 +37,7 @@ abstract class Uid implements ValueResolverInterface
 
     public function __construct(AbstractUid|Uid|string|null|false $value = null, bool $test = true)
     {
-        if(is_null($value))
+        if(empty($value))
         {
             $this->value = Uuid::v7();
 
@@ -56,7 +56,7 @@ abstract class Uid implements ValueResolverInterface
         }
 
         /* Применяем фильтр UID */
-        if(self::isUid($value) === false)
+        if(false === self::isUid($value))
         {
             throw new InvalidArgumentException(sprintf('Invalid Argument Uid: %s', $value));
         }
