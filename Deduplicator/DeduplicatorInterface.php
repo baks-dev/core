@@ -63,4 +63,34 @@ interface DeduplicatorInterface
     /** Метод возвращает идентификатор ключа дедубликатора */
     public function getKey(): string;
 
+    /**
+     * Метод возвращает и сохраняет метку времени, по истечении которого можно выполнить следующий запрос
+     * к новой метке добавляет время кеширования expires, тем самым позволит добавить в очередь сообщения, с разбросом
+     *
+     * <code>
+     *
+     *  $Deduplicator = $this->deduplicator
+     *      ->namespace('module-name')
+     *      ->expiresAfter('3 seconds')
+     *      ->deduplication([$message->getProfile(), self::class]);
+     *
+     *  if($Deduplicator->isExecuted())
+     *  {
+     *      $MessageDelay = new MessageDelay($Deduplicator->getAndSaveNextTime('3 seconds'));
+     *
+     *      $this->dispatcher->dispatch(
+     *          message: $message,
+     *          stamps: [$MessageDelay],
+     *          transport: 'transport',
+     *      );
+     *
+     *      return;
+     *  }
+     *
+     *  $Deduplicator->save();
+     *
+     * </code>
+     */
+    public function getAndSaveNextTime(DateInterval|string $delay): DateInterval|false;
+
 }

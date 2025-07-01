@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,19 +27,18 @@ namespace BaksDev\Core\Deduplicator\Tests;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Products\Product\Type\Id\ProductUid;
+use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\Uid\UuidV7;
 
-/**
- * @group core
- * @group core-deduplicator
- *
- * @depends BaksDev\Core\Deduplicator\Tests\DeduplicatorStartTest::class
- */
+#[Group('core')]
+#[Group('core-deduplicator')]
 #[When(env: 'test')]
 class DeduplicatorEndTest extends KernelTestCase
 {
+    #[DependsOnClass(DeduplicatorStartTest::class)]
     public function testUseCase(): void
     {
         /** @var DeduplicatorInterface $DeduplicatorInterface */
@@ -50,11 +49,12 @@ class DeduplicatorEndTest extends KernelTestCase
             ->deduplication([
                 'key1',
                 'key2',
-                new ProductUid(),
+                new ProductUid(ProductUid::TEST),
                 ['key3' => 'value']
             ]);
 
         self::assertTrue($Deduplicator->isExecuted());
+
 
         $Deduplicator->delete();
     }

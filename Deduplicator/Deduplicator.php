@@ -27,6 +27,7 @@ namespace BaksDev\Core\Deduplicator;
 
 use BaksDev\Core\Cache\AppCacheInterface;
 use DateInterval;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -52,7 +53,7 @@ final class Deduplicator implements DeduplicatorInterface
     )
     {
         /* Время жизни дедубликации по умолчанию 30 дней */
-        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '1 seconds');
+        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '3 seconds');
     }
 
     /**
@@ -114,9 +115,10 @@ final class Deduplicator implements DeduplicatorInterface
             throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
         }
 
+        /** @var CacheItem $item */
         $item = $this->cache->getItem($this->key);
 
-        return $item->isHit() && trim($item->get()) === 'executed';
+        return true === $item->isHit() && false === empty($item->get());
     }
 
     /**
@@ -132,7 +134,7 @@ final class Deduplicator implements DeduplicatorInterface
         $item = $this->cache
             ->getItem($this->key)
             ->expiresAfter($this->expires)
-            ->set('executed');
+            ->set(time());
 
         $this->cache->save($item);
     }
@@ -161,5 +163,58 @@ final class Deduplicator implements DeduplicatorInterface
         }
 
         return $this->key;
+    }
+
+
+    /**
+     * Метод возвращает и сохраняет метку времени, по истечении которого можно выполнить следующий запрос
+     * к новой метке добавляет время кеширования expires, тем самым позволит добавить в очередь сообщения, с разбросом
+     *
+     * @param DateInterval|string $delay - время в секундах, на которое необходимо отложить запрос
+     */
+    public function getAndSaveNextTime(DateInterval|string $delay = '1 seconds'): DateInterval|false
+    {
+        if($this->cache === false || $this->key === false)
+        {
+            return false;
+        }
+
+        if(false === ($delay instanceof DateInterval))
+        {
+            $delay = DateInterval::createFromDateString($delay);
+        }
+
+        $timestamp = time();
+
+        /** @var CacheItem $item */
+        $item = $this->cache->getItem($this->key);
+
+        /** Присваиваем предыдущую метку времени */
+        if($item->isHit())
+        {
+            $timestamp = $item->get();
+            $timestamp = is_int($timestamp) ? $timestamp : time();
+        }
+
+        /** Определяем время следующей метки */
+        $next = new DateTimeImmutable()
+            ->setTimestamp($timestamp)
+            ->add($delay);
+
+        $diff = ($next->getTimestamp() - time());
+
+        $this->expires = DateInterval::createFromDateString($diff.' seconds');
+
+
+        /**
+         * Сохраняем новую метку времени и время кеширования
+         */
+        $item
+            ->expiresAfter($this->expires)
+            ->set($next->getTimestamp());
+
+        $this->cache->save($item);
+
+        return $this->expires;
     }
 }

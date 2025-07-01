@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,10 @@ declare(strict_types=1);
 namespace BaksDev\Core\Services\Switcher\Tests;
 
 use BaksDev\Core\Services\Switcher\Switcher;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group core
- */
+#[Group('core')]
 final class SwitcherTest extends TestCase
 {
     public function testToRus(): void

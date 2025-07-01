@@ -26,18 +26,17 @@ declare(strict_types=1);
 namespace BaksDev\Core\Deduplicator\Tests;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
+use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group core
- * @group core-deduplicator
- *
- * @depends BaksDev\Core\Deduplicator\Tests\DeduplicatorManyStartTest::class
- */
+#[Group('core')]
+#[Group('core-deduplicator')]
 #[When(env: 'test')]
 class DeduplicatorManyEndTest extends KernelTestCase
 {
+    #[DependsOnClass(DeduplicatorManyStartTest::class)]
     public function testUseCase(): void
     {
         /** @var DeduplicatorInterface $DeduplicatorInterface */

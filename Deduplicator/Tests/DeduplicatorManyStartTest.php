@@ -27,13 +27,12 @@ namespace BaksDev\Core\Deduplicator\Tests;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use DateInterval;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group core
- * @group core-deduplicator
- */
+#[Group('core')]
+#[Group('core-deduplicator')]
 #[When(env: 'test')]
 class DeduplicatorManyStartTest extends KernelTestCase
 {

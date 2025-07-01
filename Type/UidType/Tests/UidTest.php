@@ -27,13 +27,11 @@ namespace BaksDev\Core\Type\UidType\Tests;
 
 use BaksDev\Core\Type\UidType\Uid;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\UuidV7;
 
-/**
- * @group core
- * @group core-uid
- */
+#[Group('core')]
 final class UidTest extends TestCase
 {
     public function testCanBeCreatedFromValidUid()

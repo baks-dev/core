@@ -55,6 +55,8 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
         $this->uniqid = uniqid('', false);
         $this->errors = new ArrayObject();
 
+        $this->exchangeArray([]);
+
         return $this;
     }
 

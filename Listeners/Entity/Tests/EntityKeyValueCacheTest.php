@@ -28,14 +28,12 @@ namespace BaksDev\Core\Listeners\Entity\Tests;
 use BaksDev\Avito\Type\Authorization\AvitoTokenAuthorization;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Redis;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group entity-key-value-cache-test
- */
+#[Group('entity-key-value-cache-test')]
 #[When(env: 'test')]
 class EntityKeyValueCacheTest extends KernelTestCase
 {
