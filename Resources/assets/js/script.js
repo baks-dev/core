@@ -1260,6 +1260,10 @@ function bindSpinner(indicator)
 
                     if($placeholderText)
                     {
+                        /** Удаляем из строки теги и переносы */
+                        $placeholderText = $placeholderText.replace(/<[^>]+>/g, "").replace(/[\n\r]+/g, "");
+
+
                         $errorFormHandler = "{ \"type\":\"danger\" , " + "\"header\":\"Ошибка заполнения\"   , " + "\"message\" : \"" + $placeholderText + "\"}";
 
                         if($errorFormHandler !== false)

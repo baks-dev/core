@@ -1476,10 +1476,10 @@ function initDatepicker()
             selectedDate : $selectedDate == "Invalid Date" ? new Date() : $selectedDate,
         });
 
+        datepicker.classList.remove("js-datepicker");
+        datepicker.classList.add("pointer");
+
     });
 }
 
-document.addEventListener("DOMContentLoaded", function()
-{
-    initDatepicker();
-});
+initDatepicker();
