@@ -651,7 +651,7 @@ function modalLink(item)
             const collection_form_name = item.dataset.collectionForm
 
             /* Если выбран один товар (нажата ссылка) то добавляем только один элемент */
-            if(item.dataset.postClass === 'add-one-to-production')
+            if(item.dataset.postClass === 'add-one-to-collection')
             {
                 processFormData(item, collection_form_name, 0);
             }
@@ -763,6 +763,17 @@ function modalLink(item)
                 lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
 
+                let urlObject = new URL(url);
+                // условие, если есть GET параметр print - вызываем диалоговое окно
+                if(urlObject.searchParams.has('print') && urlObject.searchParams.get('print') === '1')
+                {
+                    window.print();
+
+                    /* Закрываем модальное окно */
+
+                    let currentmodal = bootstrap.Modal.getOrCreateInstance(modal) // Returns a Bootstrap modal instance
+                    currentmodal.hide();
+                }
             }
             else
             {
