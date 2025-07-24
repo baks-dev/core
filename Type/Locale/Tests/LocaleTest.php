@@ -61,7 +61,9 @@ final class LocaleTest extends KernelTestCase
             self::assertTrue($Locale->equals($Locale)); // объект класса
 
             $LocaleType = new LocaleType();
-            $platform = $this->getMockForAbstractClass(AbstractPlatform::class);
+            $platform = $this
+                ->getMockBuilder(AbstractPlatform::class)
+                ->getMock();
 
             $convertToDatabase = $LocaleType->convertToDatabaseValue($Locale, $platform);
             self::assertEquals($Locale->getLocalValue(), $convertToDatabase);

@@ -153,6 +153,11 @@ abstract class Uid implements ValueResolverInterface
             $value = (string) new $value();
         }
 
+        if(is_object($value) && method_exists($value, '__toString'))
+        {
+            return (string) $this->value === (string) $value;
+        }
+
         if(is_string($value))
         {
             return (string) $this->value === $value;
