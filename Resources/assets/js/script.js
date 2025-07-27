@@ -1226,7 +1226,6 @@ function bindSpinner(indicator)
 
         if(frm)
         {
-
             let formSubmit = true;
 
             Array.from(frm.elements).forEach((input) =>

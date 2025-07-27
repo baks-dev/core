@@ -152,7 +152,11 @@ function NiceSelect(element, options, reset = false)
 
 NiceSelect.prototype.create = function()
 {
-    this.el.style.setProperty("display", "none", "important")
+    //this.el.style.setProperty("display", "none", "important")
+
+    this.el.style.setProperty("opacity", 0, "important");
+    this.el.style.setProperty("position", "absolute", "important");
+    this.el.style.setProperty("z-index", -10000, "important");
 
     if(this.data)
     {

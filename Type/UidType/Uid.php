@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV7;
 
 abstract class Uid implements ValueResolverInterface
 {
@@ -76,7 +77,7 @@ abstract class Uid implements ValueResolverInterface
 
     public function getValue(): Uuid
     {
-        return $this->value;
+        return new UuidV7($this->value);
     }
 
     /**
