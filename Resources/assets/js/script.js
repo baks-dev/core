@@ -763,7 +763,10 @@ function modalLink(item)
                 lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
 
-                let urlObject = new URL(url);
+
+                let urlObject = createValidUrl(url);
+
+
                 // условие, если есть GET параметр print - вызываем диалоговое окно
                 if(urlObject.searchParams.has('print') && urlObject.searchParams.get('print') === '1')
                 {
@@ -809,6 +812,38 @@ function modalLink(item)
     });
 }
 
+
+function createValidUrl(url, baseUrl = window.location.origin)
+{
+    // Если URL undefined/null/пустой
+    if(!url)
+    {
+        return false;
+    }
+
+    // Проверяем, начинается ли строка с http:// или https://
+    if(/^https?:\/\//i.test(url))
+    {
+        return new URL(url);
+        url;
+    }
+
+    // Проверяем, начинается ли строка с / (относительный путь)
+    if(url.startsWith("/"))
+    {
+        return new URL(url, baseUrl);
+    }
+
+    // Для нестандартных случаев (например, путь без слеша вначале)
+    try
+    {
+        return new URL(url);
+    }
+    catch(e)
+    {
+        return new URL(url, baseUrl);
+    }
+}
 
 /** Отправка модального окна */
 async function submitModalForm(forms)

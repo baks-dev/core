@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ use BaksDev\Core\Type\UidType\Uid;
 
 final class UidClass extends Uid
 {
-    public const string TEST = '0188a9a2-7db3-77c6-b362-41075ebd6f09';
+    public const string TEST = '185a9c96-d664-74ed-9cf1-4a73a7010a94';
 
     public const string TYPE = 'test';
 }
