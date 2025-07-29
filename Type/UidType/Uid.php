@@ -182,20 +182,21 @@ abstract class Uid implements ValueResolverInterface
     {
 
         $attr = $argument->getAttributes(ParamConverter::class);
+
         $ParamConverter = current($attr);
 
-        if(!$ParamConverter)
+        if(false === $ParamConverter)
         {
             return [];
         }
 
         $Resolver = $ParamConverter->resolver;
 
+
         if($Resolver !== $this::class)
         {
             return [];
         }
-
 
         $key = $ParamConverter->getKey() ?: 'id';
 
