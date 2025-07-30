@@ -31,6 +31,7 @@ interface PaginatorInterface
 
     public function fetchAllAssociativeIndexed(DBALQueryBuilder $qb, ?string $namespace = null): self;
 
+    /** @depricated используйте Result и метод fetchAllHydrate(MyResult::class) */
     public function fetchAllAssociative(DBALQueryBuilder $qb, ?string $namespace = null): self;
 
 
