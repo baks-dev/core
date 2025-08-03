@@ -29,6 +29,7 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -46,7 +47,7 @@ final class MessageDispatch implements MessageDispatchInterface
         #[Target('messageDispatchLogger')] private readonly LoggerInterface $logger,
         private readonly MessageBusInterface $messageBus,
         private readonly AppCacheInterface $cache,
-
+        #[Autowire(env: 'HOST')] private readonly string $HOST,
     ) {}
 
     /**
@@ -173,6 +174,15 @@ final class MessageDispatch implements MessageDispatchInterface
         }
 
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
+
+
+        /** Поиск по домену (для идентификаторов профилей) */
+        $cacheConsume = $cache->getItem('consume-'.$this->HOST.'-'.trim($this->transport));
+
+        if($cacheConsume->isHit())
+        {
+            return $cacheConsume->get();
+        }
 
         /**
          * Если транспорт LOW и воркер модуля не запущен - передаем его в транспорт async-low
