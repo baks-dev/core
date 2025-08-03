@@ -29,7 +29,6 @@ use BaksDev\Core\Cache\AppCacheInterface;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatch;
 use BaksDev\Core\Messenger\MessengerConsumers;
-use BaksDev\Core\Type\UidType\Uid;
 use DateInterval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -97,9 +96,8 @@ final class ConsumerRunningHandler
                 $this->isSchedule = true;
             }
 
-            /** Если транспорт UUID - добавляем хост в ключ */
-            !Uid::isUid($consumer) ?: $consumer = $this->HOST.'-'.$consumer;
 
+            $consumer = $this->HOST.'-'.$consumer;
             $cacheConsume = $cache->getItem('consume-'.$consumer);
             $cacheConsume->set(true);
             $cacheConsume->expiresAfter(DateInterval::createFromDateString('1 day'));

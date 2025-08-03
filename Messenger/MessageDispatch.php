@@ -176,20 +176,12 @@ final class MessageDispatch implements MessageDispatchInterface
         $cache = $this->cache->init(self::CONSUMER_NAMESPACE);
 
 
-        /** Поиск по домену (для идентификаторов профилей) */
-        $cacheConsume = $cache->getItem('consume-'.$this->HOST.'-'.trim($this->transport));
-
-        if($cacheConsume->isHit())
-        {
-            return $cacheConsume->get();
-        }
-
         /**
          * Если транспорт LOW и воркер модуля не запущен - передаем его в транспорт async-low
          */
         if(str_contains($this->transport, '-low'))
         {
-            $cacheConsume = $cache->getItem('consume-'.trim(str_replace('-low', '', $this->transport)));
+            $cacheConsume = $cache->getItem('consume-'.$this->HOST.'-'.trim(str_replace('-low', '', $this->transport)));
 
             /** Если указанный транспорт не запущен - присваиваем транспорт async-low */
             if(false === $cacheConsume->isHit() || (true === $cacheConsume->isHit() && false === $cacheConsume->get()))
@@ -200,7 +192,7 @@ final class MessageDispatch implements MessageDispatchInterface
             return true;
         }
 
-        $cacheConsume = $cache->getItem('consume-'.trim($this->transport));
+        $cacheConsume = $cache->getItem('consume-'.$this->HOST.'-'.trim($this->transport));
 
         if($cacheConsume->isHit())
         {
