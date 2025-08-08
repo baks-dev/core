@@ -488,6 +488,10 @@ async function offcanvasLink(offcanvas)
         //.then((response) => response)
         .then((response) =>
         {
+            if(response.status === 302)
+            {
+                window.location.reload();
+            }
 
             if(response.status !== 200)
             {
@@ -495,6 +499,7 @@ async function offcanvasLink(offcanvas)
             }
 
             return response.text();
+
         }).then((data) =>
         {
 
