@@ -154,7 +154,7 @@ abstract class AbstractHandler
         /** Добавляем к валидации объект сущности */
         $this->validatorCollection->add($EntityRepo);
 
-        return $EntityRepo;
+        return $this->main = $EntityRepo;
     }
 
 
