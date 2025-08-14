@@ -266,7 +266,17 @@ function bindBootstrapToast()
 
     toastElList.map(function(toastEl)
     {
+
+        // Не создаем повторно toast.
+        if (toastEl.classList.contains('toast-shown')) {
+            return;
+        }
+
+        toastEl.classList.add('toast-shown');
+
         return new bootstrap.Toast(toastEl, {delay : 15000}).show();
+
+
     });
 
     return true;
@@ -533,8 +543,7 @@ async function offcanvasLink(offcanvas)
                     return;
                 }
 
-                var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas);
-
+                let bsOffcanvas = bootstrap.Offcanvas.getOrCreateInstance(myOffcanvas);
 
                 myOffcanvas.innerHTML = data;
 
@@ -557,6 +566,75 @@ async function offcanvasLink(offcanvas)
     //     console.error('Error:', error);
     // }); // parses JSON response into native JavaScript objects
 }
+
+
+/* Вешаем события на COLLAPSE collapse-link-content */
+document.querySelectorAll(".collapse-link-content").forEach(function(item, i, arr)
+{
+    item.addEventListener("click", function()
+    {
+        collapseLink(item);
+    } , { once: true } );
+});
+
+
+async function collapseLink(collapse)
+{
+
+    await fetch(collapse.dataset.href, {
+        method : "GET",
+        cache : "no-cache",
+        credentials : "same-origin",
+        headers : {
+            "X-Requested-With" : "XMLHttpRequest",
+        }, redirect : "follow",
+        referrerPolicy : "no-referrer",
+    })
+
+        .then((response) =>
+        {
+
+            if(response.status !== 200)
+            {
+                return false;
+            }
+
+            return response.text();
+        }).then((data) =>
+        {
+
+            if(data)
+            {
+                // Получить element c содержимым
+                const containerId = collapse.dataset.container;
+
+                var myCollapse = document.getElementById(containerId);
+
+                if(myCollapse === null)
+                {
+                    console.log('Элемент с идентификатором id="' + containerId + '" не найден');
+                    return;
+                }
+
+
+                let bsCollapse = bootstrap.Collapse.getOrCreateInstance(myCollapse);
+
+                myCollapse.innerHTML = data;
+
+
+                /** Обновляем Preload */
+
+                let lazy = document.createElement("script");
+                lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
+                document.head.appendChild(lazy);
+
+            }
+        });
+
+    return false;
+
+}
+
 
 /** сплывающее модальное окно */
 function modalLink(item)
