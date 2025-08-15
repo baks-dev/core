@@ -157,6 +157,7 @@ NiceSelect.prototype.create = function()
     this.el.style.setProperty("opacity", 0, "important");
     this.el.style.setProperty("position", "absolute", "important");
     this.el.style.setProperty("z-index", -10000, "important");
+    this.el.style.setProperty("max-width", "0px", "important");
 
     if(this.data)
     {
