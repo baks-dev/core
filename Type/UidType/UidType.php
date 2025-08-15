@@ -33,7 +33,7 @@ use function is_string;
 
 class UidType extends StringType
 {
-    public const string TYPE = 'guid';
+    public const string TYPE = 'uuid';
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
