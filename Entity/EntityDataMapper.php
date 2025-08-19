@@ -41,9 +41,10 @@ abstract class EntityDataMapper
 {
     private object|false $dto = false;
 
-    //protected ?ArrayCollection $remove = null;
 
     private ?EntityManagerInterface $entityManager = null;
+
+    private ?EntityManagerInterface $removeEntityManager = null;
 
     /**
      * Метод возвращает присваиваемую DTO к сущности
@@ -384,8 +385,10 @@ abstract class EntityDataMapper
                                 if($removeEntityElement !== false)
                                 {
 
+                                    $removeEntityManager = $this->removeEntityManager ?: clone $this->entityManager;
+                                    $removeEntityManager->remove($entityElement);
+                                    //$this->entityManager?->remove($entityElement);
 
-                                    $this->entityManager?->remove($entityElement);
                                     $entityCollections->removeElement($entityElement);
                                 }
                             }
@@ -415,70 +418,6 @@ abstract class EntityDataMapper
                                     $entityCollections->add($obj);
                                 }
                             }
-
-
-                            //                            /** @var EntityState $entityCollection */
-                            //                            foreach($dtoCollections as $value)
-                            //                            {
-                            //
-                            //
-                            //                                foreach($entityCollections as $entityCollection)
-                            //                                {
-                            //                                    $isEqual = true;
-                            //
-                            //                                    foreach($identifier as $propertyEqual)
-                            //                                    {
-                            //
-                            //                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) !== (string) $this->getPropertyValue($propertyEqual, $value))
-                            //                                        {
-                            //                                            $isEqual = false;
-                            //                                            break;
-                            //                                        }
-                            //                                    }
-                            //
-                            //                                    /** Обновляем найденную сущность */
-                            //                                    if($isEqual)
-                            //                                    {
-                            //                                        $entityCollection->setEntityManager($this->entityManager);
-                            //                                        $entityCollection->setEntity($value);
-                            //                                    }
-                            //                                }
-                            //                            }
-
-
-                            //                            /** Добавляем новые объекты в коллекцию */
-                            //                            foreach($dtoCollections as $value)
-                            //                            {
-                            //                                $isNew = true;
-                            //                                $countNew = 0;
-                            //
-                            //                                foreach($entityCollections as $entityCollection)
-                            //                                {
-                            //                                    foreach($identifier as $propertyEqual)
-                            //                                    {
-                            //                                        if((string) $this->getPropertyValue($propertyEqual, $entityCollection) === (string) $this->getPropertyValue($propertyEqual, $value))
-                            //                                        {
-                            //                                            ++$countNew;
-                            //                                        }
-                            //                                    }
-                            //
-                            //
-                            //                                    if($countNew === $countIdentifier)
-                            //                                    {
-                            //                                        $isNew = false;
-                            //                                    }
-                            //                                }
-                            //
-                            //                                if($isNew)
-                            //                                {
-                            //
-                            //
-                            //                                    $obj = new $o2oTargetEntity($this);
-                            //                                    $obj->setEntityManager($this->entityManager);
-                            //                                    $obj->setEntity($value);
-                            //                                    $entityCollections->add($obj);
-                            //                                }
-                            //                            }
                         }
 
                     }
@@ -592,6 +531,8 @@ abstract class EntityDataMapper
                 }
             }
         }
+
+        $this->removeEntityManager ? $this->removeEntityManager->flush() : false;
 
         return $this;
     }
