@@ -384,11 +384,7 @@ abstract class EntityDataMapper
 
                                 if($removeEntityElement !== false)
                                 {
-
-                                    $removeEntityManager = $this->removeEntityManager ?: clone $this->entityManager;
-                                    $removeEntityManager->remove($entityElement);
-                                    //$this->entityManager?->remove($entityElement);
-
+                                    $this->entityManager?->remove($entityElement);
                                     $entityCollections->removeElement($entityElement);
                                 }
                             }
@@ -514,7 +510,7 @@ abstract class EntityDataMapper
                 // Если свойство сущности ReadOnly и оно уже инициировано - не присваиваем
                 if(
                     $entityReflectionPropertyByName->isReadOnly() && $entityReflectionPropertyByName->isInitialized(
-                        $this
+                        $this,
                     )
                 )
                 {
@@ -532,7 +528,6 @@ abstract class EntityDataMapper
             }
         }
 
-        $this->removeEntityManager ? $this->removeEntityManager->flush() : false;
 
         return $this;
     }
