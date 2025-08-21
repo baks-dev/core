@@ -153,7 +153,8 @@ final class MessageDispatch implements MessageDispatchInterface
      */
     private function isUid(): bool
     {
-        return (bool) preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $this->transport);
+        $transport = trim(str_replace('-low', '', $this->transport));
+        return (bool) preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $transport);
     }
 
     /**
@@ -186,6 +187,15 @@ final class MessageDispatch implements MessageDispatchInterface
             /** Если указанный транспорт не запущен - присваиваем транспорт async-low */
             if(false === $cacheConsume->isHit() || (true === $cacheConsume->isHit() && false === $cacheConsume->get()))
             {
+                /**
+                 * Если транспорт профиля - не отправляем в ASYNC
+                 * основное требование - всегда должен быть запущен!!!
+                 */
+                if($this->isUid())
+                {
+                    return false;
+                }
+
                 $this->transport = 'async-low';
             }
 
