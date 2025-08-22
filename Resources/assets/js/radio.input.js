@@ -1,34 +1,49 @@
-
-document.querySelectorAll('[data-buttons="true"]').forEach(
-    function (e) {
-        [].slice.call(e.querySelectorAll("label.btn")).map((function (label) {
-
-            label.querySelector("input").addEventListener('change', function () {
-
-
-                if((this.type === "checkbox" || this.type === "radio") && this.checked == false)
+document.querySelectorAll("[data-buttons=\"true\"]").forEach(
+    function(e)
+    {
+        [].slice.call(e.querySelectorAll("label.btn")).map((function(label)
+        {
+            label.querySelector("input").addEventListener("change", function()
+            {
+                if(this.type !== "checkbox" && this.type !== "radio")
                 {
                     return;
                 }
 
                 if(this.type === "checkbox")
                 {
+                    if(this.checked == true)
+                    {
+                        label.classList.add("active");
+                        return;
+                    }
+
                     [].slice.call(e.querySelectorAll(".active")).map((function(act)
                     {
                         act.classList.remove("active");
                     }));
+
+                    return;
                 }
 
                 if(this.type === "radio")
                 {
                     document.querySelectorAll("[name=\"" + this.name + "\"]").forEach((function(unact)
                     {
+                        if(unact.checked == true)
+                        {
+                            unact.closest("label.btn").classList.add("active");
+                            return;
+                        }
+
                         unact.closest("label.btn").classList.remove("active");
+
                     }));
+
+
                 }
 
-                label.classList.add("active");
             });
         }));
-    }
+    },
 );

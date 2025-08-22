@@ -124,7 +124,6 @@ abstract class AbstractController
             '</tbody>',
         ];
 
-
         return str_ireplace($remove, '', $body);
     }
 
@@ -213,7 +212,7 @@ abstract class AbstractController
                             'message' => $message,
                             'arguments' => is_array($arguments) ? json_encode($arguments, JSON_THROW_ON_ERROR, 512) : $arguments,
                         ],
-                        status: $status
+                        status: $status,
                     );
                 }
 
@@ -228,7 +227,7 @@ abstract class AbstractController
                 throw new LogicException(
                     'You cannot use the addFlash method if sessions are disabled. Enable them in "config/packages/framework.yaml".',
                     0,
-                    $e
+                    $e,
                 );
             }
         }
@@ -256,16 +255,21 @@ abstract class AbstractController
      * Отображает шаблон
      *
      * @param array $parameters - передаваемые шаблону параметры
-     * @param string|null $fileName - нейминг роута файла
-     * @param string|null $moduleTemplateName
+     *
+     * @param string|null $module - директория модуля
+     *
+     * @param string|null $dir - нейминг роута контроллера либо относительный путь к директории
+     * например: admin.index либо admin/index
+     *
+     *
      * @param string|null $template
      * @param Response|null $response
      */
     protected function render(
         array $parameters = [],
-        bool|string $module = false,
-        ?string $routingName = null,
-        ?string $file = null,
+        string|false|null $module = false,
+        string|false|null $dir = false,
+        string|false|null $file = null,
         ?Response $response = null,
     ): Response
     {
@@ -274,24 +278,26 @@ abstract class AbstractController
 
         $route = $request->getCurrentRequest()->attributes->get('_route');
 
-        if(!$module)
+        if(empty($module))
         {
             $exp = explode(':', $route);
             $module = current($exp) ?: $module;
         }
 
-        $moduleTemplateName = '@'.$module;
+        /** Присваиваем значение модуля */
+        $moduleTemplateName = '@'.str_replace('@', '', $module);
 
-
-        // Если не задан нейминг роутинга - присваиваем из префикса роутинга
-        if(!$routingName)
+        if(empty($dir))
         {
-            $routingName = explode(':', $route)[1];
+            // Если не задана директория шаблона - присваиваем из постфикса роутинга (например admin.index)
+            $dir = explode(':', $route)[1];
         }
 
+        // По умолчанию подключается шаблон template.html.twig из директории модуля
         $fileDefault = 'template.html.twig';
 
 
+        // Для печати ищем в директории print шаблон content.html.twig
         if(is_null($file) && $request->getCurrentRequest()?->get('print') !== null)
         {
             $file = 'print/content.html.twig';
@@ -311,14 +317,16 @@ abstract class AbstractController
             }
         }
 
-        $fileName = str_replace('.', '/', $routingName).'/'.$file;
-
+        // Приводим полностью к относительному пути
+        $fileName = str_replace('.', '/', $dir).'/'.$file;
 
         $content = null;
 
 
         /**
-         * Подключаем шаблон в директории Template
+         * Подключаем шаблон в директории Template в случае переопределения
+         *
+         * @note шаблоны в директории templates имеют самый высокий приоритет
          */
         $ModuleTemplate = '@Template';
 
@@ -330,14 +338,16 @@ abstract class AbstractController
         // Пробуем определить файл шаблона по умолчанию template.html.twig
         elseif(file_exists($this->project_dir.'/templates/'.$module.'/'.$fileDefault))
         {
-            $fileName = str_replace('.', '/', $routingName).'/'.$fileDefault;
+            $fileName = str_replace('.', '/', $dir).'/'.$fileDefault;
 
             $view = $ModuleTemplate.'/'.$module.'/'.$fileName;
             $content = $this->environment->render($view, $parameters);
         }
 
         /**
-         * Подключаем шаблон в директории @App
+         * Подключаем шаблон в директории @App (src) в случае переопределения
+         *
+         * @note шаблоны в директории src имеют приоритет выше шаблона модуля
          */
         if($content === null)
         {
@@ -358,7 +368,7 @@ abstract class AbstractController
 
 
         /**
-         * Подключаем шаблон в директории модуля
+         * Подключаем шаблон из директории модуля
          */
         if($content === null)
         {
@@ -568,7 +578,7 @@ abstract class AbstractController
                     'message' => $message ? current($message) : '',
                     'redirect' => $url ?: $referer,
                 ],
-                status: $status
+                status: $status,
             );
         }
 

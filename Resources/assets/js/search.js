@@ -23,6 +23,7 @@
 //document.addEventListener("DOMContentLoaded", (event) => {
 
 const search_form = document.forms.search_form;
+
 if (search_form) {
 
 

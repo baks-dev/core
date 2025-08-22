@@ -53,7 +53,7 @@ final class SitemapController extends AbstractController
             ];
         }
 
-        $response = $this->render(['sitemaps' => $sitemaps], routingName: 'sitemap');
+        $response = $this->render(['sitemaps' => $sitemaps], dir: 'sitemap');
         $response->headers->set('Content-Type', 'text/xml');
 
         return $response;

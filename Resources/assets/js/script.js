@@ -268,11 +268,12 @@ function bindBootstrapToast()
     {
 
         // Не создаем повторно toast.
-        if (toastEl.classList.contains('toast-shown')) {
+        if(toastEl.classList.contains("toast-shown"))
+        {
             return;
         }
 
-        toastEl.classList.add('toast-shown');
+        toastEl.classList.add("toast-shown");
 
         return new bootstrap.Toast(toastEl, {delay : 15000}).show();
 
@@ -444,10 +445,14 @@ executeFunc(function uQnFyjnB()
 
     const search = form.querySelector("#search_form_query");
 
-    search.addEventListener("input", formDebounce(() =>
+    const debouncedSubmit = formDebounce(() =>
     {
         form.submit();
-    }, 1500));
+    }, 1500);
+
+    // Вешаем на все relevant события
+    search.addEventListener("input", debouncedSubmit);
+    search.addEventListener("keyup", debouncedSubmit);
 
     return true;
 });
@@ -530,7 +535,7 @@ async function offcanvasLink(offcanvas)
 
                 if(myOffcanvas === null)
                 {
-                    console.log('Элемент с идентификатором id="offcanvas" не найден');
+                    console.log("Элемент с идентификатором id=\"offcanvas\" не найден");
 
                     /**
                      <div class="offcanvas offcanvas-start"
@@ -574,7 +579,7 @@ document.querySelectorAll(".collapse-link-content").forEach(function(item, i, ar
     item.addEventListener("click", function()
     {
         collapseLink(item);
-    } , { once: true } );
+    }, {once : true});
 });
 
 
@@ -582,54 +587,48 @@ async function collapseLink(collapse)
 {
 
     await fetch(collapse.dataset.href, {
-        method : "GET",
-        cache : "no-cache",
-        credentials : "same-origin",
-        headers : {
+        method : "GET", cache : "no-cache", credentials : "same-origin", headers : {
             "X-Requested-With" : "XMLHttpRequest",
-        }, redirect : "follow",
-        referrerPolicy : "no-referrer",
-    })
+        }, redirect : "follow", referrerPolicy : "no-referrer",
+    }).then((response) =>
+    {
 
-        .then((response) =>
+        if(response.status !== 200)
         {
+            return false;
+        }
 
-            if(response.status !== 200)
+        return response.text();
+    }).then((data) =>
+    {
+
+        if(data)
+        {
+            // Получить element c содержимым
+            const containerId = collapse.dataset.container;
+
+            var myCollapse = document.getElementById(containerId);
+
+            if(myCollapse === null)
             {
-                return false;
+                console.log("Элемент с идентификатором id=\"" + containerId + "\" не найден");
+                return;
             }
 
-            return response.text();
-        }).then((data) =>
-        {
 
-            if(data)
-            {
-                // Получить element c содержимым
-                const containerId = collapse.dataset.container;
+            let bsCollapse = bootstrap.Collapse.getOrCreateInstance(myCollapse);
 
-                var myCollapse = document.getElementById(containerId);
-
-                if(myCollapse === null)
-                {
-                    console.log('Элемент с идентификатором id="' + containerId + '" не найден');
-                    return;
-                }
+            myCollapse.innerHTML = data;
 
 
-                let bsCollapse = bootstrap.Collapse.getOrCreateInstance(myCollapse);
+            /** Обновляем Preload */
 
-                myCollapse.innerHTML = data;
+            let lazy = document.createElement("script");
+            lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
+            document.head.appendChild(lazy);
 
-
-                /** Обновляем Preload */
-
-                let lazy = document.createElement("script");
-                lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
-                document.head.appendChild(lazy);
-
-            }
-        });
+        }
+    });
 
     return false;
 
@@ -684,7 +683,8 @@ function modalLink(item)
         let METHOD = typeof item.dataset.method === "undefined" ? "GET" : item.dataset.method;
 
         /** Обработка dataset и добавление в formData */
-        const processFormData = function(item, collection_form_name, i) {
+        const processFormData = function(item, collection_form_name, i)
+        {
             if(typeof item.dataset.formname === "undefined")
             {
                 return false;
@@ -703,7 +703,6 @@ function modalLink(item)
                 }
             }
         };
-
 
 
         /** Обработка данных - dataset ссылок, пример - Производственный процесс baks-dev/manufacture-part
@@ -731,10 +730,10 @@ function modalLink(item)
             let className = item.dataset.postClass;
 
             // Получим атрибут элемента коллекции форм data-collection-form
-            const collection_form_name = item.dataset.collectionForm
+            const collection_form_name = item.dataset.collectionForm;
 
             /* Если выбран один товар (нажата ссылка) то добавляем только один элемент */
-            if(item.dataset.postClass === 'add-one-to-collection')
+            if(item.dataset.postClass === "add-one-to-collection")
             {
                 processFormData(item, collection_form_name, 0);
             }
@@ -743,7 +742,7 @@ function modalLink(item)
             else
             {
                 /** Получаем все элементы по классу */
-                document.querySelectorAll("." + className + ':checked').forEach(function(item, i, arr)
+                document.querySelectorAll("." + className + ":checked").forEach(function(item, i, arr)
                 {
                     processFormData(item, collection_form_name, i);
                 });
@@ -851,13 +850,13 @@ function modalLink(item)
 
 
                 // условие, если есть GET параметр print - вызываем диалоговое окно
-                if(urlObject.searchParams.has('print') && urlObject.searchParams.get('print') === '1')
+                if(urlObject.searchParams.has("print") && urlObject.searchParams.get("print") === "1")
                 {
                     window.print();
 
                     /* Закрываем модальное окно */
 
-                    let currentmodal = bootstrap.Modal.getOrCreateInstance(modal) // Returns a Bootstrap modal instance
+                    let currentmodal = bootstrap.Modal.getOrCreateInstance(modal); // Returns a Bootstrap modal instance
                     currentmodal.hide();
                 }
             }
