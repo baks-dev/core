@@ -1,4 +1,25 @@
 <?php
+/*
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished
+ *  to do so, subject to the following conditions:
+ *  
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *  
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
 
 namespace BaksDev\Core\Command;
 
@@ -10,14 +31,13 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
-
 use function dirname;
-
 use const DIRECTORY_SEPARATOR;
 
 #[AsCommand(
@@ -29,23 +49,25 @@ class AssetsInstallCommand extends Command
     public const string METHOD_COPY = 'copy';
     public const string METHOD_ABSOLUTE_SYMLINK = 'absolute symlink';
 
-    private Filesystem $filesystem;
 
     private string $projectDir;
 
     public function __construct(
-        Filesystem $filesystem,
-        KernelInterface $kernel
-    ) {
+        private readonly Filesystem $filesystem,
+        KernelInterface $kernel,
+        #[Autowire(env: 'APP_VERSION')] private readonly ?string $version = null,
+    )
+    {
         parent::__construct();
 
-        $this->filesystem = $filesystem;
         $this->projectDir = $kernel->getProjectDir();
     }
 
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
+
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
 
@@ -98,23 +120,33 @@ class AssetsInstallCommand extends Command
 
         $publicDir = $this->projectDir.DIRECTORY_SEPARATOR.$this->getPublicDirectory($kernel->getContainer());
 
-        if(!is_dir($publicDir))
+        if(false === is_dir($publicDir))
         {
             throw new InvalidArgumentException(sprintf('Каталог "%s" не существует.', $publicDir));
         }
 
         /* Получаем все имеющиеся папки с ресурсами ASSET */
-        $ModuleAssets = $this->searchAssets($this->projectDir.DIRECTORY_SEPARATOR.'src', 'assets') ?: [];
+        $ModuleAssets = $this->searchAssets(
+            $this->projectDir.DIRECTORY_SEPARATOR.'src',
+            'assets',
+        ) ?: [];
 
         $ModuleAssets = array_merge(
             $ModuleAssets,
-            $this->searchAssets($this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']), 'assets')
+            $this->searchAssets(
+                $this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']),
+                'assets'),
         );
 
         $validAssetDirs = null;
         $rows = null;
 
         $bundlesDir = $publicDir.implode(DIRECTORY_SEPARATOR, ['', 'assets', '']);
+
+        if(false === empty($this->version))
+        {
+            $this->filesystem->remove($bundlesDir);
+        }
 
         foreach($ModuleAssets as $moduleAsset)
         {
@@ -144,7 +176,7 @@ class AssetsInstallCommand extends Command
                     $rows[] = [
                         sprintf(
                             '<fg=green;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94" /* HEAVY CHECK MARK (U+2714) */
+                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94", /* HEAVY CHECK MARK (U+2714) */
                         ),
                         $message,
                         $method,
@@ -155,7 +187,7 @@ class AssetsInstallCommand extends Command
                     $rows[] = [
                         sprintf(
                             '<fg=red;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */
+                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98", /* HEAVY BALLOT X (U+2718) */
                         ),
                         $message,
                         $e->getMessage(),
@@ -230,7 +262,7 @@ class AssetsInstallCommand extends Command
                     $rows[] = [
                         sprintf(
                             '<fg=green;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94"
+                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94",
                         ),
                         $message,
                         $method,
@@ -243,7 +275,7 @@ class AssetsInstallCommand extends Command
                     $rows[] = [
                         sprintf(
                             '<fg=red;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */
+                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98", /* HEAVY BALLOT X (U+2718) */
                         ),
                         $message,
                         $e->getMessage(),
@@ -316,7 +348,7 @@ class AssetsInstallCommand extends Command
                     $rows[] = [
                         sprintf(
                             '<fg=green;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94"
+                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94",
                         ),
                         $message,
                         $method,
@@ -327,7 +359,7 @@ class AssetsInstallCommand extends Command
                     $rows[] = [
                         sprintf(
                             '<fg=red;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98" /* HEAVY BALLOT X (U+2718) */
+                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98", /* HEAVY BALLOT X (U+2718) */
                         ),
                         $message,
                         $e->getMessage(),
@@ -443,7 +475,7 @@ class AssetsInstallCommand extends Command
                 sprintf('Symbolic link "%s" was created but appears to be broken.', $targetDir),
                 0,
                 null,
-                $targetDir
+                $targetDir,
             );
         }
     }
