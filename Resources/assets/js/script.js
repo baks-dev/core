@@ -651,6 +651,8 @@ function modalLink(item)
          */
         const modalData = new FormData();
 
+        // Получить data-formname элемента
+        const formname = item.dataset.formname;
 
         /** Показываем прелоад модального окна */
         document.querySelector("#modal .spinner-border")?.classList.remove("d-none");
@@ -699,7 +701,8 @@ function modalLink(item)
                 /* Пропустить элемент formname */
                 if(name !== "formname")
                 {
-                    modalData.append(item.dataset.formname + "[" + collection_form_name + "]" + "[" + i + "][" + name + "]", dataAttributes[name]);
+                    const elem_formname = formname === 'undefined' ? item.dataset.formname : formname;
+                    modalData.append(elem_formname + "[" + collection_form_name + "]" + "[" + i + "][" + name + "]", dataAttributes[name]);
                 }
             }
         };
