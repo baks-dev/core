@@ -707,7 +707,6 @@ function modalLink(item)
             }
         };
 
-
         /** Обработка данных - dataset ссылок, пример - Производственный процесс baks-dev/manufacture-part
          * Цель - возможность отправки данных в POST-запросе
          */
