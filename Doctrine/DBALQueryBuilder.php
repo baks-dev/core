@@ -876,12 +876,35 @@ final class DBALQueryBuilder extends QueryBuilder
         }
 
         /**
-         * Если пользователь не авторизован
+         * Если пользователь авторизован и его профиль соответствует PROJECT_PROFILE из .env
          */
         if(
             true === $this->UserProfileTokenStorageInterface->isUser() &&
             true === $this->UserProfileTokenStorageInterface->getProfileCurrent()->equals($this->projectProfile)
         )
+        {
+            return false;
+        }
+
+        $this->setParameter(
+            key: self::PROJECT_PROFILE_KEY,
+            value: new UserProfileUid($this->projectProfile),
+            type: UserProfileUid::TYPE,
+        );
+
+        return true;
+    }
+
+    /**
+     * Метод создает bind параметр профиля проекта для запроса,
+     * НЕ ПРОВЕРЯЯ авторизацию и соответствие профиля PROJECT_PROFILE из .env
+     */
+    public function isProjectProfile(): bool
+    {
+        /**
+         * Если не указан идентификатор проекта
+         */
+        if(is_null($this->projectProfile))
         {
             return false;
         }
