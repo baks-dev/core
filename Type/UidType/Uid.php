@@ -38,7 +38,7 @@ abstract class Uid implements ValueResolverInterface
 
     public function __construct(AbstractUid|Uid|string|null|false $value = null, bool $test = true)
     {
-        if(empty($value))
+        if(empty($value) || $value === 'null')
         {
             $this->value = Uuid::v7();
 

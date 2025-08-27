@@ -19,7 +19,6 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
- *
  */
 
 declare(strict_types=1);
@@ -877,35 +876,12 @@ final class DBALQueryBuilder extends QueryBuilder
         }
 
         /**
-         * Если пользователь авторизован и его профиль соответствует PROJECT_PROFILE из .env
+         * Если пользователь не авторизован
          */
         if(
             true === $this->UserProfileTokenStorageInterface->isUser() &&
             true === $this->UserProfileTokenStorageInterface->getProfileCurrent()->equals($this->projectProfile)
         )
-        {
-            return false;
-        }
-
-        $this->setParameter(
-            key: self::PROJECT_PROFILE_KEY,
-            value: new UserProfileUid($this->projectProfile),
-            type: UserProfileUid::TYPE,
-        );
-
-        return true;
-    }
-
-    /**
-     * Метод создает bind параметр профиля проекта для запроса,
-     * НЕ ПРОВЕРЯЯ авторизацию и соответствие профиля PROJECT_PROFILE из .env
-     */
-    public function isProjectProfile(): bool
-    {
-        /**
-         * Если не указан идентификатор проекта
-         */
-        if(is_null($this->projectProfile))
         {
             return false;
         }
