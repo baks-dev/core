@@ -105,7 +105,7 @@ final class DBALQueryBuilder extends QueryBuilder
         private readonly AppCacheInterface $cache,
         private readonly DeduplicatorInterface $deduplicator,
         private readonly MessageDispatchInterface $dispatch,
-        private readonly UserProfileTokenStorageInterface $UserProfileTokenStorageInterface,
+        private readonly ?UserProfileTokenStorageInterface $UserProfileTokenStorageInterface = null,
         #[Autowire(env: 'PROJECT_PROFILE')] private readonly ?string $projectProfile = null,
     )
     {
@@ -867,6 +867,11 @@ final class DBALQueryBuilder extends QueryBuilder
      */
     public function bindProjectProfile(): bool
     {
+        if(false === ($this->UserProfileTokenStorageInterface instanceof UserProfileTokenStorageInterface))
+        {
+            return false;
+        }
+
         /**
          * Если не указан идентификатор проекта
          */
@@ -921,6 +926,11 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function bindCurrentProfile(): bool
     {
+        if(false === ($this->UserProfileTokenStorageInterface instanceof UserProfileTokenStorageInterface))
+        {
+            return false;
+        }
+
         if(false === $this->UserProfileTokenStorageInterface->isUser())
         {
             return false;

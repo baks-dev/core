@@ -24,7 +24,9 @@
 
 namespace BaksDev\Core\Messenger;
 
+use Exception;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -45,32 +47,60 @@ readonly class MessageHandleMiddleware implements MiddlewareInterface
     {
         $message = $envelope->getMessage();
 
+        /** Класс обработчика (Dispatcher) */
+
         $name = explode('\\', $message::class);
         $name = end($name);
+
+        /**
+         * Описываем класс вызова
+         */
+
+        $reflection = new ReflectionClass($message);
+
+        $instance = $reflection->getShortName().'(';
+
+        foreach($reflection->getProperties() as $property)
+        {
+            $value = $property->getValue($message);
+
+            try
+            {
+                $instance .= sprintf("%s: '%s', ", $property->getName(), $value);
+            }
+            catch(Exception)
+            {
+                $instance .= sprintf("%s: '%s', ", $property->getName(), var_export($value, true));
+            }
+        }
+
+        $instance .= ')';
+
+        /**
+         * Сохраняем вызовы в порядке приоритета
+         */
 
         try
         {
             $envelope = $stack->next()->handle($envelope, $stack);
-
             $handledStamps = $envelope->all(HandledStamp::class);
 
             foreach($handledStamps as $handledStamp)
             {
                 $this->logger->debug(
                     sprintf('%s: %s', $name, $handledStamp->getHandlerName()),
-                    [var_export($message, true)]
+                    [$instance],
                 );
             }
         }
         catch(Throwable $exception)
         {
-
             $this->logger->critical(
                 sprintf('%s: %s', $name, $exception->getMessage()),
                 [
+                    $instance,
                     $exception->getPrevious()?->getFile().':'.$exception->getPrevious()?->getLine(),
-                    'message' => var_export($message, true)
-                ]
+                ],
             );
         }
 
