@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Core\Command;
 
 
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,7 +40,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class DevelopmentCommand extends Command
 {
-    public function __construct()
+    public function __construct(MessageDispatchInterface $MessageDispatch)
     {
         parent::__construct();
     }
@@ -47,7 +48,6 @@ class DevelopmentCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
 
         $io->success('baks:development');
         return Command::SUCCESS;
