@@ -53,8 +53,6 @@ final readonly class EntityKeyValueCache
     public function __construct(
         #[Autowire(env: 'REDIS_HOST')] private string $REDIS_HOST,
         #[Autowire(env: 'REDIS_PORT')] private string $REDIS_PORT,
-        #[Autowire(env: 'REDIS_PASSWORD')] private string $REDIS_PASSWORD,
-        #[Autowire(env: 'default:DEFAULT_REDIS_TABLE:REDIS_TABLE')] private string $REDIS_TABLE,
     ) {}
 
     public function postFlush(PostFlushEventArgs $args): void
@@ -67,8 +65,8 @@ final readonly class EntityKeyValueCache
          */
         $Redis = new Redis();
         $Redis->connect($this->REDIS_HOST, (int) $this->REDIS_PORT);
-        $Redis->auth([$this->REDIS_PASSWORD]);
-        $Redis->select((int) $this->REDIS_TABLE);
+        //$Redis->auth([$this->REDIS_PASSWORD]);
+        //$Redis->select((int) $this->REDIS_TABLE);
 
 
         /**

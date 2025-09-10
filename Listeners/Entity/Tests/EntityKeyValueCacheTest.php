@@ -57,8 +57,8 @@ class EntityKeyValueCacheTest extends KernelTestCase
 
         $this->redis = new Redis();
         $this->redis->connect(self::$REDIS_HOST, self::$REDIS_PORT);
-        $this->redis->auth([self::$REDIS_PASSWORD]);
-        $this->redis->select(self::$REDIS_TABLE);
+        //$this->redis->auth([self::$REDIS_PASSWORD]);
+        //$this->redis->select(self::$REDIS_TABLE);
 
         $findAll = $this->redis->keys('material_categories_material:*');
 
