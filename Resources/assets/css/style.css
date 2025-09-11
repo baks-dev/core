@@ -741,3 +741,40 @@ img.loaded, div.loaded {
     transform: scale(0.9);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
+
+
+.rate {
+
+    .form-check {
+        position: relative;
+        padding-left: 0;
+    }
+
+    .form-check input[type="radio"] {
+        position: absolute;
+        top: -9999px;
+    }
+
+    .form-check label {
+        width: 1em;
+        overflow: hidden;
+        white-space: nowrap;
+        cursor: pointer;
+        font-size: 30px;
+        color: #ccc;
+        display: block;
+        transition: color 0.2s;
+    }
+
+    .form-check label:before {
+        content: '★ ';
+    }
+
+    .form-check label.active {
+        color: #ffc700;
+    }
+
+    .form-check label.hovered {
+        color: #deb217;
+    }
+}
