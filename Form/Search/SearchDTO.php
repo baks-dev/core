@@ -68,9 +68,10 @@ class SearchDTO
         return preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $this->getQuery());
     }
 
-    public function setQuery(string|int|null $query): void
+    public function setQuery(string|int|null $query): self
     {
         $this->query = $query;
+        return $this;
     }
 
 }
