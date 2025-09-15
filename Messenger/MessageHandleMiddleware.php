@@ -62,6 +62,11 @@ readonly class MessageHandleMiddleware implements MiddlewareInterface
 
         foreach($reflection->getProperties() as $property)
         {
+            if(false === $property->isInitialized($message))
+            {
+                continue;
+            }
+
             $value = $property->getValue($message);
 
             try
