@@ -554,12 +554,17 @@ async function offcanvasLink(offcanvas)
 
                 bsOffcanvas.show();
 
-
                 /** Обновляем Preload */
 
                 let lazy = document.createElement("script");
                 lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
+
+                myOffcanvas.addEventListener("hidden.bs.offcanvas", event =>
+                {
+                    myOffcanvas.innerHTML = "";
+                });
+
             }
         });
 
@@ -701,7 +706,7 @@ function modalLink(item)
                 /* Пропустить элемент formname */
                 if(name !== "formname")
                 {
-                    const elem_formname = formname === 'undefined' ? item.dataset.formname : formname;
+                    const elem_formname = formname === "undefined" ? item.dataset.formname : formname;
                     modalData.append(elem_formname + "[" + collection_form_name + "]" + "[" + i + "][" + name + "]", dataAttributes[name]);
                 }
             }
