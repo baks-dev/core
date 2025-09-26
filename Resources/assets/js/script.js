@@ -862,9 +862,16 @@ function modalLink(item)
                     window.print();
 
                     /* Закрываем модальное окно */
+                    setTimeout(function()
+                    {
+                        ///myModalEl.addEventListener('shown.bs.modal', () => {
+                        let currentmodal = bootstrap.Modal.getOrCreateInstance(modal);
+                        currentmodal.hide();
 
-                    let currentmodal = bootstrap.Modal.getOrCreateInstance(modal); // Returns a Bootstrap modal instance
-                    currentmodal.hide();
+                        document.getElementById("prnt").innerHTML = "";
+
+                    }, 10);
+
                 }
             }
             else
