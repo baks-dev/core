@@ -96,7 +96,7 @@ function printElement()
 
                         myModalEl.addEventListener('hidden.bs.modal', printers);
 
-                    }, 10);
+                    }, 500);
 
                 }
             }
