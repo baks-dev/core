@@ -55,6 +55,7 @@ class AssetsInstallCommand extends Command
     public function __construct(
         private readonly Filesystem $filesystem,
         KernelInterface $kernel,
+        #[Autowire('%kernel.project_dir%')] private readonly string $project,
         #[Autowire(env: 'APP_VERSION')] private readonly ?string $version = null,
     )
     {
@@ -71,29 +72,29 @@ class AssetsInstallCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->newLine();
 
-        /* ******************************* */
+        //        /* ******************************* */
+        //
+        //        $io->text('Установка конфигурационных файлов');
+        //        $io->newLine();
+        //
+        //        $rows = $this->assetsPackages();
+        //
+        //        if($rows)
+        //        {
+        //            $io->table(['', 'Module'], $rows);
+        //        }
 
-        $io->text('Установка конфигурационных файлов');
-        $io->newLine();
-
-        $rows = $this->assetsPackages();
-
-        if($rows)
-        {
-            $io->table(['', 'Module', 'Method / Error'], $rows);
-        }
-
-        /* ******************************* */
-
-        $io->text('Установка файлов роутинга');
-        $io->newLine();
-
-        $rows = $this->assetsRouting();
-
-        if($rows)
-        {
-            $io->table(['', 'Module', 'Method / Error'], $rows);
-        }
+        //        /* ******************************* */
+        //
+        //        $io->text('Установка файлов роутинга');
+        //        $io->newLine();
+        //
+        //        $rows = $this->assetsRouting();
+        //
+        //        if($rows)
+        //        {
+        //            $io->table(['', 'Module'], $rows);
+        //        }
 
 
         /* ******************************* */
@@ -105,7 +106,7 @@ class AssetsInstallCommand extends Command
 
         if($rows)
         {
-            $io->table(['', 'Module', 'Method / Error'], $rows);
+            $io->table(['', 'Module'], $rows);
         }
 
 
@@ -115,6 +116,7 @@ class AssetsInstallCommand extends Command
 
     private function assetsFile(): ?array
     {
+
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()?->getKernel();
 
@@ -173,25 +175,25 @@ class AssetsInstallCommand extends Command
 
                     $method = $this->absoluteSymlinkWithFallback($originDir, $targetDir);
 
-                    $rows[] = [
-                        sprintf(
-                            '<fg=green;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94", /* HEAVY CHECK MARK (U+2714) */
-                        ),
-                        $message,
-                        $method,
-                    ];
+                    //                    $rows[] = [
+                    //                        sprintf(
+                    //                            '<fg=green;options=bold>%s</>',
+                    //                            '\\' === DIRECTORY_SEPARATOR ? 'OK' : "\xE2\x9C\x94", /* HEAVY CHECK MARK (U+2714) */
+                    //                        ),
+                    //                        $message,
+                    //                        $method,
+                    //                    ];
                 }
                 catch(Exception $e)
                 {
-                    $rows[] = [
-                        sprintf(
-                            '<fg=red;options=bold>%s</>',
-                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98", /* HEAVY BALLOT X (U+2718) */
-                        ),
-                        $message,
-                        $e->getMessage(),
-                    ];
+                    //                    $rows[] = [
+                    //                        sprintf(
+                    //                            '<fg=red;options=bold>%s</>',
+                    //                            '\\' === DIRECTORY_SEPARATOR ? 'ERROR' : "\xE2\x9C\x98", /* HEAVY BALLOT X (U+2718) */
+                    //                        ),
+                    //                        $message,
+                    //                        $e->getMessage(),
+                    //                    ];
                 }
             }
         }
@@ -206,6 +208,58 @@ class AssetsInstallCommand extends Command
             $dirsToRemove = Finder::create()->depth(0)->directories()->exclude($validAssetDirs)->in($bundlesDir);
 
             $this->filesystem->remove($dirsToRemove);
+        }
+
+        /**
+         * Создаем симлинки на файлы ресурсов в директории APP_VERSION
+         * TODO: Устаревший способ выше постепенно будет удален
+         */
+
+        $assetsDir = $this->project
+            .implode(DIRECTORY_SEPARATOR, ['', 'public', 'assets', ($this->version ?? '')])
+            .(false === isset($this->version) ?: DIRECTORY_SEPARATOR);
+
+        if(isset($this->version))
+        {
+            /* Удаляем директорию с ресурсами для обновления */
+            $this->filesystem->remove($assetsDir);
+        }
+
+        $this->filesystem->mkdir($assetsDir);
+
+        foreach($ModuleAssets as $moduleAsset)
+        {
+            /* Итерируемся по директории ресурсов */
+            foreach(new DirectoryIterator($moduleAsset) as $fileInfo)
+            {
+                /* добавляем симлинки только на директории */
+                if($fileInfo->isDot() || !is_dir($fileInfo->getRealPath()))
+                {
+                    continue;
+                }
+
+                // указываем полный путь к символической ссылке модуля
+                $moduleName = mb_strtolower($fileInfo->getFilename());
+                $assetTargetDir = $assetsDir.$moduleName;
+
+                $this->symlink($fileInfo->getRealPath(), $assetTargetDir);
+
+                if(is_link($assetTargetDir) && is_dir($assetTargetDir))
+                {
+                    $rows[] = [
+                        sprintf('<fg=green;options=bold>%s</>', "\xE2\x9C\x94"),
+                        $moduleName,
+                    ];
+
+                    continue;
+                }
+
+                /** Ошибка создания символической ссылки */
+                $rows[] = [
+                    sprintf('<fg=red;options=bold>%s</>', "\xE2\x9C\x98"),
+                    $moduleName,
+                ];
+            }
         }
 
         return $rows;
@@ -302,6 +356,7 @@ class AssetsInstallCommand extends Command
     }
 
 
+    /**  */
     private function assetsPackages(): ?array
     {
         $ModulePackages = $this->searchAssets($this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']), 'packages') ?: [];
