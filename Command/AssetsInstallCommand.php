@@ -217,7 +217,7 @@ class AssetsInstallCommand extends Command
 
         $assetsDir = $this->project
             .implode(DIRECTORY_SEPARATOR, ['', 'public', 'assets', ($this->version ?? '')])
-            .(false === isset($this->version) ?: DIRECTORY_SEPARATOR);
+            .(false === isset($this->version) ? '' : DIRECTORY_SEPARATOR);
 
         if(isset($this->version))
         {
