@@ -242,7 +242,7 @@ class AssetsInstallCommand extends Command
                 $moduleName = mb_strtolower($fileInfo->getFilename());
                 $assetTargetDir = $assetsDir.$moduleName;
 
-                $this->symlink($fileInfo->getRealPath(), $assetTargetDir);
+                $this->filesystem->symlink($fileInfo->getRealPath(), $assetTargetDir);
 
                 if(is_link($assetTargetDir) && is_dir($assetTargetDir))
                 {
