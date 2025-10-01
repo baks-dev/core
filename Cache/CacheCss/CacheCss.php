@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,9 @@ final class CacheCss implements CacheCssInterface
 
     public function __construct(
         AppCacheInterface $cache,
+        #[Autowire(env: 'APP_VERSION')] private readonly string $version,
         #[Autowire(env: 'APP_ENV')] string $env = 'prod',
+
     )
     {
         $this->cache = $cache;
@@ -84,7 +86,7 @@ final class CacheCss implements CacheCssInterface
 
             $classes = $this->getHtmlClass($content);
 
-            $path = __DIR__.'/../../Resources/assets/css/style.min.css';
+            $path = __DIR__.'/../../Resources/assets/'.$this->version.'/css/style.min.css';
 
             $file = realpath($path);
 

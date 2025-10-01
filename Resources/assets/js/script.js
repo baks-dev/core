@@ -422,6 +422,8 @@ function bindBootstrapPopover()
     return true;
 }
 
+let searchValue = null;
+
 
 /** Функция отправки формы поиска */
 executeFunc(function uQnFyjnB()
@@ -445,9 +447,20 @@ executeFunc(function uQnFyjnB()
 
     const search = form.querySelector("#search_form_query");
 
+
     const debouncedSubmit = formDebounce(() =>
     {
+        if(searchValue)
+        {
+            console.log(search.value.trim());  /* TODO: удалить !!! */
+            console.log(searchValue);  /* TODO: удалить !!! */
+
+            //searchValue = search.value;
+            console.log(searchValue.trim());  /* TODO: удалить !!! */
+        }
+
         form.submit();
+
     }, 1500);
 
     // Вешаем на все relevant события
@@ -557,7 +570,7 @@ async function offcanvasLink(offcanvas)
                 /** Обновляем Preload */
 
                 let lazy = document.createElement("script");
-                lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
+                lazy.src = "/assets/" + $version + "/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
 
                 myOffcanvas.addEventListener("hidden.bs.offcanvas", event =>
@@ -629,7 +642,7 @@ async function collapseLink(collapse)
             /** Обновляем Preload */
 
             let lazy = document.createElement("script");
-            lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
+            lazy.src = "/assets/" + $version + "/js/lazyload.min.js?v=" + Date.now();
             document.head.appendChild(lazy);
 
         }
@@ -849,7 +862,7 @@ function modalLink(item)
                 }
 
                 let lazy = document.createElement("script");
-                lazy.src = "/assets/js/lazyload.min.js?v=" + Date.now();
+                lazy.src = "/assets/" + $version + "/js/lazyload.min.js?v=" + Date.now();
                 document.head.appendChild(lazy);
 
 
@@ -1014,7 +1027,6 @@ async function submitModalForm(forms)
             return false;
         }
 
-
         if(data.status === 302 || data.status === 307)
         {
             if(data.redirect === undefined || data.redirect === null)
@@ -1024,6 +1036,14 @@ async function submitModalForm(forms)
             }
 
             window.location.href = data.redirect;
+            return false;
+        }
+
+        if(data.status === 403)
+        {
+            let $access = "{ \"type\":\"danger\" , " + "\"header\":\"Ошибка\"  , " + "\"message\" : \"Недостаточно прав для выполнения данной операции\" }";
+            createToast(JSON.parse($access));
+
             return false;
         }
 
@@ -1042,12 +1062,14 @@ async function submitModalForm(forms)
                 resolve(data);
                 return;
             }
+
             console.log("resolve not found");
 
             if(resolved > 1000)
             {
                 return;
             }
+
             resolved = resolved * 2;
             setTimeout(initResolve, resolved);
 

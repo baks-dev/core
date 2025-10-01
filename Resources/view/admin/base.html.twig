@@ -9,15 +9,21 @@
 
     <title>{% block title %}{{ baks_settings.headers.title }}{% endblock %}</title>
 
-    <link rel="icon" href="/assets/img/favicon/favicon.ico">
-    <link href="/assets/plugins/bootstrap/5.3.3/bootstrap.min.css" rel="stylesheet">
-    <link href="/assets/css/style.min.css" rel="stylesheet">
+    <link rel="icon" href="/assets/{{ version }}/img/favicon/favicon.ico">
+    <link href="/assets/{{ version }}/plugins/bootstrap/5.3.3/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/{{ version }}/css/style.min.css" rel="stylesheet">
 
     {% block stylesheets %}{% endblock %}
 
 </head>
 
 <body>
+
+{# Определяем глобальные переменные локали и версии проекта #}
+<script nonce="{{ csp_nonce() }}">
+    const $version = '{{ version }}';
+    const $locale = '{{ app.request.getLocale() }}';
+</script>
 
 {% block header %}
     {{ include(_self|replace({ "base.html.twig": baks_settings.device~"/header.html.twig" })) }}
@@ -26,15 +32,14 @@
 {% block content %}{% endblock %}
 
 <script nonce="{{ csp_nonce() }}">
-    const $locale = '{{ app.request.getLocale() }}';
     window.lazyLoadOptions = {};
     window.bootstrap = false;
 </script>
 
-<script nonce="{{ csp_nonce() }}" async src='/assets/js/lazyload.min.js?v={{ version }}'></script>
-<script nonce="{{ csp_nonce() }}" data-src="/assets/plugins/bootstrap/5.3.3/bootstrap.bundle.min.js?v={{ version }}"
+<script nonce="{{ csp_nonce() }}" async src='/assets/{{ version }}/js/lazyload.min.js'></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/{{ version }}/plugins/bootstrap/5.3.3/bootstrap.bundle.min.js"
         class="lazy"></script>
-<script nonce="{{ csp_nonce() }}" data-src='/assets/js/script.min.js?v={{ version }}' class="lazy"></script>
+<script nonce="{{ csp_nonce() }}" data-src='/assets/{{ version }}/js/script.min.js' class="lazy"></script>
 
 {% block javascript %}{% endblock %}
 

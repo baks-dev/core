@@ -63,7 +63,7 @@
                                     style='margin-top: 0 !important;'
                                 >
                                     {# Обложка  #}
-                                    {% set image_path = '/assets/img/blank.svg' %}
+                                    {% set image_path = '/assets/'~version~'/img/blank.svg' %}
 
                                     {% if menu.category_cover_ext is defined and menu.category_cover_ext is not null %}
                                         {% set img_host =  menu.category_cover_cdn == true  ? CDN_HOST : '' %}
@@ -140,7 +140,7 @@
 									<div>
 										<span class="icon rounded-circle bg-cover lazy p-1"
 												style="width: 43px; height: 43px;"
-												data-bg="{{ menu.category_cover_dir ? img_path ~ menu.category_cover_dir ~ category_cover_ext : '/assets/img/blank.svg' }}"
+												data-bg="{{ menu.category_cover_dir ? img_path ~ menu.category_cover_dir ~ category_cover_ext : '/assets/'~version~'/img/blank.svg' }}"
 										>
 										</span>
 									</div>
