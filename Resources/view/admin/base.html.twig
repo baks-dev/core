@@ -13,17 +13,18 @@
     <link href="/assets/{{ version }}/plugins/bootstrap/5.3.3/bootstrap.min.css" rel="stylesheet">
     <link href="/assets/{{ version }}/css/style.min.css" rel="stylesheet">
 
+    {# Определяем глобальные переменные локали и версии проекта #}
+    <script nonce="{{ csp_nonce() }}">
+        const $version = '{{ version }}';
+        const $locale = '{{ app.request.getLocale() }}';
+    </script>
+
+
     {% block stylesheets %}{% endblock %}
 
 </head>
 
 <body>
-
-{# Определяем глобальные переменные локали и версии проекта #}
-<script nonce="{{ csp_nonce() }}">
-    const $version = '{{ version }}';
-    const $locale = '{{ app.request.getLocale() }}';
-</script>
 
 {% block header %}
     {{ include(_self|replace({ "base.html.twig": baks_settings.device~"/header.html.twig" })) }}
