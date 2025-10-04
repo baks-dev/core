@@ -108,7 +108,9 @@
 
                 {% if isProduct %}
 
-                    <a href="{{ path('products-product:public.detail', { url: card.url,
+                    <a href="{{ path('products-product:public.detail', {
+                        category: category.category_url,
+                        url: card.url,
                         offer : product_offer.offer_value,
                         variation : product_offer.variation_value,
                         modification : product_offer.modification_value
