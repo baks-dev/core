@@ -424,7 +424,6 @@ function bindBootstrapPopover()
 
 let searchValue = null;
 
-
 /** Функция отправки формы поиска */
 executeFunc(function uQnFyjnB()
 {
@@ -469,7 +468,6 @@ executeFunc(function uQnFyjnB()
 
     return true;
 });
-
 
 function modaHidden()
 {
@@ -656,9 +654,16 @@ async function collapseLink(collapse)
 /** сплывающее модальное окно */
 function modalLink(item)
 {
+    /** Pfghtoftv gjdnjhyj dtifnm cj,snbt */
+    if(typeof item.dataset.call !== "undefined")
+    {
+        return;
+    }
+
     // Обрываем запрос если имеется класс prnt
     if(item.classList.contains("prnt") === true || item.classList.contains("print") === true)
     {
+        item.dataset.call = true;
         return;
     }
 
@@ -715,12 +720,19 @@ function modalLink(item)
             // Перебираем все data-атрибуты
             for(const name in dataAttributes)
             {
+                const elem_formname = formname === "undefined" ? item.dataset.formname : formname;
 
                 /* Пропустить элемент formname */
                 if(name !== "formname")
                 {
-                    const elem_formname = formname === "undefined" ? item.dataset.formname : formname;
-                    modalData.append(elem_formname + "[" + collection_form_name + "]" + "[" + i + "][" + name + "]", dataAttributes[name]);
+                    if(typeof collection_form_name === "undefined")
+                    {
+                        modalData.append(elem_formname + "[" + name + "]", dataAttributes[name]);
+                    }
+                    else
+                    {
+                        modalData.append(elem_formname + "[" + collection_form_name + "]" + "[" + i + "][" + name + "]", dataAttributes[name]);
+                    }
                 }
             }
         };
