@@ -86,7 +86,7 @@ final class Paginator implements PaginatorInterface
             {
                 $this->session->set(
                     $this->namespace.':limit',
-                    min($this->request->query->getInt('limit'), 500) // ограничение 500
+                    min($this->request->query->getInt('limit'), 500), // ограничение 500
                 );
             }
 
@@ -274,6 +274,12 @@ final class Paginator implements PaginatorInterface
     public function getPage(): int
     {
         return $this->page + 1;
+    }
+
+    public function setPage(int $page): self
+    {
+        $this->page = $page;
+        return $this;
     }
 
     /**

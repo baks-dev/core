@@ -34,6 +34,7 @@ interface PaginatorInterface
     /** @depricated используйте Result и метод fetchAllHydrate(MyResult::class) */
     public function fetchAllAssociative(DBALQueryBuilder $qb, ?string $namespace = null): self;
 
+    public function setLimit(int $limit): self;
 
     public function getData(): array;
 
@@ -48,6 +49,8 @@ interface PaginatorInterface
 
 
     public function getNext(): int;
+
+    public function setPage(int $page): self;
 
 
     public function getPrevious(): ?int;
