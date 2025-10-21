@@ -71,7 +71,7 @@ readonly class MessageHandleMiddleware implements MiddlewareInterface
 
             try
             {
-                if(is_object($value) && false === method_exists($value, '__toString'))
+                if(is_array($value) || (is_object($value) && false === method_exists($value, '__toString')))
                 {
                     $instance .= sprintf("%s: '%s', ", $property->getName(), var_export($value, true));
                     continue;

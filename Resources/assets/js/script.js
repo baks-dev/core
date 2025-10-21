@@ -446,16 +446,13 @@ executeFunc(function uQnFyjnB()
 
     const search = form.querySelector("#search_form_query");
 
+    searchValue = search.value.trim();
 
     const debouncedSubmit = formDebounce(() =>
     {
-        if(searchValue)
+        if(searchValue === search.value.trim())
         {
-            console.log(search.value.trim());  /* TODO: удалить !!! */
-            console.log(searchValue);  /* TODO: удалить !!! */
-
-            //searchValue = search.value;
-            console.log(searchValue.trim());  /* TODO: удалить !!! */
+            return;
         }
 
         form.submit();

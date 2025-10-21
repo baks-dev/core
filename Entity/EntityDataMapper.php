@@ -141,7 +141,17 @@ abstract class EntityDataMapper
 
                 if($OneToOneAttribute)
                 {
-                    $oneToOne = new $propertyTypeName();
+                    $getDtoMethod = $dtoReflectionClass->getMethodGetter();
+
+                    /** Если свойство инициировано и имеет метод GET - возвращаем объект, в ином случае инициируем */
+                    if($getDtoMethod && true === (new ReflectionProperty($dto, $propertyName)->isInitialized($dto)))
+                    {
+                        $oneToOne = $dto->{$getDtoMethod}();
+                    }
+                    else
+                    {
+                        $oneToOne = new $propertyTypeName();
+                    }
 
                     if($oneToOne)
                     {
