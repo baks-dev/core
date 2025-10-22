@@ -422,7 +422,7 @@ function bindBootstrapPopover()
     return true;
 }
 
-let searchValue = null;
+searchValue = null;
 
 /** Функция отправки формы поиска */
 executeFunc(function uQnFyjnB()
