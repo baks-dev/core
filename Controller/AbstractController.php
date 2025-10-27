@@ -150,7 +150,7 @@ abstract class AbstractController
         string $type,
         mixed $message,
         string $domain = 'messages',
-        array|string|object|null $arguments = null,
+        array|int|string|object|null $arguments = null,
         int $status = 302
     ): ?Response
     {
@@ -210,7 +210,7 @@ abstract class AbstractController
                             'status' => $status,
                             'header' => $label,
                             'message' => $message,
-                            'arguments' => is_array($arguments) ? json_encode($arguments, JSON_THROW_ON_ERROR, 512) : $arguments,
+                            'arguments' => is_array($arguments) ? json_encode($arguments, JSON_THROW_ON_ERROR, 512) : (string) $arguments,
                         ],
                         status: $status,
                     );
