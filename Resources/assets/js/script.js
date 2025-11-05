@@ -573,6 +573,8 @@ async function offcanvasLink(offcanvas)
                     myOffcanvas.innerHTML = "";
                 });
 
+                bindBootstrapTooltip();
+
             }
         });
 
