@@ -561,6 +561,10 @@ small, .small, .help-text {
     cursor: pointer;
 }
 
+.zoom-in {
+    cursor: zoom-in;
+}
+
 .w-250px {
     width: 250px;
 }
