@@ -969,7 +969,7 @@ function createValidUrl(url, baseUrl = window.location.origin)
 async function submitModalForm(forms)
 {
     /** Если в модальном окне присутствует ckeditor - обновляем элементы перд отправкой */
-    if(typeof ClassicEditor === "function")
+    if(typeof ClassicEditor === "function" && typeof ckeditors === "object")
     {
         for(editors in ckeditors)
         {
