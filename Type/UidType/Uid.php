@@ -24,6 +24,7 @@
 namespace BaksDev\Core\Type\UidType;
 
 use App\Kernel;
+use DateTimeInterface;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -130,7 +131,7 @@ abstract class Uid implements ValueResolverInterface
             $time_hi_and_version,
             $clock_seq_hi_and_reserved,
             $clock_seq_low,
-            $node
+            $node,
         );
 
         $this->value = new Uuid($uuid);
@@ -175,6 +176,11 @@ abstract class Uid implements ValueResolverInterface
         }
 
         return preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', (string) $value);
+    }
+
+    public function getDateTime(): DateTimeInterface
+    {
+        return $this->getValue()->getDateTime();
     }
 
 
