@@ -1054,6 +1054,11 @@ final class DBALQueryBuilder extends QueryBuilder
 
         foreach($this->getParameters() as $param => $value)
         {
+            if(is_array($value))
+            {
+                $value = current($value);
+            }
+
             $connection->bindValue($param, $value);
         }
 
