@@ -31,7 +31,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 final class HomepageController extends AbstractController
 {
-    #[Route('/', name: 'public.homepage')]
+    public const string HOMEPAGE = 'public.homepage';
+
+    #[Route('/', name: self::HOMEPAGE)]
     public function index(): Response
     {
         return new Response('Переопределите контроллер главной страницы');

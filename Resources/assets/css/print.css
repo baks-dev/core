@@ -136,8 +136,12 @@
 
 @media print {
 
+    .tooltip-inner {
+        display: none !important;
+    }
     .modal { position: unset !important; }
     .modal-backdrop { background: unset; }
+
 
     .d-print-inline {
         display: inline !important
