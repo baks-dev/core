@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.getLocale() }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="author" content="Baks Development">
+
+    <title>
+        {% block title %}{{ baks_settings.headers.title }}{% endblock %}
+    </title>
+
+    {# Mета-описание Description #}
+    <meta name="description" content="{% block description %}{{ baks_settings.headers.description }}{% endblock %}">
+
+    {# список ключевых слов Keywords #}
+    <meta name="keywords" content="{% block keywords %}{{ baks_settings.headers.keywords }}{% endblock %}">
+
+    {# Теги #}
+    <meta name="tags" content="{% block tags %}{{ baks_settings.headers.tags }}{% endblock %}">
+
+    {% block meta %}
+        <meta property="og:locale" content="{{ app.request.getLocale() }}_{{ app.request.getLocale()|upper }}">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name"
+              content="{{ baks_settings.headers.title is defined ? baks_settings.headers.title : null }}">
+        <meta property="og:title" content="{{ baks_settings.meta_title is defined ? baks_settings.meta_title : null }}">
+        <meta property="og:description"
+              content="{{ baks_settings.headers.description is defined ? baks_settings.headers.description : null }}">
+        <meta property="og:url" content="{{ app.request.uri }}">
+        <meta property="og:image" content="{{ absolute_url('/logo.webp') }}">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@https://{{ app.request.host }}">
+        <meta name="twitter:title"
+              content="{{ baks_settings.headers.title is defined ? baks_settings.headers.title : null }}">
+        <meta name="twitter:description"
+              content="{{ baks_settings.headers.description is defined ? baks_settings.headers.description : null }}">
+        <meta name="twitter:image:src" content="{{ absolute_url('/logo.webp') }}">
+    {% endblock %}
+
+    <link rel="icon" href="/assets/{{ version }}/img/favicon/favicon.ico">
+    <link rel="preload" as="image" href="/logo.webp">
+
+    <link href="/assets/{{ version }}/plugins/bootstrap/5.3.3/bootstrap.min.css" rel="preload" as="style">
+    <link href="/assets/{{ version }}/plugins/bootstrap/5.3.3/bootstrap.min.css" rel="stylesheet">
+
+    <link href="/assets/{{ version }}/css/style.min.css" rel="preload" as="style">
+    <link href="/assets/{{ version }}/css/style.min.css" rel="stylesheet">
+
+    {# БЛОК ДЛЯ ВСТАВКИ CSS #}
+    {% block stylesheets %}{% endblock %}
+
+</head>
+
+<body>
+
+{% set route = app.request.get('_route') %}
+
+{% block header %}
+    {{ include(_self|replace({ "base.html.twig":baks_settings.device~"/header.html.twig" })) }}
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block footer %}
+    {{ include(_self|replace({ "base.html.twig":baks_settings.device~"/footer.html.twig" })) }}
+{% endblock %}
+
+<script nonce="{{ csp_nonce() }}">
+    const $locale = '{{ app.request.getLocale() }}';
+    window.lazyLoadOptions = {};
+    window.bootstrap = false;
+</script>
+
+
+<script nonce="{{ csp_nonce() }}" async src='/assets/{{ version }}/js/lazyload.min.js'></script>
+
+<script async
+        nonce="{{ csp_nonce() }}"
+        data-src="/assets/{{ version }}/plugins/bootstrap/5.3.3/bootstrap.bundle.min.js"
+        class="lazy"
+></script>
+
+<script async
+        nonce="{{ csp_nonce() }}"
+        data-src='/assets/{{ version }}/js/script.min.js'
+        class="lazy"
+></script>
+
+{% block javascript %}{% endblock %}
+
+
+{# TOAST УВЕДОМЛЕНИЯ ****************************************************** #}
+{% include Template('@core:user/'~baks_settings.device~'/includes/flash.html.twig') %}
+
+{# Блок модального окна #}
+<div class="modal fade" tabindex="-1" id="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="d-flex justify-content-center w-100">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# popover #}
+<div style="display: none !important;" class="popover popover-body popover-arrow fade show rounded-pill"></div>
+
+</body>
+</html>
