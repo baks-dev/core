@@ -653,7 +653,7 @@ async function collapseLink(collapse)
 /** сплывающее модальное окно */
 function modalLink(item)
 {
-    /** Pfghtoftv gjdnjhyj dtifnm cj,snbt */
+    /** Запрещаем повторно вешать событие */
     if(typeof item.dataset.call !== "undefined")
     {
         return;
@@ -662,6 +662,7 @@ function modalLink(item)
     // Обрываем запрос если имеется класс prnt
     if(item.classList.contains("prnt") === true || item.classList.contains("print") === true)
     {
+        /** добавляем аттрибут call от повторных событий */
         item.dataset.call = true;
         return;
     }
