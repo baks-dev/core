@@ -469,6 +469,9 @@ final class DBALQueryBuilder extends QueryBuilder
         array|false $types = false
     ): Result
     {
+        $this->cacheQueries = $this->cache->init($this->namespace, $this->ttl);
+        $this->setCacheQueries($this->cacheQueries);
+
         return $this->connection->executeCacheQuery(
             $sql ?: $this->getSQL(),
             $params ?: $this->getParameters(),
@@ -487,7 +490,6 @@ final class DBALQueryBuilder extends QueryBuilder
     {
         $this->cacheQueries->deleteItem($this->cacheKey);
     }
-
 
     /**
      * Создает SearchQueryBuilder для поиска, и добавляет в открытый запрос
