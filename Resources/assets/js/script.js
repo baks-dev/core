@@ -884,7 +884,11 @@ function modalLink(item)
                 // условие, если есть GET параметр print - вызываем диалоговое окно
                 if(urlObject.searchParams.has("print") && urlObject.searchParams.get("print") === "1")
                 {
-                    window.print();
+                    /* Вызываем отложенное диалоговое окно печати */
+                    setTimeout(function()
+                    {
+                        window.print();
+                    }, 500);
 
                     /* Закрываем модальное окно */
                     setTimeout(function()
@@ -895,7 +899,7 @@ function modalLink(item)
 
                         document.getElementById("prnt").innerHTML = "";
 
-                    }, 10);
+                    }, 1000);
 
                 }
             }

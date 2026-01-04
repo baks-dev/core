@@ -115,11 +115,21 @@ function printElement()
 
 function printers()
 {
-    window.print();
-    document.getElementById('prnt').innerHTML = '';
+    /* Вызываем отложенное диалоговое окно печати */
+    setTimeout(function()
+    {
+        window.print();
+    }, 500);
 
-    /* Удаляем прослушиватель событий  */
-    let myModalEl = document.querySelector('#modal');
-    myModalEl.removeEventListener('hidden.bs.modal', printers);
+    /* Закрываем модальное окно */
+    setTimeout(function()
+    {
+        document.getElementById("prnt").innerHTML = "";
+
+        /* Удаляем прослушиватель событий  */
+        let myModalEl = document.querySelector("#modal");
+        myModalEl.removeEventListener("hidden.bs.modal", printers);
+
+    }, 1000);
 
 }
