@@ -471,6 +471,12 @@ function modaHidden()
     /* Скрываем модальное окно */
     let ModalElement = document.getElementById("modal");
     bootstrap.Modal.getInstance(ModalElement).hide();
+
+    /* Сбрасываем содержимое модального окна при закрытии */
+    ModalElement.addEventListener("hidden.bs.modal", function(event)
+    {
+        this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+    });
 }
 
 
@@ -1083,6 +1089,10 @@ async function submitModalForm(forms)
 
             if(resolved > 1000)
             {
+                /* Скрываем модальное окно */
+                let ModalElement = document.getElementById("modal");
+                ModalElement.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+                
                 return;
             }
 
