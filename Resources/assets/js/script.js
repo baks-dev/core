@@ -499,6 +499,10 @@ document.querySelectorAll(".offcanvas-link").forEach(function(item, i, arr)
 
 async function offcanvasLink(offcanvas)
 {
+    /** Показываем прелоад */
+    let modal = document.getElementById("modal");
+    modal.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+    bootstrap.Modal.getOrCreateInstance(modal).show();
 
     //const data = new FormData(forms);
 
@@ -522,6 +526,9 @@ async function offcanvasLink(offcanvas)
                 window.location.reload();
             }
 
+            /** Закрываем прелоад */
+            bootstrap.Modal.getOrCreateInstance(modal).hide();
+
             if(response.status !== 200)
             {
                 return false;
@@ -531,12 +538,11 @@ async function offcanvasLink(offcanvas)
 
         }).then((data) =>
         {
-
+            /** Закрываем прелоад */
+            bootstrap.Modal.getOrCreateInstance(modal).hide();
 
             if(data)
             {
-
-
                 // var offcanvasElList = [].slice.call(document.querySelectorAll('.offcanvas'));
                 // offcanvasElList.map(function (offcanvaslEl) {
                 //      new bootstrap.Offcanvas(offcanvaslEl);
@@ -582,6 +588,8 @@ async function offcanvasLink(offcanvas)
                 bindBootstrapTooltip();
 
             }
+
+
         });
 
 
@@ -1092,7 +1100,7 @@ async function submitModalForm(forms)
                 /* Скрываем модальное окно */
                 let ModalElement = document.getElementById("modal");
                 ModalElement.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
-                
+
                 return;
             }
 
