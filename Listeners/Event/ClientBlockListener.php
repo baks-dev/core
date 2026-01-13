@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ final readonly class ClientBlockListener
 
     public function __construct(AppCacheInterface $appCache)
     {
-        $this->cache = $appCache->init('request');
+        $this->cache = $appCache->init('request-limiter');
     }
 
     /**
@@ -65,6 +65,12 @@ final readonly class ClientBlockListener
         if($item->isHit())
         {
             $event->setResponse(new Response('429: Too Many Requests', status: 429));
+
+            $item->expiresAfter(DateInterval::createFromDateString('5 seconds'));
+            $item->set(true);
+            $this->cache->save($item);
+
+            return;
         }
 
         for($i = 1; $i <= self::LIMIT; $i++)

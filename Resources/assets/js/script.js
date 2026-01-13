@@ -555,7 +555,7 @@ async function offcanvasLink(offcanvas)
                      <div class="offcanvas offcanvas-start"
                      tabindex="-1"
                      id="offcanvas"
-                     style="--bs-offcanvas-width: 800px;">
+                     style="--bs-offcanvas-width: 850px;">
                      </div>
                      */
 
