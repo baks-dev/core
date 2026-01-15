@@ -1085,6 +1085,11 @@ async function submitModalForm(forms)
             return;
         }
 
+        /* Скрываем модальное окно */
+        let ModalElement = document.getElementById("modal");
+        ModalElement.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+
+
         setTimeout(function initResolve()
         {
             if(typeof resolve == "function")
@@ -1097,9 +1102,6 @@ async function submitModalForm(forms)
 
             if(resolved > 1000)
             {
-                /* Скрываем модальное окно */
-                let ModalElement = document.getElementById("modal");
-                ModalElement.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
 
                 return;
             }
