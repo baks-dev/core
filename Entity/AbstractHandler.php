@@ -95,8 +95,11 @@ abstract class AbstractHandler
      * - если объект сущности не найден - создает новый объект
      * - гидрирует переданные через метод setCommand значения свойств DTO на объект сущности
      * - добавляет объект сущности в коллекцию валидации
+     *
+     * main передается в случае если нужна в статической сущности необходимо создать новый объект
+     *
      */
-    protected function prePersistOrUpdate(string $entity, array $criteria): object
+    protected function prePersistOrUpdate(string $entity, array $criteria, string|false $main = false): object
     {
         if($this->command === false)
         {
@@ -133,6 +136,29 @@ abstract class AbstractHandler
             }
 
             $EntityRepo = empty($args) ? new $entity() : new $entity(...$args);
+
+            /** В случае передачи - создаем корневую сущность */
+            if($main !== false)
+            {
+                if(false === method_exists($EntityRepo, 'setMain'))
+                {
+                    throw new InvalidArgumentException(sprintf('Класс сущности %s не реализует метод setMain($main) ', $EntityRepo::class));
+                }
+
+                $main = new $main();
+
+                if(false === method_exists($main, 'setEvent'))
+                {
+                    throw new InvalidArgumentException(sprintf('Класс сущности %s не реализует метод setEvent($event) ', $main::class));
+                }
+
+                $main->setEvent($EntityRepo);
+                $this->entityManager->persist($main);
+
+                $EntityRepo->setMain($main);
+            }
+
+
             $this->entityManager->persist($EntityRepo);
         }
 

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -52,8 +52,13 @@ final class Deduplicator implements DeduplicatorInterface
         private readonly AppCacheInterface $appCache,
     )
     {
-        /* Время жизни дедубликации по умолчанию 30 дней */
-        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '3 seconds');
+        /**
+         * Время жизни дедубликации по умолчанию 30 дней
+         * в тестовом окружении ограничиваем 1 часом для фильтра диспатчеров тестовых данных
+         *
+         * @note Валидный тест диспатчеров будет только с периодичностью 1 час
+         */
+        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '1 hour');
     }
 
     /**
