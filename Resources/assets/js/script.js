@@ -964,7 +964,6 @@ function createValidUrl(url, baseUrl = window.location.origin)
     if(/^https?:\/\//i.test(url))
     {
         return new URL(url);
-        url;
     }
 
     // Проверяем, начинается ли строка с / (относительный путь)
