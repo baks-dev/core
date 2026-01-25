@@ -52,13 +52,8 @@ final class Deduplicator implements DeduplicatorInterface
         private readonly AppCacheInterface $appCache,
     )
     {
-        /**
-         * Время жизни дедубликации по умолчанию 30 дней
-         * в тестовом окружении ограничиваем 1 часом для фильтра диспатчеров тестовых данных
-         *
-         * @note Валидный тест диспатчеров будет только с периодичностью 1 час
-         */
-        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '1 hour');
+        /* Время жизни дедубликации по умолчанию 30 дней */
+        $this->expires = DateInterval::createFromDateString($environment === 'prod' ? '1 week' : '3 seconds');
     }
 
     /**
