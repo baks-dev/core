@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Command;
 
-
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Type\Event\OrderEventUid;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
+use BaksDev\Products\Stocks\Messenger\Orders\EditProductStockTotal\EditProductStockTotalMessage;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
 use BaksDev\Products\Stocks\Type\Event\ProductStockEventUid;
 use BaksDev\Products\Stocks\Type\Id\ProductStockUid;
@@ -55,19 +55,13 @@ class DevelopmentCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $ProductStockMessage = new ProductStockMessage(
-            new ProductStockUid('0199baae-ee55-756e-a231-dd02dc324709'),
-            new ProductStockEventUid('0199baae-ee55-756e-a231-dd02dd12308f'),
-            null,
+        $message = new EditProductStockTotalMessage(
+            id: new ProductStockUid('019c0193-0fac-7918-8aa5-8df2e94fddf8'),
+            event: new ProductStockEventUid('019c0198-3a2a-7686-9c35-24932eecea65'),
+            last: new ProductStockEventUid('019c0196-79c3-76d3-b7e5-dc26e6d20582'),
         );
 
-        $OrderMessage = new OrderMessage(
-            new OrderUid('01992feb-aaf0-7e42-a242-c4d6de87db76'),
-            new OrderEventUid('01992fef-5037-7de4-a561-963a95d45750'),
-            new OrderEventUid('01992fed-96c0-7e8b-a048-ac743f3070c5'),
-        );
-
-        $this->MessageDispatch->dispatch($ProductStockMessage);
+        $this->MessageDispatch->dispatch($message);
 
         $io->success('baks:development');
         return Command::SUCCESS;
