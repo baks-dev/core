@@ -538,9 +538,6 @@ async function offcanvasLink(offcanvas)
 
         }).then((data) =>
         {
-            /** Закрываем прелоад */
-            bootstrap.Modal.getOrCreateInstance(modal).hide();
-
             if(data)
             {
                 // var offcanvasElList = [].slice.call(document.querySelectorAll('.offcanvas'));
@@ -589,9 +586,13 @@ async function offcanvasLink(offcanvas)
 
             }
 
+            /** Закрываем прелоад */
+            setTimeout(function()
+            {
+                bootstrap.Modal.getOrCreateInstance(modal).hide();
+            }, 100);
 
         });
-
 
     return false;
 
