@@ -590,7 +590,7 @@ async function offcanvasLink(offcanvas)
             setTimeout(function()
             {
                 bootstrap.Modal.getOrCreateInstance(modal).hide();
-            }, 100);
+            }, 300);
 
         });
 
