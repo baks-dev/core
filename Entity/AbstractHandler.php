@@ -51,6 +51,8 @@ abstract class AbstractHandler
 
     protected ?object $event = null;
 
+    private ?object $last = null;
+
     private bool $persist = false;
 
 
@@ -59,6 +61,7 @@ abstract class AbstractHandler
      * @see self::flush
      */
     protected readonly EntityManagerInterface $entityManager;
+
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -455,6 +458,8 @@ abstract class AbstractHandler
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
+        $this->last = clone $EventRepo;
+
         /** Присваиваем одноименные свойства DTO */
         $EventRepo->setEntityManager($this->entityManager);
         $EventRepo->setEntity($this->command);
@@ -693,6 +698,10 @@ abstract class AbstractHandler
         $this->entityManager->remove($object);
     }
 
+    public function getLastEvent(): ?object
+    {
+        return $this->last;
+    }
 
     /**
      * Метод возвращает TRUE в случае, если добавлен новый объект Main

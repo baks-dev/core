@@ -1091,4 +1091,10 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this->connection->prepare($sql);
     }
 
+    public function withCte(string $alias, string|QueryBuilder $dbal, ?array $columns = null): self
+    {
+        $this->with($alias, $dbal, $columns);
+
+        return $this;
+    }
 }
