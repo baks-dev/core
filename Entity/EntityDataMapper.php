@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -321,11 +321,16 @@ abstract class EntityDataMapper
 
                         $entityCollections = $this->getPropertyValue($propertyName, $this);
 
+                        if($entityCollections === 'not_initialized')
+                        {
+                            continue;
+                        }
+
                         // Получаем коллекцию DTO
                         $dtoCollections = $this->getPropertyValue($propertyName, $dto); // $dto->$getDtoMethod();
 
                         /** Если сущность клонируется или коллекция пуста */
-                        if($entityCollections->current() instanceof EntityEvent || $entityCollections->isEmpty())
+                        if($entityCollections->isEmpty() || $entityCollections->current() instanceof EntityEvent)
                         {
 
                             $entityCollections = new ArrayCollection();
@@ -752,13 +757,19 @@ abstract class EntityDataMapper
 
         $modifiers = new ReflectionProperty($object, $property);
 
-        /* Если свойство не принимает null */
-        if($value === null && !$modifiers->getType()?->allowsNull())
+        /** Если значение NULL, но свойство не принимает NULL */
+        if($value === null && $modifiers->getType()?->allowsNull() !== true)
         {
             return false;
         }
 
-        /* Если свойство ReadOnly и оно уже инициировано */
+        /** Если значение не инициировано */
+        if($value === 'not_initialized')
+        {
+            return false;
+        }
+
+        /** Если свойство ReadOnly и оно уже инициировано - не присваиваем повторно */
         if($modifiers->isReadOnly() && $modifiers->isInitialized($object))
         {
             return false;
