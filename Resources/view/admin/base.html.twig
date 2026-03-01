@@ -50,12 +50,16 @@
 {% include Template('/_includes/'~baks_settings.device~'/flash.html.twig') %}
 {# END УВЕДОМЛЕНИЯ ****************************************************** #}
 
-{# Блок модального окна #}
-<div class="modal fade" tabindex="-1" id="modal">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="d-flex justify-content-center w-100">
-            <div class="spinner-border text-light" role="status">
-                <span class="visually-hidden">Loading...</span>
+{# Блок модального окна data-bs-backdrop #}
+<div class="modal fade" tabindex="-1" id="modal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 bg-transparent shadow-none">
+            <div class="d-flex justify-content-center w-100">
+                <button type="button" class="btn btn-link w-100" style="min-height: 500px;" data-bs-dismiss="modal">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </button>
             </div>
         </div>
     </div>

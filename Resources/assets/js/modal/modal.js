@@ -178,7 +178,15 @@ function modalLink(item)
                 /* Сбрасываем содержимое модального окна при закрытии */
                 modal.addEventListener("hidden.bs.modal", function(event)
                 {
-                    this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+                    this.innerHTML = "<div class=\"modal-content border-0 bg-transparent shadow-none\">\n" +
+                        "            <div class=\"d-flex justify-content-center w-100\">\n" +
+                        "                <button type=\"button\" class=\"btn btn-link w-100\" style=\"min-height: 500px;\" data-bs-dismiss=\"modal\">\n" +
+                        "                    <div class=\"spinner-border text-light\" role=\"status\">\n" +
+                        "                        <span class=\"visually-hidden\">Loading...</span>\n" +
+                        "                    </div>\n" +
+                        "                </button>\n" +
+                        "            </div>\n" +
+                        "        </div>";
                 });
 
 

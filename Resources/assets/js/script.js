@@ -475,7 +475,17 @@ function modaHidden()
     /* Сбрасываем содержимое модального окна при закрытии */
     ModalElement.addEventListener("hidden.bs.modal", function(event)
     {
-        this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+        this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered modal-xl\">\n" +
+            "        <div class=\"modal-content border-0 bg-transparent shadow-none\">\n" +
+            "            <div class=\"d-flex justify-content-center w-100\">\n" +
+            "                <button type=\"button\" class=\"btn btn-link w-100\" style=\"min-height: 500px;\" data-bs-dismiss=\"modal\">\n" +
+            "                    <div class=\"spinner-border text-light\" role=\"status\">\n" +
+            "                        <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                    </div>\n" +
+            "                </button>\n" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "    </div>";
     });
 }
 
@@ -501,7 +511,21 @@ async function offcanvasLink(offcanvas)
 {
     /** Показываем прелоад */
     let modal = document.getElementById("modal");
-    modal.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+    //modal.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+
+    modal.innerHTML = "<div class=\"modal-dialog modal-dialog-centered modal-xl\">\n" +
+        "        <div class=\"modal-content border-0 bg-transparent shadow-none\">\n" +
+        "            <div class=\"d-flex justify-content-center w-100\">\n" +
+        "                <button type=\"button\" class=\"btn btn-link w-100\" style=\"min-height: 500px;\" data-bs-dismiss=\"modal\">\n" +
+        "                    <div class=\"spinner-border text-light\" role=\"status\">\n" +
+        "                        <span class=\"visually-hidden\">Loading...</span>\n" +
+        "                    </div>\n" +
+        "                </button>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "    </div>";
+
+
     bootstrap.Modal.getOrCreateInstance(modal).show();
 
     //const data = new FormData(forms);
@@ -823,7 +847,17 @@ function modalLink(item)
                 /* Сбрасываем содержимое модального окна при закрытии */
                 modal.addEventListener("hidden.bs.modal", function(event)
                 {
-                    this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
+                    this.innerHTML = "<div class=\"modal-dialog modal-dialog-centered modal-xl\">\n" +
+                        "        <div class=\"modal-content border-0 bg-transparent shadow-none\">\n" +
+                        "            <div class=\"d-flex justify-content-center w-100\">\n" +
+                        "                <button type=\"button\" class=\"btn btn-link w-100\" style=\"min-height: 500px;\" data-bs-dismiss=\"modal\">\n" +
+                        "                    <div class=\"spinner-border text-light\" role=\"status\">\n" +
+                        "                        <span class=\"visually-hidden\">Loading...</span>\n" +
+                        "                    </div>\n" +
+                        "                </button>\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "    </div>";
                 });
 
 
@@ -1087,8 +1121,18 @@ async function submitModalForm(forms)
 
         /* Скрываем модальное окно */
         let ModalElement = document.getElementById("modal");
-        ModalElement.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
 
+        ModalElement.innerHTML = "<div class=\"modal-dialog modal-dialog-centered modal-xl\">\n" +
+            "        <div class=\"modal-content border-0 bg-transparent shadow-none\">\n" +
+            "            <div class=\"d-flex justify-content-center w-100\">\n" +
+            "                <button type=\"button\" class=\"btn btn-link w-100\" style=\"min-height: 500px;\" data-bs-dismiss=\"modal\">\n" +
+            "                    <div class=\"spinner-border text-light\" role=\"status\">\n" +
+            "                        <span class=\"visually-hidden\">Loading...</span>\n" +
+            "                    </div>\n" +
+            "                </button>\n" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "    </div>";
 
         setTimeout(function initResolve()
         {
