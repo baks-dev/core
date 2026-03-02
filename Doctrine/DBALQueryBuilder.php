@@ -440,6 +440,8 @@ final class DBALQueryBuilder extends QueryBuilder
                     transport: $this->namespace.'-low',
                 );
             }
+
+            return null;
         }
 
         return false === $delay || $cache->isHit() ? (int) $this->fetchOne() : null;
