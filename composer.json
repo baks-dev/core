@@ -23,12 +23,6 @@
   "require": {
     "ext-mbstring": "*",
     "php": ">=8.4",
-    "symfony/lock": "^7.3|^8.0",
-    "symfony/form": "^7.3|^8.0",
-    "symfony/scheduler": "^7.3|^8.0",
-    "symfony/messenger": "^7.3|^8.0",
-    "symfony/console": "^7.3|^8.0",
-    "symfony/translation": "^7.3|^8.0"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest"
