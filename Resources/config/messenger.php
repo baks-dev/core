@@ -36,7 +36,6 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
      * Настройка подключения к базе данных с очередями
      */
 
-
     $transport = $_ENV['MESSENGER_TRANSPORT_DSN'];
     $isDoctrine = str_starts_with($transport, 'doctrine');
 
