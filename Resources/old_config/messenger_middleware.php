@@ -30,10 +30,7 @@ return App::config([
         'messenger' => [
             'buses' => [
                 'messenger.bus.default' => [
-                    'default_middleware' => false,
-                    'middleware' => [
-                        MessageHandleMiddleware::class,
-                    ],
+                    'middleware' => [MessageHandleMiddleware::class],
                 ],
             ],
         ],
