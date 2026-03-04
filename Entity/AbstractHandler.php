@@ -488,6 +488,8 @@ abstract class AbstractHandler
             ])
         )
         {
+            return;
+
             throw new DomainException($this->validatorCollection->getErrorUniqid());
         }
 
