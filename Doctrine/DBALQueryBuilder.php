@@ -57,7 +57,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Autoconfigure(public: true)]
+// #[Autoconfigure(public: true)]
 final class DBALQueryBuilder extends QueryBuilder
 {
     private Connection $connection;
