@@ -30,9 +30,11 @@ use DateInterval;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 
+#[Autoconfigure(shared: false)]
 final class Deduplicator implements DeduplicatorInterface
 {
     private string|false $namespace = false;
