@@ -62,6 +62,17 @@ final class MessageDelay
 
     }
 
+    public function getDelayStamp(): DelayStamp
+    {
+        $milliseconds = $this->getMilliseconds();
+
+        /** Генерируем рандомно число для разброса сообщений */
+        $Randomizer = new Randomizer();
+        $delay = $Randomizer->getInt($milliseconds, ($milliseconds * 2));
+
+        return new DelayStamp($delay);
+    }
+
     public function getMilliseconds(): int
     {
         $totalSeconds =
@@ -79,16 +90,5 @@ final class MessageDelay
         }
 
         return $totalSeconds * 1000;
-    }
-
-    public function getDelayStamp(): DelayStamp
-    {
-        $milliseconds = $this->getMilliseconds();
-
-        /** Генерируем рандомно число для разброса сообщений */
-        $Randomizer = new Randomizer();
-        $delay = $Randomizer->getInt($milliseconds, ($milliseconds * 2));
-
-        return new DelayStamp($delay);
     }
 }

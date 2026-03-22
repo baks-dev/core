@@ -65,10 +65,10 @@ class EntityKeyValueCacheTest extends KernelTestCase
         foreach($findAll as $key)
         {
             // Выбор всех значений
-            dump($this->redis->hGetAll($key));
+            //dump($this->redis->hGetAll($key));
 
             // Выбор определенного значение
-            dump($this->redis->hGet($key, 'category'));
+            //dump($this->redis->hGet($key, 'category'));
         }
     }
 }

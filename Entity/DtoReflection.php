@@ -72,6 +72,7 @@ final class DtoReflection
 
     /**
      * Возвращает все свойства класса
+     *
      * @return ReflectionProperty[]
      */
     public function getProperties(): array
@@ -85,45 +86,9 @@ final class DtoReflection
         $this->dtoReflectionProperty = $property;
     }
 
-
-    /**
-     * Получает имя свойства
-     */
-    public function getPropertyName(): string
-    {
-        return $this->dtoReflectionProperty->getName();
-    }
-
     public function hasConstant(string $name): bool
     {
         return $this->dtoReflectionClass->hasConstant($name);
-    }
-
-    /**
-     * Получите текстовое значение типа (string)
-     */
-    public function getPropertyTypeName(): string
-    {
-        $ReflectionType = $this->dtoReflectionProperty->getType();
-
-        if($ReflectionType instanceof ReflectionUnionType)
-        {
-            $ReflectionType = current($ReflectionType->getTypes());
-        }
-
-        if($ReflectionType instanceof ReflectionNamedType)
-        {
-            return $ReflectionType->getName() ?: 'string';
-        }
-
-        return 'string';
-    }
-
-    public function getPropertyMethodName()
-    {
-        $propertyName = $this->getPropertyName();
-        $ucSingulars = $this->inflector->singularize(ucfirst($propertyName));
-        return end($ucSingulars);
     }
 
     /**
@@ -149,6 +114,25 @@ final class DtoReflection
         return new $class();
     }
 
+    /**
+     * Получите текстовое значение типа (string)
+     */
+    public function getPropertyTypeName(): string
+    {
+        $ReflectionType = $this->dtoReflectionProperty->getType();
+
+        if($ReflectionType instanceof ReflectionUnionType)
+        {
+            $ReflectionType = current($ReflectionType->getTypes());
+        }
+
+        if($ReflectionType instanceof ReflectionNamedType)
+        {
+            return $ReflectionType->getName() ?: 'string';
+        }
+
+        return 'string';
+    }
 
     public function getMethodAdder(): bool|string
     {
@@ -168,6 +152,21 @@ final class DtoReflection
         }
 
         return $addDtoMethod;
+    }
+
+    public function getPropertyMethodName()
+    {
+        $propertyName = $this->getPropertyName();
+        $ucSingulars = $this->inflector->singularize(ucfirst($propertyName));
+        return end($ucSingulars);
+    }
+
+    /**
+     * Получает имя свойства
+     */
+    public function getPropertyName(): string
+    {
+        return $this->dtoReflectionProperty->getName();
     }
 
     public function getMethodSetter(): bool|string

@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Type\Locale\Locales;
 
-use BaksDev\Core\Type\Locale\Locale;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class LocaleCollection

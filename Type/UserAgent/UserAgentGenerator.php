@@ -147,142 +147,6 @@ final class UserAgentGenerator
         'ipad' => 'iPad; CPU iPad OS :number7-11:_:number0-9:_:number0-9: like Mac OS X;',
         'ipod' => 'iPod; CPU iPod OS :number7-11:_:number0-9:_:number0-9:; like Mac OS X;',];
 
-
-    public function getOS($os = null)
-    {
-        $_os = [];
-
-        if($os === null || in_array($os, ['chrome', 'firefox', 'explorer']))
-        {
-            $_os = $os === 'explorer' ? $this->windows_os : array_merge($this->windows_os, $this->linux_os, $this->mac_os);
-        }
-        else
-        {
-            $_os += $this->{$os.'_os'};
-        }
-
-        // randomly select on operating system
-        $selected_os = rtrim($_os[random_int(0, count($_os) - 1)], ';');
-
-        // check for spin syntax
-        if(strpos($selected_os, '[') !== false)
-        {
-            $selected_os = self::processSpinSyntax($selected_os);
-        }
-
-        // check for random number syntax
-        if(strpos($selected_os, ':number') !== false)
-        {
-            $selected_os = self::processRandomNumbers($selected_os);
-        }
-
-        if(random_int(1, 100) > 50)
-        {
-            $selected_os .= '; en-US';
-        }
-        return $selected_os;
-    }
-
-    public function getMobileOS($os = null)
-    {
-        $os = mb_strtolower($os);
-        $_os = [];
-        switch($os)
-        {
-            case'android':
-                $_os += $this->android_os;
-                break;
-            case 'iphone':
-            case 'ipad':
-            case 'ipod':
-                $_os[] = $this->mobile_ios[$os];
-                break;
-            default:
-                $_os = array_merge($this->android_os, array_values($this->mobile_ios));
-        }
-        // select random mobile os
-        $selected_os = rtrim($_os[random_int(0, count($_os) - 1)], ';');
-
-        if(strpos($selected_os, ':androidVersion:') !== false)
-        {
-            $selected_os = $this->processAndroidVersion($selected_os);
-        }
-
-        if(strpos($selected_os, ':androidDevice:') !== false)
-        {
-            $selected_os = $this->addAndroidDevice($selected_os);
-        }
-
-        if(strpos($selected_os, ':number') !== false)
-        {
-            $selected_os = self::processRandomNumbers($selected_os);
-        }
-
-        return trim($selected_os);
-    }
-
-
-    public static function processRandomNumbers($selected_os)
-    {
-        return preg_replace_callback(
-            '/:number(\d+)-(\d+):/i',
-            function ($matches) {
-                return random_int((int) $matches[1], (int) $matches[2]);
-            },
-            $selected_os
-        );
-    }
-
-    public static function processSpinSyntax($selected_os)
-    {
-        return preg_replace_callback(
-            '/\[([\w\-\s|;]*?)\]/i',
-            function ($matches) {
-                $shuffle = explode('|', $matches[1]);
-                return $shuffle[array_rand($shuffle)];
-            },
-            $selected_os
-        );
-    }
-
-    public function processAndroidVersion($selected_os)
-    {
-        $this->androidVersion = $version = $this->androidVersions[array_rand($this->androidVersions)];
-
-        return preg_replace_callback(
-            '/:androidVersion:/i',
-            function ($matches) use ($version) {
-                return $version;
-            },
-            $selected_os
-        );
-    }
-
-    public function addAndroidDevice($selected_os)
-    {
-        $devices = $this->androidDevices[substr($this->androidVersion, 0, 3)];
-        $device = $devices[array_rand($devices)];
-
-        $device = self::processSpinSyntax($device);
-        return preg_replace_callback(
-            '/:androidDevice:/i',
-            function ($matches) use ($device) {
-                return $device;
-            },
-            $selected_os
-        );
-    }
-
-    public static function chromeVersion($version): string
-    {
-        return random_int($version['min'], $version['max']).'.0.'.random_int(1000, 4000).'.'.random_int(100, 400);
-    }
-
-    public static function firefoxVersion($version): string
-    {
-        return random_int($version['min'], $version['max']).'.'.random_int(0, 9);
-    }
-
     public static function windows($version): string
     {
         return random_int($version['min'], $version['max']).'.'.random_int(0, 9);
@@ -326,6 +190,73 @@ final class UserAgentGenerator
         throw new Exception('Unable to determine user agent to generate');
     }
 
+    public function getOS($os = null)
+    {
+        $_os = [];
+
+        if($os === null || in_array($os, ['chrome', 'firefox', 'explorer']))
+        {
+            $_os = $os === 'explorer' ? $this->windows_os : array_merge($this->windows_os, $this->linux_os, $this->mac_os);
+        }
+        else
+        {
+            $_os += $this->{$os.'_os'};
+        }
+
+        // randomly select on operating system
+        $selected_os = rtrim($_os[random_int(0, count($_os) - 1)], ';');
+
+        // check for spin syntax
+        if(strpos($selected_os, '[') !== false)
+        {
+            $selected_os = self::processSpinSyntax($selected_os);
+        }
+
+        // check for random number syntax
+        if(strpos($selected_os, ':number') !== false)
+        {
+            $selected_os = self::processRandomNumbers($selected_os);
+        }
+
+        if(random_int(1, 100) > 50)
+        {
+            $selected_os .= '; en-US';
+        }
+        return $selected_os;
+    }
+
+    public static function processSpinSyntax($selected_os)
+    {
+        return preg_replace_callback(
+            '/\[([\w\-\s|;]*?)\]/i',
+            function($matches) {
+                $shuffle = explode('|', $matches[1]);
+                return $shuffle[array_rand($shuffle)];
+            },
+            $selected_os,
+        );
+    }
+
+    public static function processRandomNumbers($selected_os)
+    {
+        return preg_replace_callback(
+            '/:number(\d+)-(\d+):/i',
+            function($matches) {
+                return random_int((int) $matches[1], (int) $matches[2]);
+            },
+            $selected_os,
+        );
+    }
+
+    public static function chromeVersion($version): string
+    {
+        return random_int($version['min'], $version['max']).'.0.'.random_int(1000, 4000).'.'.random_int(100, 400);
+    }
+
+    public static function firefoxVersion($version): string
+    {
+        return random_int($version['min'], $version['max']).'.'.random_int(0, 9);
+    }
 
     public function genMobile(): string
     {
@@ -334,6 +265,72 @@ final class UserAgentGenerator
         return 'Mozilla/5.0 ('.$this->getMobileOS($userAgent).') AppleWebKit/'.
             (random_int(1, 100) > 50 ? random_int(533, 537) : random_int(600, 603)).'.'.random_int(1, 50).' (KHTML, like Gecko)  Chrome/'.
             self::chromeVersion(['min' => 47, 'max' => 55]).' Mobile Safari/'.(random_int(1, 100) > 50 ? random_int(533, 537) : random_int(600, 603)).'.'.random_int(0, 9);
+    }
+
+    public function getMobileOS($os = null)
+    {
+        $os = mb_strtolower($os);
+        $_os = [];
+        switch($os)
+        {
+            case'android':
+                $_os += $this->android_os;
+                break;
+            case 'iphone':
+            case 'ipad':
+            case 'ipod':
+                $_os[] = $this->mobile_ios[$os];
+                break;
+            default:
+                $_os = array_merge($this->android_os, array_values($this->mobile_ios));
+        }
+        // select random mobile os
+        $selected_os = rtrim($_os[random_int(0, count($_os) - 1)], ';');
+
+        if(strpos($selected_os, ':androidVersion:') !== false)
+        {
+            $selected_os = $this->processAndroidVersion($selected_os);
+        }
+
+        if(strpos($selected_os, ':androidDevice:') !== false)
+        {
+            $selected_os = $this->addAndroidDevice($selected_os);
+        }
+
+        if(strpos($selected_os, ':number') !== false)
+        {
+            $selected_os = self::processRandomNumbers($selected_os);
+        }
+
+        return trim($selected_os);
+    }
+
+    public function processAndroidVersion($selected_os)
+    {
+        $this->androidVersion = $version = $this->androidVersions[array_rand($this->androidVersions)];
+
+        return preg_replace_callback(
+            '/:androidVersion:/i',
+            function($matches) use ($version) {
+                return $version;
+            },
+            $selected_os,
+        );
+    }
+
+    public function addAndroidDevice($selected_os)
+    {
+        $devices = $this->androidDevices[substr($this->androidVersion, 0, 3)];
+        $device = $devices[array_rand($devices)];
+
+        $device = self::processSpinSyntax($device);
+        return preg_replace_callback(
+            '/:androidDevice:/i',
+            function($matches) use ($device) {
+                return $device;
+            },
+            $selected_os,
+        );
     }
 
     //    /**

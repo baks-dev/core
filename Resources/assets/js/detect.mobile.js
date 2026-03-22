@@ -22,42 +22,53 @@
 
 
 var isMobile = {
-    Android: function Android() {
+    Android : function Android()
+    {
         return navigator.userAgent.match(/Android/i) ? true : false;
     },
-    AndroidMobile: function AndroidMobile() {
+    AndroidMobile : function AndroidMobile()
+    {
         return navigator.userAgent.match(/Android(?=.+Mobile)/i) ? true : false;
     },
-    AndroidTablet: function AndroidTablet() {
+    AndroidTablet : function AndroidTablet()
+    {
         return navigator.userAgent.match(/Android(?!.+Mobile)/i) ? true : false;
     },
-    BlackBerry: function BlackBerry() {
+    BlackBerry : function BlackBerry()
+    {
         return navigator.userAgent.match(/BlackBerry/i) ? true : false;
     },
-    iOS: function iOS() {
+    iOS : function iOS()
+    {
         return navigator.userAgent.match(/iPhone|iPad|iPod/i) ? true : false;
     },
-    iPhone: function iPhone() {
+    iPhone : function iPhone()
+    {
         return (/iphone/.test(navigator.userAgent.toLowerCase()) && !window.MSStream
         );
     },
-    iPad: function iPad() {
+    iPad : function iPad()
+    {
         return (/ipad/.test(navigator.userAgent.toLowerCase()) && !window.MSStream
         );
     },
-    iPod: function iPod() {
+    iPod : function iPod()
+    {
         return (/ipod/.test(navigator.userAgent.toLowerCase()) && !window.MSStream
         );
     },
-    Windows: function Windows() {
+    Windows : function Windows()
+    {
         return navigator.userAgent.match(/IEMobile/i) ? true : false;
     },
-    Other: function Other() {
+    Other : function Other()
+    {
         return navigator.userAgent.match(/windows\ phone|windows\ mobile|windows\ ce|symbian|opera\ mini|nokia|symbos|blackberry/i) ? true : false;
     },
-    any: function any() {
+    any : function any()
+    {
         return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows();
-    }
+    },
 };
 
 // user_agent = navigator.userAgent.toLowerCase();

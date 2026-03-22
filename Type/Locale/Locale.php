@@ -77,15 +77,19 @@ final class Locale
         $this->locale = new LocaleDisable();
     }
 
-
-    public function __toString(): string
-    {
-        return $this->locale->getValue();
-    }
-
     public function getLocal(): LocaleInterface
     {
         return $this->locale;
+    }
+
+    public static function getDeclared(): array
+    {
+        return array_filter(
+            get_declared_classes(),
+            static function($className) {
+                return in_array(LocaleInterface::class, class_implements($className), true);
+            },
+        );
     }
 
     public function getLocalValue(): string
@@ -158,25 +162,6 @@ final class Locale
         return $default;
     }
 
-    /**
-     * Метод возвращает региональность в формате в стандарте ISO 639-1
-     * @example ru_RU
-     */
-    public function getLangCountry(): string
-    {
-        return mb_strtolower($this->locale->getValue()).'_'.mb_strtoupper($this->locale->getValue());
-    }
-
-    public static function getDeclared(): array
-    {
-        return array_filter(
-            get_declared_classes(),
-            static function ($className) {
-                return in_array(LocaleInterface::class, class_implements($className), true);
-            }
-        );
-    }
-
     public static function diffLocale(ArrayCollection|array $diffArray): array
     {
         $search = [];
@@ -190,6 +175,20 @@ final class Locale
         return array_diff(self::cases(), $search);
     }
 
+    public function __toString(): string
+    {
+        return $this->locale->getValue();
+    }
+
+    /**
+     * Метод возвращает региональность в формате в стандарте ISO 639-1
+     *
+     * @example ru_RU
+     */
+    public function getLangCountry(): string
+    {
+        return mb_strtolower($this->locale->getValue()).'_'.mb_strtoupper($this->locale->getValue());
+    }
 
     public function equals(mixed $status): bool
     {

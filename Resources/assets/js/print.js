@@ -21,29 +21,27 @@
  */
 
 
-document.querySelectorAll('.prnt').forEach(function(element, i, arr)
+document.querySelectorAll(".prnt").forEach(function(element, i, arr)
 {
-    element.classList.replace('prnt', 'print');
-    element.classList.remove('d-none');
-    element.classList.remove('disabled');
+    element.classList.replace("prnt", "print");
+    element.classList.remove("d-none");
+    element.classList.remove("disabled");
 
     if(element.dataset.href || element.href)
     {
-        element.addEventListener('click', printElement);
+        element.addEventListener("click", printElement);
     }
 });
 
 function printElement()
 {
-    this.classList.add('disabled');
+    this.classList.add("disabled");
 
     /* Отключаем дефолтный переход по ссылке если */
     event.preventDefault();
 
     /** Показываем прелоад модального окна */
-    document.querySelector('#modal .spinner-border')
-        ?.classList
-        .remove('d-none');
+    document.querySelector("#modal .spinner-border")?.classList.remove("d-none");
 
     /* Создаём объект класса XMLHttpRequest */
     const request = new XMLHttpRequest();
@@ -54,9 +52,10 @@ function printElement()
     if(this.href)
     {
         url = this.href;
-    } else if(this.dataset.href)
+    }
+    else if(this.dataset.href)
     {
-        url = this.dataset.href
+        url = this.dataset.href;
     }
 
     if(!url)
@@ -66,10 +65,10 @@ function printElement()
 
 
     /* Указываем метод соединения GET и путь к файлу на сервере */
-    request.open('GET', url);
+    request.open("GET", url);
     /* Указываем заголовки для сервера */
     //request.setRequestHeader('Content-Type', 'application/x-www-form-url');
-    request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
     /* Получаем ответ от сервера на запрос*/
     request.addEventListener("readystatechange", function(evemnt)
@@ -77,14 +76,14 @@ function printElement()
         /* request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) */
         if(request.readyState === 4 && request.status === 200)
         {
-            const prnt = document.getElementById('prnt');
+            const prnt = document.getElementById("prnt");
 
             if(prnt)
             {
                 prnt.innerHTML = request.responseText;
 
                 /* Закрываем модальное окно */
-                let myModalEl = document.querySelector('#modal');
+                let myModalEl = document.querySelector("#modal");
 
                 if(myModalEl)
                 {
@@ -94,7 +93,7 @@ function printElement()
                         let modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
                         modal.hide();
 
-                        myModalEl.addEventListener('hidden.bs.modal', printers);
+                        myModalEl.addEventListener("hidden.bs.modal", printers);
 
                     }, 500);
 
@@ -107,7 +106,7 @@ function printElement()
     /*Выполняем запрос*/
     request.send();
 
-    this.classList.remove('disabled');
+    this.classList.remove("disabled");
 
     return false;
 

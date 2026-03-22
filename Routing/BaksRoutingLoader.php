@@ -82,12 +82,6 @@ final class BaksRoutingLoader extends Loader
         return $routes;
     }
 
-
-    public function supports($resource, ?string $type = null): bool
-    {
-        return 'baks' === $type;
-    }
-
     /**
      * Метод рекурсивно сканирует директории в поиске папки /Resources/config.
      */
@@ -114,5 +108,10 @@ final class BaksRoutingLoader extends Loader
                 $this->configs->offsetSet($configDir, $configDir);
             }
         }
+    }
+
+    public function supports($resource, ?string $type = null): bool
+    {
+        return 'baks' === $type;
     }
 }

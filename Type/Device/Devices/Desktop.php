@@ -33,6 +33,11 @@ class Desktop implements DeviceInterface
 {
     public const DEVICE = 'pc';
 
+    public static function equals($value): bool
+    {
+        return $value === self::DEVICE;
+    }
+
     public function __toString(): string
     {
         return self::DEVICE;
@@ -47,10 +52,5 @@ class Desktop implements DeviceInterface
     public function getSort(): int
     {
         return 100;
-    }
-
-    public static function equals($value): bool
-    {
-        return $value === self::DEVICE;
     }
 }

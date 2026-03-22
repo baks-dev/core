@@ -29,7 +29,6 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 use function is_array;
 
 #[AsEventListener(event: ControllerEvent::class)]
@@ -70,7 +69,7 @@ final class SecurityListener
 
         $commonRoles = array_intersect(
             $roles,
-            $granted
+            $granted,
         );
 
         if(empty($commonRoles))

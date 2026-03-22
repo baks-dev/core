@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.useragent')]
 interface UserAgentInterface
 {
-    public function getValue(): string;
-
     public static function equals($value): bool;
+
+    public function getValue(): string;
 }

@@ -32,15 +32,6 @@ final class Switcher implements SwitcherInterface
         return is_int($text) ? $this->text : $this->switch('ru');
     }
 
-
-    public function toEng(int|string $text, bool $lower = true): string
-    {
-        $this->text = (string) $text;
-        $this->lower = $lower;
-
-        return is_int($text) ? $this->text : $this->switch('en');
-    }
-
     protected function switch(string $lng): string
     {
         $str['en'] = [
@@ -182,6 +173,13 @@ final class Switcher implements SwitcherInterface
         return $this->lower ? mb_strtolower($reload) : $reload;
     }
 
+    public function toEng(int|string $text, bool $lower = true): string
+    {
+        $this->text = (string) $text;
+        $this->lower = $lower;
+
+        return is_int($text) ? $this->text : $this->switch('en');
+    }
 
     public function transliterate(string $string): string
     {

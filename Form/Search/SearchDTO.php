@@ -55,14 +55,6 @@ class SearchDTO
     }
 
     /**
-     * Query
-     */
-    public function getQuery(): ?string
-    {
-        return $this->query ? mb_strtolower(trim($this->query)) : null;
-    }
-
-    /**
      * Метод фильтрует строку поиска заменяя на пробел все, кроме
      * \p{L} - любой букве
      * \p{N} - любой цифре
@@ -71,6 +63,14 @@ class SearchDTO
     public function getQueryFilter(): array|string|null
     {
         return preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $this->getQuery());
+    }
+
+    /**
+     * Query
+     */
+    public function getQuery(): ?string
+    {
+        return $this->query ? mb_strtolower(trim($this->query)) : null;
     }
 
     public function setQuery(string|int|null $query): self

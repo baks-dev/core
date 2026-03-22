@@ -265,6 +265,109 @@ class AssetsInstallCommand extends Command
         return $rows;
     }
 
+    private function getPublicDirectory(ContainerInterface $container): string
+    {
+        $defaultPublicDir = 'public';
+
+        if(null === $this->projectDir && !$container->hasParameter('kernel.project_dir'))
+        {
+            return $defaultPublicDir;
+        }
+
+        $composerFilePath = ($this->projectDir ?? $container->getParameter('kernel.project_dir')).'/composer.json';
+
+        if(!file_exists($composerFilePath))
+        {
+            return $defaultPublicDir;
+        }
+
+        $composerConfig = json_decode(file_get_contents($composerFilePath), true, 512, JSON_THROW_ON_ERROR);
+
+        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
+    }
+
+    /**
+     * Метод рекурсивно сканирует директории в поиске папки /Resources/assets
+     */
+    public function searchAssets(string $path, string $dirname = 'assets'): ?array
+    {
+        $configs = null;
+
+        foreach(new DirectoryIterator($path) as $module)
+        {
+            if($module->isDot() || !$module->isDir())
+            {
+                continue;
+            }
+
+            if(is_dir($module->getRealPath().'/Resources/'.$dirname))
+            {
+                $configs[] = $module->getRealPath().'/Resources/'.$dirname;
+                continue;
+            }
+
+            $config = $this->searchAssets($module->getRealPath());
+
+            if($config !== null)
+            {
+                $configs = $configs ? array_merge($configs, $config) : $config;
+            }
+
+        }
+
+        return $configs;
+    }
+
+    /**
+     * Попробуйте создать абсолютную символическую ссылку.
+     */
+    private function absoluteSymlinkWithFallback(string $originDir, string $targetDir): string
+    {
+        try
+        {
+            $this->symlink($originDir, $targetDir);
+            $method = self::METHOD_ABSOLUTE_SYMLINK;
+        }
+        catch(IOException $e)
+        {
+            $method = $this->hardCopy($originDir, $targetDir);
+        }
+
+        return $method;
+    }
+
+    /**
+     * Создает символическую ссылку
+     */
+    private function symlink(string $originDir, string $targetDir): void
+    {
+        $this->filesystem->mkdir(dirname($targetDir));
+        $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
+
+        $this->filesystem->symlink($originDir, $targetDir);
+        if(!file_exists($targetDir))
+        {
+            throw new IOException(
+                sprintf('Symbolic link "%s" was created but appears to be broken.', $targetDir),
+                0,
+                null,
+                $targetDir,
+            );
+        }
+    }
+
+    /**
+     * Копирует источник
+     */
+    private function hardCopy(string $originDir, string $targetDir): string
+    {
+        $this->filesystem->mkdir($targetDir, 0777);
+        // We use a custom iterator to ignore VCS files
+        $this->filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
+
+        return self::METHOD_COPY;
+    }
+
     private function assetsRouting(): ?array
     {
         $ModuleRoutes = $this->searchAssets($this->projectDir.implode(DIRECTORY_SEPARATOR, ['', 'vendor', 'baks-dev']), 'routes') ?: [];
@@ -355,7 +458,6 @@ class AssetsInstallCommand extends Command
         return $rows;
     }
 
-
     /**  */
     private function assetsPackages(): ?array
     {
@@ -438,114 +540,6 @@ class AssetsInstallCommand extends Command
         }
 
         return $rows;
-    }
-
-
-    private function getPublicDirectory(ContainerInterface $container): string
-    {
-        $defaultPublicDir = 'public';
-
-        if(null === $this->projectDir && !$container->hasParameter('kernel.project_dir'))
-        {
-            return $defaultPublicDir;
-        }
-
-        $composerFilePath = ($this->projectDir ?? $container->getParameter('kernel.project_dir')).'/composer.json';
-
-        if(!file_exists($composerFilePath))
-        {
-            return $defaultPublicDir;
-        }
-
-        $composerConfig = json_decode(file_get_contents($composerFilePath), true, 512, JSON_THROW_ON_ERROR);
-
-        return $composerConfig['extra']['public-dir'] ?? $defaultPublicDir;
-    }
-
-
-    /**
-     * Попробуйте создать абсолютную символическую ссылку.
-     */
-    private function absoluteSymlinkWithFallback(string $originDir, string $targetDir): string
-    {
-        try
-        {
-            $this->symlink($originDir, $targetDir);
-            $method = self::METHOD_ABSOLUTE_SYMLINK;
-        }
-        catch(IOException $e)
-        {
-            $method = $this->hardCopy($originDir, $targetDir);
-        }
-
-        return $method;
-    }
-
-
-    /**
-     * Метод рекурсивно сканирует директории в поиске папки /Resources/assets
-     */
-    public function searchAssets(string $path, string $dirname = 'assets'): ?array
-    {
-        $configs = null;
-
-        foreach(new DirectoryIterator($path) as $module)
-        {
-            if($module->isDot() || !$module->isDir())
-            {
-                continue;
-            }
-
-            if(is_dir($module->getRealPath().'/Resources/'.$dirname))
-            {
-                $configs[] = $module->getRealPath().'/Resources/'.$dirname;
-                continue;
-            }
-
-            $config = $this->searchAssets($module->getRealPath());
-
-            if($config !== null)
-            {
-                $configs = $configs ? array_merge($configs, $config) : $config;
-            }
-
-        }
-
-        return $configs;
-    }
-
-
-    /**
-     * Создает символическую ссылку
-     */
-    private function symlink(string $originDir, string $targetDir): void
-    {
-        $this->filesystem->mkdir(dirname($targetDir));
-        $originDir = $this->filesystem->makePathRelative($originDir, realpath(dirname($targetDir)));
-
-        $this->filesystem->symlink($originDir, $targetDir);
-        if(!file_exists($targetDir))
-        {
-            throw new IOException(
-                sprintf('Symbolic link "%s" was created but appears to be broken.', $targetDir),
-                0,
-                null,
-                $targetDir,
-            );
-        }
-    }
-
-
-    /**
-     * Копирует источник
-     */
-    private function hardCopy(string $originDir, string $targetDir): string
-    {
-        $this->filesystem->mkdir($targetDir, 0777);
-        // We use a custom iterator to ignore VCS files
-        $this->filesystem->mirror($originDir, $targetDir, Finder::create()->ignoreDotFiles(false)->in($originDir));
-
-        return self::METHOD_COPY;
     }
 
 }

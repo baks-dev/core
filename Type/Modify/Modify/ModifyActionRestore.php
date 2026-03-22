@@ -33,12 +33,6 @@ final class ModifyActionRestore implements ModifyActionInterface
 {
     public const ACTION = 'restore';
 
-    /** Возвращает значение (value) */
-    public function getValue(): string
-    {
-        return self::ACTION;
-    }
-
     public static function sort(): int
     {
         return 400;
@@ -47,5 +41,11 @@ final class ModifyActionRestore implements ModifyActionInterface
     public static function equals(string $action): bool
     {
         return self::ACTION === mb_strtolower($action);
+    }
+
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::ACTION;
     }
 }

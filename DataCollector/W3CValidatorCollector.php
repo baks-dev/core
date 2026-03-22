@@ -32,14 +32,14 @@ use Throwable;
 
 final class W3CValidatorCollector extends AbstractDataCollector
 {
-    public function collect(Request $request, Response $response, ?Throwable $exception = null): void
-    {
-        $this->data = ['url' => $request->getUri()];
-    }
-
     public static function getTemplate(): ?string
     {
         return '@core/collector/validator.html.twig';
+    }
+
+    public function collect(Request $request, Response $response, ?Throwable $exception = null): void
+    {
+        $this->data = ['url' => $request->getUri()];
     }
 
     public function getUrl(): string

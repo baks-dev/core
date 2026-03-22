@@ -1,10 +1,12 @@
-function translitRuEn(str) {
+function translitRuEn(str)
+{
 
-    var magic = function (lit) {
+    var magic = function(lit)
+    {
         var arrayLits = [
             ["а", "a"], ["б", "b"], ["в", "v"], ["г", "g"],
             ["д", "d"], ["е", "e"], ["ё", "yo"], ["ж", "zh"],
-            ["з", "z"],  ["и", "i"], ["й", "j"], ["к", "k"],
+            ["з", "z"], ["и", "i"], ["й", "j"], ["к", "k"],
             ["л", "l"], ["м", "m"], ["н", "n"], ["о", "o"],
             ["п", "p"], ["р", "r"], ["с", "s"], ["т", "t"],
             ["у", "u"], ["ф", "f"], ["х", "h"], ["ц", "c"],
@@ -23,12 +25,12 @@ function translitRuEn(str) {
             ["Я", "YA"],
 
             [0, "0"], [1, "1"], [2, "2"], [3, "3"], [4, "4"], [5, "5"],
-            [6, "6"], [7, "7"],  [8, "8"], [9, "9"],
+            [6, "6"], [7, "7"], [8, "8"], [9, "9"],
 
             ["0", "0"], ["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"],
             ["5", "5"], ["6", "6"], ["7", "7"], ["8", "8"], ["9", "9"],
 
-            ["a", "a"], ["b", "b"], ["c", "c"],  ["d", "d"], ["e", "e"],
+            ["a", "a"], ["b", "b"], ["c", "c"], ["d", "d"], ["e", "e"],
             ["f", "f"], ["g", "g"], ["h", "h"], ["i", "i"], ["j", "j"],
             ["k", "k"], ["l", "l"], ["m", "m"], ["n", "n"], ["o", "o"],
             ["p", "p"], ["q", "q"], ["r", "r"], ["s", "s"], ["t", "t"],
@@ -46,19 +48,26 @@ function translitRuEn(str) {
             [":", ""], [";", ""],
         ];
 
-        var efim360ru = arrayLits.map(i => {
-            if (i[0] === lit) {
-                return i[1]
-            } else {
-                return undefined
+        var efim360ru = arrayLits.map(i =>
+        {
+            if(i[0] === lit)
+            {
+                return i[1];
+            }
+            else
+            {
+                return undefined;
             }
         }).filter(i => i != undefined);
-        if (efim360ru.length > 0) {
-            return efim360ru[0]
-        } else {
-            return "-"
+        if(efim360ru.length > 0)
+        {
+            return efim360ru[0];
+        }
+        else
+        {
+            return "-";
         }
     };
 
-    return Array.from(str).map(i => magic(i)).join("")
+    return Array.from(str).map(i => magic(i)).join("");
 }

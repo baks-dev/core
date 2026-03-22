@@ -68,44 +68,18 @@ final class Device
         }
     }
 
-    public function __toString(): string
-    {
-        return (string) $this->device;
-    }
-
     public function getDevice(): DeviceInterface
     {
         return $this->device;
-    }
-
-    public function getDeviceValue(): string
-    {
-        return $this->device->getValue();
-    }
-
-    public static function cases(): array
-    {
-        $case = null;
-
-        foreach(self::getDeclared() as $declared)
-        {
-            /** @var DeviceInterface $declared */
-            $class = new $declared();
-            $case[$class->getSort()] = new self($class);
-        }
-
-        ksort($case);
-
-        return $case;
     }
 
     public static function getDeclared(): array
     {
         return array_filter(
             get_declared_classes(),
-            static function ($className) {
+            static function($className) {
                 return in_array(DeviceInterface::class, class_implements($className), true);
-            }
+            },
         );
     }
 
@@ -127,5 +101,31 @@ final class Device
         }
 
         return $device === (string) $this->device;
+    }
+
+    public static function cases(): array
+    {
+        $case = null;
+
+        foreach(self::getDeclared() as $declared)
+        {
+            /** @var DeviceInterface $declared */
+            $class = new $declared();
+            $case[$class->getSort()] = new self($class);
+        }
+
+        ksort($case);
+
+        return $case;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->device;
+    }
+
+    public function getDeviceValue(): string
+    {
+        return $this->device->getValue();
     }
 }

@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Listeners\Event;
 
-use BaksDev\Core\Type\Locale\Locale;
 use BaksDev\Core\Type\Locale\Locales\LocaleCollection;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;

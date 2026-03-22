@@ -50,7 +50,7 @@ class DeduplicatorEndTest extends KernelTestCase
                 'key1',
                 'key2',
                 new ProductUid(ProductUid::TEST),
-                ['key3' => 'value']
+                ['key3' => 'value'],
             ]);
 
         self::assertTrue($Deduplicator->isExecuted());

@@ -76,18 +76,6 @@ class BaksDevCoreBundle extends AbstractBundle
 
     }
 
-    public function configure(DefinitionConfigurator $definition): void
-    {
-        $rootNode = $definition->rootNode();
-
-        $domainPath = $rootNode->children();
-
-        $domainPath
-            ->scalarNode('messenger_transport')
-            ->defaultValue('doctrine')
-            ->end();
-    }
-
     /**
      * Метод рекурсивно сканирует директории в поиске папки /Resources/config.
      */
@@ -114,5 +102,17 @@ class BaksDevCoreBundle extends AbstractBundle
                 $this->configs->offsetSet($configDir, $configDir);
             }
         }
+    }
+
+    public function configure(DefinitionConfigurator $definition): void
+    {
+        $rootNode = $definition->rootNode();
+
+        $domainPath = $rootNode->children();
+
+        $domainPath
+            ->scalarNode('messenger_transport')
+            ->defaultValue('doctrine')
+            ->end();
     }
 }

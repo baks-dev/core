@@ -33,6 +33,11 @@ class Mobile implements DeviceInterface
 {
     public const DEVICE = 'mobile';
 
+    public static function equals($value): bool
+    {
+        return $value === self::DEVICE;
+    }
+
     public function __toString(): string
     {
         return self::DEVICE;
@@ -47,10 +52,5 @@ class Mobile implements DeviceInterface
     public function getSort(): int
     {
         return 200;
-    }
-
-    public static function equals($value): bool
-    {
-        return $value === self::DEVICE;
     }
 }

@@ -91,6 +91,5 @@ final readonly class CacheClearTemplateHandler
         }
 
 
-
     }
 }

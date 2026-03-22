@@ -60,42 +60,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 // #[Autoconfigure(public: true)]
 final class DBALQueryBuilder extends QueryBuilder
 {
+    public const string PROJECT_PROFILE_KEY = 'project_profile';
+    public const string CURRENT_PROFILE_KEY = 'current_profile';
     private Connection $connection;
-
     private array $select = [];
-
-
     /**  Кеш запросов */
 
     private CacheInterface|CacheItemPoolInterface|false $cacheQueries = false;
-
     private string $cacheKey;
-
     private int $ttl = 60;
-
     /**  Флаг кеширования запроса  */
     private bool $isCache = false;
-
     private ?string $namespace;
-
     /** Поиск */
     private SearchDTO $query;
-
     private ?QueryBuilder $search = null;
-
     /** Билдер рекурсии */
     private ?string $recursive_alias = null;
-
-
     /** Метод, который вызывается для обновления кеша */
     private string|bool $methodReset = false;
-
     private bool $refresh = true;
-
-    public const string PROJECT_PROFILE_KEY = 'project_profile';
-
-    public const string CURRENT_PROFILE_KEY = 'current_profile';
-
 
     public function __construct(
         #[Autowire(env: 'APP_ENV')] private readonly string $env,
@@ -114,102 +98,34 @@ final class DBALQueryBuilder extends QueryBuilder
         parent::__construct($this->connection);
     }
 
-    public function createQueryBuilder(object|string $class): self
-    {
-        $inst = clone $this;
-
-        $newInstance = new self(
-            env: $inst->env,
-            connection: $inst->connection,
-            switcher: $inst->switcher,
-            translator: $inst->translator,
-            cache: $inst->cache,
-            deduplicator: $inst->deduplicator,
-            dispatch: $inst->dispatch,
-            UserProfileTokenStorageInterface: $this->UserProfileTokenStorageInterface,
-            projectProfile: $inst->projectProfile,
-        );
-
-        //$newInstance->resetQueryParts();
-
-        $newInstance->resetOrderBy();
-        $newInstance->resetGroupBy();
-        $newInstance->resetWhere();
-
-        $newInstance->setParameters([]);
-
-        $classNamespace = is_object($class) ? $class::class : $class;
-
-        /** По умолчанию присваиваем немспейс и ключ кеширования по классу билдера запроса */
-        $newInstance->namespace = $inst->getCacheNamespace($classNamespace);
-        $newInstance->cacheKey = md5($classNamespace);
-
-        $newInstance->isCache = false;
-
-        return $newInstance;
-    }
-
-    private function getCacheNamespace(string $class)
-    {
-        if(class_exists($class))
-        {
-            /** Выделяем из namespace класса название модуля */
-            $reflect = new ReflectionClass($class);
-
-            if(preg_match('/vendor\/baks-dev\/([^\/]+)\//', $reflect->getFileName(), $matches))
-            {
-                return $matches[1];
-            }
-        }
-
-        return $class;
-    }
-
-
     /**
-     * Кешируем результат DBAL
+     * Сбрасываем тек ключа запроса
      */
-
-    public function enableCache(?string $namespace = null, int|string $ttl = '1 day', bool $refresh = true): self
+    public function resetCacheQuery(): bool
     {
-        /** Переопределяем кеш модуля если передан */
-
-        if($namespace)
+        /* Не сбрасываем кеш если тестовая среда */
+        if($this->env === 'test')
         {
-            $this->namespace = $this->getCacheNamespace($namespace);
+            return true;
         }
 
-        /** Если не переделен селектор - указываем все  */
+        $this->connection->getConfiguration()->setResultCache($this->cacheQueries);
+        $this->deleteCacheQueries(); // Удаляем
 
-        if(empty($this->select))
-        {
-            $this->select('*');
-        }
-
-        $this->isCache = true;
-        $this->refresh = $refresh;
-
-        $ttl = $this->getTimeToLive($ttl);
-        $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
-
-        $this->ttl = $this->getTimeToLive($ttl);
-
-        /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
-        $this->cacheKey = sha1(
-            $this->namespace.
-            $this->cacheKey.
-            md5(var_export($this->getParameters(), true)).
-            md5($this->getSQL()).
-            $this->getMaxResults().
-            $this->getFirstResult(),
-        );
-
-        $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
-
-        return $this;
-
+        return true;
     }
 
+    public function deleteCacheQueries(): void
+    {
+        $this->cacheQueries->deleteItem($this->cacheKey);
+    }
+
+    public function fetchAllGenerator(): Generator|false
+    {
+        $result = $this->executeDBALQuery()->iterateAssociative();
+
+        return $result->valid() ? $result : false;
+    }
 
     /**
      * Метод включает кеш результата запроса и добавляет комманду для обновления с низким приоритетом
@@ -256,72 +172,21 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this->executeQuery();
     }
 
-
-    /**
-     * Метод возвращает время в секундах с разбросом * 2
-     */
-    private function getTimeToLive(string|int $seconds): int
+    public function executeCacheQuery(
+        string|false $sql = false,
+        array|false $params = false,
+        array|false $types = false
+    ): Result
     {
-        if(is_string($seconds))
-        {
-            $interval = DateInterval::createFromDateString($seconds);
+        $this->cacheQueries = $this->cache->init($this->namespace, $this->ttl);
+        $this->setCacheQueries($this->cacheQueries);
 
-            $seconds =
-                ($interval->d * 86400) + // дни в секундах
-                ($interval->h * 3600) +  // часы в секундах
-                ($interval->i * 60) +    // минуты в секундах
-                $interval->s;            // секунды
-        }
-
-        $seconds = (int) $seconds;
-
-        /**
-         * Ограничиваем кеширование больше одних суток
-         */
-        if(empty($seconds) || $seconds > 86400)
-        {
-            $seconds = 86400;
-        }
-
-        /**
-         * Делаем разброс по времени
-         */
-        $Randomizer = new Randomizer();
-        $seconds = $Randomizer->getInt($seconds, ($seconds * 2));
-
-        return $seconds;
-    }
-
-    /**
-     * Сбрасываем тек ключа запроса
-     */
-    public function resetCacheQuery(): bool
-    {
-        /* Не сбрасываем кеш если тестовая среда */
-        if($this->env === 'test')
-        {
-            return true;
-        }
-
-        $this->connection->getConfiguration()->setResultCache($this->cacheQueries);
-        $this->deleteCacheQueries(); // Удаляем
-
-        return true;
-    }
-
-
-    public function fetchAllAssociative(): array
-    {
-        $result = $this->executeDBALQuery()->fetchAllAssociative();
-
-        return $result ?: [];
-    }
-
-    public function fetchAllGenerator(): Generator|false
-    {
-        $result = $this->executeDBALQuery()->iterateAssociative();
-
-        return $result->valid() ? $result : false;
+        return $this->connection->executeCacheQuery(
+            $sql ?: $this->getSQL(),
+            $params ?: $this->getParameters(),
+            $types ?: $this->getParameterTypes(),
+            new QueryCacheProfile($this->ttl, $this->cacheKey),
+        );
     }
 
     public function fetchHydrate(string $class, ?string $method = null): object|false
@@ -334,6 +199,13 @@ final class DBALQueryBuilder extends QueryBuilder
         }
 
         return $method ? (new $class())->{$method}(...$result) : new $class(...$result);
+    }
+
+    public function fetchAssociative(): array|false
+    {
+        $result = $this->executeDBALQuery()->fetchAssociative();
+
+        return $result ?: false;
     }
 
     public function fetchAllHydrate(string $class, ?string $method = null): Generator
@@ -354,14 +226,6 @@ final class DBALQueryBuilder extends QueryBuilder
         {
             $result[$key] = new $class(...$item);
         }
-
-        return $result ?: false;
-    }
-
-
-    public function fetchAssociative(): array|false
-    {
-        $result = $this->executeDBALQuery()->fetchAssociative();
 
         return $result ?: false;
     }
@@ -393,11 +257,11 @@ final class DBALQueryBuilder extends QueryBuilder
 
     }
 
-    public function fetchOne(): mixed
+    public function fetchAllAssociative(): array
     {
-        $result = $this->executeDBALQuery()->fetchOne();
+        $result = $this->executeDBALQuery()->fetchAllAssociative();
 
-        return $result ?: false;
+        return $result ?: [];
     }
 
     public function count(bool $delay = false): int|null
@@ -447,6 +311,115 @@ final class DBALQueryBuilder extends QueryBuilder
         return false === $delay || $cache->isHit() ? (int) $this->fetchOne() : null;
     }
 
+    public function select(string ...$expressions): self
+    {
+        $this->select = $expressions;
+        parent::select(...$expressions);
+
+        return $this;
+    }
+
+    /**
+     * Кешируем результат DBAL
+     */
+
+    public function enableCache(?string $namespace = null, int|string $ttl = '1 day', bool $refresh = true): self
+    {
+        /** Переопределяем кеш модуля если передан */
+
+        if($namespace)
+        {
+            $this->namespace = $this->getCacheNamespace($namespace);
+        }
+
+        /** Если не переделен селектор - указываем все  */
+
+        if(empty($this->select))
+        {
+            $this->select('*');
+        }
+
+        $this->isCache = true;
+        $this->refresh = $refresh;
+
+        $ttl = $this->getTimeToLive($ttl);
+        $this->cacheQueries = $this->cache->init($this->namespace, $ttl);
+
+        $this->ttl = $this->getTimeToLive($ttl);
+
+        /** Создаем ключ кеша конкатенируя параметры и присваиваем дайджест  */
+        $this->cacheKey = sha1(
+            $this->namespace.
+            $this->cacheKey.
+            md5(var_export($this->getParameters(), true)).
+            md5($this->getSQL()).
+            $this->getMaxResults().
+            $this->getFirstResult(),
+        );
+
+        $this->connection->getConfiguration()?->setResultCache($this->cacheQueries);
+
+        return $this;
+
+    }
+
+    private function getCacheNamespace(string $class)
+    {
+        if(class_exists($class))
+        {
+            /** Выделяем из namespace класса название модуля */
+            $reflect = new ReflectionClass($class);
+
+            if(preg_match('/vendor\/baks-dev\/([^\/]+)\//', $reflect->getFileName(), $matches))
+            {
+                return $matches[1];
+            }
+        }
+
+        return $class;
+    }
+
+    /**
+     * Метод возвращает время в секундах с разбросом * 2
+     */
+    private function getTimeToLive(string|int $seconds): int
+    {
+        if(is_string($seconds))
+        {
+            $interval = DateInterval::createFromDateString($seconds);
+
+            $seconds =
+                ($interval->d * 86400) + // дни в секундах
+                ($interval->h * 3600) +  // часы в секундах
+                ($interval->i * 60) +    // минуты в секундах
+                $interval->s;            // секунды
+        }
+
+        $seconds = (int) $seconds;
+
+        /**
+         * Ограничиваем кеширование больше одних суток
+         */
+        if(empty($seconds) || $seconds > 86400)
+        {
+            $seconds = 86400;
+        }
+
+        /**
+         * Делаем разброс по времени
+         */
+        $Randomizer = new Randomizer();
+        $seconds = $Randomizer->getInt($seconds, ($seconds * 2));
+
+        return $seconds;
+    }
+
+    public function fetchOne(): mixed
+    {
+        $result = $this->executeDBALQuery()->fetchOne();
+
+        return $result ?: false;
+    }
 
     public function fetchExist($not = false): bool
     {
@@ -468,33 +441,39 @@ final class DBALQueryBuilder extends QueryBuilder
         return (bool) $result;
     }
 
-
-    public function executeCacheQuery(
-        string|false $sql = false,
-        array|false $params = false,
-        array|false $types = false
-    ): Result
+    public function createQueryBuilder(object|string $class): self
     {
-        $this->cacheQueries = $this->cache->init($this->namespace, $this->ttl);
-        $this->setCacheQueries($this->cacheQueries);
+        $inst = clone $this;
 
-        return $this->connection->executeCacheQuery(
-            $sql ?: $this->getSQL(),
-            $params ?: $this->getParameters(),
-            $types ?: $this->getParameterTypes(),
-            new QueryCacheProfile($this->ttl, $this->cacheKey),
+        $newInstance = new self(
+            env: $inst->env,
+            connection: $inst->connection,
+            switcher: $inst->switcher,
+            translator: $inst->translator,
+            cache: $inst->cache,
+            deduplicator: $inst->deduplicator,
+            dispatch: $inst->dispatch,
+            UserProfileTokenStorageInterface: $this->UserProfileTokenStorageInterface,
+            projectProfile: $inst->projectProfile,
         );
-    }
 
-    public function setCacheQueries(CacheInterface|CacheItemPoolInterface $cacheQueries): self
-    {
-        $this->connection->getConfiguration()?->setResultCache($cacheQueries);
-        return $this;
-    }
+        //$newInstance->resetQueryParts();
 
-    public function deleteCacheQueries(): void
-    {
-        $this->cacheQueries->deleteItem($this->cacheKey);
+        $newInstance->resetOrderBy();
+        $newInstance->resetGroupBy();
+        $newInstance->resetWhere();
+
+        $newInstance->setParameters([]);
+
+        $classNamespace = is_object($class) ? $class::class : $class;
+
+        /** По умолчанию присваиваем немспейс и ключ кеширования по классу билдера запроса */
+        $newInstance->namespace = $inst->getCacheNamespace($classNamespace);
+        $newInstance->cacheKey = md5($classNamespace);
+
+        $newInstance->isCache = false;
+
+        return $newInstance;
     }
 
     /**
@@ -562,6 +541,30 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
+    public function join($fromAlias, $join, $alias, $condition = null): self
+    {
+        $this->innerJoin(
+            $fromAlias,
+            $this->table($join),
+            $alias,
+            $condition,
+        );
+
+        return $this;
+    }
+
+    public function table(string $class): string
+    {
+        if(class_exists($class))
+        {
+            $ref = new ReflectionClass($class);
+            /** @var ReflectionAttribute $current */
+            $current = current($ref->getAttributes(Table::class));
+            return $current->getArguments()['name'] ?? $class;
+        }
+
+        return $class;
+    }
 
     /**
      * @param $id - идентификатор сущности
@@ -630,15 +633,6 @@ final class DBALQueryBuilder extends QueryBuilder
         return $result;
     }
 
-
-    public function select(string ...$expressions): self
-    {
-        $this->select = $expressions;
-        parent::select(...$expressions);
-
-        return $this;
-    }
-
     public function addSelect(string $expression, string ...$expressions): self
     {
         $this->select = array_merge($this->select, [$expression], $expressions);
@@ -647,7 +641,6 @@ final class DBALQueryBuilder extends QueryBuilder
 
         return $this;
     }
-
 
     public function allGroupByExclude(string|array|null $exclude = null): void
     {
@@ -720,7 +713,6 @@ final class DBALQueryBuilder extends QueryBuilder
         }
     }
 
-
     /**  Example Builder:
      * $qb->leftJoin(
      * 'part_event',
@@ -765,6 +757,28 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
+    public function from(string $table, $alias = null): self
+    {
+        $from = $this->table($table);
+
+        parent::from($from, $alias);
+
+        return $this;
+    }
+
+    public function leftJoin($fromAlias, $join, $alias, $condition = null): self
+    {
+        $table = $this->table($join);
+
+        parent::leftJoin(
+            $fromAlias,
+            $table,
+            $alias,
+            $condition,
+        );
+
+        return $this;
+    }
 
     /**
      * Добавляет к поиску строку для поиска соответствий LIKE
@@ -931,7 +945,6 @@ final class DBALQueryBuilder extends QueryBuilder
         return true;
     }
 
-
     public function bindCurrentProfile(): bool
     {
         if(false === ($this->UserProfileTokenStorageInterface instanceof UserProfileTokenStorageInterface))
@@ -961,6 +974,12 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this->cacheQueries;
     }
 
+    public function setCacheQueries(CacheInterface|CacheItemPoolInterface $cacheQueries): self
+    {
+        $this->connection->getConfiguration()?->setResultCache($cacheQueries);
+        return $this;
+    }
+
     /**
      * CacheKey
      */
@@ -972,16 +991,6 @@ final class DBALQueryBuilder extends QueryBuilder
     public function setCacheKey(string $key): self
     {
         $this->cacheKey = $key;
-        return $this;
-    }
-
-
-    public function from(string $table, $alias = null): self
-    {
-        $from = $this->table($table);
-
-        parent::from($from, $alias);
-
         return $this;
     }
 
@@ -1003,6 +1012,11 @@ final class DBALQueryBuilder extends QueryBuilder
         return $this;
     }
 
+    public function andWhereExists($existClass, $alias, $condition): DBALQueryBuilder
+    {
+        $this->andWhere('EXISTS('.$this->buildExist($existClass, $alias, $condition).')');
+        return $this;
+    }
 
     private function buildExist($existClass, $alias, $condition): string
     {
@@ -1015,44 +1029,11 @@ final class DBALQueryBuilder extends QueryBuilder
         return $exist->getSQL();
     }
 
-    public function andWhereExists($existClass, $alias, $condition): DBALQueryBuilder
-    {
-        $this->andWhere('EXISTS('.$this->buildExist($existClass, $alias, $condition).')');
-        return $this;
-    }
-
     public function andWhereNotExists($existClass, $alias, $condition = null): DBALQueryBuilder
     {
         $this->andWhere('NOT EXISTS('.$this->buildExist($existClass, $alias, $condition).')');
         return $this;
     }
-
-    public function leftJoin($fromAlias, $join, $alias, $condition = null): self
-    {
-        $table = $this->table($join);
-
-        parent::leftJoin(
-            $fromAlias,
-            $table,
-            $alias,
-            $condition,
-        );
-
-        return $this;
-    }
-
-    public function join($fromAlias, $join, $alias, $condition = null): self
-    {
-        $this->innerJoin(
-            $fromAlias,
-            $this->table($join),
-            $alias,
-            $condition,
-        );
-
-        return $this;
-    }
-
 
     public function analyze(): void
     {
@@ -1073,19 +1054,6 @@ final class DBALQueryBuilder extends QueryBuilder
         $analyze = $connection->executeQuery()->fetchAllAssociativeIndexed();
 
         dd($analyze);
-    }
-
-    public function table(string $class): string
-    {
-        if(class_exists($class))
-        {
-            $ref = new ReflectionClass($class);
-            /** @var ReflectionAttribute $current */
-            $current = current($ref->getAttributes(Table::class));
-            return $current->getArguments()['name'] ?? $class;
-        }
-
-        return $class;
     }
 
     public function prepare(string $sql): Statement

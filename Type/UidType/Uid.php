@@ -66,6 +66,16 @@ abstract class Uid implements ValueResolverInterface
         $this->value = new Uuid((string) $value);
     }
 
+    public static function isUid(mixed $value): bool
+    {
+        if(empty($value))
+        {
+            return false;
+        }
+
+        return preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', (string) $value);
+    }
+
     public function __clone(): void
     {
         $this->value = Uuid::v7();
@@ -74,11 +84,6 @@ abstract class Uid implements ValueResolverInterface
     public function __toString(): string
     {
         return (string) $this->value;
-    }
-
-    public function getValue(): Uuid
-    {
-        return new UuidV7($this->value);
     }
 
     /**
@@ -168,21 +173,15 @@ abstract class Uid implements ValueResolverInterface
         return (string) $this->value === (string) $value->value;
     }
 
-    public static function isUid(mixed $value): bool
-    {
-        if(empty($value))
-        {
-            return false;
-        }
-
-        return preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', (string) $value);
-    }
-
     public function getDateTime(): DateTimeInterface
     {
         return $this->getValue()->getDateTime();
     }
 
+    public function getValue(): Uuid
+    {
+        return new UuidV7($this->value);
+    }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {

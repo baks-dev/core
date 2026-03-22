@@ -28,10 +28,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.device')]
 interface DeviceInterface
 {
+    public static function equals($value): bool;
+
     public function getValue(): string;
 
     public function getSort(): int;
-
-    public static function equals($value): bool;
 
 }

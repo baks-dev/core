@@ -40,7 +40,7 @@ final readonly class MessengerConsumersHandler
     {
         $this->messageDispatch->dispatch(
             message: new ConsumerRunningMessage(),
-            transport: 'systemd'
+            transport: 'systemd',
         );
     }
 }

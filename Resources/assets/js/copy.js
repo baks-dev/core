@@ -20,31 +20,29 @@
  *  THE SOFTWARE.
  */
 
-document.querySelectorAll('.copy').forEach(el =>
+document.querySelectorAll(".copy").forEach(el =>
 {
-    el.addEventListener('click', event =>
+    el.addEventListener("click", event =>
     {
-        navigator.clipboard.writeText(el.dataset.copy)
-            .then(() =>
+        navigator.clipboard.writeText(el.dataset.copy).then(() =>
+        {
+
+            let $successSupplyToast = "{ \"type\":\"success\" , " +
+                "\"header\":\"Копирование\"  , " +
+                "\"message\" : \"Результат успешно скопирован в буфер обмена\" }";
+
+            createToast(JSON.parse($successSupplyToast));
+
+            el.classList.add("opacity-25");
+
+            setTimeout(() =>
             {
+                el.classList.remove("opacity-25");
+            }, 500);
 
-                let $successSupplyToast = '{ "type":"success" , ' +
-                    '"header":"Копирование"  , ' +
-                    '"message" : "Результат успешно скопирован в буфер обмена" }';
-
-                createToast(JSON.parse($successSupplyToast));
-
-                el.classList.add('opacity-25');
-
-                setTimeout(() =>
-                {
-                    el.classList.remove('opacity-25');
-                }, 500);
-
-            })
-            .catch(err =>
-            {
-                console.log('Something went wrong', err);
-            });
+        }).catch(err =>
+        {
+            console.log("Something went wrong", err);
+        });
     });
 });

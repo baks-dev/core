@@ -39,7 +39,8 @@ class ErrorController
         #[Autowire(service: 'twig.error_renderer.html')] ErrorRendererInterface $errorRenderer,
         #[Autowire(env: 'ROOT_IP')] string $root = '0.0.0.0',
         #[Autowire(env: 'APP_ENV')] string $env = 'prod',
-    ): Response {
+    ): Response
+    {
 
         if($env === 'dev' && $request->getClientIp() === $root)
         {
@@ -48,7 +49,7 @@ class ErrorController
             return new Response(
                 $error->getAsString(),
                 $error->getStatusCode(),
-                $error->getHeaders()
+                $error->getHeaders(),
             );
         }
 

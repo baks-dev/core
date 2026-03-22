@@ -42,14 +42,14 @@ final class SitemapController extends AbstractController
         if(class_exists(BaksDevProductsCategoryBundle::class))
         {
             $sitemaps[] = [
-                'loc' => 'products-category:sitemap'
+                'loc' => 'products-category:sitemap',
             ];
         }
 
         if(class_exists(BaksDevReferenceCarsBundle::class))
         {
             $sitemaps[] = [
-                'loc' => 'reference-cars:sitemap'
+                'loc' => 'reference-cars:sitemap',
             ];
         }
 

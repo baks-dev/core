@@ -210,6 +210,219 @@ abstract class EntityDataMapper
         return $dto;
     }
 
+    /**
+     * Получаем через рефлексию и замыкание значение свойства
+     */
+
+    protected function getPropertyValue(string $property, object $object)
+    {
+        if(!property_exists($object, $property))
+        {
+            return 'not_initialized';
+        }
+
+        $modifiers = new ReflectionProperty($object, $property);
+
+        // Если свойство не инициировано - false
+        if(!$modifiers->isInitialized($object))
+        {
+            return 'not_initialized';
+        }
+
+        $getPropertyEntity = Closure::bind(static function($object, $property) {
+            return $object->{$property};
+        }, null, $object);
+
+        return $getPropertyEntity($object, $property);
+    }
+
+    /**
+     * Присваиваем через рефлексию замыкание значение свойству
+     */
+
+    protected function setPropertyValue(string $property, mixed $value, object $object): bool
+    {
+        if(!property_exists($object, $property))
+        {
+            return false;
+        }
+
+        $modifiers = new ReflectionProperty($object, $property);
+
+        /** Если значение NULL, но свойство не принимает NULL */
+        if($value === null && $modifiers->getType()?->allowsNull() !== true)
+        {
+            return false;
+        }
+
+        /** Если значение не инициировано */
+        if($value === 'not_initialized')
+        {
+            return false;
+        }
+
+        /** Если свойство ReadOnly и оно уже инициировано - не присваиваем повторно */
+        if($modifiers->isReadOnly() && $modifiers->isInitialized($object))
+        {
+            return false;
+        }
+
+        $setPropertyDto = Closure::bind(static function(object $object, string $property, mixed $value) {
+            return $object->{$property} = $value;
+        }, null, $object);
+
+        $setPropertyDto($object, $property, $value);
+
+        return true;
+    }
+
+    public function cloneEntity($entity = null)
+    {
+
+
+        if($this instanceof EntityState)
+        {
+            return $entity ?: $this;
+        }
+
+        $clone = clone $this;
+
+        $oReflectionClass = new ReflectionClass($clone);
+
+        if($this->entityManager)
+        {
+            /** Получаем все свойства с атрибутом ID */
+            /** @var ReflectionProperty $property */
+
+            $hash = [];
+
+            foreach($oReflectionClass->getProperties() as $property)
+            {
+                /** @var ReflectionAttribute $Attr */
+                $Attr = $property->getAttributes(ORM\Id::class);
+
+                if($Attr)
+                {
+                    $keyHashName = $this->getPropertyValue($property->getName(), $this);
+
+                    if($keyHashName !== 'not_initialized')
+                    {
+                        $hash[$property->getName()] = (string) $keyHashName;
+                    }
+                }
+            }
+
+            if($hash)
+            {
+                $unitOfWork = $this->entityManager->getUnitOfWork();
+
+                $detach = $unitOfWork->getIdentityMap()[$this::class][implode(' ', $hash)] ?? null;
+
+                if($detach)
+                {
+                    $this->entityManager->detach($detach);
+                }
+
+                if($this instanceof EntityReadonly)
+                {
+                    $remove = $this->entityManager->getRepository($this::class)->findOneBy($hash);
+
+                    if($remove)
+                    {
+                        $remove->setEntity($clone);
+                        $clone = $remove;
+                    }
+                }
+            }
+        }
+
+
+        foreach($oReflectionClass->getProperties() as $property)
+        {
+            $propertyName = $property->getName();
+            $entityReflectionPropertyByName = new ReflectionProperty($clone, $propertyName);
+            $type = null;
+
+            $instanceClassCollection = $property->getType()?->getName();
+
+            // Если свойство является коллекцией
+            if(
+                interface_exists($instanceClassCollection) && $instanceClassCollection === Collection::class
+            )
+            {
+                $newColl = new ArrayCollection();
+
+                $cloneCollection = $this->getPropertyValue($propertyName, $clone);
+
+                if(is_string($cloneCollection) && $cloneCollection === 'not_initialized')
+                {
+                    continue;
+                }
+
+                foreach($cloneCollection as $coll)
+                {
+                    //$coll->setRemove($this->remove);
+                    $coll->setEntityManager($this->entityManager);
+                    $return = $coll->cloneEntity($clone);
+                    $newColl->add($return);
+                }
+
+                $this->setPropertyValue($propertyName, $newColl, $clone);
+
+                continue;
+            }
+
+            // Если свойство O2O (один к одному)
+
+            $reference = $entityReflectionPropertyByName->getAttributes(ORM\OneToMany::class);
+
+            if(!$reference)
+            {
+                $reference = $entityReflectionPropertyByName->getAttributes(ORM\OneToOne::class);
+            }
+
+            if($reference)
+            {
+                $cloneProperty = $this->getPropertyValue($propertyName, $clone);
+
+                if(!empty($entity) && $cloneProperty instanceof $entity)
+                {
+                    $this->setPropertyValue($propertyName, $entity, $clone);
+                    continue;
+                }
+
+                if($cloneProperty === null)
+                {
+                    continue;
+                }
+
+                if(method_exists($cloneProperty, 'cloneEntity'))
+                {
+                    //$cloneProperty->setRemove($this->remove);
+                    $cloneProperty->setEntityManager($this->entityManager);
+                    $return = $cloneProperty->cloneEntity($clone);
+                    $this->setPropertyValue($propertyName, $return, $clone);
+                    continue;
+                }
+            }
+
+            if(class_exists($property->getType()?->getName()))
+            {
+                $instanceClass = new ReflectionClass($property->getType()?->getName());
+                $typeInstall = $instanceClass->newInstanceWithoutConstructor();
+
+                if(!empty($entity) && $typeInstall instanceof $entity)
+                {
+                    $this->setPropertyValue($propertyName, $entity, $clone);
+                }
+            }
+        }
+
+
+        $this->entityManager?->persist($clone);
+
+        return $clone;
+    }
 
     /**
      * Мотод обновляет одноименные свойства сущности из DTO при выполнении условий:
@@ -547,248 +760,10 @@ abstract class EntityDataMapper
         return $this;
     }
 
-
-    public function cloneEntity($entity = null)
-    {
-
-
-        if($this instanceof EntityState)
-        {
-            return $entity ?: $this;
-        }
-
-        $clone = clone $this;
-
-        $oReflectionClass = new ReflectionClass($clone);
-
-        if($this->entityManager)
-        {
-            /** Получаем все свойства с атрибутом ID */
-            /** @var ReflectionProperty $property */
-
-            $hash = [];
-
-            foreach($oReflectionClass->getProperties() as $property)
-            {
-                /** @var ReflectionAttribute $Attr */
-                $Attr = $property->getAttributes(ORM\Id::class);
-
-                if($Attr)
-                {
-                    $keyHashName = $this->getPropertyValue($property->getName(), $this);
-
-                    if($keyHashName !== 'not_initialized')
-                    {
-                        $hash[$property->getName()] = (string) $keyHashName;
-                    }
-                }
-            }
-
-            if($hash)
-            {
-                $unitOfWork = $this->entityManager->getUnitOfWork();
-
-                $detach = $unitOfWork->getIdentityMap()[$this::class][implode(' ', $hash)] ?? null;
-
-                if($detach)
-                {
-                    $this->entityManager->detach($detach);
-                }
-
-                if($this instanceof EntityReadonly)
-                {
-                    $remove = $this->entityManager->getRepository($this::class)->findOneBy($hash);
-
-                    if($remove)
-                    {
-                        $remove->setEntity($clone);
-                        $clone = $remove;
-                    }
-                }
-            }
-        }
-
-
-        foreach($oReflectionClass->getProperties() as $property)
-        {
-            $propertyName = $property->getName();
-            $entityReflectionPropertyByName = new ReflectionProperty($clone, $propertyName);
-            $type = null;
-
-            $instanceClassCollection = $property->getType()?->getName();
-
-            // Если свойство является коллекцией
-            if(
-                interface_exists($instanceClassCollection) && $instanceClassCollection === Collection::class
-            )
-            {
-                $newColl = new ArrayCollection();
-
-                $cloneCollection = $this->getPropertyValue($propertyName, $clone);
-
-                if(is_string($cloneCollection) && $cloneCollection === 'not_initialized')
-                {
-                    continue;
-                }
-
-                foreach($cloneCollection as $coll)
-                {
-                    //$coll->setRemove($this->remove);
-                    $coll->setEntityManager($this->entityManager);
-                    $return = $coll->cloneEntity($clone);
-                    $newColl->add($return);
-                }
-
-                $this->setPropertyValue($propertyName, $newColl, $clone);
-
-                continue;
-            }
-
-            // Если свойство O2O (один к одному)
-
-            $reference = $entityReflectionPropertyByName->getAttributes(ORM\OneToMany::class);
-
-            if(!$reference)
-            {
-                $reference = $entityReflectionPropertyByName->getAttributes(ORM\OneToOne::class);
-            }
-
-            if($reference)
-            {
-                $cloneProperty = $this->getPropertyValue($propertyName, $clone);
-
-                if(!empty($entity) && $cloneProperty instanceof $entity)
-                {
-                    $this->setPropertyValue($propertyName, $entity, $clone);
-                    continue;
-                }
-
-                if($cloneProperty === null)
-                {
-                    continue;
-                }
-
-                if(method_exists($cloneProperty, 'cloneEntity'))
-                {
-                    //$cloneProperty->setRemove($this->remove);
-                    $cloneProperty->setEntityManager($this->entityManager);
-                    $return = $cloneProperty->cloneEntity($clone);
-                    $this->setPropertyValue($propertyName, $return, $clone);
-                    continue;
-                }
-            }
-
-            if(class_exists($property->getType()?->getName()))
-            {
-                $instanceClass = new ReflectionClass($property->getType()?->getName());
-                $typeInstall = $instanceClass->newInstanceWithoutConstructor();
-
-                if(!empty($entity) && $typeInstall instanceof $entity)
-                {
-                    $this->setPropertyValue($propertyName, $entity, $clone);
-                }
-            }
-        }
-
-
-        $this->entityManager?->persist($clone);
-
-        return $clone;
-    }
-
-
-    /**
-     * Создает новый экземпляр класса без вызова конструктора.
-     */
-
-    protected function newClassTypeWithoutConstructor(?string $class)
-    {
-        // Если свойство класс VO - инстанс без конструктора
-        if(class_exists($class))
-        {
-            $instanceClass = new ReflectionClass($class);
-            if($instanceClass->getExtensionName() === false && !$instanceClass->isEnum())
-            {
-                return $instanceClass->newInstanceWithoutConstructor();
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Получаем через рефлексию и замыкание значение свойства
-     */
-
-    protected function getPropertyValue(string $property, object $object)
-    {
-        if(!property_exists($object, $property))
-        {
-            return 'not_initialized';
-        }
-
-        $modifiers = new ReflectionProperty($object, $property);
-
-        // Если свойство не инициировано - false
-        if(!$modifiers->isInitialized($object))
-        {
-            return 'not_initialized';
-        }
-
-        $getPropertyEntity = Closure::bind(static function($object, $property) {
-            return $object->{$property};
-        }, null, $object);
-
-        return $getPropertyEntity($object, $property);
-    }
-
-
-    /**
-     * Присваиваем через рефлексию замыкание значение свойству
-     */
-
-    protected function setPropertyValue(string $property, mixed $value, object $object): bool
-    {
-        if(!property_exists($object, $property))
-        {
-            return false;
-        }
-
-        $modifiers = new ReflectionProperty($object, $property);
-
-        /** Если значение NULL, но свойство не принимает NULL */
-        if($value === null && $modifiers->getType()?->allowsNull() !== true)
-        {
-            return false;
-        }
-
-        /** Если значение не инициировано */
-        if($value === 'not_initialized')
-        {
-            return false;
-        }
-
-        /** Если свойство ReadOnly и оно уже инициировано - не присваиваем повторно */
-        if($modifiers->isReadOnly() && $modifiers->isInitialized($object))
-        {
-            return false;
-        }
-
-        $setPropertyDto = Closure::bind(static function(object $object, string $property, mixed $value) {
-            return $object->{$property} = $value;
-        }, null, $object);
-
-        $setPropertyDto($object, $property, $value);
-
-        return true;
-    }
-
     public function setEntityManager(?EntityManagerInterface $entityManager): void
     {
         $this->entityManager = $entityManager;
     }
-
 
     /** Метод возвращает элемент коллекции Entity, если он был удален из коллекции DTO */
     public function findRemoveElement(object $entityElement, object $dtoCollection, array $properties): bool|object
@@ -822,7 +797,6 @@ abstract class EntityDataMapper
         /** Возвращаем элемент Entity для удаления, если ключи сравнения не найдены */
         return $entityElement;
     }
-
 
     /** Метод возвращает элемент коллекции Entity для обновления, либо FALSE для создания */
     public function findUpdateOrCreateElement(
@@ -860,6 +834,25 @@ abstract class EntityDataMapper
         }
 
         /** Возвращаем false ля создания нового элемента */
+        return false;
+    }
+
+    /**
+     * Создает новый экземпляр класса без вызова конструктора.
+     */
+
+    protected function newClassTypeWithoutConstructor(?string $class)
+    {
+        // Если свойство класс VO - инстанс без конструктора
+        if(class_exists($class))
+        {
+            $instanceClass = new ReflectionClass($class);
+            if($instanceClass->getExtensionName() === false && !$instanceClass->isEnum())
+            {
+                return $instanceClass->newInstanceWithoutConstructor();
+            }
+        }
+
         return false;
     }
 

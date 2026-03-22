@@ -66,14 +66,26 @@ final class UserAgent
         }
     }
 
-    public function __toString(): string
-    {
-        return (string) $this->userAgent;
-    }
-
     public function getUserAgent(): UserAgentInterface
     {
         return $this->userAgent;
+    }
+
+    public static function getDeclared(): array
+    {
+        return array_filter(
+            get_declared_classes(),
+            static function($className) {
+                return in_array(UserAgentInterface::class, class_implements($className), true);
+            },
+        );
+    }
+
+    public function equals(mixed $userAgent): bool
+    {
+        $userAgent = new self($userAgent);
+
+        return $this->getUserAgentValue() === $userAgent->getUserAgentValue();
     }
 
     public function getUserAgentValue(): string
@@ -97,20 +109,8 @@ final class UserAgent
         return $case;
     }
 
-    public static function getDeclared(): array
+    public function __toString(): string
     {
-        return array_filter(
-            get_declared_classes(),
-            static function ($className) {
-                return in_array(UserAgentInterface::class, class_implements($className), true);
-            }
-        );
-    }
-
-    public function equals(mixed $userAgent): bool
-    {
-        $userAgent = new self($userAgent);
-
-        return $this->getUserAgentValue() === $userAgent->getUserAgentValue();
+        return (string) $this->userAgent;
     }
 }

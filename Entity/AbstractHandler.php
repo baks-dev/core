@@ -38,8 +38,6 @@ use ReflectionClass;
 
 abstract class AbstractHandler
 {
-    private object|false $command = false;
-
     /**
      * Объекты событийной модели
      *
@@ -48,20 +46,15 @@ abstract class AbstractHandler
      * dd($this->main);
      */
     protected ?object $main = null;
-
     protected ?object $event = null;
-
-    private ?object $last = null;
-
-    private bool $persist = false;
-
-
     /**
      * @deprecated свойство entityManager станет приватным, используйте метод абстракции $this->flush()
      * @see self::flush
      */
     protected readonly EntityManagerInterface $entityManager;
-
+    private object|false $command = false;
+    private ?object $last = null;
+    private bool $persist = false;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -88,6 +81,29 @@ abstract class AbstractHandler
         $this->command = $command;
 
         return $this;
+    }
+
+    /**
+     * Сохраняет все изменения объектов в базу данных, которые находились в UnitOfWork
+     *
+     * @see UnitOfWork
+     */
+    public function flush(): void
+    {
+        $this->entityManager->flush();
+    }
+
+    public function getLastEvent(): ?object
+    {
+        return $this->last;
+    }
+
+    /**
+     * Метод возвращает TRUE в случае, если добавлен новый объект Main
+     */
+    public function isPersist(): bool
+    {
+        return $this->persist;
     }
 
     /**
@@ -186,6 +202,25 @@ abstract class AbstractHandler
         return $this->main = $EntityRepo;
     }
 
+    public function clear(): void
+    {
+        $this->entityManager->clear();
+    }
+
+    public function getRepository(string $class): EntityRepository
+    {
+        if(false === class_exists($class))
+        {
+            throw new InvalidArgumentException('Invalid Argument Class Entity');
+        }
+
+        return $this->entityManager->getRepository($class);
+    }
+
+    public function persist(object $object): void
+    {
+        $this->entityManager->persist($object);
+    }
 
     /**
      * @note Перед вызовом данного метода необходимо передать DTO через вызов метода $this->setCommand($command)
@@ -305,120 +340,6 @@ abstract class AbstractHandler
     }
 
     /**
-     * Метод удаляет корень объекта события и сохраняет событие с новой версией
-     */
-    protected function preEventRemove(string|object $main, string|object $event): void
-    {
-        /**
-         * Проверка объекта DTO
-         */
-
-        if($this->command === false)
-        {
-            throw new InvalidArgumentException('Необходимо передать объект DTO через аргумент метода $this->setCommand($command)');
-        }
-
-        if(false === method_exists($this->command, 'getEvent'))
-        {
-            throw new InvalidArgumentException('Объект DTO не реализует метод getEvent()');
-        }
-
-
-        /**
-         * Проверка структуры корневой сущности
-         */
-
-        if(is_string($main) && class_exists($main))
-        {
-            $main = new $main();
-        }
-
-        if(false === method_exists($main, 'setEvent'))
-        {
-            throw new InvalidArgumentException(sprintf('Корень объекта сущности %s не реализует метод setEvent($event)', $main::class));
-        }
-
-        $this->main = $main;
-        $this->validatorCollection->add($this->main);
-
-        /**
-         * Проверка структуры событийной сущности
-         */
-
-        if(is_string($event) && class_exists($event))
-        {
-            $event = new $event();
-        }
-
-        if(false === ($event instanceof EntityEvent))
-        {
-            throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityEvent');
-        }
-
-        if(false === method_exists($event, 'setMain'))
-        {
-            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setMain()', $event::class));
-        }
-
-        if(false === method_exists($event, 'setEntity'))
-        {
-            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
-        }
-
-        $this->event = $event;
-        $this->validatorCollection->add($this->event);
-
-        $this->updateEvent();
-
-        $this->entityManager->remove($this->main);
-    }
-
-
-    /**
-     * Метод создает новый объект события
-     */
-    private function persistMain(): void
-    {
-        /** Присваиваем корню идентификатор активного события */
-        $this->main->setEntity($this->command);
-
-        /** Добавляем объекты в UOW */
-        $this->entityManager->clear();
-        $this->entityManager->persist($this->main);
-
-    }
-
-    /**
-     * Метод сохраняет объект события с новой версией
-     */
-    private function updateMain(): void
-    {
-        /**
-         * Получаем корень после clear (для контроля объекта UOW)
-         * до сохранения состояния - корневая сущность доступна по идентификатору предыдущего события
-         */
-        $MainClass = $this->main::class;
-        $this->main = $this->entityManager
-            ->getRepository($MainClass)
-            ->find($this->command->getMain());
-
-        if(
-            false === $this->validatorCollection->add($this->main, context: [
-                self::class.':'.__LINE__,
-                'class' => $MainClass,
-                'event' => $this->command->getMain(),
-            ])
-        )
-        {
-            throw new DomainException($this->validatorCollection->getErrorUniqid());
-        }
-
-        /** Обновляем событие в корне и добавляем Событие в коллекцию валидации  */
-        $this->main->setEntity($this->command);
-    }
-
-
-    /**
      * Метод создает новый объект события
      */
     private function persistEvent(): void
@@ -497,6 +418,122 @@ abstract class AbstractHandler
         $this->main->setEvent($this->event);
     }
 
+    /**
+     * Метод создает новый объект события
+     */
+    private function persistMain(): void
+    {
+        /** Присваиваем корню идентификатор активного события */
+        $this->main->setEntity($this->command);
+
+        /** Добавляем объекты в UOW */
+        $this->entityManager->clear();
+        $this->entityManager->persist($this->main);
+
+    }
+
+    /**
+     * Метод сохраняет объект события с новой версией
+     */
+    private function updateMain(): void
+    {
+        /**
+         * Получаем корень после clear (для контроля объекта UOW)
+         * до сохранения состояния - корневая сущность доступна по идентификатору предыдущего события
+         */
+        $MainClass = $this->main::class;
+        $this->main = $this->entityManager
+            ->getRepository($MainClass)
+            ->find($this->command->getMain());
+
+        if(
+            false === $this->validatorCollection->add($this->main, context: [
+                self::class.':'.__LINE__,
+                'class' => $MainClass,
+                'event' => $this->command->getMain(),
+            ])
+        )
+        {
+            throw new DomainException($this->validatorCollection->getErrorUniqid());
+        }
+
+        /** Обновляем событие в корне и добавляем Событие в коллекцию валидации  */
+        $this->main->setEntity($this->command);
+    }
+
+    /**
+     * Метод удаляет корень объекта события и сохраняет событие с новой версией
+     */
+    protected function preEventRemove(string|object $main, string|object $event): void
+    {
+        /**
+         * Проверка объекта DTO
+         */
+
+        if($this->command === false)
+        {
+            throw new InvalidArgumentException('Необходимо передать объект DTO через аргумент метода $this->setCommand($command)');
+        }
+
+        if(false === method_exists($this->command, 'getEvent'))
+        {
+            throw new InvalidArgumentException('Объект DTO не реализует метод getEvent()');
+        }
+
+
+        /**
+         * Проверка структуры корневой сущности
+         */
+
+        if(is_string($main) && class_exists($main))
+        {
+            $main = new $main();
+        }
+
+        if(false === method_exists($main, 'setEvent'))
+        {
+            throw new InvalidArgumentException(sprintf('Корень объекта сущности %s не реализует метод setEvent($event)', $main::class));
+        }
+
+        $this->main = $main;
+        $this->validatorCollection->add($this->main);
+
+        /**
+         * Проверка структуры событийной сущности
+         */
+
+        if(is_string($event) && class_exists($event))
+        {
+            $event = new $event();
+        }
+
+        if(false === ($event instanceof EntityEvent))
+        {
+            throw new InvalidArgumentException('Класс сущности не расширяется абстрактным классом EntityEvent');
+        }
+
+        if(false === method_exists($event, 'setMain'))
+        {
+            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setMain()', $event::class));
+        }
+
+        if(false === method_exists($event, 'setEntity'))
+        {
+            throw new InvalidArgumentException(sprintf('Событийный объект сущности %s не реализует метод setEntity($dto)', $event::class));
+        }
+
+        $this->event = $event;
+        $this->validatorCollection->add($this->event);
+
+        $this->updateEvent();
+
+        $this->entityManager->remove($this->main);
+    }
+
+    public function remove(object $object): void
+    {
+        $this->entityManager->remove($object);
+    }
 
     /**
      * @deprecated используйте метод preEventPersistOrUpdate(string|object $main, string|object $event)
@@ -673,53 +710,5 @@ abstract class AbstractHandler
         /** Добавляем валидацию в коллекцию */
         $this->validatorCollection->add($this->event);
         $this->validatorCollection->add($this->main);
-    }
-
-    /**
-     * Сохраняет все изменения объектов в базу данных, которые находились в UnitOfWork
-     *
-     * @see UnitOfWork
-     */
-    public function flush(): void
-    {
-        $this->entityManager->flush();
-    }
-
-    public function clear(): void
-    {
-        $this->entityManager->clear();
-    }
-
-    public function persist(object $object): void
-    {
-        $this->entityManager->persist($object);
-    }
-
-    public function remove(object $object): void
-    {
-        $this->entityManager->remove($object);
-    }
-
-    public function getLastEvent(): ?object
-    {
-        return $this->last;
-    }
-
-    /**
-     * Метод возвращает TRUE в случае, если добавлен новый объект Main
-     */
-    public function isPersist(): bool
-    {
-        return $this->persist;
-    }
-
-    public function getRepository(string $class): EntityRepository
-    {
-        if(false === class_exists($class))
-        {
-            throw new InvalidArgumentException('Invalid Argument Class Entity');
-        }
-
-        return $this->entityManager->getRepository($class);
     }
 }

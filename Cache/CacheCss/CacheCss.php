@@ -111,15 +111,6 @@ final class CacheCss implements CacheCssInterface
         return $content;
     }
 
-
-    private function getHtmlTags($html)
-    {
-        preg_match_all('/<([a-z]+)[^>]*>/i', $html, $matches);
-        $tags = array_unique($matches[1]);
-        sort($tags);
-        return $tags;
-    }
-
     private function getHtmlClass($html)
     {
 
@@ -167,5 +158,13 @@ final class CacheCss implements CacheCssInterface
         //sort($classes);
 
         return $classes;
+    }
+
+    private function getHtmlTags($html)
+    {
+        preg_match_all('/<([a-z]+)[^>]*>/i', $html, $matches);
+        $tags = array_unique($matches[1]);
+        sort($tags);
+        return $tags;
     }
 }

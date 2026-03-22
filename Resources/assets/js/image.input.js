@@ -31,23 +31,29 @@
  *
  */
 
-document.querySelectorAll('.image-input').forEach((image) => {
+document.querySelectorAll(".image-input").forEach((image) =>
+{
 
-    let inputElement = image.querySelector('input[type="file"]');
+    let inputElement = image.querySelector("input[type=\"file\"]");
 
-    inputElement.addEventListener('change', function (e) {
+    inputElement.addEventListener("change", function(e)
+    {
 
         var file = inputElement.files[0];
         var reader = new FileReader();
 
-        reader.onloadend = function () {
-            image.style.setProperty("background-image", "url(" + reader.result + ")", "important")
-        }
+        reader.onloadend = function()
+        {
+            image.style.setProperty("background-image", "url(" + reader.result + ")", "important");
+        };
 
-        if (file) {
+        if(file)
+        {
             reader.readAsDataURL(file);
-        } else {
-            image.style.setProperty("background-image", "url(/img/blank.svg)", "important")
+        }
+        else
+        {
+            image.style.setProperty("background-image", "url(/img/blank.svg)", "important");
 
         }
     });

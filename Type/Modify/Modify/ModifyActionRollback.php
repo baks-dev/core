@@ -33,12 +33,6 @@ final class ModifyActionRollback implements ModifyActionInterface
 {
     public const ACTION = 'rollback';
 
-    /** Возвращает значение (value) */
-    public function getValue(): string
-    {
-        return self::ACTION;
-    }
-
     public static function sort(): int
     {
         return 500;
@@ -47,5 +41,11 @@ final class ModifyActionRollback implements ModifyActionInterface
     public static function equals(string $action): bool
     {
         return self::ACTION === mb_strtolower($action);
+    }
+
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::ACTION;
     }
 }

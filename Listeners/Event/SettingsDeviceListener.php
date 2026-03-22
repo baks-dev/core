@@ -47,11 +47,14 @@ final readonly class SettingsDeviceListener
 
         $device = 'pc';
 
+
         if($agent)
         {
             $AppCache = $this->cache->init('core');
 
-            $device = $AppCache->get(md5($agent), function (ItemInterface $item) use ($agent) {
+            // $AppCache->delete(md5($agent));
+
+            $device = $AppCache->get(md5($agent), function(ItemInterface $item) use ($agent) {
 
                 $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 

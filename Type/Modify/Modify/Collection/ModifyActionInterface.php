@@ -28,15 +28,15 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.modify.action')]
 interface ModifyActionInterface
 {
-    /**
-     * Возвращает значение статуса (value)
-     */
-    public function getValue(): string;
-
     public static function sort(): int;
 
     /**
      * Проверяет, относится ли значение к данному объекту
      */
     public static function equals(string $action): bool;
+
+    /**
+     * Возвращает значение статуса (value)
+     */
+    public function getValue(): string;
 }

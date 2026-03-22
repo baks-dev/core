@@ -52,7 +52,7 @@ class MessageDelayTest extends KernelTestCase
         $MessageDispatch->dispatch(
             message: new class { },
             stamps: [$MessageDelay],
-            transport: 'test'
+            transport: 'test',
         );
 
 

@@ -54,17 +54,6 @@ final class DBALQueryBuilderTest extends TestCase
     private MessageDispatchInterface $dispatch;
     private UserProfileTokenStorageInterface $storage;
 
-    protected function setUp(): void
-    {
-        $this->connection = $this->createMock(Connection::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->switcher = $this->createMock(SwitcherInterface::class);
-        $this->cache = $this->createMock(AppCacheInterface::class);
-        $this->deduplicator = $this->createMock(DeduplicatorInterface::class);
-        $this->dispatch = $this->createMock(MessageDispatchInterface::class);
-        $this->storage = $this->createMock(UserProfileTokenStorageInterface::class);
-    }
-
     public function testCreateQueryBuilder(): void
     {
 
@@ -86,6 +75,17 @@ final class DBALQueryBuilderTest extends TestCase
         $this->assertNotSame($dbalQueryBuilder, $newInstance);
         $this->assertEquals(md5('test-class'), $newInstance->getCacheKey());
 
+    }
+
+    protected function setUp(): void
+    {
+        $this->connection = $this->createMock(Connection::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->switcher = $this->createMock(SwitcherInterface::class);
+        $this->cache = $this->createMock(AppCacheInterface::class);
+        $this->deduplicator = $this->createMock(DeduplicatorInterface::class);
+        $this->dispatch = $this->createMock(MessageDispatchInterface::class);
+        $this->storage = $this->createMock(UserProfileTokenStorageInterface::class);
     }
 
 }

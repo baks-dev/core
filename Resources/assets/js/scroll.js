@@ -20,29 +20,29 @@
  *  THE SOFTWARE.
  */
 
-const scrollElements = document.querySelectorAll('[data-scroll]');
+const scrollElements = document.querySelectorAll("[data-scroll]");
 
 scrollElements.forEach(element =>
 {
-    element.addEventListener('click', () =>
+    element.addEventListener("click", () =>
     {
         const elementId = element.dataset.scroll;
-        const position = element.dataset.scrollPosition || 'center'; // Добавьте опциональную позицию
+        const position = element.dataset.scrollPosition || "center"; // Добавьте опциональную позицию
         scrollToElement(elementId, position);
 
-        if(typeof bootstrap !== 'object')
+        if(typeof bootstrap !== "object")
         {
             return;
         }
 
         /** Срываем все раскрытые dropdown */
-        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(menu =>
+        document.querySelectorAll("[data-bs-toggle=\"dropdown\"]").forEach(menu =>
         {
             (bootstrap.Dropdown.getInstance(menu))?.hide();
         });
 
         /** Срываем все раскрытые offcanvas */
-        document.querySelectorAll('.offcanvas').forEach(menu =>
+        document.querySelectorAll(".offcanvas").forEach(menu =>
         {
             (bootstrap.Offcanvas.getInstance(menu))?.hide();
         });
@@ -58,7 +58,7 @@ scrollElements.forEach(element =>
  *
  */
 
-function scrollToElement(elementId, position = 'center')
+function scrollToElement(elementId, position = "center")
 {
 
     const element = document.getElementById(elementId);
@@ -73,15 +73,15 @@ function scrollToElement(elementId, position = 'center')
 
     switch(position)
     {
-        case 'bottom':
+        case "bottom":
             scrollTop = element.offsetTop;
             break;
 
-        case 'top':
+        case "top":
             scrollTop = element.offsetTop + element.offsetHeight;
             break;
 
-        case 'center':
+        case "center":
 
         default:
             scrollTop = element.offsetTop + (element.offsetHeight / 2) - (window.innerHeight / 2);
@@ -89,6 +89,6 @@ function scrollToElement(elementId, position = 'center')
     }
 
     window.scrollTo({
-        top: scrollTop, behavior: 'smooth'
+        top : scrollTop, behavior : "smooth",
     });
 }

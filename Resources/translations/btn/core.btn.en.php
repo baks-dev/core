@@ -22,24 +22,24 @@
  */
 
 return
-	[
-		'btn' =>
-			[
-				'cancel' => 'Cancel',
+    [
+        'btn' =>
+            [
+                'cancel' => 'Cancel',
                 'open' => 'Open',
                 'close' => 'Close',
                 'continue' => 'Continue',
-				'save' => 'Save',
-				'add' => 'Add',
-				'update' => 'Refresh',
-				'delete' => 'Delete',
-				'edit' => 'Edit',
-				'new' => 'New',
+                'save' => 'Save',
+                'add' => 'Add',
+                'update' => 'Refresh',
+                'delete' => 'Delete',
+                'edit' => 'Edit',
+                'new' => 'New',
                 'copy' => 'Copy',
-				'truncate' => 'Truncate',
-				'apply' => 'Apply',
+                'truncate' => 'Truncate',
+                'apply' => 'Apply',
                 'yes' => 'Yes',
                 'no' => 'No',
                 'rename' => 'Rename',
-			],
-	];
+            ],
+    ];

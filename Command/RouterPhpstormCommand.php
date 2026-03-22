@@ -44,7 +44,8 @@ class RouterPhpstormCommand extends Command
         private readonly RouterInterface $router,
         private readonly KernelInterface $kernel,
         private readonly Filesystem $filesystem,
-    ) {
+    )
+    {
         parent::__construct();
 
     }
@@ -79,8 +80,8 @@ class RouterPhpstormCommand extends Command
                 $this->filesystem->appendToFile(
                     $fileName,
                     "\t'".$def["_canonical_route"]."' => [[], ['_controller' => '".quotemeta(
-                        $def["_controller"]
-                    )."']], \r\n"
+                        $def["_controller"],
+                    )."']], \r\n",
                 );
 
             }

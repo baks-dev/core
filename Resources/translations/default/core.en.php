@@ -34,7 +34,7 @@ return [
             'page' =>
                 [
                     'user' => 'Home',
-                    'index' => 'Administration'
+                    'index' => 'Administration',
                 ],
         ],
 

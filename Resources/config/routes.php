@@ -25,7 +25,7 @@ use BaksDev\Core\BaksDevCoreBundle;
 use BaksDev\Elastic\BaksDevElasticBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-return function (RoutingConfigurator $routes) {
+return function(RoutingConfigurator $routes) {
 
     $MODULE = BaksDevCoreBundle::PATH;
 
@@ -33,7 +33,7 @@ return function (RoutingConfigurator $routes) {
         $MODULE.'Controller',
         'attribute',
         false,
-        $MODULE.implode(DIRECTORY_SEPARATOR, ['Controller', '**', '*Test.php'])
+        $MODULE.implode(DIRECTORY_SEPARATOR, ['Controller', '**', '*Test.php']),
     )
         ->prefix(\BaksDev\Core\Type\Locale\Locale::routes())
         ->namePrefix('core:');

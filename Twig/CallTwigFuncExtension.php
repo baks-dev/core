@@ -38,7 +38,7 @@ final class CallTwigFuncExtension extends AbstractExtension
             new TwigFilter(
                 'call_twig_func',
                 [$this, 'call'],
-                ['needs_environment' => true, 'is_safe' => ['html']]
+                ['needs_environment' => true, 'is_safe' => ['html']],
             ),
         ];
     }

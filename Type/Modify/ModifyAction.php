@@ -79,20 +79,19 @@ final class ModifyAction
 
     }
 
-    public function __toString(): string
-    {
-        return $this->action->getvalue();
-    }
-
-
     public function getModifyAction(): ModifyActionInterface
     {
         return $this->action;
     }
 
-    public function getModifyActionValue(): string
+    public static function getDeclared(): array
     {
-        return $this->action->getValue();
+        return array_filter(
+            get_declared_classes(),
+            static function($className) {
+                return in_array(ModifyActionInterface::class, class_implements($className), true);
+            },
+        );
     }
 
     public function equals(mixed $status): bool
@@ -102,6 +101,10 @@ final class ModifyAction
         return $this->getModifyActionValue() === $status->getModifyActionValue();
     }
 
+    public function getModifyActionValue(): string
+    {
+        return $this->action->getValue();
+    }
 
     public static function cases(): array
     {
@@ -117,15 +120,9 @@ final class ModifyAction
         return $case;
     }
 
-
-    public static function getDeclared(): array
+    public function __toString(): string
     {
-        return array_filter(
-            get_declared_classes(),
-            static function($className) {
-                return in_array(ModifyActionInterface::class, class_implements($className), true);
-            }
-        );
+        return $this->action->getvalue();
     }
 
 }

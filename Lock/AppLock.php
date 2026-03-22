@@ -45,23 +45,6 @@ final class AppLock implements AppLockInterface
     ) {}
 
     /**
-     * Метод включает блокировку ресурса
-     */
-    public function createLock(string|array $keys): self
-    {
-
-        $key = is_array($keys) ? implode('.', $keys) : $keys;
-
-        $this->key = md5($key.'lock');
-
-        $FlockStore = new FlockStore($this->project_dir.'/var/stores');
-        $this->factory = new LockFactory($FlockStore);
-
-        return $this;
-    }
-
-
-    /**
      * Устанавливает время жизни блокировки
      */
     public function lifetime(int|float $ttl = 60): self
@@ -90,7 +73,7 @@ final class AppLock implements AppLockInterface
     {
         $this->lock = $this->factory->createLock(
             $this->key,
-            $this->ttl
+            $this->ttl,
         );
 
         $this->lock->acquire(true);
@@ -98,6 +81,21 @@ final class AppLock implements AppLockInterface
         return $this;
     }
 
+    /**
+     * Метод включает блокировку ресурса
+     */
+    public function createLock(string|array $keys): self
+    {
+
+        $key = is_array($keys) ? implode('.', $keys) : $keys;
+
+        $this->key = md5($key.'lock');
+
+        $FlockStore = new FlockStore($this->project_dir.'/var/stores');
+        $this->factory = new LockFactory($FlockStore);
+
+        return $this;
+    }
 
     /**
      * Метод применяет блокировку процесса, без последующего автоматического снятия (ожидает все время)
@@ -107,7 +105,7 @@ final class AppLock implements AppLockInterface
         $this->lock = $this->factory->createLock(
             $this->key,
             $this->ttl,
-            false
+            false,
         );
 
         $this->lock->acquire(true);
@@ -141,7 +139,7 @@ final class AppLock implements AppLockInterface
         $this->lock = $this->factory->createLock(
             $this->key,
             $this->ttl,
-            false
+            false,
         );
 
         $this->lock->acquire();

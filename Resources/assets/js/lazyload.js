@@ -1,11 +1,11 @@
 (function(global, factory)
 {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-        typeof define === 'function' && define.amd ? define(factory) :
+    typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() :
+        typeof define === "function" && define.amd ? define(factory) :
             (global = global || self, global.LazyLoad = factory());
 }(this, (function()
 {
-    'use strict';
+    "use strict";
 
     function _extends()
     {
@@ -77,7 +77,7 @@
         //WARNING: эту проверку не пройдут IOS 8 и ниже, а также sailfish webview
         () => window.outerWidth === 0 && window.outerHeight === 0,
         //Множество ботов не заботится проставлении navigator.online и ходят по сайту в оффлайн режиме
-        () => window.navigator.onLine === false
+        () => window.navigator.onLine === false,
     ];
 
     //Проверяем правила
@@ -96,36 +96,36 @@
 
 
     var defaultSettings = {
-        elements_selector: ".lazy",
-        container: isRobot || runningOnBrowser ? document : null,
-        threshold: 300,
-        thresholds: null,
-        data_src: "src",
-        data_srcset: "srcset",
-        data_sizes: "sizes",
-        data_bg: "bg",
-        data_bg_hidpi: "bg-hidpi",
-        data_bg_multi: "bg-multi",
-        data_bg_multi_hidpi: "bg-multi-hidpi",
-        data_poster: "poster",
-        class_applied: "applied",
-        class_loading: "loading",
-        class_loaded: "loaded",
-        class_error: "error",
-        class_entered: "entered",
-        class_exited: "exited",
-        unobserve_completed: true,
-        unobserve_entered: false,
-        cancel_on_exit: true,
-        callback_enter: null,
-        callback_exit: null,
-        callback_applied: null,
-        callback_loading: null,
-        callback_loaded: null,
-        callback_error: null,
-        callback_finish: null,
-        callback_cancel: null,
-        use_native: false
+        elements_selector : ".lazy",
+        container : isRobot || runningOnBrowser ? document : null,
+        threshold : 300,
+        thresholds : null,
+        data_src : "src",
+        data_srcset : "srcset",
+        data_sizes : "sizes",
+        data_bg : "bg",
+        data_bg_hidpi : "bg-hidpi",
+        data_bg_multi : "bg-multi",
+        data_bg_multi_hidpi : "bg-multi-hidpi",
+        data_poster : "poster",
+        class_applied : "applied",
+        class_loading : "loading",
+        class_loaded : "loaded",
+        class_error : "error",
+        class_entered : "entered",
+        class_exited : "exited",
+        unobserve_completed : true,
+        unobserve_entered : false,
+        cancel_on_exit : true,
+        callback_enter : null,
+        callback_exit : null,
+        callback_applied : null,
+        callback_loading : null,
+        callback_loaded : null,
+        callback_error : null,
+        callback_finish : null,
+        callback_cancel : null,
+        use_native : false,
     };
 
 
@@ -150,18 +150,19 @@
 
             // Works in modern browsers
             event = new CustomEvent(eventString, {
-                detail: {
-                    instance: instance
-                }
+                detail : {
+                    instance : instance,
+                },
             });
 
-        } catch(err)
+        }
+        catch(err)
         {
 
             // Works in Internet Explorer (all versions)
             event = document.createEvent("CustomEvent");
             event.initCustomEvent(eventString, false, false, {
-                instance: instance
+                instance : instance,
             });
         }
 
@@ -192,7 +193,8 @@
 
             // Plain object
             createInstance(classObj, options);
-        } else
+        }
+        else
         {
 
             // Array of objects
@@ -246,10 +248,10 @@
             return;
         }
 
-        if(value === 'error')
+        if(value === "error")
         {
-            element.classList.add('border');
-            element.classList.add('border-danger');
+            element.classList.add("border");
+            element.classList.add("border-danger");
         }
 
         element.setAttribute(attrName, value);
@@ -723,9 +725,9 @@
 
 
     var setSourcesFunctions = {
-        IMG: setSourcesImg,
-        IFRAME: setSourcesIframe,
-        VIDEO: setSourcesVideo
+        IMG : setSourcesImg,
+        IFRAME : setSourcesIframe,
+        VIDEO : setSourcesVideo,
     };
 
 
@@ -826,22 +828,23 @@
 
         let elem = null;
 
-        if(element.tagName === 'LINK')
+        if(element.tagName === "LINK")
         {
-            elem = document.createElement('LINK');
-            elem.setAttribute('href', element.dataset.href);
+            elem = document.createElement("LINK");
+            elem.setAttribute("href", element.dataset.href);
 
             // console.log(element.dataset.href);
         }
 
-        if(element.tagName === 'SCRIPT')
+        if(element.tagName === "SCRIPT")
         {
-            elem = document.createElement('SCRIPT');
+            elem = document.createElement("SCRIPT");
 
-            if(typeof element.dataset.src === 'string')
+            if(typeof element.dataset.src === "string")
             {
-                elem.setAttribute('src', element.dataset.src);
-            } else
+                elem.setAttribute("src", element.dataset.src);
+            }
+            else
             {
                 /** Присваиваем скрипт из тега */
                 elem.text = element.text;
@@ -879,18 +882,19 @@
             /** переопределяем аттрибуты */
 
 
-            if(element instanceof Element && typeof element.getAttributeNames == 'function')
+            if(element instanceof Element && typeof element.getAttributeNames == "function")
             {
                 element.getAttributeNames().forEach((function(e)
                 {
 
-                    if(e != 'data-src' && e != 'data-href' && e != 'class')
+                    if(e != "data-src" && e != "data-href" && e != "class")
                     {
 
-                        if(e == 'data-nonce')
+                        if(e == "data-nonce")
                         {
-                            elem.setAttribute('nonce', element.getAttribute(e));
-                        } else
+                            elem.setAttribute("nonce", element.getAttribute(e));
+                        }
+                        else
                         {
                             elem.setAttribute(e.toString(), element.getAttribute(e));
                         }
@@ -902,7 +906,7 @@
 
             if(typeof callback == "function")
             {
-                elem.addEventListener('load', callback);
+                elem.addEventListener("load", callback);
             }
 
             setTimeout(function()
@@ -940,7 +944,7 @@
         // console.log('*');
         // console.log('*');
         // console.log('*');
-    }
+    };
 
 
     var manageLoading = function manageLoading(element, settings, instance)
@@ -954,9 +958,9 @@
         setStatus(element, statusLoading);
         safeCallback(settings.callback_loading, element, instance);
 
-        element.removeAttribute('data-' + settings.data_bg);
-        element.removeAttribute('data-' + settings.data_bg_hidpi);
-        element.removeAttribute('data-' + settings.data_src);
+        element.removeAttribute("data-" + settings.data_bg);
+        element.removeAttribute("data-" + settings.data_bg_hidpi);
+        element.removeAttribute("data-" + settings.data_src);
 
         // console.log('END manageLoading');
 
@@ -1138,7 +1142,8 @@
 
 
             loadRegular(element, settings, instance);
-        } else
+        }
+        else
         {
             loadBackground(element, settings, instance);
         }
@@ -1274,8 +1279,8 @@
     {
 
         return {
-            root: settings.container === document ? null : settings.container,
-            rootMargin: settings.thresholds || settings.threshold + "px"
+            root : settings.container === document ? null : settings.container,
+            rootMargin : settings.thresholds || settings.threshold + "px",
         };
     };
 
@@ -1292,14 +1297,14 @@
 
         executeFunc(function activeDisableButton()
         {
-            if(typeof bootstrap !== 'object')
+            if(typeof bootstrap !== "object")
             {
                 return false;
             }
 
-            document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function(el)
+            document.querySelectorAll("[data-bs-toggle=\"modal\"]").forEach(function(el)
             {
-                el.classList.remove('disabled');
+                el.classList.remove("disabled");
             });
 
             return true;
@@ -1484,9 +1489,9 @@
 
     LazyLoad.prototype = {
 
-        update: function update(givenNodeset)
+        update : function update(givenNodeset)
         {
-            LazyLoad.prototype
+            LazyLoad.prototype;
 
             // console.log('START LazyLoad.prototype');
 
@@ -1523,7 +1528,7 @@
 
         },
 
-        destroy: function destroy()
+        destroy : function destroy()
         {
 
 
@@ -1545,7 +1550,7 @@
             delete this.toLoadCount;
         },
 
-        loadAll: function loadAll(elements)
+        loadAll : function loadAll(elements)
         {
 
             var _this = this;
@@ -1561,7 +1566,7 @@
                 unobserve(element, _this);
                 load(element, settings, _this);
             });
-        }
+        },
     };
 
     LazyLoad.load = function(element, customSettings)
@@ -1596,7 +1601,7 @@
 
 function reloadLazy(element = null)
 {
-    const selector = element ? element.querySelectorAll('.lazy') : document.querySelectorAll('.lazy');
+    const selector = element ? element.querySelectorAll(".lazy") : document.querySelectorAll(".lazy");
 
     selector.forEach(e => window.LazyLoad.load(e));
 }
@@ -1614,7 +1619,7 @@ function executeFunc(func, initialDelay = 100, multiplier = 2, limit = 10000)
 
             if(delay > limit)
             {
-                console.error('Ошибка при выполнении функции');
+                console.error("Ошибка при выполнении функции");
                 console.log(func);
                 resolve(true);
                 return;

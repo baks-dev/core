@@ -15,24 +15,24 @@
  *
  */
 
-if(typeof $locale === 'undefined')
+if(typeof $locale === "undefined")
 {
-    let html = document.querySelector('html');
-    let lng = html.getAttribute('lang');
-    $locale = lng ? lng : 'en';
+    let html = document.querySelector("html");
+    let lng = html.getAttribute("lang");
+    $locale = lng ? lng : "en";
 }
 
 
 niceLang = {
-    'ru': {
-        placeholder: 'Выберите из списка ...',
-        search: 'Поиск...',
+    "ru" : {
+        placeholder : "Выберите из списка ...",
+        search : "Поиск...",
     },
-    'en': {
-        placeholder: 'Select an option ...',
-        search: 'Search...',
-    }
-}
+    "en" : {
+        placeholder : "Select an option ...",
+        search : "Search...",
+    },
+};
 
 function triggerClick(el)
 {
@@ -77,7 +77,8 @@ function hasClass(el, className)
     if(el)
     {
         return el.classList.contains(className);
-    } else
+    }
+    else
     {
         return false;
     }
@@ -100,14 +101,14 @@ function removeClass(el, className)
 }
 
 var defaultOptions = {
-    data: null,
-    searchable: true
+    data : null,
+    searchable : true,
 };
 
 function NiceSelect(element, options, reset = false)
 {
 
-    let isExistSelec = document.getElementById(element.id + '_select2');
+    let isExistSelec = document.getElementById(element.id + "_select2");
 
     if(isExistSelec)
     {
@@ -119,15 +120,16 @@ function NiceSelect(element, options, reset = false)
     this.data = this.config.data;
     this.selectedOptions = [];
 
-    if(this.el.tagName !== 'SELECT')
+    if(this.el.tagName !== "SELECT")
     {
         return;
     }
 
     if(this.el.options[0] !== undefined && !this.el.options[0].value)
     {
-        this.placeholder = this.el.options[0].text
-    } else
+        this.placeholder = this.el.options[0].text;
+    }
+    else
     {
         this.placeholder =
             attr(this.el, "placeholder") ||
@@ -138,12 +140,13 @@ function NiceSelect(element, options, reset = false)
     this.dropdown = null;
     this.multiple = attr(this.el, "multiple");
     this.disabled = attr(this.el, "disabled");
-    this.id = attr(this.el, "id") + '_select2';
+    this.id = attr(this.el, "id") + "_select2";
 
-    if(options === 'update')
+    if(options === "update")
     {
         this.update();
-    } else
+    }
+    else
     {
         this.create();
     }
@@ -162,7 +165,8 @@ NiceSelect.prototype.create = function()
     if(this.data)
     {
         this.processData(this.data);
-    } else
+    }
+    else
     {
         this.extractData();
     }
@@ -177,12 +181,12 @@ NiceSelect.prototype.processData = function(data)
     data.forEach(item =>
     {
         options.push({
-            data: item,
-            attributes: {
-                selected: false,
-                disabled: false,
-                optgroup: item.value == 'optgroup'
-            }
+            data : item,
+            attributes : {
+                selected : false,
+                disabled : false,
+                optgroup : item.value == "optgroup",
+            },
         });
     });
     this.options = options;
@@ -200,31 +204,32 @@ NiceSelect.prototype.extractData = function()
 
         //console.log(item);
 
-        if(item.tagName == 'OPTGROUP')
+        if(item.tagName == "OPTGROUP")
         {
             var itemData = {
-                text: item.label,
-                value: 'optgroup'
+                text : item.label,
+                value : "optgroup",
             };
-        } else
+        }
+        else
         {
             var itemData = {
-                text: item.innerText,
-                value: item.value,
+                text : item.innerText,
+                value : item.value,
             };
 
         }
 
         var attributes = {
-            selected: item.getAttribute("selected") != null,
-            disabled: item.getAttribute("disabled") != null,
-            optgroup: item.tagName == 'OPTGROUP',
-            filter: typeof item.dataset.filter != "undefined" ? item.dataset.filter : null
+            selected : item.getAttribute("selected") != null,
+            disabled : item.getAttribute("disabled") != null,
+            optgroup : item.tagName == "OPTGROUP",
+            filter : typeof item.dataset.filter != "undefined" ? item.dataset.filter : null,
         };
 
 
         data.push(itemData);
-        allOptions.push({data: itemData, attributes: attributes});
+        allOptions.push({data : itemData, attributes : attributes});
     });
 
     this.data = data;
@@ -246,7 +251,7 @@ NiceSelect.prototype.renderDropdown = function()
         "nice-select",
         attr(this.el, "class") || "",
         this.disabled ? "disabled" : "",
-        this.multiple ? "has-multiple" : ""
+        this.multiple ? "has-multiple" : "",
     ];
 
     let seachPlaceholder = this.el.dataset.search != undefined ? this.el.dataset.search : niceLang[$locale].search;
@@ -275,7 +280,7 @@ NiceSelect.prototype._renderSelectedItems = function()
     if(this.multiple)
     {
         var selectedHtml = "";
-        if(window.getComputedStyle(this.dropdown).width == 'auto' || this.selectedOptions.length < 2)
+        if(window.getComputedStyle(this.dropdown).width == "auto" || this.selectedOptions.length < 2)
         {
 
             this.selectedOptions.forEach(function(item)
@@ -283,13 +288,15 @@ NiceSelect.prototype._renderSelectedItems = function()
                 selectedHtml += `<span class='current'>${item.data.text}</span>`;
             });
             selectedHtml = selectedHtml == "" ? this.placeholder : selectedHtml;
-        } else
+        }
+        else
         {
-            selectedHtml = this.selectedOptions.length + ' selected';
+            selectedHtml = this.selectedOptions.length + " selected";
         }
 
         this.dropdown.querySelector(".multiple-options").innerHTML = selectedHtml;
-    } else
+    }
+    else
     {
         let html =
             this.selectedOptions.length > 0
@@ -322,35 +329,36 @@ NiceSelect.prototype._renderItem = function(option)
 
         var small = document.createElement("small");
         small.textContent = option.attributes.filter;
-        small.classList.add('ms-1');
-        small.classList.add('text-muted');
+        small.classList.add("ms-1");
+        small.classList.add("text-muted");
         /*small.style.fontSize = '9px';*/
         el.appendChild(small);
     }
 
     if(option.attributes.optgroup)
     {
-        el.classList.add('optgroup');
-    } else
+        el.classList.add("optgroup");
+    }
+    else
     {
 
         el.setAttribute("data-value", option.data.value);
 
-        el.classList.add('option');
+        el.classList.add("option");
 
         if(option.attributes.selected)
         {
-            el.classList.add('selected');
+            el.classList.add("selected");
         }
 
         if(option.attributes.disabled)
         {
-            el.classList.add('disabled');
+            el.classList.add("disabled");
         }
 
-        if(option.data.value == '')
+        if(option.data.value == "")
         {
-            el.classList.add('text-muted');
+            el.classList.add("text-muted");
         }
 
         // var classList = [
@@ -456,7 +464,8 @@ NiceSelect.prototype._onClicked = function(e)
     if(this.multiple)
     {
         this.dropdown.classList.add("open");
-    } else
+    }
+    else
     {
         this.dropdown.classList.toggle("open");
     }
@@ -478,12 +487,12 @@ NiceSelect.prototype._onClicked = function(e)
 
 
         var t = this.dropdown.querySelector(".selected");
-        var list = this.dropdown.querySelector('.nice-select-dropdown .list');
+        var list = this.dropdown.querySelector(".nice-select-dropdown .list");
 
 
         if(t && list)
         {
-            if(t.tagName === 'SMALL')
+            if(t.tagName === "SMALL")
             {
                 this.dropdown.querySelectorAll(".selected").forEach(e =>
                 {
@@ -492,7 +501,8 @@ NiceSelect.prototype._onClicked = function(e)
 
                 addClass(t.parentElement, "focus");
                 addClass(t.parentElement, "selected");
-            } else
+            }
+            else
             {
                 addClass(t, "focus");
             }
@@ -507,7 +517,8 @@ NiceSelect.prototype._onClicked = function(e)
             item.style.display = "";
         });
 
-    } else
+    }
+    else
     {
         this.dropdown.focus();
     }
@@ -525,13 +536,15 @@ NiceSelect.prototype._onItemClicked = function(option, e)
             {
                 removeClass(optionEl, "selected");
                 this.selectedOptions.splice(this.selectedOptions.indexOf(option), 1);
-                this.el.querySelector('option[value="' + optionEl.dataset.value + '"]').selected = false;
-            } else
+                this.el.querySelector("option[value=\"" + optionEl.dataset.value + "\"]").selected = false;
+            }
+            else
             {
                 addClass(optionEl, "selected");
                 this.selectedOptions.push(option);
             }
-        } else
+        }
+        else
         {
             this.selectedOptions.forEach(function(item)
             {
@@ -554,13 +567,14 @@ NiceSelect.prototype.updateSelectValue = function()
         var select = this.el;
         this.selectedOptions.forEach(function(item)
         {
-            var el = select.querySelector('option[value="' + item.data.value + '"]');
+            var el = select.querySelector("option[value=\"" + item.data.value + "\"]");
             if(el)
             {
                 el.setAttribute("selected", true);
             }
         });
-    } else if(this.selectedOptions.length > 0)
+    }
+    else if(this.selectedOptions.length > 0)
     {
         this.el.value = this.selectedOptions[0].data.value;
     }
@@ -590,17 +604,20 @@ NiceSelect.prototype._onKeyPressed = function(e)
         if(open)
         {
             triggerClick(focusedOption);
-        } else
+        }
+        else
         {
             triggerClick(this.dropdown);
         }
-    } else if(e.keyCode == 40)
+    }
+    else if(e.keyCode == 40)
     {
         // Down
         if(!open)
         {
             triggerClick(this.dropdown);
-        } else
+        }
+        else
         {
             var next = this._findNext(focusedOption);
             if(next)
@@ -611,13 +628,15 @@ NiceSelect.prototype._onKeyPressed = function(e)
             }
         }
         e.preventDefault();
-    } else if(e.keyCode == 38)
+    }
+    else if(e.keyCode == 38)
     {
         // Up
         if(!open)
         {
             triggerClick(this.dropdown);
-        } else
+        }
+        else
         {
             var prev = this._findPrev(focusedOption);
             if(prev)
@@ -628,7 +647,8 @@ NiceSelect.prototype._onKeyPressed = function(e)
             }
         }
         e.preventDefault();
-    } else if(e.keyCode == 27 && open)
+    }
+    else if(e.keyCode == 27 && open)
     {
         // Esc
         triggerClick(this.dropdown);
@@ -641,7 +661,8 @@ NiceSelect.prototype._findNext = function(el)
     if(el)
     {
         el = el.nextElementSibling;
-    } else
+    }
+    else
     {
         el = this.dropdown.querySelector(".list .option");
     }
@@ -663,7 +684,8 @@ NiceSelect.prototype._findPrev = function(el)
     if(el)
     {
         el = el.previousElementSibling;
-    } else
+    }
+    else
     {
         el = this.dropdown.querySelector(".list .option:last-child");
     }
@@ -693,7 +715,8 @@ NiceSelect.prototype._onSearchChanged = function(e)
         {
             item.element.style.display = "";
         });
-    } else if(open)
+    }
+    else if(open)
     {
 
         var matchReg = new RegExp(text);
@@ -745,49 +768,50 @@ function changeKeyboard(text)
 {
 
     var layoutMapping = {
-        'a': 'ф',
-        'b': 'и',
-        'c': 'с',
-        'd': 'в',
-        'e': 'у',
-        'f': 'а',
-        'g': 'п',
-        'h': 'р',
-        'i': 'ш',
-        'j': 'о',
-        'k': 'л',
-        'l': 'д',
-        'm': 'ь',
-        'n': 'т',
-        'o': 'щ',
-        'p': 'з',
-        'q': 'й',
-        'r': 'к',
-        's': 'ы',
-        't': 'е',
-        'u': 'г',
-        'v': 'м',
-        'w': 'ц',
-        'x': 'ч',
-        'y': 'н',
-        'z': 'я',
-        '[': 'х',
-        ']': 'ъ',
-        ';': 'ж',
-        '\'': 'э',
-        ',': 'б',
-        '.': 'ю',
+        "a" : "ф",
+        "b" : "и",
+        "c" : "с",
+        "d" : "в",
+        "e" : "у",
+        "f" : "а",
+        "g" : "п",
+        "h" : "р",
+        "i" : "ш",
+        "j" : "о",
+        "k" : "л",
+        "l" : "д",
+        "m" : "ь",
+        "n" : "т",
+        "o" : "щ",
+        "p" : "з",
+        "q" : "й",
+        "r" : "к",
+        "s" : "ы",
+        "t" : "е",
+        "u" : "г",
+        "v" : "м",
+        "w" : "ц",
+        "x" : "ч",
+        "y" : "н",
+        "z" : "я",
+        "[" : "х",
+        "]" : "ъ",
+        ";" : "ж",
+        "'" : "э",
+        "," : "б",
+        "." : "ю",
     };
 
 
-    var convertedValue = '';
+    var convertedValue = "";
     for(var i = 0; i < text.length; i++)
     {
         var char = text[i];
         if(layoutMapping[char])
         {
             convertedValue += layoutMapping[char];
-        } else
+        }
+        else
         {
             convertedValue += char;
         }
@@ -804,7 +828,7 @@ function changeKeyboard(text)
             }
         }
 
-        convertedValue = '';
+        convertedValue = "";
 
         for(var i = 0; i < text.length; i++)
         {
@@ -812,7 +836,8 @@ function changeKeyboard(text)
             if(swappedObj[char])
             {
                 convertedValue += swappedObj[char];
-            } else
+            }
+            else
             {
                 convertedValue += char;
             }
@@ -828,7 +853,7 @@ function bind(el, options)
     return new NiceSelect(el, options);
 }
 
-document.querySelectorAll('[data-select="select2"]').forEach(function(item)
+document.querySelectorAll("[data-select=\"select2\"]").forEach(function(item)
 {
-    new NiceSelect(item, {searchable: true});
+    new NiceSelect(item, {searchable : true});
 });

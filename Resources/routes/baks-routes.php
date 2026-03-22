@@ -21,9 +21,8 @@
  *  THE SOFTWARE.
  */
 
-use BaksDev\Core\BaksDevCoreBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-return function (RoutingConfigurator $routes): void {
+return function(RoutingConfigurator $routes): void {
     $routes->import('.', 'baks');
 };

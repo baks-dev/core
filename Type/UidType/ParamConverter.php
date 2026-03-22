@@ -37,7 +37,8 @@ class ParamConverter extends ValueResolver implements ArgumentInterface
     public function __construct(
         string $resolver,
         string|null $key = null
-    ) {
+    )
+    {
         parent::__construct($resolver);
         $this->key = $key;
     }

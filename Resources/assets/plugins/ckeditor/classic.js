@@ -24,31 +24,28 @@ ckeditors = {};
 
 executeFunc(function initClassicEditor()
 {
-    if(typeof ClassicEditor !== 'function')
+    if(typeof ClassicEditor !== "function")
     {
         return false;
     }
 
-    document.querySelectorAll('.ckeditor').forEach((ckeditor) =>
+    document.querySelectorAll(".ckeditor").forEach((ckeditor) =>
     {
 
-        ClassicEditor
-            .create(ckeditor, {
-                extraPlugins: [MyCustomUploadAdapterPlugin],
-                autoUpdateElement: true
-            })
-            .then(editor =>
-            {
-                ckeditors[editor.id] = editor;
-            })
-            .catch(error =>
-            {
-                console.error(error);
-            });
+        ClassicEditor.create(ckeditor, {
+            extraPlugins : [MyCustomUploadAdapterPlugin],
+            autoUpdateElement : true,
+        }).then(editor =>
+        {
+            ckeditors[editor.id] = editor;
+        }).catch(error =>
+        {
+            console.error(error);
+        });
     });
 
     return true;
-})
+});
 
 
 BaksUploadAdapter = class BaksUploadAdapter
@@ -62,13 +59,12 @@ BaksUploadAdapter = class BaksUploadAdapter
     // Запускает процесс загрузки.
     upload()
     {
-        return this.loader.file
-            .then(file => new Promise((resolve, reject) =>
-            {
-                this._initRequest();
-                this._initListeners(resolve, reject, file);
-                this._sendRequest(file);
-            }));
+        return this.loader.file.then(file => new Promise((resolve, reject) =>
+        {
+            this._initRequest();
+            this._initListeners(resolve, reject, file);
+            this._sendRequest(file);
+        }));
     }
 
     // Прерывает процесс загрузки.
@@ -83,8 +79,8 @@ BaksUploadAdapter = class BaksUploadAdapter
     _initRequest()
     {
         const xhr = this.xhr = new XMLHttpRequest();
-        xhr.open('POST', '/file/upload/image', true);
-        xhr.responseType = 'json';
+        xhr.open("POST", "/file/upload/image", true);
+        xhr.responseType = "json";
     }
 
 
@@ -94,9 +90,9 @@ BaksUploadAdapter = class BaksUploadAdapter
         const loader = this.loader;
         const genericErrorText = `Couldn't upload file: ${file.name}.`;
 
-        xhr.addEventListener('error', () => reject(genericErrorText));
-        xhr.addEventListener('abort', () => reject());
-        xhr.addEventListener('load', () =>
+        xhr.addEventListener("error", () => reject(genericErrorText));
+        xhr.addEventListener("abort", () => reject());
+        xhr.addEventListener("load", () =>
         {
             const response = xhr.response;
 
@@ -115,7 +111,7 @@ BaksUploadAdapter = class BaksUploadAdapter
             // по крайней мере, URL-адрес «по умолчанию», указывающий на изображение на сервере.
             // Этот URL-адрес будет использоваться для отображения изображения в контенте. Узнайте больше в
             // UploadAdapter#загрузить документацию.
-            resolve({default: response.url});
+            resolve({default : response.url});
         });
 
         // Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
@@ -123,7 +119,7 @@ BaksUploadAdapter = class BaksUploadAdapter
         // user interface.
         if(xhr.upload)
         {
-            xhr.upload.addEventListener('progress', evt =>
+            xhr.upload.addEventListener("progress", evt =>
             {
                 if(evt.lengthComputable)
                 {
@@ -140,7 +136,7 @@ BaksUploadAdapter = class BaksUploadAdapter
         // Prepare the form data.
         const data = new FormData();
 
-        data.append('file', file);
+        data.append("file", file);
 
         // Важное примечание: это подходящее место для реализации механизмов безопасности.
         // как аутентификация и защита CSRF. Например, вы можете использовать
@@ -150,12 +146,12 @@ BaksUploadAdapter = class BaksUploadAdapter
         // Send the request.
         this.xhr.send(data);
     }
-}
+};
 
 
 function MyCustomUploadAdapterPlugin(editor)
 {
-    editor.plugins.get('FileRepository').createUploadAdapter = (loader) =>
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) =>
     {
         // Configure the URL to the upload script in your back-end here!
         return new BaksUploadAdapter(loader);

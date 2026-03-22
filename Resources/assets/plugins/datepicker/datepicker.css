@@ -953,4 +953,6 @@
     }
 }
 
-.js-datepicker { cursor: pointer; }
+.js-datepicker {
+    cursor: pointer;
+}

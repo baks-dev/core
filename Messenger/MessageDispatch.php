@@ -140,24 +140,6 @@ final class MessageDispatch implements MessageDispatchInterface
     }
 
     /**
-     * Метод присваивает транспорт сообщения
-     */
-    public function transport(string $transport): self
-    {
-        $this->transport = $transport;
-        return $this;
-    }
-
-    /**
-     * Метод проверяет, является ли указанный транспорт UID
-     */
-    private function isUid(): bool
-    {
-        $transport = trim(str_replace('-low', '', $this->transport));
-        return (bool) preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $transport);
-    }
-
-    /**
      * Делаем пинг на указанный транспорт
      */
     public function isConsumer(?string $transport = null): bool
@@ -210,6 +192,24 @@ final class MessageDispatch implements MessageDispatchInterface
         }
 
         return false;
+    }
+
+    /**
+     * Метод проверяет, является ли указанный транспорт UID
+     */
+    private function isUid(): bool
+    {
+        $transport = trim(str_replace('-low', '', $this->transport));
+        return (bool) preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $transport);
+    }
+
+    /**
+     * Метод присваивает транспорт сообщения
+     */
+    public function transport(string $transport): self
+    {
+        $this->transport = $transport;
+        return $this;
     }
 
     /**

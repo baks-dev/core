@@ -32,14 +32,14 @@ class LocaleDisable implements LocaleInterface
 {
     public const LOCAL = '';
 
+    public static function sort(): int
+    {
+        return 9999;
+    }
+
     /** Возвращает значение (value) */
     public function getValue(): string
     {
         return self::LOCAL;
-    }
-
-    public static function sort(): int
-    {
-        return 9999;
     }
 }

@@ -58,7 +58,7 @@ class MessengerConsumersStopCommand extends Command
         $question = new ChoiceQuestion(
             'Остановить все запущенные воркеры?',
             $questions,
-            0
+            0,
         );
 
         $ask = $helper->ask($input, $output, $question);

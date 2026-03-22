@@ -33,20 +33,19 @@ final class ModifyActionDelete implements ModifyActionInterface
 {
     public const ACTION = 'delete';
 
-    /** Возвращает значение (value) */
-    public function getValue(): string
-    {
-        return self::ACTION;
-    }
-
     public static function sort(): int
     {
         return 300;
     }
 
-
     public static function equals(string $action): bool
     {
         return self::ACTION === mb_strtolower($action);
+    }
+
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::ACTION;
     }
 }

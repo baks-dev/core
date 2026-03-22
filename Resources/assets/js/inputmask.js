@@ -32,17 +32,18 @@ limitcsnJftGwR = 100;
 
 setTimeout(function hsrxswFKs()
 {
-    if(typeof InputMask == 'function')
+    if(typeof InputMask == "function")
     {
-        var inputs = document.querySelectorAll('input[type="tel"]');
+        var inputs = document.querySelectorAll("input[type=\"tel\"]");
 
-        Array.prototype.forEach.call(inputs, function(input) {
+        Array.prototype.forEach.call(inputs, function(input)
+        {
 
-            if(input.classList.contains('loaded') === false)
+            if(input.classList.contains("loaded") === false)
             {
-                new InputMask(input)
+                new InputMask(input);
             }
-        })
+        });
 
         return;
     }
@@ -58,9 +59,10 @@ setTimeout(function hsrxswFKs()
 
 }, 100);
 
-function InputMask(element) {
+function InputMask(element)
+{
 
-    this.layout = '+_ (___) ___-__-__';
+    this.layout = "+_ (___) ___-__-__";
 
     if(element.dataset.mask)
     {
@@ -69,32 +71,33 @@ function InputMask(element) {
 
     this.el = element;
 
-/*    this.el = this.getElement(options.selector);
+    /*    this.el = this.getElement(options.selector);
 
-    if (!this.el) return console.log('Что-то не так с селектором');
+     if (!this.el) return console.log('Что-то не так с селектором');
 
-    this.layout = options.layout || '+_ (___) ___-__-__';
-    this.maskreg = this.getRegexp();
+     this.layout = options.layout || '+_ (___) ___-__-__';
+     this.maskreg = this.getRegexp();
 
-    this.setListeners();*/
+     this.setListeners();*/
     //this.maskreg = this.getRegexp();
     this.setListeners();
 
-    element.classList.add('loaded');
+    element.classList.add("loaded");
 }
 
 
-InputMask.prototype.getRegexp = function() {
-    var str = this.layout.replace(/_/g, '\\d')
-    str = str.replace(/\(/g, '\\(')
-    str = str.replace(/\)/g, '\\)')
-    str = str.replace(/\+/g, '\\+')
-    str = str.replace(/\s/g, '\\s')
+InputMask.prototype.getRegexp = function()
+{
+    var str = this.layout.replace(/_/g, "\\d");
+    str = str.replace(/\(/g, "\\(");
+    str = str.replace(/\)/g, "\\)");
+    str = str.replace(/\+/g, "\\+");
+    str = str.replace(/\s/g, "\\s");
     return str;
-}
+};
 
-InputMask.prototype.mask = function(e) {
-
+InputMask.prototype.mask = function(e)
+{
 
 
     var _this = e.target,
@@ -112,25 +115,25 @@ InputMask.prototype.mask = function(e) {
 
         if(currentChar == 8)
         {
-            this.layout = '_ (___) ___-__-__';
+            this.layout = "_ (___) ___-__-__";
             _this.value = 8;
             return 8;
         }
 
         /** номер в междуНАРОДном формате */
 
-        if(currentChar == '+')
+        if(currentChar == "+")
         {
-            this.layout = '+_ (___) ___-__-__';
+            this.layout = "+_ (___) ___-__-__";
             //_this.value = '+';
-            return '+';
+            return "+";
         }
 
         if(currentChar != 8)
         {
-            this.layout = '+'+currentChar+' (___) ___-__-__';
-            _this.value = '+'+currentChar;
-            return '+'+currentChar;
+            this.layout = "+" + currentChar + " (___) ___-__-__";
+            _this.value = "+" + currentChar;
+            return "+" + currentChar;
         }
     }
     else if(lastCharacterInt > 0)
@@ -146,7 +149,7 @@ InputMask.prototype.mask = function(e) {
         var space = false;
 
         /** Если вводный символ пробел - проверяем следующий за пробелом символ */
-        if(currentMaskChar == ' ')
+        if(currentMaskChar == " ")
         {
             space = true;
             currentMaskChar = this.layout[_this.value.length];
@@ -167,53 +170,81 @@ InputMask.prototype.mask = function(e) {
 
     var val = _this.value.replace(/\D/g, "");
 
-    if (def.length >= val.length) val = def;
+    if(def.length >= val.length)
+    {
+        val = def;
+    }
 
-    _this.value = matrix.replace(/./g, function(a) {
-        return /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a
+    _this.value = matrix.replace(/./g, function(a)
+    {
+        return /[_\d]/.test(a) && i < val.length ? val.charAt(i++) : i >= val.length ? "" : a;
     });
 
 
-    if (e.type == "blur") {
+    if(e.type == "blur")
+    {
         var regexp = new RegExp(this.maskreg);
-        if (!regexp.test(_this.value)) _this.value = "";
-    } else {
+        if(!regexp.test(_this.value))
+        {
+            _this.value = "";
+        }
+    }
+    else
+    {
         this.setCursorPosition(_this.value.length, _this);
     }
-}
+};
 
-InputMask.prototype.setCursorPosition = function(pos, elem) {
+InputMask.prototype.setCursorPosition = function(pos, elem)
+{
     elem.focus();
-    if (elem.setSelectionRange) elem.setSelectionRange(pos, pos);
-    else if (elem.createTextRange) {
+    if(elem.setSelectionRange)
+    {
+        elem.setSelectionRange(pos, pos);
+    }
+    else if(elem.createTextRange)
+    {
         var range = elem.createTextRange();
         range.collapse(true);
         range.moveEnd("character", pos);
         range.moveStart("character", pos);
-        range.select()
+        range.select();
     }
-}
+};
 
-InputMask.prototype.setListeners = function() {
+InputMask.prototype.setListeners = function()
+{
     this.el.addEventListener("input", this.mask.bind(this), false);
     this.el.addEventListener("focus", this.mask.bind(this), false);
     this.el.addEventListener("blur", this.mask.bind(this), false);
-}
+};
 
-InputMask.prototype.getElement = function(selector) {
+InputMask.prototype.getElement = function(selector)
+{
 
-    if (selector === undefined) return false;
-
-    if (this.isElement(selector)) return selector;
-
-    if (typeof selector == 'string') {
-        var el = document.querySelector(selector);
-        if (this.isElement(el)) return el;
+    if(selector === undefined)
+    {
+        return false;
     }
 
-    return false
-}
+    if(this.isElement(selector))
+    {
+        return selector;
+    }
 
-InputMask.prototype.isElement = function(element) {
+    if(typeof selector == "string")
+    {
+        var el = document.querySelector(selector);
+        if(this.isElement(el))
+        {
+            return el;
+        }
+    }
+
+    return false;
+};
+
+InputMask.prototype.isElement = function(element)
+{
     return element instanceof Element || element instanceof HTMLDocument;
-}
+};

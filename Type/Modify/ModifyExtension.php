@@ -13,7 +13,7 @@ final class ModifyExtension extends AbstractExtension
         return [
             new TwigFunction('modify_action',
                 [$this, 'modify_action'],
-                ['needs_environment' => true, 'is_safe' => ['html']]
+                ['needs_environment' => true, 'is_safe' => ['html']],
             ),
         ];
     }

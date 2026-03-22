@@ -33,6 +33,23 @@ final class CryptType extends Type
         return sprintf("pgp_sym_decrypt(%s, %s)", $sqlExpr, $PG_CRYPT_KEY);
     }
 
+    public static function getCryptKey(): bool|string
+    {
+        $CryptKeys = array_filter(
+            get_declared_classes(),
+            static function($className) {
+                return in_array(CryptKeyInterface::class, class_implements($className), true);
+            },
+        );
+
+        $current = current($CryptKeys);
+
+        /** @var CryptKeyInterface $CryptKeyClass */
+        $CryptKeyClass = class_exists($current) ? (new $current()) : null;
+
+        return $CryptKeyClass instanceof CryptKeyInterface ? $CryptKeyClass->getCryptKey() : false;
+    }
+
     public function convertToDatabaseValueSQL($sqlExpr, AbstractPlatform $platform): string
     {
         if(!$PG_CRYPT_KEY = self::getCryptKey())
@@ -51,22 +68,5 @@ final class CryptType extends Type
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
-    }
-
-    public static function getCryptKey(): bool|string
-    {
-        $CryptKeys = array_filter(
-            get_declared_classes(),
-            static function ($className) {
-                return in_array(CryptKeyInterface::class, class_implements($className), true);
-            }
-        );
-
-        $current = current($CryptKeys);
-
-        /** @var CryptKeyInterface $CryptKeyClass */
-        $CryptKeyClass = class_exists($current) ? (new $current()) : null;
-
-        return $CryptKeyClass instanceof CryptKeyInterface ? $CryptKeyClass->getCryptKey() : false;
     }
 }

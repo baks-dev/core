@@ -6,336 +6,433 @@
  *
  * Version: 5.9.2 (2021-09-08)
  */
-(function () {
-    'use strict';
+(function()
+{
+    "use strict";
 
-    var global$6 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+    var global$6 = tinymce.util.Tools.resolve("tinymce.PluginManager");
 
-    var global$5 = tinymce.util.Tools.resolve('tinymce.util.VK');
+    var global$5 = tinymce.util.Tools.resolve("tinymce.util.VK");
 
-    var typeOf = function (x) {
+    var typeOf = function(x)
+    {
         var t = typeof x;
-        if (x === null) {
-            return 'null';
-        } else if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
-            return 'array';
-        } else if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
-            return 'string';
-        } else {
+        if(x === null)
+        {
+            return "null";
+        }
+        else if(t === "object" && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === "Array"))
+        {
+            return "array";
+        }
+        else if(t === "object" && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === "String"))
+        {
+            return "string";
+        }
+        else
+        {
             return t;
         }
     };
-    var isType = function (type) {
-        return function (value) {
+    var isType = function(type)
+    {
+        return function(value)
+        {
             return typeOf(value) === type;
         };
     };
-    var isSimpleType = function (type) {
-        return function (value) {
+    var isSimpleType = function(type)
+    {
+        return function(value)
+        {
             return typeof value === type;
         };
     };
-    var eq = function (t) {
-        return function (a) {
+    var eq = function(t)
+    {
+        return function(a)
+        {
             return t === a;
         };
     };
-    var isString = isType('string');
-    var isArray = isType('array');
+    var isString = isType("string");
+    var isArray = isType("array");
     var isNull = eq(null);
-    var isBoolean = isSimpleType('boolean');
-    var isFunction = isSimpleType('function');
+    var isBoolean = isSimpleType("boolean");
+    var isFunction = isSimpleType("function");
 
-    var noop = function () {
+    var noop = function()
+    {
     };
-    var constant = function (value) {
-        return function () {
+    var constant = function(value)
+    {
+        return function()
+        {
             return value;
         };
     };
-    var identity = function (x) {
+    var identity = function(x)
+    {
         return x;
     };
-    var tripleEquals = function (a, b) {
+    var tripleEquals = function(a, b)
+    {
         return a === b;
     };
     var never = constant(false);
     var always = constant(true);
 
-    var none = function () {
+    var none = function()
+    {
         return NONE;
     };
-    var NONE = function () {
-        var call = function (thunk) {
+    var NONE = function()
+    {
+        var call = function(thunk)
+        {
             return thunk();
         };
         var id = identity;
         var me = {
-            fold: function (n, _s) {
+            fold : function(n, _s)
+            {
                 return n();
             },
-            isSome: never,
-            isNone: always,
-            getOr: id,
-            getOrThunk: call,
-            getOrDie: function (msg) {
-                throw new Error(msg || 'error: getOrDie called on none.');
+            isSome : never,
+            isNone : always,
+            getOr : id,
+            getOrThunk : call,
+            getOrDie : function(msg)
+            {
+                throw new Error(msg || "error: getOrDie called on none.");
             },
-            getOrNull: constant(null),
-            getOrUndefined: constant(undefined),
-            or: id,
-            orThunk: call,
-            map: none,
-            each: noop,
-            bind: none,
-            exists: never,
-            forall: always,
-            filter: function () {
+            getOrNull : constant(null),
+            getOrUndefined : constant(undefined),
+            or : id,
+            orThunk : call,
+            map : none,
+            each : noop,
+            bind : none,
+            exists : never,
+            forall : always,
+            filter : function()
+            {
                 return none();
             },
-            toArray: function () {
+            toArray : function()
+            {
                 return [];
             },
-            toString: constant('none()')
+            toString : constant("none()"),
         };
         return me;
     }();
-    var some = function (a) {
+    var some = function(a)
+    {
         var constant_a = constant(a);
-        var self = function () {
+        var self = function()
+        {
             return me;
         };
-        var bind = function (f) {
+        var bind = function(f)
+        {
             return f(a);
         };
         var me = {
-            fold: function (n, s) {
+            fold : function(n, s)
+            {
                 return s(a);
             },
-            isSome: always,
-            isNone: never,
-            getOr: constant_a,
-            getOrThunk: constant_a,
-            getOrDie: constant_a,
-            getOrNull: constant_a,
-            getOrUndefined: constant_a,
-            or: self,
-            orThunk: self,
-            map: function (f) {
+            isSome : always,
+            isNone : never,
+            getOr : constant_a,
+            getOrThunk : constant_a,
+            getOrDie : constant_a,
+            getOrNull : constant_a,
+            getOrUndefined : constant_a,
+            or : self,
+            orThunk : self,
+            map : function(f)
+            {
                 return some(f(a));
             },
-            each: function (f) {
+            each : function(f)
+            {
                 f(a);
             },
-            bind: bind,
-            exists: bind,
-            forall: bind,
-            filter: function (f) {
+            bind : bind,
+            exists : bind,
+            forall : bind,
+            filter : function(f)
+            {
                 return f(a) ? me : NONE;
             },
-            toArray: function () {
+            toArray : function()
+            {
                 return [a];
             },
-            toString: function () {
-                return 'some(' + a + ')';
-            }
+            toString : function()
+            {
+                return "some(" + a + ")";
+            },
         };
         return me;
     };
-    var from = function (value) {
+    var from = function(value)
+    {
         return value === null || value === undefined ? NONE : some(value);
     };
     var Optional = {
-        some: some,
-        none: none,
-        from: from
+        some : some,
+        none : none,
+        from : from,
     };
 
     var nativeIndexOf = Array.prototype.indexOf;
     var nativePush = Array.prototype.push;
-    var rawIndexOf = function (ts, t) {
+    var rawIndexOf = function(ts, t)
+    {
         return nativeIndexOf.call(ts, t);
     };
-    var contains = function (xs, x) {
+    var contains = function(xs, x)
+    {
         return rawIndexOf(xs, x) > -1;
     };
-    var map = function (xs, f) {
+    var map = function(xs, f)
+    {
         var len = xs.length;
         var r = new Array(len);
-        for (var i = 0; i < len; i++) {
+        for(var i = 0; i < len; i++)
+        {
             var x = xs[i];
             r[i] = f(x, i);
         }
         return r;
     };
-    var each$1 = function (xs, f) {
-        for (var i = 0, len = xs.length; i < len; i++) {
+    var each$1 = function(xs, f)
+    {
+        for(var i = 0, len = xs.length; i < len; i++)
+        {
             var x = xs[i];
             f(x, i);
         }
     };
-    var foldl = function (xs, f, acc) {
-        each$1(xs, function (x, i) {
+    var foldl = function(xs, f, acc)
+    {
+        each$1(xs, function(x, i)
+        {
             acc = f(acc, x, i);
         });
         return acc;
     };
-    var flatten = function (xs) {
+    var flatten = function(xs)
+    {
         var r = [];
-        for (var i = 0, len = xs.length; i < len; ++i) {
-            if (!isArray(xs[i])) {
-                throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        for(var i = 0, len = xs.length; i < len; ++i)
+        {
+            if(!isArray(xs[i]))
+            {
+                throw new Error("Arr.flatten item " + i + " was not an array, input: " + xs);
             }
             nativePush.apply(r, xs[i]);
         }
         return r;
     };
-    var bind = function (xs, f) {
+    var bind = function(xs, f)
+    {
         return flatten(map(xs, f));
     };
-    var findMap = function (arr, f) {
-        for (var i = 0; i < arr.length; i++) {
+    var findMap = function(arr, f)
+    {
+        for(var i = 0; i < arr.length; i++)
+        {
             var r = f(arr[i], i);
-            if (r.isSome()) {
+            if(r.isSome())
+            {
                 return r;
             }
         }
         return Optional.none();
     };
 
-    var is = function (lhs, rhs, comparator) {
-        if (comparator === void 0) {
+    var is = function(lhs, rhs, comparator)
+    {
+        if(comparator === void 0)
+        {
             comparator = tripleEquals;
         }
-        return lhs.exists(function (left) {
+        return lhs.exists(function(left)
+        {
             return comparator(left, rhs);
         });
     };
-    var cat = function (arr) {
+    var cat = function(arr)
+    {
         var r = [];
-        var push = function (x) {
+        var push = function(x)
+        {
             r.push(x);
         };
-        for (var i = 0; i < arr.length; i++) {
+        for(var i = 0; i < arr.length; i++)
+        {
             arr[i].each(push);
         }
         return r;
     };
-    var someIf = function (b, a) {
+    var someIf = function(b, a)
+    {
         return b ? Optional.some(a) : Optional.none();
     };
 
-    var assumeExternalTargets = function (editor) {
-        var externalTargets = editor.getParam('link_assume_external_targets', false);
-        if (isBoolean(externalTargets) && externalTargets) {
+    var assumeExternalTargets = function(editor)
+    {
+        var externalTargets = editor.getParam("link_assume_external_targets", false);
+        if(isBoolean(externalTargets) && externalTargets)
+        {
             return 1;
-        } else if (isString(externalTargets) && (externalTargets === 'http' || externalTargets === 'https')) {
+        }
+        else if(isString(externalTargets) && (externalTargets === "http" || externalTargets === "https"))
+        {
             return externalTargets;
         }
         return 0;
     };
-    var hasContextToolbar = function (editor) {
-        return editor.getParam('link_context_toolbar', false, 'boolean');
+    var hasContextToolbar = function(editor)
+    {
+        return editor.getParam("link_context_toolbar", false, "boolean");
     };
-    var getLinkList = function (editor) {
-        return editor.getParam('link_list');
+    var getLinkList = function(editor)
+    {
+        return editor.getParam("link_list");
     };
-    var getDefaultLinkTarget = function (editor) {
-        return editor.getParam('default_link_target');
+    var getDefaultLinkTarget = function(editor)
+    {
+        return editor.getParam("default_link_target");
     };
-    var getTargetList = function (editor) {
-        return editor.getParam('target_list', true);
+    var getTargetList = function(editor)
+    {
+        return editor.getParam("target_list", true);
     };
-    var getRelList = function (editor) {
-        return editor.getParam('rel_list', [], 'array');
+    var getRelList = function(editor)
+    {
+        return editor.getParam("rel_list", [], "array");
     };
-    var getLinkClassList = function (editor) {
-        return editor.getParam('link_class_list', [], 'array');
+    var getLinkClassList = function(editor)
+    {
+        return editor.getParam("link_class_list", [], "array");
     };
-    var shouldShowLinkTitle = function (editor) {
-        return editor.getParam('link_title', true, 'boolean');
+    var shouldShowLinkTitle = function(editor)
+    {
+        return editor.getParam("link_title", true, "boolean");
     };
-    var allowUnsafeLinkTarget = function (editor) {
-        return editor.getParam('allow_unsafe_link_target', false, 'boolean');
+    var allowUnsafeLinkTarget = function(editor)
+    {
+        return editor.getParam("allow_unsafe_link_target", false, "boolean");
     };
-    var useQuickLink = function (editor) {
-        return editor.getParam('link_quicklink', false, 'boolean');
+    var useQuickLink = function(editor)
+    {
+        return editor.getParam("link_quicklink", false, "boolean");
     };
-    var getDefaultLinkProtocol = function (editor) {
-        return editor.getParam('link_default_protocol', 'http', 'string');
+    var getDefaultLinkProtocol = function(editor)
+    {
+        return editor.getParam("link_default_protocol", "http", "string");
     };
 
-    var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+    var global$4 = tinymce.util.Tools.resolve("tinymce.util.Tools");
 
-    var getValue = function (item) {
-        return isString(item.value) ? item.value : '';
+    var getValue = function(item)
+    {
+        return isString(item.value) ? item.value : "";
     };
-    var getText = function (item) {
-        if (isString(item.text)) {
+    var getText = function(item)
+    {
+        if(isString(item.text))
+        {
             return item.text;
-        } else if (isString(item.title)) {
+        }
+        else if(isString(item.title))
+        {
             return item.title;
-        } else {
-            return '';
+        }
+        else
+        {
+            return "";
         }
     };
-    var sanitizeList = function (list, extractValue) {
+    var sanitizeList = function(list, extractValue)
+    {
         var out = [];
-        global$4.each(list, function (item) {
+        global$4.each(list, function(item)
+        {
             var text = getText(item);
-            if (item.menu !== undefined) {
+            if(item.menu !== undefined)
+            {
                 var items = sanitizeList(item.menu, extractValue);
                 out.push({
-                    text: text,
-                    items: items
+                    text : text,
+                    items : items,
                 });
-            } else {
+            }
+            else
+            {
                 var value = extractValue(item);
                 out.push({
-                    text: text,
-                    value: value
+                    text : text,
+                    value : value,
                 });
             }
         });
         return out;
     };
-    var sanitizeWith = function (extracter) {
-        if (extracter === void 0) {
+    var sanitizeWith = function(extracter)
+    {
+        if(extracter === void 0)
+        {
             extracter = getValue;
         }
-        return function (list) {
-            return Optional.from(list).map(function (list) {
+        return function(list)
+        {
+            return Optional.from(list).map(function(list)
+            {
                 return sanitizeList(list, extracter);
             });
         };
     };
-    var sanitize = function (list) {
+    var sanitize = function(list)
+    {
         return sanitizeWith(getValue)(list);
     };
-    var createUi = function (name, label) {
-        return function (items) {
+    var createUi = function(name, label)
+    {
+        return function(items)
+        {
             return {
-                name: name,
-                type: 'listbox',
-                label: label,
-                items: items
+                name : name,
+                type : "listbox",
+                label : label,
+                items : items,
             };
         };
     };
     var ListOptions = {
-        sanitize: sanitize,
-        sanitizeWith: sanitizeWith,
-        createUi: createUi,
-        getValue: getValue
+        sanitize : sanitize,
+        sanitizeWith : sanitizeWith,
+        createUi : createUi,
+        getValue : getValue,
     };
 
-    var __assign = function () {
-        __assign = Object.assign || function __assign(t) {
-            for (var s, i = 1, n = arguments.length; i < n; i++) {
+    var __assign = function()
+    {
+        __assign = Object.assign || function __assign(t)
+        {
+            for(var s, i = 1, n = arguments.length; i < n; i++)
+            {
                 s = arguments[i];
-                for (var p in s)
-                    if (Object.prototype.hasOwnProperty.call(s, p))
+                for(var p in s)
+                    if(Object.prototype.hasOwnProperty.call(s, p))
+                    {
                         t[p] = s[p];
+                    }
             }
             return t;
         };
@@ -344,475 +441,626 @@
 
     var keys = Object.keys;
     var hasOwnProperty = Object.hasOwnProperty;
-    var each = function (obj, f) {
+    var each = function(obj, f)
+    {
         var props = keys(obj);
-        for (var k = 0, len = props.length; k < len; k++) {
+        for(var k = 0, len = props.length; k < len; k++)
+        {
             var i = props[k];
             var x = obj[i];
             f(x, i);
         }
     };
-    var objAcc = function (r) {
-        return function (x, i) {
+    var objAcc = function(r)
+    {
+        return function(x, i)
+        {
             r[i] = x;
         };
     };
-    var internalFilter = function (obj, pred, onTrue, onFalse) {
+    var internalFilter = function(obj, pred, onTrue, onFalse)
+    {
         var r = {};
-        each(obj, function (x, i) {
+        each(obj, function(x, i)
+        {
             (pred(x, i) ? onTrue : onFalse)(x, i);
         });
         return r;
     };
-    var filter = function (obj, pred) {
+    var filter = function(obj, pred)
+    {
         var t = {};
         internalFilter(obj, pred, objAcc(t), noop);
         return t;
     };
-    var has = function (obj, key) {
+    var has = function(obj, key)
+    {
         return hasOwnProperty.call(obj, key);
     };
-    var hasNonNullableKey = function (obj, key) {
+    var hasNonNullableKey = function(obj, key)
+    {
         return has(obj, key) && obj[key] !== undefined && obj[key] !== null;
     };
 
-    var global$3 = tinymce.util.Tools.resolve('tinymce.dom.TreeWalker');
+    var global$3 = tinymce.util.Tools.resolve("tinymce.dom.TreeWalker");
 
-    var isAnchor = function (elm) {
-        return elm && elm.nodeName.toLowerCase() === 'a';
+    var isAnchor = function(elm)
+    {
+        return elm && elm.nodeName.toLowerCase() === "a";
     };
-    var isLink = function (elm) {
+    var isLink = function(elm)
+    {
         return isAnchor(elm) && !!getHref(elm);
     };
-    var collectNodesInRange = function (rng, predicate) {
-        if (rng.collapsed) {
+    var collectNodesInRange = function(rng, predicate)
+    {
+        if(rng.collapsed)
+        {
             return [];
-        } else {
+        }
+        else
+        {
             var contents = rng.cloneContents();
             var walker = new global$3(contents.firstChild, contents);
             var elements = [];
             var current = contents.firstChild;
-            do {
-                if (predicate(current)) {
+            do
+            {
+                if(predicate(current))
+                {
                     elements.push(current);
                 }
-            } while (current = walker.next());
+            }
+            while(current = walker.next());
             return elements;
         }
     };
-    var hasProtocol = function (url) {
+    var hasProtocol = function(url)
+    {
         return /^\w+:/i.test(url);
     };
-    var getHref = function (elm) {
-        var href = elm.getAttribute('data-mce-href');
-        return href ? href : elm.getAttribute('href');
+    var getHref = function(elm)
+    {
+        var href = elm.getAttribute("data-mce-href");
+        return href ? href : elm.getAttribute("href");
     };
-    var applyRelTargetRules = function (rel, isUnsafe) {
-        var rules = ['noopener'];
+    var applyRelTargetRules = function(rel, isUnsafe)
+    {
+        var rules = ["noopener"];
         var rels = rel ? rel.split(/\s+/) : [];
-        var toString = function (rels) {
-            return global$4.trim(rels.sort().join(' '));
+        var toString = function(rels)
+        {
+            return global$4.trim(rels.sort().join(" "));
         };
-        var addTargetRules = function (rels) {
+        var addTargetRules = function(rels)
+        {
             rels = removeTargetRules(rels);
             return rels.length > 0 ? rels.concat(rules) : rules;
         };
-        var removeTargetRules = function (rels) {
-            return rels.filter(function (val) {
+        var removeTargetRules = function(rels)
+        {
+            return rels.filter(function(val)
+            {
                 return global$4.inArray(rules, val) === -1;
             });
         };
         var newRels = isUnsafe ? addTargetRules(rels) : removeTargetRules(rels);
-        return newRels.length > 0 ? toString(newRels) : '';
+        return newRels.length > 0 ? toString(newRels) : "";
     };
-    var trimCaretContainers = function (text) {
-        return text.replace(/\uFEFF/g, '');
+    var trimCaretContainers = function(text)
+    {
+        return text.replace(/\uFEFF/g, "");
     };
-    var getAnchorElement = function (editor, selectedElm) {
+    var getAnchorElement = function(editor, selectedElm)
+    {
         selectedElm = selectedElm || editor.selection.getNode();
-        if (isImageFigure(selectedElm)) {
-            return editor.dom.select('a[href]', selectedElm)[0];
-        } else {
-            return editor.dom.getParent(selectedElm, 'a[href]');
+        if(isImageFigure(selectedElm))
+        {
+            return editor.dom.select("a[href]", selectedElm)[0];
+        }
+        else
+        {
+            return editor.dom.getParent(selectedElm, "a[href]");
         }
     };
-    var getAnchorText = function (selection, anchorElm) {
-        var text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({format: 'text'});
+    var getAnchorText = function(selection, anchorElm)
+    {
+        var text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({format : "text"});
         return trimCaretContainers(text);
     };
-    var hasLinks = function (elements) {
+    var hasLinks = function(elements)
+    {
         return global$4.grep(elements, isLink).length > 0;
     };
-    var hasLinksInSelection = function (rng) {
+    var hasLinksInSelection = function(rng)
+    {
         return collectNodesInRange(rng, isLink).length > 0;
     };
-    var isOnlyTextSelected = function (editor) {
+    var isOnlyTextSelected = function(editor)
+    {
         var inlineTextElements = editor.schema.getTextInlineElements();
-        var isElement = function (elm) {
+        var isElement = function(elm)
+        {
             return elm.nodeType === 1 && !isAnchor(elm) && !has(inlineTextElements, elm.nodeName.toLowerCase());
         };
         var elements = collectNodesInRange(editor.selection.getRng(), isElement);
         return elements.length === 0;
     };
-    var isImageFigure = function (elm) {
-        return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className);
+    var isImageFigure = function(elm)
+    {
+        return elm && elm.nodeName === "FIGURE" && /\bimage\b/i.test(elm.className);
     };
-    var getLinkAttrs = function (data) {
+    var getLinkAttrs = function(data)
+    {
         var attrs = [
-            'title',
-            'rel',
-            'class',
-            'target'
+            "title",
+            "rel",
+            "class",
+            "target",
         ];
-        return foldl(attrs, function (acc, key) {
-            data[key].each(function (value) {
+        return foldl(attrs, function(acc, key)
+        {
+            data[key].each(function(value)
+            {
                 acc[key] = value.length > 0 ? value : null;
             });
             return acc;
-        }, {href: data.href});
+        }, {href : data.href});
     };
-    var handleExternalTargets = function (href, assumeExternalTargets) {
-        if ((assumeExternalTargets === 'http' || assumeExternalTargets === 'https') && !hasProtocol(href)) {
-            return assumeExternalTargets + '://' + href;
+    var handleExternalTargets = function(href, assumeExternalTargets)
+    {
+        if((assumeExternalTargets === "http" || assumeExternalTargets === "https") && !hasProtocol(href))
+        {
+            return assumeExternalTargets + "://" + href;
         }
         return href;
     };
-    var applyLinkOverrides = function (editor, linkAttrs) {
+    var applyLinkOverrides = function(editor, linkAttrs)
+    {
         var newLinkAttrs = __assign({}, linkAttrs);
-        if (!(getRelList(editor).length > 0) && allowUnsafeLinkTarget(editor) === false) {
-            var newRel = applyRelTargetRules(newLinkAttrs.rel, newLinkAttrs.target === '_blank');
+        if(!(getRelList(editor).length > 0) && allowUnsafeLinkTarget(editor) === false)
+        {
+            var newRel = applyRelTargetRules(newLinkAttrs.rel, newLinkAttrs.target === "_blank");
             newLinkAttrs.rel = newRel ? newRel : null;
         }
-        if (Optional.from(newLinkAttrs.target).isNone() && getTargetList(editor) === false) {
+        if(Optional.from(newLinkAttrs.target).isNone() && getTargetList(editor) === false)
+        {
             newLinkAttrs.target = getDefaultLinkTarget(editor);
         }
         newLinkAttrs.href = handleExternalTargets(newLinkAttrs.href, assumeExternalTargets(editor));
         return newLinkAttrs;
     };
-    var updateLink = function (editor, anchorElm, text, linkAttrs) {
-        text.each(function (text) {
-            if (has(anchorElm, 'innerText')) {
+    var updateLink = function(editor, anchorElm, text, linkAttrs)
+    {
+        text.each(function(text)
+        {
+            if(has(anchorElm, "innerText"))
+            {
                 anchorElm.innerText = text;
-            } else {
+            }
+            else
+            {
                 anchorElm.textContent = text;
             }
         });
         editor.dom.setAttribs(anchorElm, linkAttrs);
         editor.selection.select(anchorElm);
     };
-    var createLink = function (editor, selectedElm, text, linkAttrs) {
-        if (isImageFigure(selectedElm)) {
+    var createLink = function(editor, selectedElm, text, linkAttrs)
+    {
+        if(isImageFigure(selectedElm))
+        {
             linkImageFigure(editor, selectedElm, linkAttrs);
-        } else {
-            text.fold(function () {
-                editor.execCommand('mceInsertLink', false, linkAttrs);
-            }, function (text) {
-                editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(text)));
+        }
+        else
+        {
+            text.fold(function()
+            {
+                editor.execCommand("mceInsertLink", false, linkAttrs);
+            }, function(text)
+            {
+                editor.insertContent(editor.dom.createHTML("a", linkAttrs, editor.dom.encode(text)));
             });
         }
     };
-    var linkDomMutation = function (editor, attachState, data) {
+    var linkDomMutation = function(editor, attachState, data)
+    {
         var selectedElm = editor.selection.getNode();
         var anchorElm = getAnchorElement(editor, selectedElm);
         var linkAttrs = applyLinkOverrides(editor, getLinkAttrs(data));
-        editor.undoManager.transact(function () {
-            if (data.href === attachState.href) {
+        editor.undoManager.transact(function()
+        {
+            if(data.href === attachState.href)
+            {
                 attachState.attach();
             }
-            if (anchorElm) {
+            if(anchorElm)
+            {
                 editor.focus();
                 updateLink(editor, anchorElm, data.text, linkAttrs);
-            } else {
+            }
+            else
+            {
                 createLink(editor, selectedElm, data.text, linkAttrs);
             }
         });
     };
-    var unlinkSelection = function (editor) {
+    var unlinkSelection = function(editor)
+    {
         var dom = editor.dom, selection = editor.selection;
         var bookmark = selection.getBookmark();
         var rng = selection.getRng().cloneRange();
-        var startAnchorElm = dom.getParent(rng.startContainer, 'a[href]', editor.getBody());
-        var endAnchorElm = dom.getParent(rng.endContainer, 'a[href]', editor.getBody());
-        if (startAnchorElm) {
+        var startAnchorElm = dom.getParent(rng.startContainer, "a[href]", editor.getBody());
+        var endAnchorElm = dom.getParent(rng.endContainer, "a[href]", editor.getBody());
+        if(startAnchorElm)
+        {
             rng.setStartBefore(startAnchorElm);
         }
-        if (endAnchorElm) {
+        if(endAnchorElm)
+        {
             rng.setEndAfter(endAnchorElm);
         }
         selection.setRng(rng);
-        editor.execCommand('unlink');
+        editor.execCommand("unlink");
         selection.moveToBookmark(bookmark);
     };
-    var unlinkDomMutation = function (editor) {
-        editor.undoManager.transact(function () {
+    var unlinkDomMutation = function(editor)
+    {
+        editor.undoManager.transact(function()
+        {
             var node = editor.selection.getNode();
-            if (isImageFigure(node)) {
+            if(isImageFigure(node))
+            {
                 unlinkImageFigure(editor, node);
-            } else {
+            }
+            else
+            {
                 unlinkSelection(editor);
             }
             editor.focus();
         });
     };
-    var unwrapOptions = function (data) {
+    var unwrapOptions = function(data)
+    {
         var cls = data.class, href = data.href, rel = data.rel, target = data.target, text = data.text,
             title = data.title;
         return filter({
-            class: cls.getOrNull(),
-            href: href,
-            rel: rel.getOrNull(),
-            target: target.getOrNull(),
-            text: text.getOrNull(),
-            title: title.getOrNull()
-        }, function (v, _k) {
+            class : cls.getOrNull(),
+            href : href,
+            rel : rel.getOrNull(),
+            target : target.getOrNull(),
+            text : text.getOrNull(),
+            title : title.getOrNull(),
+        }, function(v, _k)
+        {
             return isNull(v) === false;
         });
     };
-    var link = function (editor, attachState, data) {
-        editor.hasPlugin('rtc', true) ? editor.execCommand('createlink', false, unwrapOptions(data)) : linkDomMutation(editor, attachState, data);
+    var link = function(editor, attachState, data)
+    {
+        editor.hasPlugin("rtc", true) ? editor.execCommand("createlink", false, unwrapOptions(data)) : linkDomMutation(editor, attachState, data);
     };
-    var unlink = function (editor) {
-        editor.hasPlugin('rtc', true) ? editor.execCommand('unlink') : unlinkDomMutation(editor);
+    var unlink = function(editor)
+    {
+        editor.hasPlugin("rtc", true) ? editor.execCommand("unlink") : unlinkDomMutation(editor);
     };
-    var unlinkImageFigure = function (editor, fig) {
-        var img = editor.dom.select('img', fig)[0];
-        if (img) {
-            var a = editor.dom.getParents(img, 'a[href]', fig)[0];
-            if (a) {
+    var unlinkImageFigure = function(editor, fig)
+    {
+        var img = editor.dom.select("img", fig)[0];
+        if(img)
+        {
+            var a = editor.dom.getParents(img, "a[href]", fig)[0];
+            if(a)
+            {
                 a.parentNode.insertBefore(img, a);
                 editor.dom.remove(a);
             }
         }
     };
-    var linkImageFigure = function (editor, fig, attrs) {
-        var img = editor.dom.select('img', fig)[0];
-        if (img) {
-            var a = editor.dom.create('a', attrs);
+    var linkImageFigure = function(editor, fig, attrs)
+    {
+        var img = editor.dom.select("img", fig)[0];
+        if(img)
+        {
+            var a = editor.dom.create("a", attrs);
             img.parentNode.insertBefore(a, img);
             a.appendChild(img);
         }
     };
 
-    var isListGroup = function (item) {
-        return hasNonNullableKey(item, 'items');
+    var isListGroup = function(item)
+    {
+        return hasNonNullableKey(item, "items");
     };
-    var findTextByValue = function (value, catalog) {
-        return findMap(catalog, function (item) {
-            if (isListGroup(item)) {
+    var findTextByValue = function(value, catalog)
+    {
+        return findMap(catalog, function(item)
+        {
+            if(isListGroup(item))
+            {
                 return findTextByValue(value, item.items);
-            } else {
+            }
+            else
+            {
                 return someIf(item.value === value, item);
             }
         });
     };
-    var getDelta = function (persistentText, fieldName, catalog, data) {
+    var getDelta = function(persistentText, fieldName, catalog, data)
+    {
         var value = data[fieldName];
         var hasPersistentText = persistentText.length > 0;
-        return value !== undefined ? findTextByValue(value, catalog).map(function (i) {
+        return value !== undefined ? findTextByValue(value, catalog).map(function(i)
+        {
             return {
-                url: {
-                    value: i.value,
-                    meta: {
-                        text: hasPersistentText ? persistentText : i.text,
-                        attach: noop
-                    }
+                url : {
+                    value : i.value,
+                    meta : {
+                        text : hasPersistentText ? persistentText : i.text,
+                        attach : noop,
+                    },
                 },
-                text: hasPersistentText ? persistentText : i.text
+                text : hasPersistentText ? persistentText : i.text,
             };
         }) : Optional.none();
     };
-    var findCatalog = function (catalogs, fieldName) {
-        if (fieldName === 'link') {
+    var findCatalog = function(catalogs, fieldName)
+    {
+        if(fieldName === "link")
+        {
             return catalogs.link;
-        } else if (fieldName === 'anchor') {
+        }
+        else if(fieldName === "anchor")
+        {
             return catalogs.anchor;
-        } else {
+        }
+        else
+        {
             return Optional.none();
         }
     };
-    var init = function (initialData, linkCatalog) {
+    var init = function(initialData, linkCatalog)
+    {
         var persistentData = {
-            text: initialData.text,
-            title: initialData.title
+            text : initialData.text,
+            title : initialData.title,
         };
-        var getTitleFromUrlChange = function (url) {
-            return someIf(persistentData.title.length <= 0, Optional.from(url.meta.title).getOr(''));
+        var getTitleFromUrlChange = function(url)
+        {
+            return someIf(persistentData.title.length <= 0, Optional.from(url.meta.title).getOr(""));
         };
-        var getTextFromUrlChange = function (url) {
+        var getTextFromUrlChange = function(url)
+        {
             return someIf(persistentData.text.length <= 0, Optional.from(url.meta.text).getOr(url.value));
         };
-        var onUrlChange = function (data) {
+        var onUrlChange = function(data)
+        {
             var text = getTextFromUrlChange(data.url);
             var title = getTitleFromUrlChange(data.url);
-            if (text.isSome() || title.isSome()) {
-                return Optional.some(__assign(__assign({}, text.map(function (text) {
-                    return {text: text};
-                }).getOr({})), title.map(function (title) {
-                    return {title: title};
+            if(text.isSome() || title.isSome())
+            {
+                return Optional.some(__assign(__assign({}, text.map(function(text)
+                {
+                    return {text : text};
+                }).getOr({})), title.map(function(title)
+                {
+                    return {title : title};
                 }).getOr({})));
-            } else {
+            }
+            else
+            {
                 return Optional.none();
             }
         };
-        var onCatalogChange = function (data, change) {
+        var onCatalogChange = function(data, change)
+        {
             var catalog = findCatalog(linkCatalog, change.name).getOr([]);
             return getDelta(persistentData.text, change.name, catalog, data);
         };
-        var onChange = function (getData, change) {
+        var onChange = function(getData, change)
+        {
             var name = change.name;
-            if (name === 'url') {
+            if(name === "url")
+            {
                 return onUrlChange(getData());
-            } else if (contains([
-                'anchor',
-                'link'
-            ], name)) {
+            }
+            else if(contains([
+                "anchor",
+                "link",
+            ], name))
+            {
                 return onCatalogChange(getData(), change);
-            } else if (name === 'text' || name === 'title') {
+            }
+            else if(name === "text" || name === "title")
+            {
                 persistentData[name] = getData()[name];
                 return Optional.none();
-            } else {
+            }
+            else
+            {
                 return Optional.none();
             }
         };
-        return {onChange: onChange};
+        return {onChange : onChange};
     };
     var DialogChanges = {
-        init: init,
-        getDelta: getDelta
+        init : init,
+        getDelta : getDelta,
     };
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+    var global$2 = tinymce.util.Tools.resolve("tinymce.util.Delay");
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Promise');
+    var global$1 = tinymce.util.Tools.resolve("tinymce.util.Promise");
 
-    var delayedConfirm = function (editor, message, callback) {
+    var delayedConfirm = function(editor, message, callback)
+    {
         var rng = editor.selection.getRng();
-        global$2.setEditorTimeout(editor, function () {
-            editor.windowManager.confirm(message, function (state) {
+        global$2.setEditorTimeout(editor, function()
+        {
+            editor.windowManager.confirm(message, function(state)
+            {
                 editor.selection.setRng(rng);
                 callback(state);
             });
         });
     };
-    var tryEmailTransform = function (data) {
+    var tryEmailTransform = function(data)
+    {
         var url = data.href;
-        var suggestMailTo = url.indexOf('@') > 0 && url.indexOf('/') === -1 && url.indexOf('mailto:') === -1;
+        var suggestMailTo = url.indexOf("@") > 0 && url.indexOf("/") === -1 && url.indexOf("mailto:") === -1;
         return suggestMailTo ? Optional.some({
-            message: 'The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?',
-            preprocess: function (oldData) {
-                return __assign(__assign({}, oldData), {href: 'mailto:' + url});
-            }
+            message : "The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?",
+            preprocess : function(oldData)
+            {
+                return __assign(__assign({}, oldData), {href : "mailto:" + url});
+            },
         }) : Optional.none();
     };
-    var tryProtocolTransform = function (assumeExternalTargets, defaultLinkProtocol) {
-        return function (data) {
+    var tryProtocolTransform = function(assumeExternalTargets, defaultLinkProtocol)
+    {
+        return function(data)
+        {
             var url = data.href;
             var suggestProtocol = assumeExternalTargets === 1 && !hasProtocol(url) || assumeExternalTargets === 0 && /^\s*www(\.|\d\.)/i.test(url);
             return suggestProtocol ? Optional.some({
-                message: 'The URL you entered seems to be an external link. Do you want to add the required ' + defaultLinkProtocol + ':// prefix?',
-                preprocess: function (oldData) {
-                    return __assign(__assign({}, oldData), {href: defaultLinkProtocol + '://' + url});
-                }
+                message : "The URL you entered seems to be an external link. Do you want to add the required " + defaultLinkProtocol + ":// prefix?",
+                preprocess : function(oldData)
+                {
+                    return __assign(__assign({}, oldData), {href : defaultLinkProtocol + "://" + url});
+                },
             }) : Optional.none();
         };
     };
-    var preprocess = function (editor, data) {
+    var preprocess = function(editor, data)
+    {
         return findMap([
             tryEmailTransform,
-            tryProtocolTransform(assumeExternalTargets(editor), getDefaultLinkProtocol(editor))
-        ], function (f) {
+            tryProtocolTransform(assumeExternalTargets(editor), getDefaultLinkProtocol(editor)),
+        ], function(f)
+        {
             return f(data);
-        }).fold(function () {
+        }).fold(function()
+        {
             return global$1.resolve(data);
-        }, function (transform) {
-            return new global$1(function (callback) {
-                delayedConfirm(editor, transform.message, function (state) {
+        }, function(transform)
+        {
+            return new global$1(function(callback)
+            {
+                delayedConfirm(editor, transform.message, function(state)
+                {
                     callback(state ? transform.preprocess(data) : data);
                 });
             });
         });
     };
-    var DialogConfirms = {preprocess: preprocess};
+    var DialogConfirms = {preprocess : preprocess};
 
-    var getAnchors = function (editor) {
-        var anchorNodes = editor.dom.select('a:not([href])');
-        var anchors = bind(anchorNodes, function (anchor) {
+    var getAnchors = function(editor)
+    {
+        var anchorNodes = editor.dom.select("a:not([href])");
+        var anchors = bind(anchorNodes, function(anchor)
+        {
             var id = anchor.name || anchor.id;
             return id ? [{
-                text: id,
-                value: '#' + id
+                text : id,
+                value : "#" + id,
             }] : [];
         });
         return anchors.length > 0 ? Optional.some([{
-            text: 'None',
-            value: ''
+            text : "None",
+            value : "",
         }].concat(anchors)) : Optional.none();
     };
-    var AnchorListOptions = {getAnchors: getAnchors};
+    var AnchorListOptions = {getAnchors : getAnchors};
 
-    var getClasses = function (editor) {
+    var getClasses = function(editor)
+    {
         var list = getLinkClassList(editor);
-        if (list.length > 0) {
+        if(list.length > 0)
+        {
             return ListOptions.sanitize(list);
         }
         return Optional.none();
     };
-    var ClassListOptions = {getClasses: getClasses};
+    var ClassListOptions = {getClasses : getClasses};
 
-    var global = tinymce.util.Tools.resolve('tinymce.util.XHR');
+    var global = tinymce.util.Tools.resolve("tinymce.util.XHR");
 
-    var parseJson = function (text) {
-        try {
+    var parseJson = function(text)
+    {
+        try
+        {
             return Optional.some(JSON.parse(text));
-        } catch (err) {
+        }
+        catch(err)
+        {
             return Optional.none();
         }
     };
-    var getLinks = function (editor) {
-        var extractor = function (item) {
-            return editor.convertURL(item.value || item.url, 'href');
+    var getLinks = function(editor)
+    {
+        var extractor = function(item)
+        {
+            return editor.convertURL(item.value || item.url, "href");
         };
         var linkList = getLinkList(editor);
-        return new global$1(function (callback) {
-            if (isString(linkList)) {
+        return new global$1(function(callback)
+        {
+            if(isString(linkList))
+            {
                 global.send({
-                    url: linkList,
-                    success: function (text) {
+                    url : linkList,
+                    success : function(text)
+                    {
                         return callback(parseJson(text));
                     },
-                    error: function (_) {
+                    error : function(_)
+                    {
                         return callback(Optional.none());
-                    }
+                    },
                 });
-            } else if (isFunction(linkList)) {
-                linkList(function (output) {
+            }
+            else if(isFunction(linkList))
+            {
+                linkList(function(output)
+                {
                     return callback(Optional.some(output));
                 });
-            } else {
+            }
+            else
+            {
                 callback(Optional.from(linkList));
             }
-        }).then(function (optItems) {
-            return optItems.bind(ListOptions.sanitizeWith(extractor)).map(function (items) {
-                if (items.length > 0) {
+        }).then(function(optItems)
+        {
+            return optItems.bind(ListOptions.sanitizeWith(extractor)).map(function(items)
+            {
+                if(items.length > 0)
+                {
                     var noneItem = [{
-                        text: 'None',
-                        value: ''
+                        text : "None",
+                        value : "",
                     }];
                     return noneItem.concat(items);
-                } else {
+                }
+                else
+                {
                     return items;
                 }
             });
         });
     };
-    var LinkListOptions = {getLinks: getLinks};
+    var LinkListOptions = {getLinks : getLinks};
 
-    var getRels = function (editor, initialTarget) {
+    var getRels = function(editor, initialTarget)
+    {
         var list = getRelList(editor);
-        if (list.length > 0) {
-            var isTargetBlank_1 = is(initialTarget, '_blank');
+        if(list.length > 0)
+        {
+            var isTargetBlank_1 = is(initialTarget, "_blank");
             var enforceSafe = allowUnsafeLinkTarget(editor) === false;
-            var safeRelExtractor = function (item) {
+            var safeRelExtractor = function(item)
+            {
                 return applyRelTargetRules(ListOptions.getValue(item), isTargetBlank_1);
             };
             var sanitizer = enforceSafe ? ListOptions.sanitizeWith(safeRelExtractor) : ListOptions.sanitize;
@@ -820,458 +1068,542 @@
         }
         return Optional.none();
     };
-    var RelOptions = {getRels: getRels};
+    var RelOptions = {getRels : getRels};
 
     var fallbacks = [
         {
-            text: 'Current window',
-            value: ''
+            text : "Current window",
+            value : "",
         },
         {
-            text: 'New window',
-            value: '_blank'
-        }
+            text : "New window",
+            value : "_blank",
+        },
     ];
-    var getTargets = function (editor) {
+    var getTargets = function(editor)
+    {
         var list = getTargetList(editor);
-        if (isArray(list)) {
-            return ListOptions.sanitize(list).orThunk(function () {
+        if(isArray(list))
+        {
+            return ListOptions.sanitize(list).orThunk(function()
+            {
                 return Optional.some(fallbacks);
             });
-        } else if (list === false) {
+        }
+        else if(list === false)
+        {
             return Optional.none();
         }
         return Optional.some(fallbacks);
     };
-    var TargetOptions = {getTargets: getTargets};
+    var TargetOptions = {getTargets : getTargets};
 
-    var nonEmptyAttr = function (dom, elem, name) {
+    var nonEmptyAttr = function(dom, elem, name)
+    {
         var val = dom.getAttrib(elem, name);
         return val !== null && val.length > 0 ? Optional.some(val) : Optional.none();
     };
-    var extractFromAnchor = function (editor, anchor) {
+    var extractFromAnchor = function(editor, anchor)
+    {
         var dom = editor.dom;
         var onlyText = isOnlyTextSelected(editor);
         var text = onlyText ? Optional.some(getAnchorText(editor.selection, anchor)) : Optional.none();
-        var url = anchor ? Optional.some(dom.getAttrib(anchor, 'href')) : Optional.none();
-        var target = anchor ? Optional.from(dom.getAttrib(anchor, 'target')) : Optional.none();
-        var rel = nonEmptyAttr(dom, anchor, 'rel');
-        var linkClass = nonEmptyAttr(dom, anchor, 'class');
-        var title = nonEmptyAttr(dom, anchor, 'title');
+        var url = anchor ? Optional.some(dom.getAttrib(anchor, "href")) : Optional.none();
+        var target = anchor ? Optional.from(dom.getAttrib(anchor, "target")) : Optional.none();
+        var rel = nonEmptyAttr(dom, anchor, "rel");
+        var linkClass = nonEmptyAttr(dom, anchor, "class");
+        var title = nonEmptyAttr(dom, anchor, "title");
         return {
-            url: url,
-            text: text,
-            title: title,
-            target: target,
-            rel: rel,
-            linkClass: linkClass
+            url : url,
+            text : text,
+            title : title,
+            target : target,
+            rel : rel,
+            linkClass : linkClass,
         };
     };
-    var collect = function (editor, linkNode) {
-        return LinkListOptions.getLinks(editor).then(function (links) {
+    var collect = function(editor, linkNode)
+    {
+        return LinkListOptions.getLinks(editor).then(function(links)
+        {
             var anchor = extractFromAnchor(editor, linkNode);
             return {
-                anchor: anchor,
-                catalogs: {
-                    targets: TargetOptions.getTargets(editor),
-                    rels: RelOptions.getRels(editor, anchor.target),
-                    classes: ClassListOptions.getClasses(editor),
-                    anchor: AnchorListOptions.getAnchors(editor),
-                    link: links
+                anchor : anchor,
+                catalogs : {
+                    targets : TargetOptions.getTargets(editor),
+                    rels : RelOptions.getRels(editor, anchor.target),
+                    classes : ClassListOptions.getClasses(editor),
+                    anchor : AnchorListOptions.getAnchors(editor),
+                    link : links,
                 },
-                optNode: Optional.from(linkNode),
-                flags: {titleEnabled: shouldShowLinkTitle(editor)}
+                optNode : Optional.from(linkNode),
+                flags : {titleEnabled : shouldShowLinkTitle(editor)},
             };
         });
     };
-    var DialogInfo = {collect: collect};
+    var DialogInfo = {collect : collect};
 
-    var handleSubmit = function (editor, info) {
-        return function (api) {
+    var handleSubmit = function(editor, info)
+    {
+        return function(api)
+        {
             var data = api.getData();
-            if (!data.url.value) {
+            if(!data.url.value)
+            {
                 unlink(editor);
                 api.close();
                 return;
             }
-            var getChangedValue = function (key) {
-                return Optional.from(data[key]).filter(function (value) {
+            var getChangedValue = function(key)
+            {
+                return Optional.from(data[key]).filter(function(value)
+                {
                     return !is(info.anchor[key], value);
                 });
             };
             var changedData = {
-                href: data.url.value,
-                text: getChangedValue('text'),
-                target: getChangedValue('target'),
-                rel: getChangedValue('rel'),
-                class: getChangedValue('linkClass'),
-                title: getChangedValue('title')
+                href : data.url.value,
+                text : getChangedValue("text"),
+                target : getChangedValue("target"),
+                rel : getChangedValue("rel"),
+                class : getChangedValue("linkClass"),
+                title : getChangedValue("title"),
             };
             var attachState = {
-                href: data.url.value,
-                attach: data.url.meta !== undefined && data.url.meta.attach ? data.url.meta.attach : noop
+                href : data.url.value,
+                attach : data.url.meta !== undefined && data.url.meta.attach ? data.url.meta.attach : noop,
             };
-            DialogConfirms.preprocess(editor, changedData).then(function (pData) {
+            DialogConfirms.preprocess(editor, changedData).then(function(pData)
+            {
                 link(editor, attachState, pData);
             });
             api.close();
         };
     };
-    var collectData = function (editor) {
+    var collectData = function(editor)
+    {
         var anchorNode = getAnchorElement(editor);
         return DialogInfo.collect(editor, anchorNode);
     };
-    var getInitialData = function (info, defaultTarget) {
+    var getInitialData = function(info, defaultTarget)
+    {
         var anchor = info.anchor;
-        var url = anchor.url.getOr('');
+        var url = anchor.url.getOr("");
         return {
-            url: {
-                value: url,
-                meta: {original: {value: url}}
+            url : {
+                value : url,
+                meta : {original : {value : url}},
             },
-            text: anchor.text.getOr(''),
-            title: anchor.title.getOr(''),
-            anchor: url,
-            link: url,
-            rel: anchor.rel.getOr(''),
-            target: anchor.target.or(defaultTarget).getOr(''),
-            linkClass: anchor.linkClass.getOr('')
+            text : anchor.text.getOr(""),
+            title : anchor.title.getOr(""),
+            anchor : url,
+            link : url,
+            rel : anchor.rel.getOr(""),
+            target : anchor.target.or(defaultTarget).getOr(""),
+            linkClass : anchor.linkClass.getOr(""),
         };
     };
-    var makeDialog = function (settings, onSubmit, editor) {
+    var makeDialog = function(settings, onSubmit, editor)
+    {
         var urlInput = [{
-            name: 'url',
-            type: 'urlinput',
-            filetype: 'file',
-            label: 'URL'
+            name : "url",
+            type : "urlinput",
+            filetype : "file",
+            label : "URL",
         }];
-        var displayText = settings.anchor.text.map(function () {
+        var displayText = settings.anchor.text.map(function()
+        {
             return {
-                name: 'text',
-                type: 'input',
-                label: 'Text to display'
+                name : "text",
+                type : "input",
+                label : "Text to display",
             };
         }).toArray();
         var titleText = settings.flags.titleEnabled ? [{
-            name: 'title',
-            type: 'input',
-            label: 'Title'
+            name : "title",
+            type : "input",
+            label : "Title",
         }] : [];
         var defaultTarget = Optional.from(getDefaultLinkTarget(editor));
         var initialData = getInitialData(settings, defaultTarget);
         var catalogs = settings.catalogs;
         var dialogDelta = DialogChanges.init(initialData, catalogs);
         var body = {
-            type: 'panel',
-            items: flatten([
+            type : "panel",
+            items : flatten([
                 urlInput,
                 displayText,
                 titleText,
                 cat([
-                    catalogs.anchor.map(ListOptions.createUi('anchor', 'Anchors')),
-                    catalogs.rels.map(ListOptions.createUi('rel', 'Rel')),
-                    catalogs.targets.map(ListOptions.createUi('target', 'Open link in...')),
-                    catalogs.link.map(ListOptions.createUi('link', 'Link list')),
-                    catalogs.classes.map(ListOptions.createUi('linkClass', 'Class'))
-                ])
-            ])
+                    catalogs.anchor.map(ListOptions.createUi("anchor", "Anchors")),
+                    catalogs.rels.map(ListOptions.createUi("rel", "Rel")),
+                    catalogs.targets.map(ListOptions.createUi("target", "Open link in...")),
+                    catalogs.link.map(ListOptions.createUi("link", "Link list")),
+                    catalogs.classes.map(ListOptions.createUi("linkClass", "Class")),
+                ]),
+            ]),
         };
         return {
-            title: 'Insert/Edit Link',
-            size: 'normal',
-            body: body,
-            buttons: [
+            title : "Insert/Edit Link",
+            size : "normal",
+            body : body,
+            buttons : [
                 {
-                    type: 'cancel',
-                    name: 'cancel',
-                    text: 'Cancel'
+                    type : "cancel",
+                    name : "cancel",
+                    text : "Cancel",
                 },
                 {
-                    type: 'submit',
-                    name: 'save',
-                    text: 'Save',
-                    primary: true
-                }
+                    type : "submit",
+                    name : "save",
+                    text : "Save",
+                    primary : true,
+                },
             ],
-            initialData: initialData,
-            onChange: function (api, _a) {
+            initialData : initialData,
+            onChange : function(api, _a)
+            {
                 var name = _a.name;
-                dialogDelta.onChange(api.getData, {name: name}).each(function (newData) {
+                dialogDelta.onChange(api.getData, {name : name}).each(function(newData)
+                {
                     api.setData(newData);
                 });
             },
-            onSubmit: onSubmit
+            onSubmit : onSubmit,
         };
     };
-    var open$1 = function (editor) {
+    var open$1 = function(editor)
+    {
         var data = collectData(editor);
-        data.then(function (info) {
+        data.then(function(info)
+        {
             var onSubmit = handleSubmit(editor, info);
             return makeDialog(info, onSubmit, editor);
-        }).then(function (spec) {
+        }).then(function(spec)
+        {
             editor.windowManager.open(spec);
         });
     };
 
-    var appendClickRemove = function (link, evt) {
+    var appendClickRemove = function(link, evt)
+    {
         document.body.appendChild(link);
         link.dispatchEvent(evt);
         document.body.removeChild(link);
     };
-    var open = function (url) {
-        var link = document.createElement('a');
-        link.target = '_blank';
+    var open = function(url)
+    {
+        var link = document.createElement("a");
+        link.target = "_blank";
         link.href = url;
-        link.rel = 'noreferrer noopener';
-        var evt = document.createEvent('MouseEvents');
-        evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        link.rel = "noreferrer noopener";
+        var evt = document.createEvent("MouseEvents");
+        evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         appendClickRemove(link, evt);
     };
 
-    var getLink = function (editor, elm) {
-        return editor.dom.getParent(elm, 'a[href]');
+    var getLink = function(editor, elm)
+    {
+        return editor.dom.getParent(elm, "a[href]");
     };
-    var getSelectedLink = function (editor) {
+    var getSelectedLink = function(editor)
+    {
         return getLink(editor, editor.selection.getStart());
     };
-    var hasOnlyAltModifier = function (e) {
+    var hasOnlyAltModifier = function(e)
+    {
         return e.altKey === true && e.shiftKey === false && e.ctrlKey === false && e.metaKey === false;
     };
-    var gotoLink = function (editor, a) {
-        if (a) {
+    var gotoLink = function(editor, a)
+    {
+        if(a)
+        {
             var href = getHref(a);
-            if (/^#/.test(href)) {
+            if(/^#/.test(href))
+            {
                 var targetEl = editor.$(href);
-                if (targetEl.length) {
+                if(targetEl.length)
+                {
                     editor.selection.scrollIntoView(targetEl[0], true);
                 }
-            } else {
+            }
+            else
+            {
                 open(a.href);
             }
         }
     };
-    var openDialog = function (editor) {
-        return function () {
+    var openDialog = function(editor)
+    {
+        return function()
+        {
             open$1(editor);
         };
     };
-    var gotoSelectedLink = function (editor) {
-        return function () {
+    var gotoSelectedLink = function(editor)
+    {
+        return function()
+        {
             gotoLink(editor, getSelectedLink(editor));
         };
     };
-    var setupGotoLinks = function (editor) {
-        editor.on('click', function (e) {
+    var setupGotoLinks = function(editor)
+    {
+        editor.on("click", function(e)
+        {
             var link = getLink(editor, e.target);
-            if (link && global$5.metaKeyPressed(e)) {
+            if(link && global$5.metaKeyPressed(e))
+            {
                 e.preventDefault();
                 gotoLink(editor, link);
             }
         });
-        editor.on('keydown', function (e) {
+        editor.on("keydown", function(e)
+        {
             var link = getSelectedLink(editor);
-            if (link && e.keyCode === 13 && hasOnlyAltModifier(e)) {
+            if(link && e.keyCode === 13 && hasOnlyAltModifier(e))
+            {
                 e.preventDefault();
                 gotoLink(editor, link);
             }
         });
     };
-    var toggleState = function (editor, toggler) {
-        editor.on('NodeChange', toggler);
-        return function () {
-            return editor.off('NodeChange', toggler);
+    var toggleState = function(editor, toggler)
+    {
+        editor.on("NodeChange", toggler);
+        return function()
+        {
+            return editor.off("NodeChange", toggler);
         };
     };
-    var toggleActiveState = function (editor) {
-        return function (api) {
-            var updateState = function () {
+    var toggleActiveState = function(editor)
+    {
+        return function(api)
+        {
+            var updateState = function()
+            {
                 return api.setActive(!editor.mode.isReadOnly() && getAnchorElement(editor, editor.selection.getNode()) !== null);
             };
             updateState();
             return toggleState(editor, updateState);
         };
     };
-    var toggleEnabledState = function (editor) {
-        return function (api) {
-            var updateState = function () {
+    var toggleEnabledState = function(editor)
+    {
+        return function(api)
+        {
+            var updateState = function()
+            {
                 return api.setDisabled(getAnchorElement(editor, editor.selection.getNode()) === null);
             };
             updateState();
             return toggleState(editor, updateState);
         };
     };
-    var toggleUnlinkState = function (editor) {
-        return function (api) {
-            var hasLinks$1 = function (parents) {
+    var toggleUnlinkState = function(editor)
+    {
+        return function(api)
+        {
+            var hasLinks$1 = function(parents)
+            {
                 return hasLinks(parents) || hasLinksInSelection(editor.selection.getRng());
             };
             var parents = editor.dom.getParents(editor.selection.getStart());
             api.setDisabled(!hasLinks$1(parents));
-            return toggleState(editor, function (e) {
+            return toggleState(editor, function(e)
+            {
                 return api.setDisabled(!hasLinks$1(e.parents));
             });
         };
     };
 
-    var register = function (editor) {
-        editor.addCommand('mceLink', function () {
-            if (useQuickLink(editor)) {
-                editor.fire('contexttoolbar-show', {toolbarKey: 'quicklink'});
-            } else {
+    var register = function(editor)
+    {
+        editor.addCommand("mceLink", function()
+        {
+            if(useQuickLink(editor))
+            {
+                editor.fire("contexttoolbar-show", {toolbarKey : "quicklink"});
+            }
+            else
+            {
                 openDialog(editor)();
             }
         });
     };
 
-    var setup = function (editor) {
-        editor.addShortcut('Meta+K', '', function () {
-            editor.execCommand('mceLink');
+    var setup = function(editor)
+    {
+        editor.addShortcut("Meta+K", "", function()
+        {
+            editor.execCommand("mceLink");
         });
     };
 
-    var setupButtons = function (editor) {
-        editor.ui.registry.addToggleButton('link', {
-            icon: 'link',
-            tooltip: 'Insert/edit link',
-            onAction: openDialog(editor),
-            onSetup: toggleActiveState(editor)
+    var setupButtons = function(editor)
+    {
+        editor.ui.registry.addToggleButton("link", {
+            icon : "link",
+            tooltip : "Insert/edit link",
+            onAction : openDialog(editor),
+            onSetup : toggleActiveState(editor),
         });
-        editor.ui.registry.addButton('openlink', {
-            icon: 'new-tab',
-            tooltip: 'Open link',
-            onAction: gotoSelectedLink(editor),
-            onSetup: toggleEnabledState(editor)
+        editor.ui.registry.addButton("openlink", {
+            icon : "new-tab",
+            tooltip : "Open link",
+            onAction : gotoSelectedLink(editor),
+            onSetup : toggleEnabledState(editor),
         });
-        editor.ui.registry.addButton('unlink', {
-            icon: 'unlink',
-            tooltip: 'Remove link',
-            onAction: function () {
+        editor.ui.registry.addButton("unlink", {
+            icon : "unlink",
+            tooltip : "Remove link",
+            onAction : function()
+            {
                 return unlink(editor);
             },
-            onSetup: toggleUnlinkState(editor)
+            onSetup : toggleUnlinkState(editor),
         });
     };
-    var setupMenuItems = function (editor) {
-        editor.ui.registry.addMenuItem('openlink', {
-            text: 'Open link',
-            icon: 'new-tab',
-            onAction: gotoSelectedLink(editor),
-            onSetup: toggleEnabledState(editor)
+    var setupMenuItems = function(editor)
+    {
+        editor.ui.registry.addMenuItem("openlink", {
+            text : "Open link",
+            icon : "new-tab",
+            onAction : gotoSelectedLink(editor),
+            onSetup : toggleEnabledState(editor),
         });
-        editor.ui.registry.addMenuItem('link', {
-            icon: 'link',
-            text: 'Link...',
-            shortcut: 'Meta+K',
-            onAction: openDialog(editor)
+        editor.ui.registry.addMenuItem("link", {
+            icon : "link",
+            text : "Link...",
+            shortcut : "Meta+K",
+            onAction : openDialog(editor),
         });
-        editor.ui.registry.addMenuItem('unlink', {
-            icon: 'unlink',
-            text: 'Remove link',
-            onAction: function () {
+        editor.ui.registry.addMenuItem("unlink", {
+            icon : "unlink",
+            text : "Remove link",
+            onAction : function()
+            {
                 return unlink(editor);
             },
-            onSetup: toggleUnlinkState(editor)
+            onSetup : toggleUnlinkState(editor),
         });
     };
-    var setupContextMenu = function (editor) {
-        var inLink = 'link unlink openlink';
-        var noLink = 'link';
-        editor.ui.registry.addContextMenu('link', {
-            update: function (element) {
-                return hasLinks(editor.dom.getParents(element, 'a')) ? inLink : noLink;
-            }
+    var setupContextMenu = function(editor)
+    {
+        var inLink = "link unlink openlink";
+        var noLink = "link";
+        editor.ui.registry.addContextMenu("link", {
+            update : function(element)
+            {
+                return hasLinks(editor.dom.getParents(element, "a")) ? inLink : noLink;
+            },
         });
     };
-    var setupContextToolbars = function (editor) {
-        var collapseSelectionToEnd = function (editor) {
+    var setupContextToolbars = function(editor)
+    {
+        var collapseSelectionToEnd = function(editor)
+        {
             editor.selection.collapse(false);
         };
-        var onSetupLink = function (buttonApi) {
+        var onSetupLink = function(buttonApi)
+        {
             var node = editor.selection.getNode();
             buttonApi.setDisabled(!getAnchorElement(editor, node));
             return noop;
         };
-        var getLinkText = function (value) {
+        var getLinkText = function(value)
+        {
             var anchor = getAnchorElement(editor);
             var onlyText = isOnlyTextSelected(editor);
-            if (!anchor && onlyText) {
+            if(!anchor && onlyText)
+            {
                 var text = getAnchorText(editor.selection, anchor);
                 return Optional.some(text.length > 0 ? text : value);
-            } else {
+            }
+            else
+            {
                 return Optional.none();
             }
         };
-        editor.ui.registry.addContextForm('quicklink', {
-            launch: {
-                type: 'contextformtogglebutton',
-                icon: 'link',
-                tooltip: 'Link',
-                onSetup: toggleActiveState(editor)
+        editor.ui.registry.addContextForm("quicklink", {
+            launch : {
+                type : "contextformtogglebutton",
+                icon : "link",
+                tooltip : "Link",
+                onSetup : toggleActiveState(editor),
             },
-            label: 'Link',
-            predicate: function (node) {
+            label : "Link",
+            predicate : function(node)
+            {
                 return !!getAnchorElement(editor, node) && hasContextToolbar(editor);
             },
-            initValue: function () {
+            initValue : function()
+            {
                 var elm = getAnchorElement(editor);
-                return !!elm ? getHref(elm) : '';
+                return !!elm ? getHref(elm) : "";
             },
-            commands: [
+            commands : [
                 {
-                    type: 'contextformtogglebutton',
-                    icon: 'link',
-                    tooltip: 'Link',
-                    primary: true,
-                    onSetup: function (buttonApi) {
+                    type : "contextformtogglebutton",
+                    icon : "link",
+                    tooltip : "Link",
+                    primary : true,
+                    onSetup : function(buttonApi)
+                    {
                         var node = editor.selection.getNode();
                         buttonApi.setActive(!!getAnchorElement(editor, node));
                         return toggleActiveState(editor)(buttonApi);
                     },
-                    onAction: function (formApi) {
+                    onAction : function(formApi)
+                    {
                         var value = formApi.getValue();
                         var text = getLinkText(value);
                         var attachState = {
-                            href: value,
-                            attach: noop
+                            href : value,
+                            attach : noop,
                         };
                         link(editor, attachState, {
-                            href: value,
-                            text: text,
-                            title: Optional.none(),
-                            rel: Optional.none(),
-                            target: Optional.none(),
-                            class: Optional.none()
+                            href : value,
+                            text : text,
+                            title : Optional.none(),
+                            rel : Optional.none(),
+                            target : Optional.none(),
+                            class : Optional.none(),
                         });
                         collapseSelectionToEnd(editor);
                         formApi.hide();
-                    }
+                    },
                 },
                 {
-                    type: 'contextformbutton',
-                    icon: 'unlink',
-                    tooltip: 'Remove link',
-                    onSetup: onSetupLink,
-                    onAction: function (formApi) {
+                    type : "contextformbutton",
+                    icon : "unlink",
+                    tooltip : "Remove link",
+                    onSetup : onSetupLink,
+                    onAction : function(formApi)
+                    {
                         unlink(editor);
                         formApi.hide();
-                    }
+                    },
                 },
                 {
-                    type: 'contextformbutton',
-                    icon: 'new-tab',
-                    tooltip: 'Open link',
-                    onSetup: onSetupLink,
-                    onAction: function (formApi) {
+                    type : "contextformbutton",
+                    icon : "new-tab",
+                    tooltip : "Open link",
+                    onSetup : onSetupLink,
+                    onAction : function(formApi)
+                    {
                         gotoSelectedLink(editor)();
                         formApi.hide();
-                    }
-                }
-            ]
+                    },
+                },
+            ],
         });
     };
 
-    function Plugin() {
-        global$6.add('link', function (editor) {
+    function Plugin()
+    {
+        global$6.add("link", function(editor)
+        {
             setupButtons(editor);
             setupMenuItems(editor);
             setupContextMenu(editor);

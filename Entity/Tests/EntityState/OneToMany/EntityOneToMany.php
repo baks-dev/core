@@ -17,7 +17,6 @@
 
 namespace BaksDev\Core\Entity\Tests\EntityState\OneToMany;
 
-use BaksDev\Core\Entity\EntityEvent;
 use BaksDev\Core\Entity\EntityState;
 use BaksDev\Users\User\Type\Id\UserUid;
 use Doctrine\DBAL\Types\Types;

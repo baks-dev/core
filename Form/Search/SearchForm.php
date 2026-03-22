@@ -124,7 +124,7 @@ final class SearchForm extends AbstractType
                 }
 
 
-            }
+            },
         );
     }
 
@@ -136,7 +136,7 @@ final class SearchForm extends AbstractType
                 'data_class' => SearchDTO::class,
                 'method' => 'POST',
                 'attr' => ['class' => 'w-100'],
-            ]
+            ],
         );
     }
 }

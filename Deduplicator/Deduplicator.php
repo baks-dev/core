@@ -59,33 +59,6 @@ final class Deduplicator implements DeduplicatorInterface
     }
 
     /**
-     * Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя)
-     */
-    public function expiresAfter(DateInterval|string $time): self
-    {
-        if($time instanceof DateInterval)
-        {
-            $this->expires = $time;
-            return $this;
-        }
-
-        $this->expires = DateInterval::createFromDateString($time);
-
-        return $this;
-    }
-
-    /**
-     * Метод присваивает пространство имен для дедубликации
-     */
-    public function namespace(string $namespace): self
-    {
-        $this->namespace = $this->namespace ?: $namespace;
-        $this->cache = $this->cache ?: $this->appCache->init('deduplicator-'.$this->namespace);
-
-        return $this;
-    }
-
-    /**
      * Метод присваивает ключ(и) для проверки дедубликации
      */
     public function deduplication(string|array $keys): self
@@ -108,6 +81,17 @@ final class Deduplicator implements DeduplicatorInterface
     }
 
     /**
+     * Метод присваивает пространство имен для дедубликации
+     */
+    public function namespace(string $namespace): self
+    {
+        $this->namespace = $this->namespace ?: $namespace;
+        $this->cache = $this->cache ?: $this->appCache->init('deduplicator-'.$this->namespace);
+
+        return $this;
+    }
+
+    /**
      * Метод делает проверку и возвращает результат выполненного ранее процесса
      */
     public function isExecuted(): bool
@@ -121,24 +105,6 @@ final class Deduplicator implements DeduplicatorInterface
         $item = $this->cache->getItem($this->key);
 
         return true === $item->isHit() && false === empty($item->get());
-    }
-
-    /**
-     * Метод сохраняет результат выполнения
-     */
-    public function save(): void
-    {
-        if($this->cache === false)
-        {
-            throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
-        }
-
-        $item = $this->cache
-            ->getItem($this->key)
-            ->expiresAfter($this->expires)
-            ->set(time());
-
-        $this->cache->save($item);
     }
 
     /**
@@ -166,7 +132,6 @@ final class Deduplicator implements DeduplicatorInterface
 
         return $this->key;
     }
-
 
     /**
      * Метод возвращает и сохраняет метку времени, по истечении которого можно выполнить следующий запрос
@@ -218,5 +183,39 @@ final class Deduplicator implements DeduplicatorInterface
         $this->cache->save($item);
 
         return $this->expires;
+    }
+
+    /**
+     * Метод присваивает (переопределяет) время жизни дедубликатора (по умолчанию 1 неделя)
+     */
+    public function expiresAfter(DateInterval|string $time): self
+    {
+        if($time instanceof DateInterval)
+        {
+            $this->expires = $time;
+            return $this;
+        }
+
+        $this->expires = DateInterval::createFromDateString($time);
+
+        return $this;
+    }
+
+    /**
+     * Метод сохраняет результат выполнения
+     */
+    public function save(): void
+    {
+        if($this->cache === false)
+        {
+            throw new InvalidArgumentException('Invalid Argument: call method deduplication or namespace');
+        }
+
+        $item = $this->cache
+            ->getItem($this->key)
+            ->expiresAfter($this->expires)
+            ->set(time());
+
+        $this->cache->save($item);
     }
 }

@@ -66,68 +66,6 @@ abstract class AbstractController
         private CsrfTokenManagerInterface $csrfTokenManager,
     ) {}
 
-
-    public function contentMinify(string $body)
-    {
-        //return $body;
-
-        $replace = [
-            // удалить вкладки до и после тегов HTML
-            '/\>[^\S ]+/s' => '>',
-            '/[^\S ]+\</s' => '<',
-
-            // сократить несколько последовательностей пробелов; сохраняйте символы новой строки, потому что они имеют значение в JS!!!
-            '/([\t ])+/s' => ' ',
-
-            // удалить начальные и конечные пробелы
-            '/^([\t ])+/m' => '',
-            '/([\t ])+$/m' => '',
-
-            // удалить комментарии строки JS (только простые); НЕ удаляйте строки, содержащие URL (e.g. 'src="http://server.com/"')!!!
-            // '~//[a-zA-Z0-9 ]+$~m' => '',
-
-            // удалить пустые строки (последовательность символов конца строки и пробелов)
-            '/[\r\n]+([\t ]?[\r\n]+)+/s' => "\n",
-
-            // удалить пустые строки (между тегами HTML); не может удалить любые символы конца строки, потому что во встроенном JS они могут иметь значение!
-            '/\>[\r\n\t ]+\</s' => '><',
-
-            // удалить «пустые» строки, содержащие только символ конца блока JS; присоединиться к следующей строке (например, "}\n}\n<script>" --> "}}<script>"
-            '/}[\r\n\t ]+/s' => '}',
-            '/}[\r\n\t ]+,[\r\n\t ]+/s' => '},',
-
-            // удалить новую строку после запуска функции или условия JS; присоединиться к следующей строке
-            '/\)[\r\n\t ]?{[\r\n\t ]+/s' => '){',
-            '/,[\r\n\t ]?{[\r\n\t ]+/s' => ',{',
-
-            // удалить новую строку после конца строки JS (только самые очевидные и безопасные случаи)
-            // '/\),[\r\n\t ]+/s' => '),',
-
-            // удалить кавычки из HTML-атрибутов, не содержащих пробелов; держите URL-адреса в кавычках!
-            '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4',
-
-            // 1 и 4 вставляют первый найденный символ пробела до и после атрибута
-        ];
-
-        $body = preg_replace(array_keys($replace), array_values($replace), $body);
-
-        // Удалить необязательные закрывающие теги (см. http://www.w3.org/TR/html5/syntax.html#syntax-tag-omission )
-        $remove = [
-            '</option>',
-            '</li>',
-            '</dt>',
-            '</dd>',
-            '</tr>',
-            '</th>',
-            '</td>',
-            '</thead>',
-            '</tbody>',
-        ];
-
-        return str_ireplace($remove, '', $body);
-    }
-
-
     public function settings(): ?array
     {
         $request = $this->requestStack;
@@ -144,6 +82,10 @@ abstract class AbstractController
         return $settings;
     }
 
+    public function getLocale(): Locale
+    {
+        return new Locale($this->translator->getLocale());
+    }
 
     /** Добавляет сообщение пользователю постпредством сессий */
     public function addFlash(
@@ -235,12 +177,82 @@ abstract class AbstractController
         return null;
     }
 
-
-    public function getLocale(): Locale
+    /**
+     * Редирект на указаннй нейм роута.
+     */
+    protected function redirectToReferer(int $status = 302): ?Response
     {
-        return new Locale($this->translator->getLocale());
+        $url = $this
+            ->requestStack->getCurrentRequest()
+            ->headers->get('referer');
+
+        $this
+            ->requestStack
+            ->getSession()
+            ->set('statusCode', $status);
+
+        if($jsonResponse = $this->responseXmlHttpRequest($url, $status))
+        {
+            return $jsonResponse;
+        }
+
+        if(empty($url))
+        {
+            $url = '/';
+        }
+
+        return new RedirectResponse($url, $status);
     }
 
+    private function responseXmlHttpRequest(?string $url, int $status): ?Response
+    {
+        if(
+            $this->requestStack
+                ->getMainRequest()
+                ?->isXmlHttpRequest()
+        )
+        {
+
+            $referer = $this->requestStack->getCurrentRequest()->headers->get('referer');
+
+            $flash = null;
+
+            if($status !== 302)
+            {
+                $session = $this->requestStack->getSession();
+                $session->clear();
+                $flash = $session->getFlashBag()->all();
+            }
+
+            if(!$flash)
+            {
+                $flash = ['success' => ['success']];
+            }
+
+
+            $message = current($flash);
+
+            return new JsonResponse(
+                [
+                    'status' => $status,
+                    'header' => current(array_keys($flash)),
+                    'message' => $message ? current($message) : '',
+                    'redirect' => $url ?: $referer,
+                ],
+                status: $status,
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Метод возвращает TRUE в случае если пользователь является администратором ресурса
+     */
+    public function isAdmin(): bool
+    {
+        return $this->authorizationChecker->isGranted('ROLE_ADMIN');
+    }
 
     /**
      * Проверяем, имеется ли у пользователя соответствующая роль */
@@ -249,6 +261,10 @@ abstract class AbstractController
         return $this->authorizationChecker->isGranted($attribute, $subject);
     }
 
+    public function refreshTokenForm(FormInterface $form): CsrfToken
+    {
+        return $this->csrfTokenManager->refreshToken($form->getName());
+    }
 
     /**
      *
@@ -398,21 +414,65 @@ abstract class AbstractController
         return $response;
     }
 
-
-    protected function getUsr(): UserInterface|User|null
+    public function contentMinify(string $body)
     {
-        try
-        {
-            $token = $this->tokenStorage->getToken();
-        }
-        catch(UnauthorizedHttpException $exception)
-        {
-            $token = null;
-        }
+        //return $body;
 
-        return $token?->getUser();
+        $replace = [
+            // удалить вкладки до и после тегов HTML
+            '/\>[^\S ]+/s' => '>',
+            '/[^\S ]+\</s' => '<',
+
+            // сократить несколько последовательностей пробелов; сохраняйте символы новой строки, потому что они имеют значение в JS!!!
+            '/([\t ])+/s' => ' ',
+
+            // удалить начальные и конечные пробелы
+            '/^([\t ])+/m' => '',
+            '/([\t ])+$/m' => '',
+
+            // удалить комментарии строки JS (только простые); НЕ удаляйте строки, содержащие URL (e.g. 'src="http://server.com/"')!!!
+            // '~//[a-zA-Z0-9 ]+$~m' => '',
+
+            // удалить пустые строки (последовательность символов конца строки и пробелов)
+            '/[\r\n]+([\t ]?[\r\n]+)+/s' => "\n",
+
+            // удалить пустые строки (между тегами HTML); не может удалить любые символы конца строки, потому что во встроенном JS они могут иметь значение!
+            '/\>[\r\n\t ]+\</s' => '><',
+
+            // удалить «пустые» строки, содержащие только символ конца блока JS; присоединиться к следующей строке (например, "}\n}\n<script>" --> "}}<script>"
+            '/}[\r\n\t ]+/s' => '}',
+            '/}[\r\n\t ]+,[\r\n\t ]+/s' => '},',
+
+            // удалить новую строку после запуска функции или условия JS; присоединиться к следующей строке
+            '/\)[\r\n\t ]?{[\r\n\t ]+/s' => '){',
+            '/,[\r\n\t ]?{[\r\n\t ]+/s' => ',{',
+
+            // удалить новую строку после конца строки JS (только самые очевидные и безопасные случаи)
+            // '/\),[\r\n\t ]+/s' => '),',
+
+            // удалить кавычки из HTML-атрибутов, не содержащих пробелов; держите URL-адреса в кавычках!
+            '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4',
+
+            // 1 и 4 вставляют первый найденный символ пробела до и после атрибута
+        ];
+
+        $body = preg_replace(array_keys($replace), array_values($replace), $body);
+
+        // Удалить необязательные закрывающие теги (см. http://www.w3.org/TR/html5/syntax.html#syntax-tag-omission )
+        $remove = [
+            '</option>',
+            '</li>',
+            '</dt>',
+            '</dd>',
+            '</tr>',
+            '</th>',
+            '</td>',
+            '</thead>',
+            '</tbody>',
+        ];
+
+        return str_ireplace($remove, '', $body);
     }
-
 
     protected function getCurrentUsr(): UserUid
     {
@@ -441,6 +501,19 @@ abstract class AbstractController
         return $this->getUsr()?->getProfile();
     }
 
+    protected function getUsr(): UserInterface|User|null
+    {
+        try
+        {
+            $token = $this->tokenStorage->getToken();
+        }
+        catch(UnauthorizedHttpException $exception)
+        {
+            $token = null;
+        }
+
+        return $token?->getUser();
+    }
 
     /** Возвращает идентификатор профиля, независимо от авторизации */
     protected function getCurrentProfileUid(): ?UserProfileUid
@@ -463,21 +536,12 @@ abstract class AbstractController
     }
 
     /**
-     * Метод возвращает TRUE в случае если пользователь является администратором ресурса
-     */
-    public function isAdmin(): bool
-    {
-        return $this->authorizationChecker->isGranted('ROLE_ADMIN');
-    }
-
-    /**
      * Создает и возвращает экземпляр формы.
      */
     protected function createForm(string $type, mixed $data = null, array $options = []): FormInterface
     {
         return $this->formFactory->create($type, $data, $options);
     }
-
 
     /**
      * Редирект на указанный Route Name
@@ -499,35 +563,6 @@ abstract class AbstractController
         return new RedirectResponse($url, $status);
     }
 
-
-    /**
-     * Редирект на указаннй нейм роута.
-     */
-    protected function redirectToReferer(int $status = 302): ?Response
-    {
-        $url = $this
-            ->requestStack->getCurrentRequest()
-            ->headers->get('referer');
-
-        $this
-            ->requestStack
-            ->getSession()
-            ->set('statusCode', $status);
-
-        if($jsonResponse = $this->responseXmlHttpRequest($url, $status))
-        {
-            return $jsonResponse;
-        }
-
-        if(empty($url))
-        {
-            $url = '/';
-        }
-
-        return new RedirectResponse($url, $status);
-    }
-
-
     /**
      * Генерирует URL с параметрами параметров.
      *
@@ -540,53 +575,5 @@ abstract class AbstractController
     ): string
     {
         return $this->router->generate($route, $parameters, $referenceType);
-    }
-
-
-    private function responseXmlHttpRequest(?string $url, int $status): ?Response
-    {
-        if(
-            $this->requestStack
-                ->getMainRequest()
-                ?->isXmlHttpRequest()
-        )
-        {
-
-            $referer = $this->requestStack->getCurrentRequest()->headers->get('referer');
-
-            $flash = null;
-
-            if($status !== 302)
-            {
-                $session = $this->requestStack->getSession();
-                $session->clear();
-                $flash = $session->getFlashBag()->all();
-            }
-
-            if(!$flash)
-            {
-                $flash = ['success' => ['success']];
-            }
-
-
-            $message = current($flash);
-
-            return new JsonResponse(
-                [
-                    'status' => $status,
-                    'header' => current(array_keys($flash)),
-                    'message' => $message ? current($message) : '',
-                    'redirect' => $url ?: $referer,
-                ],
-                status: $status,
-            );
-        }
-
-        return null;
-    }
-
-    public function refreshTokenForm(FormInterface $form): CsrfToken
-    {
-        return $this->csrfTokenManager->refreshToken($form->getName());
     }
 }

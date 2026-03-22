@@ -32,14 +32,14 @@ class Ru implements LocaleInterface
 {
     public const LOCAL = 'ru';
 
+    public static function sort(): int
+    {
+        return 100;
+    }
+
     /** Возвращает значение (value) */
     public function getValue(): string
     {
         return self::LOCAL;
-    }
-
-    public static function sort(): int
-    {
-        return 100;
     }
 }

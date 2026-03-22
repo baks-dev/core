@@ -31,7 +31,7 @@ use BaksDev\Core\Routing\BaksRoutingLoader;
 use BaksDev\Core\Type\Crypt\CryptKey;
 use BaksDev\Core\Type\Crypt\CryptKeyInterface;
 
-return static function (ContainerConfigurator $container): void {
+return static function(ContainerConfigurator $container): void {
 
     //    $services = $container->services()
     //        ->defaults()
@@ -82,31 +82,31 @@ return static function (ContainerConfigurator $container): void {
     /* Language */
     $services->load(
         $NAMESPACE.'Type\Locale\Locales\\',
-        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'Locale', 'Locales']) // 'Type/Locale/Locales'
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'Locale', 'Locales']), // 'Type/Locale/Locales'
     );
 
     /* Device */
     $services->load(
         $NAMESPACE.'Type\Device\Devices\\',
-        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'Device', 'Devices']) //'Type/Device/Devices'
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'Device', 'Devices']), //'Type/Device/Devices'
     );
 
     /* Модификаторы */
     $services->load(
         $NAMESPACE.'Type\Modify\Modify\\',
-        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'Modify', 'Modify']) //'Type/Modify/Modify'
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'Modify', 'Modify']), //'Type/Modify/Modify'
     );
 
 
     /** @see https://symfony.com/doc/current/service_container/autowiring.html#dealing-with-multiple-implementations-of-the-same-type */
     $services->alias(
         SettingsMainInterface::class,
-        SettingsMainRepository::class
+        SettingsMainRepository::class,
     );
 
     $services->alias(
         CryptKeyInterface::class,
-        CryptKey::class
+        CryptKey::class,
     );
 
     $services

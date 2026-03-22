@@ -42,6 +42,69 @@ final class MessengerConsumers
         private readonly CacheItemPoolInterface $restartSignalCachePool,
     ) {}
 
+    public function restart(): void
+    {
+        $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
+        $cacheItem->set(microtime(true));
+        $this->restartSignalCachePool->save($cacheItem);
+    }
+
+    public function stop(): void
+    {
+        $services = $this->toArray();
+
+        if(false === $services)
+        {
+            return;
+        }
+
+        foreach($services as $name)
+        {
+            $process = Process::fromShellCommandline(sprintf('systemctl stop %s.service', $name));
+            $process->setTimeout(60);
+
+            try
+            {
+                $process->mustRun();
+
+                $this->logger->info(sprintf('Завершили consumer %s', $name), [self::class.':'.__LINE__]);
+
+            }
+            catch(Exception $exception)
+            {
+                $this->logger->critical(sprintf('messenger-consume: Ошибка при завершении consumer %s', $name), [self::class.':'.__LINE__, $exception->getMessage()]);
+            }
+        }
+    }
+
+    public function toArray($grep = ['active', 'running']): array|false
+    {
+        $services = $this->getServices($grep);
+
+        if(false === $services || false === $services->valid())
+        {
+            return false;
+        }
+
+        $names = null;
+
+        foreach($services as $service)
+        {
+            $name = explode('.service', $service);
+            $name = current($name);
+            $name = trim($name);
+
+            if(empty($name))
+            {
+                continue;
+            }
+
+            $names[] = $name;
+        }
+
+        return $names ?: false;
+    }
+
     /**
      * Метод возвращает генератор запущенных воркеров Systemd
      */
@@ -76,70 +139,6 @@ final class MessengerConsumers
         foreach($services as $service)
         {
             yield trim($service);
-        }
-    }
-
-
-    public function toArray($grep = ['active', 'running']): array|false
-    {
-        $services = $this->getServices($grep);
-
-        if(false === $services || false === $services->valid())
-        {
-            return false;
-        }
-
-        $names = null;
-
-        foreach($services as $service)
-        {
-            $name = explode('.service', $service);
-            $name = current($name);
-            $name = trim($name);
-
-            if(empty($name))
-            {
-                continue;
-            }
-
-            $names[] = $name;
-        }
-
-        return $names ?: false;
-    }
-
-    public function restart(): void
-    {
-        $cacheItem = $this->restartSignalCachePool->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
-        $cacheItem->set(microtime(true));
-        $this->restartSignalCachePool->save($cacheItem);
-    }
-
-    public function stop(): void
-    {
-        $services = $this->toArray();
-
-        if(false === $services)
-        {
-            return;
-        }
-
-        foreach($services as $name)
-        {
-            $process = Process::fromShellCommandline(sprintf('systemctl stop %s.service', $name));
-            $process->setTimeout(60);
-
-            try
-            {
-                $process->mustRun();
-
-                $this->logger->info(sprintf('Завершили consumer %s', $name), [self::class.':'.__LINE__]);
-
-            }
-            catch(Exception $exception)
-            {
-                $this->logger->critical(sprintf('messenger-consume: Ошибка при завершении consumer %s', $name), [self::class.':'.__LINE__, $exception->getMessage()]);
-            }
         }
     }
 }

@@ -139,8 +139,14 @@
     .tooltip-inner {
         display: none !important;
     }
-    .modal { position: unset !important; }
-    .modal-backdrop { background: unset; }
+
+    .modal {
+        position: unset !important;
+    }
+
+    .modal-backdrop {
+        background: unset;
+    }
 
 
     .d-print-inline {

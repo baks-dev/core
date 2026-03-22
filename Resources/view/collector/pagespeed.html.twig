@@ -19,10 +19,11 @@
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
 
     <script nonce="{{ csp_nonce() }}">
-        let pagespeed = document.getElementById('baks-pagespeed');
+        let pagespeed = document.getElementById("baks-pagespeed");
 
-        pagespeed.addEventListener('click', () => {
-            window.open('https://pagespeed.web.dev/report?url={{ collector.url }}', '_blank');
+        pagespeed.addEventListener("click", () =>
+        {
+            window.open('https://pagespeed.web.dev/report?url={{ collector.url }}', "_blank");
         });
     </script>
 

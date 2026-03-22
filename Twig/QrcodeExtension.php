@@ -24,7 +24,6 @@
 namespace BaksDev\Core\Twig;
 
 use chillerlan\QRCode\QRCode;
-use InvalidArgumentException;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -38,7 +37,7 @@ final class QrcodeExtension extends AbstractExtension
             new TwigFunction(
                 'qrcode',
                 [$this, 'qrcode'],
-                ['needs_environment' => true, 'is_safe' => ['html']]
+                ['needs_environment' => true, 'is_safe' => ['html']],
             ),
         ];
     }

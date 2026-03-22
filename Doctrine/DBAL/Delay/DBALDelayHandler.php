@@ -59,7 +59,7 @@ final class DBALDelayHandler
         $tmpCache->executeCacheQuery(
             $message->getSql(),
             $message->getParams(),
-            $message->getTypes()
+            $message->getTypes(),
         );
 
         $this->logger->debug($message->getSql());

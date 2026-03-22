@@ -6,1520 +6,1609 @@
  *
  * Version: 5.9.2 (2021-09-08)
  */
-(function () {
-    'use strict';
+(function()
+{
+    "use strict";
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+    var global$2 = tinymce.util.Tools.resolve("tinymce.PluginManager");
 
-    var fireInsertCustomChar = function (editor, chr) {
-        return editor.fire('insertCustomChar', {chr: chr});
+    var fireInsertCustomChar = function(editor, chr)
+    {
+        return editor.fire("insertCustomChar", {chr : chr});
     };
 
-    var insertChar = function (editor, chr) {
+    var insertChar = function(editor, chr)
+    {
         var evtChr = fireInsertCustomChar(editor, chr).chr;
-        editor.execCommand('mceInsertContent', false, evtChr);
+        editor.execCommand("mceInsertContent", false, evtChr);
     };
 
-    var typeOf = function (x) {
+    var typeOf = function(x)
+    {
         var t = typeof x;
-        if (x === null) {
-            return 'null';
-        } else if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
-            return 'array';
-        } else if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
-            return 'string';
-        } else {
+        if(x === null)
+        {
+            return "null";
+        }
+        else if(t === "object" && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === "Array"))
+        {
+            return "array";
+        }
+        else if(t === "object" && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === "String"))
+        {
+            return "string";
+        }
+        else
+        {
             return t;
         }
     };
-    var isType = function (type) {
-        return function (value) {
+    var isType = function(type)
+    {
+        return function(value)
+        {
             return typeOf(value) === type;
         };
     };
-    var eq = function (t) {
-        return function (a) {
+    var eq = function(t)
+    {
+        return function(a)
+        {
             return t === a;
         };
     };
-    var isArray$1 = isType('array');
+    var isArray$1 = isType("array");
     var isNull = eq(null);
 
-    var noop = function () {
+    var noop = function()
+    {
     };
-    var constant = function (value) {
-        return function () {
+    var constant = function(value)
+    {
+        return function()
+        {
             return value;
         };
     };
-    var identity = function (x) {
+    var identity = function(x)
+    {
         return x;
     };
     var never = constant(false);
     var always = constant(true);
 
-    var none = function () {
+    var none = function()
+    {
         return NONE;
     };
-    var NONE = function () {
-        var call = function (thunk) {
+    var NONE = function()
+    {
+        var call = function(thunk)
+        {
             return thunk();
         };
         var id = identity;
         var me = {
-            fold: function (n, _s) {
+            fold : function(n, _s)
+            {
                 return n();
             },
-            isSome: never,
-            isNone: always,
-            getOr: id,
-            getOrThunk: call,
-            getOrDie: function (msg) {
-                throw new Error(msg || 'error: getOrDie called on none.');
+            isSome : never,
+            isNone : always,
+            getOr : id,
+            getOrThunk : call,
+            getOrDie : function(msg)
+            {
+                throw new Error(msg || "error: getOrDie called on none.");
             },
-            getOrNull: constant(null),
-            getOrUndefined: constant(undefined),
-            or: id,
-            orThunk: call,
-            map: none,
-            each: noop,
-            bind: none,
-            exists: never,
-            forall: always,
-            filter: function () {
+            getOrNull : constant(null),
+            getOrUndefined : constant(undefined),
+            or : id,
+            orThunk : call,
+            map : none,
+            each : noop,
+            bind : none,
+            exists : never,
+            forall : always,
+            filter : function()
+            {
                 return none();
             },
-            toArray: function () {
+            toArray : function()
+            {
                 return [];
             },
-            toString: constant('none()')
+            toString : constant("none()"),
         };
         return me;
     }();
-    var some = function (a) {
+    var some = function(a)
+    {
         var constant_a = constant(a);
-        var self = function () {
+        var self = function()
+        {
             return me;
         };
-        var bind = function (f) {
+        var bind = function(f)
+        {
             return f(a);
         };
         var me = {
-            fold: function (n, s) {
+            fold : function(n, s)
+            {
                 return s(a);
             },
-            isSome: always,
-            isNone: never,
-            getOr: constant_a,
-            getOrThunk: constant_a,
-            getOrDie: constant_a,
-            getOrNull: constant_a,
-            getOrUndefined: constant_a,
-            or: self,
-            orThunk: self,
-            map: function (f) {
+            isSome : always,
+            isNone : never,
+            getOr : constant_a,
+            getOrThunk : constant_a,
+            getOrDie : constant_a,
+            getOrNull : constant_a,
+            getOrUndefined : constant_a,
+            or : self,
+            orThunk : self,
+            map : function(f)
+            {
                 return some(f(a));
             },
-            each: function (f) {
+            each : function(f)
+            {
                 f(a);
             },
-            bind: bind,
-            exists: bind,
-            forall: bind,
-            filter: function (f) {
+            bind : bind,
+            exists : bind,
+            forall : bind,
+            filter : function(f)
+            {
                 return f(a) ? me : NONE;
             },
-            toArray: function () {
+            toArray : function()
+            {
                 return [a];
             },
-            toString: function () {
-                return 'some(' + a + ')';
-            }
+            toString : function()
+            {
+                return "some(" + a + ")";
+            },
         };
         return me;
     };
-    var from = function (value) {
+    var from = function(value)
+    {
         return value === null || value === undefined ? NONE : some(value);
     };
     var Optional = {
-        some: some,
-        none: none,
-        from: from
+        some : some,
+        none : none,
+        from : from,
     };
 
     var nativePush = Array.prototype.push;
-    var map = function (xs, f) {
+    var map = function(xs, f)
+    {
         var len = xs.length;
         var r = new Array(len);
-        for (var i = 0; i < len; i++) {
+        for(var i = 0; i < len; i++)
+        {
             var x = xs[i];
             r[i] = f(x, i);
         }
         return r;
     };
-    var each = function (xs, f) {
-        for (var i = 0, len = xs.length; i < len; i++) {
+    var each = function(xs, f)
+    {
+        for(var i = 0, len = xs.length; i < len; i++)
+        {
             var x = xs[i];
             f(x, i);
         }
     };
-    var findUntil = function (xs, pred, until) {
-        for (var i = 0, len = xs.length; i < len; i++) {
+    var findUntil = function(xs, pred, until)
+    {
+        for(var i = 0, len = xs.length; i < len; i++)
+        {
             var x = xs[i];
-            if (pred(x, i)) {
+            if(pred(x, i))
+            {
                 return Optional.some(x);
-            } else if (until(x, i)) {
+            }
+            else if(until(x, i))
+            {
                 break;
             }
         }
         return Optional.none();
     };
-    var find = function (xs, pred) {
+    var find = function(xs, pred)
+    {
         return findUntil(xs, pred, never);
     };
-    var flatten = function (xs) {
+    var flatten = function(xs)
+    {
         var r = [];
-        for (var i = 0, len = xs.length; i < len; ++i) {
-            if (!isArray$1(xs[i])) {
-                throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
+        for(var i = 0, len = xs.length; i < len; ++i)
+        {
+            if(!isArray$1(xs[i]))
+            {
+                throw new Error("Arr.flatten item " + i + " was not an array, input: " + xs);
             }
             nativePush.apply(r, xs[i]);
         }
         return r;
     };
-    var bind = function (xs, f) {
+    var bind = function(xs, f)
+    {
         return flatten(map(xs, f));
     };
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+    var global$1 = tinymce.util.Tools.resolve("tinymce.util.Tools");
 
-    var getCharMap$1 = function (editor) {
-        return editor.getParam('charmap');
+    var getCharMap$1 = function(editor)
+    {
+        return editor.getParam("charmap");
     };
-    var getCharMapAppend = function (editor) {
-        return editor.getParam('charmap_append');
+    var getCharMapAppend = function(editor)
+    {
+        return editor.getParam("charmap_append");
     };
 
     var isArray = global$1.isArray;
-    var UserDefined = 'User Defined';
-    var getDefaultCharMap = function () {
+    var UserDefined = "User Defined";
+    var getDefaultCharMap = function()
+    {
         return [
             {
-                name: 'Currency',
-                characters: [
+                name : "Currency",
+                characters : [
                     [
                         36,
-                        'dollar sign'
+                        "dollar sign",
                     ],
                     [
                         162,
-                        'cent sign'
+                        "cent sign",
                     ],
                     [
                         8364,
-                        'euro sign'
+                        "euro sign",
                     ],
                     [
                         163,
-                        'pound sign'
+                        "pound sign",
                     ],
                     [
                         165,
-                        'yen sign'
+                        "yen sign",
                     ],
                     [
                         164,
-                        'currency sign'
+                        "currency sign",
                     ],
                     [
                         8352,
-                        'euro-currency sign'
+                        "euro-currency sign",
                     ],
                     [
                         8353,
-                        'colon sign'
+                        "colon sign",
                     ],
                     [
                         8354,
-                        'cruzeiro sign'
+                        "cruzeiro sign",
                     ],
                     [
                         8355,
-                        'french franc sign'
+                        "french franc sign",
                     ],
                     [
                         8356,
-                        'lira sign'
+                        "lira sign",
                     ],
                     [
                         8357,
-                        'mill sign'
+                        "mill sign",
                     ],
                     [
                         8358,
-                        'naira sign'
+                        "naira sign",
                     ],
                     [
                         8359,
-                        'peseta sign'
+                        "peseta sign",
                     ],
                     [
                         8360,
-                        'rupee sign'
+                        "rupee sign",
                     ],
                     [
                         8361,
-                        'won sign'
+                        "won sign",
                     ],
                     [
                         8362,
-                        'new sheqel sign'
+                        "new sheqel sign",
                     ],
                     [
                         8363,
-                        'dong sign'
+                        "dong sign",
                     ],
                     [
                         8365,
-                        'kip sign'
+                        "kip sign",
                     ],
                     [
                         8366,
-                        'tugrik sign'
+                        "tugrik sign",
                     ],
                     [
                         8367,
-                        'drachma sign'
+                        "drachma sign",
                     ],
                     [
                         8368,
-                        'german penny symbol'
+                        "german penny symbol",
                     ],
                     [
                         8369,
-                        'peso sign'
+                        "peso sign",
                     ],
                     [
                         8370,
-                        'guarani sign'
+                        "guarani sign",
                     ],
                     [
                         8371,
-                        'austral sign'
+                        "austral sign",
                     ],
                     [
                         8372,
-                        'hryvnia sign'
+                        "hryvnia sign",
                     ],
                     [
                         8373,
-                        'cedi sign'
+                        "cedi sign",
                     ],
                     [
                         8374,
-                        'livre tournois sign'
+                        "livre tournois sign",
                     ],
                     [
                         8375,
-                        'spesmilo sign'
+                        "spesmilo sign",
                     ],
                     [
                         8376,
-                        'tenge sign'
+                        "tenge sign",
                     ],
                     [
                         8377,
-                        'indian rupee sign'
+                        "indian rupee sign",
                     ],
                     [
                         8378,
-                        'turkish lira sign'
+                        "turkish lira sign",
                     ],
                     [
                         8379,
-                        'nordic mark sign'
+                        "nordic mark sign",
                     ],
                     [
                         8380,
-                        'manat sign'
+                        "manat sign",
                     ],
                     [
                         8381,
-                        'ruble sign'
+                        "ruble sign",
                     ],
                     [
                         20870,
-                        'yen character'
+                        "yen character",
                     ],
                     [
                         20803,
-                        'yuan character'
+                        "yuan character",
                     ],
                     [
                         22291,
-                        'yuan character, in hong kong and taiwan'
+                        "yuan character, in hong kong and taiwan",
                     ],
                     [
                         22278,
-                        'yen/yuan character variant one'
-                    ]
-                ]
+                        "yen/yuan character variant one",
+                    ],
+                ],
             },
             {
-                name: 'Text',
-                characters: [
+                name : "Text",
+                characters : [
                     [
                         169,
-                        'copyright sign'
+                        "copyright sign",
                     ],
                     [
                         174,
-                        'registered sign'
+                        "registered sign",
                     ],
                     [
                         8482,
-                        'trade mark sign'
+                        "trade mark sign",
                     ],
                     [
                         8240,
-                        'per mille sign'
+                        "per mille sign",
                     ],
                     [
                         181,
-                        'micro sign'
+                        "micro sign",
                     ],
                     [
                         183,
-                        'middle dot'
+                        "middle dot",
                     ],
                     [
                         8226,
-                        'bullet'
+                        "bullet",
                     ],
                     [
                         8230,
-                        'three dot leader'
+                        "three dot leader",
                     ],
                     [
                         8242,
-                        'minutes / feet'
+                        "minutes / feet",
                     ],
                     [
                         8243,
-                        'seconds / inches'
+                        "seconds / inches",
                     ],
                     [
                         167,
-                        'section sign'
+                        "section sign",
                     ],
                     [
                         182,
-                        'paragraph sign'
+                        "paragraph sign",
                     ],
                     [
                         223,
-                        'sharp s / ess-zed'
-                    ]
-                ]
+                        "sharp s / ess-zed",
+                    ],
+                ],
             },
             {
-                name: 'Quotations',
-                characters: [
+                name : "Quotations",
+                characters : [
                     [
                         8249,
-                        'single left-pointing angle quotation mark'
+                        "single left-pointing angle quotation mark",
                     ],
                     [
                         8250,
-                        'single right-pointing angle quotation mark'
+                        "single right-pointing angle quotation mark",
                     ],
                     [
                         171,
-                        'left pointing guillemet'
+                        "left pointing guillemet",
                     ],
                     [
                         187,
-                        'right pointing guillemet'
+                        "right pointing guillemet",
                     ],
                     [
                         8216,
-                        'left single quotation mark'
+                        "left single quotation mark",
                     ],
                     [
                         8217,
-                        'right single quotation mark'
+                        "right single quotation mark",
                     ],
                     [
                         8220,
-                        'left double quotation mark'
+                        "left double quotation mark",
                     ],
                     [
                         8221,
-                        'right double quotation mark'
+                        "right double quotation mark",
                     ],
                     [
                         8218,
-                        'single low-9 quotation mark'
+                        "single low-9 quotation mark",
                     ],
                     [
                         8222,
-                        'double low-9 quotation mark'
+                        "double low-9 quotation mark",
                     ],
                     [
                         60,
-                        'less-than sign'
+                        "less-than sign",
                     ],
                     [
                         62,
-                        'greater-than sign'
+                        "greater-than sign",
                     ],
                     [
                         8804,
-                        'less-than or equal to'
+                        "less-than or equal to",
                     ],
                     [
                         8805,
-                        'greater-than or equal to'
+                        "greater-than or equal to",
                     ],
                     [
                         8211,
-                        'en dash'
+                        "en dash",
                     ],
                     [
                         8212,
-                        'em dash'
+                        "em dash",
                     ],
                     [
                         175,
-                        'macron'
+                        "macron",
                     ],
                     [
                         8254,
-                        'overline'
+                        "overline",
                     ],
                     [
                         164,
-                        'currency sign'
+                        "currency sign",
                     ],
                     [
                         166,
-                        'broken bar'
+                        "broken bar",
                     ],
                     [
                         168,
-                        'diaeresis'
+                        "diaeresis",
                     ],
                     [
                         161,
-                        'inverted exclamation mark'
+                        "inverted exclamation mark",
                     ],
                     [
                         191,
-                        'turned question mark'
+                        "turned question mark",
                     ],
                     [
                         710,
-                        'circumflex accent'
+                        "circumflex accent",
                     ],
                     [
                         732,
-                        'small tilde'
+                        "small tilde",
                     ],
                     [
                         176,
-                        'degree sign'
+                        "degree sign",
                     ],
                     [
                         8722,
-                        'minus sign'
+                        "minus sign",
                     ],
                     [
                         177,
-                        'plus-minus sign'
+                        "plus-minus sign",
                     ],
                     [
                         247,
-                        'division sign'
+                        "division sign",
                     ],
                     [
                         8260,
-                        'fraction slash'
+                        "fraction slash",
                     ],
                     [
                         215,
-                        'multiplication sign'
+                        "multiplication sign",
                     ],
                     [
                         185,
-                        'superscript one'
+                        "superscript one",
                     ],
                     [
                         178,
-                        'superscript two'
+                        "superscript two",
                     ],
                     [
                         179,
-                        'superscript three'
+                        "superscript three",
                     ],
                     [
                         188,
-                        'fraction one quarter'
+                        "fraction one quarter",
                     ],
                     [
                         189,
-                        'fraction one half'
+                        "fraction one half",
                     ],
                     [
                         190,
-                        'fraction three quarters'
-                    ]
-                ]
+                        "fraction three quarters",
+                    ],
+                ],
             },
             {
-                name: 'Mathematical',
-                characters: [
+                name : "Mathematical",
+                characters : [
                     [
                         402,
-                        'function / florin'
+                        "function / florin",
                     ],
                     [
                         8747,
-                        'integral'
+                        "integral",
                     ],
                     [
                         8721,
-                        'n-ary sumation'
+                        "n-ary sumation",
                     ],
                     [
                         8734,
-                        'infinity'
+                        "infinity",
                     ],
                     [
                         8730,
-                        'square root'
+                        "square root",
                     ],
                     [
                         8764,
-                        'similar to'
+                        "similar to",
                     ],
                     [
                         8773,
-                        'approximately equal to'
+                        "approximately equal to",
                     ],
                     [
                         8776,
-                        'almost equal to'
+                        "almost equal to",
                     ],
                     [
                         8800,
-                        'not equal to'
+                        "not equal to",
                     ],
                     [
                         8801,
-                        'identical to'
+                        "identical to",
                     ],
                     [
                         8712,
-                        'element of'
+                        "element of",
                     ],
                     [
                         8713,
-                        'not an element of'
+                        "not an element of",
                     ],
                     [
                         8715,
-                        'contains as member'
+                        "contains as member",
                     ],
                     [
                         8719,
-                        'n-ary product'
+                        "n-ary product",
                     ],
                     [
                         8743,
-                        'logical and'
+                        "logical and",
                     ],
                     [
                         8744,
-                        'logical or'
+                        "logical or",
                     ],
                     [
                         172,
-                        'not sign'
+                        "not sign",
                     ],
                     [
                         8745,
-                        'intersection'
+                        "intersection",
                     ],
                     [
                         8746,
-                        'union'
+                        "union",
                     ],
                     [
                         8706,
-                        'partial differential'
+                        "partial differential",
                     ],
                     [
                         8704,
-                        'for all'
+                        "for all",
                     ],
                     [
                         8707,
-                        'there exists'
+                        "there exists",
                     ],
                     [
                         8709,
-                        'diameter'
+                        "diameter",
                     ],
                     [
                         8711,
-                        'backward difference'
+                        "backward difference",
                     ],
                     [
                         8727,
-                        'asterisk operator'
+                        "asterisk operator",
                     ],
                     [
                         8733,
-                        'proportional to'
+                        "proportional to",
                     ],
                     [
                         8736,
-                        'angle'
-                    ]
-                ]
+                        "angle",
+                    ],
+                ],
             },
             {
-                name: 'Extended Latin',
-                characters: [
+                name : "Extended Latin",
+                characters : [
                     [
                         192,
-                        'A - grave'
+                        "A - grave",
                     ],
                     [
                         193,
-                        'A - acute'
+                        "A - acute",
                     ],
                     [
                         194,
-                        'A - circumflex'
+                        "A - circumflex",
                     ],
                     [
                         195,
-                        'A - tilde'
+                        "A - tilde",
                     ],
                     [
                         196,
-                        'A - diaeresis'
+                        "A - diaeresis",
                     ],
                     [
                         197,
-                        'A - ring above'
+                        "A - ring above",
                     ],
                     [
                         256,
-                        'A - macron'
+                        "A - macron",
                     ],
                     [
                         198,
-                        'ligature AE'
+                        "ligature AE",
                     ],
                     [
                         199,
-                        'C - cedilla'
+                        "C - cedilla",
                     ],
                     [
                         200,
-                        'E - grave'
+                        "E - grave",
                     ],
                     [
                         201,
-                        'E - acute'
+                        "E - acute",
                     ],
                     [
                         202,
-                        'E - circumflex'
+                        "E - circumflex",
                     ],
                     [
                         203,
-                        'E - diaeresis'
+                        "E - diaeresis",
                     ],
                     [
                         274,
-                        'E - macron'
+                        "E - macron",
                     ],
                     [
                         204,
-                        'I - grave'
+                        "I - grave",
                     ],
                     [
                         205,
-                        'I - acute'
+                        "I - acute",
                     ],
                     [
                         206,
-                        'I - circumflex'
+                        "I - circumflex",
                     ],
                     [
                         207,
-                        'I - diaeresis'
+                        "I - diaeresis",
                     ],
                     [
                         298,
-                        'I - macron'
+                        "I - macron",
                     ],
                     [
                         208,
-                        'ETH'
+                        "ETH",
                     ],
                     [
                         209,
-                        'N - tilde'
+                        "N - tilde",
                     ],
                     [
                         210,
-                        'O - grave'
+                        "O - grave",
                     ],
                     [
                         211,
-                        'O - acute'
+                        "O - acute",
                     ],
                     [
                         212,
-                        'O - circumflex'
+                        "O - circumflex",
                     ],
                     [
                         213,
-                        'O - tilde'
+                        "O - tilde",
                     ],
                     [
                         214,
-                        'O - diaeresis'
+                        "O - diaeresis",
                     ],
                     [
                         216,
-                        'O - slash'
+                        "O - slash",
                     ],
                     [
                         332,
-                        'O - macron'
+                        "O - macron",
                     ],
                     [
                         338,
-                        'ligature OE'
+                        "ligature OE",
                     ],
                     [
                         352,
-                        'S - caron'
+                        "S - caron",
                     ],
                     [
                         217,
-                        'U - grave'
+                        "U - grave",
                     ],
                     [
                         218,
-                        'U - acute'
+                        "U - acute",
                     ],
                     [
                         219,
-                        'U - circumflex'
+                        "U - circumflex",
                     ],
                     [
                         220,
-                        'U - diaeresis'
+                        "U - diaeresis",
                     ],
                     [
                         362,
-                        'U - macron'
+                        "U - macron",
                     ],
                     [
                         221,
-                        'Y - acute'
+                        "Y - acute",
                     ],
                     [
                         376,
-                        'Y - diaeresis'
+                        "Y - diaeresis",
                     ],
                     [
                         562,
-                        'Y - macron'
+                        "Y - macron",
                     ],
                     [
                         222,
-                        'THORN'
+                        "THORN",
                     ],
                     [
                         224,
-                        'a - grave'
+                        "a - grave",
                     ],
                     [
                         225,
-                        'a - acute'
+                        "a - acute",
                     ],
                     [
                         226,
-                        'a - circumflex'
+                        "a - circumflex",
                     ],
                     [
                         227,
-                        'a - tilde'
+                        "a - tilde",
                     ],
                     [
                         228,
-                        'a - diaeresis'
+                        "a - diaeresis",
                     ],
                     [
                         229,
-                        'a - ring above'
+                        "a - ring above",
                     ],
                     [
                         257,
-                        'a - macron'
+                        "a - macron",
                     ],
                     [
                         230,
-                        'ligature ae'
+                        "ligature ae",
                     ],
                     [
                         231,
-                        'c - cedilla'
+                        "c - cedilla",
                     ],
                     [
                         232,
-                        'e - grave'
+                        "e - grave",
                     ],
                     [
                         233,
-                        'e - acute'
+                        "e - acute",
                     ],
                     [
                         234,
-                        'e - circumflex'
+                        "e - circumflex",
                     ],
                     [
                         235,
-                        'e - diaeresis'
+                        "e - diaeresis",
                     ],
                     [
                         275,
-                        'e - macron'
+                        "e - macron",
                     ],
                     [
                         236,
-                        'i - grave'
+                        "i - grave",
                     ],
                     [
                         237,
-                        'i - acute'
+                        "i - acute",
                     ],
                     [
                         238,
-                        'i - circumflex'
+                        "i - circumflex",
                     ],
                     [
                         239,
-                        'i - diaeresis'
+                        "i - diaeresis",
                     ],
                     [
                         299,
-                        'i - macron'
+                        "i - macron",
                     ],
                     [
                         240,
-                        'eth'
+                        "eth",
                     ],
                     [
                         241,
-                        'n - tilde'
+                        "n - tilde",
                     ],
                     [
                         242,
-                        'o - grave'
+                        "o - grave",
                     ],
                     [
                         243,
-                        'o - acute'
+                        "o - acute",
                     ],
                     [
                         244,
-                        'o - circumflex'
+                        "o - circumflex",
                     ],
                     [
                         245,
-                        'o - tilde'
+                        "o - tilde",
                     ],
                     [
                         246,
-                        'o - diaeresis'
+                        "o - diaeresis",
                     ],
                     [
                         248,
-                        'o slash'
+                        "o slash",
                     ],
                     [
                         333,
-                        'o macron'
+                        "o macron",
                     ],
                     [
                         339,
-                        'ligature oe'
+                        "ligature oe",
                     ],
                     [
                         353,
-                        's - caron'
+                        "s - caron",
                     ],
                     [
                         249,
-                        'u - grave'
+                        "u - grave",
                     ],
                     [
                         250,
-                        'u - acute'
+                        "u - acute",
                     ],
                     [
                         251,
-                        'u - circumflex'
+                        "u - circumflex",
                     ],
                     [
                         252,
-                        'u - diaeresis'
+                        "u - diaeresis",
                     ],
                     [
                         363,
-                        'u - macron'
+                        "u - macron",
                     ],
                     [
                         253,
-                        'y - acute'
+                        "y - acute",
                     ],
                     [
                         254,
-                        'thorn'
+                        "thorn",
                     ],
                     [
                         255,
-                        'y - diaeresis'
+                        "y - diaeresis",
                     ],
                     [
                         563,
-                        'y - macron'
+                        "y - macron",
                     ],
                     [
                         913,
-                        'Alpha'
+                        "Alpha",
                     ],
                     [
                         914,
-                        'Beta'
+                        "Beta",
                     ],
                     [
                         915,
-                        'Gamma'
+                        "Gamma",
                     ],
                     [
                         916,
-                        'Delta'
+                        "Delta",
                     ],
                     [
                         917,
-                        'Epsilon'
+                        "Epsilon",
                     ],
                     [
                         918,
-                        'Zeta'
+                        "Zeta",
                     ],
                     [
                         919,
-                        'Eta'
+                        "Eta",
                     ],
                     [
                         920,
-                        'Theta'
+                        "Theta",
                     ],
                     [
                         921,
-                        'Iota'
+                        "Iota",
                     ],
                     [
                         922,
-                        'Kappa'
+                        "Kappa",
                     ],
                     [
                         923,
-                        'Lambda'
+                        "Lambda",
                     ],
                     [
                         924,
-                        'Mu'
+                        "Mu",
                     ],
                     [
                         925,
-                        'Nu'
+                        "Nu",
                     ],
                     [
                         926,
-                        'Xi'
+                        "Xi",
                     ],
                     [
                         927,
-                        'Omicron'
+                        "Omicron",
                     ],
                     [
                         928,
-                        'Pi'
+                        "Pi",
                     ],
                     [
                         929,
-                        'Rho'
+                        "Rho",
                     ],
                     [
                         931,
-                        'Sigma'
+                        "Sigma",
                     ],
                     [
                         932,
-                        'Tau'
+                        "Tau",
                     ],
                     [
                         933,
-                        'Upsilon'
+                        "Upsilon",
                     ],
                     [
                         934,
-                        'Phi'
+                        "Phi",
                     ],
                     [
                         935,
-                        'Chi'
+                        "Chi",
                     ],
                     [
                         936,
-                        'Psi'
+                        "Psi",
                     ],
                     [
                         937,
-                        'Omega'
+                        "Omega",
                     ],
                     [
                         945,
-                        'alpha'
+                        "alpha",
                     ],
                     [
                         946,
-                        'beta'
+                        "beta",
                     ],
                     [
                         947,
-                        'gamma'
+                        "gamma",
                     ],
                     [
                         948,
-                        'delta'
+                        "delta",
                     ],
                     [
                         949,
-                        'epsilon'
+                        "epsilon",
                     ],
                     [
                         950,
-                        'zeta'
+                        "zeta",
                     ],
                     [
                         951,
-                        'eta'
+                        "eta",
                     ],
                     [
                         952,
-                        'theta'
+                        "theta",
                     ],
                     [
                         953,
-                        'iota'
+                        "iota",
                     ],
                     [
                         954,
-                        'kappa'
+                        "kappa",
                     ],
                     [
                         955,
-                        'lambda'
+                        "lambda",
                     ],
                     [
                         956,
-                        'mu'
+                        "mu",
                     ],
                     [
                         957,
-                        'nu'
+                        "nu",
                     ],
                     [
                         958,
-                        'xi'
+                        "xi",
                     ],
                     [
                         959,
-                        'omicron'
+                        "omicron",
                     ],
                     [
                         960,
-                        'pi'
+                        "pi",
                     ],
                     [
                         961,
-                        'rho'
+                        "rho",
                     ],
                     [
                         962,
-                        'final sigma'
+                        "final sigma",
                     ],
                     [
                         963,
-                        'sigma'
+                        "sigma",
                     ],
                     [
                         964,
-                        'tau'
+                        "tau",
                     ],
                     [
                         965,
-                        'upsilon'
+                        "upsilon",
                     ],
                     [
                         966,
-                        'phi'
+                        "phi",
                     ],
                     [
                         967,
-                        'chi'
+                        "chi",
                     ],
                     [
                         968,
-                        'psi'
+                        "psi",
                     ],
                     [
                         969,
-                        'omega'
-                    ]
-                ]
+                        "omega",
+                    ],
+                ],
             },
             {
-                name: 'Symbols',
-                characters: [
+                name : "Symbols",
+                characters : [
                     [
                         8501,
-                        'alef symbol'
+                        "alef symbol",
                     ],
                     [
                         982,
-                        'pi symbol'
+                        "pi symbol",
                     ],
                     [
                         8476,
-                        'real part symbol'
+                        "real part symbol",
                     ],
                     [
                         978,
-                        'upsilon - hook symbol'
+                        "upsilon - hook symbol",
                     ],
                     [
                         8472,
-                        'Weierstrass p'
+                        "Weierstrass p",
                     ],
                     [
                         8465,
-                        'imaginary part'
-                    ]
-                ]
+                        "imaginary part",
+                    ],
+                ],
             },
             {
-                name: 'Arrows',
-                characters: [
+                name : "Arrows",
+                characters : [
                     [
                         8592,
-                        'leftwards arrow'
+                        "leftwards arrow",
                     ],
                     [
                         8593,
-                        'upwards arrow'
+                        "upwards arrow",
                     ],
                     [
                         8594,
-                        'rightwards arrow'
+                        "rightwards arrow",
                     ],
                     [
                         8595,
-                        'downwards arrow'
+                        "downwards arrow",
                     ],
                     [
                         8596,
-                        'left right arrow'
+                        "left right arrow",
                     ],
                     [
                         8629,
-                        'carriage return'
+                        "carriage return",
                     ],
                     [
                         8656,
-                        'leftwards double arrow'
+                        "leftwards double arrow",
                     ],
                     [
                         8657,
-                        'upwards double arrow'
+                        "upwards double arrow",
                     ],
                     [
                         8658,
-                        'rightwards double arrow'
+                        "rightwards double arrow",
                     ],
                     [
                         8659,
-                        'downwards double arrow'
+                        "downwards double arrow",
                     ],
                     [
                         8660,
-                        'left right double arrow'
+                        "left right double arrow",
                     ],
                     [
                         8756,
-                        'therefore'
+                        "therefore",
                     ],
                     [
                         8834,
-                        'subset of'
+                        "subset of",
                     ],
                     [
                         8835,
-                        'superset of'
+                        "superset of",
                     ],
                     [
                         8836,
-                        'not a subset of'
+                        "not a subset of",
                     ],
                     [
                         8838,
-                        'subset of or equal to'
+                        "subset of or equal to",
                     ],
                     [
                         8839,
-                        'superset of or equal to'
+                        "superset of or equal to",
                     ],
                     [
                         8853,
-                        'circled plus'
+                        "circled plus",
                     ],
                     [
                         8855,
-                        'circled times'
+                        "circled times",
                     ],
                     [
                         8869,
-                        'perpendicular'
+                        "perpendicular",
                     ],
                     [
                         8901,
-                        'dot operator'
+                        "dot operator",
                     ],
                     [
                         8968,
-                        'left ceiling'
+                        "left ceiling",
                     ],
                     [
                         8969,
-                        'right ceiling'
+                        "right ceiling",
                     ],
                     [
                         8970,
-                        'left floor'
+                        "left floor",
                     ],
                     [
                         8971,
-                        'right floor'
+                        "right floor",
                     ],
                     [
                         9001,
-                        'left-pointing angle bracket'
+                        "left-pointing angle bracket",
                     ],
                     [
                         9002,
-                        'right-pointing angle bracket'
+                        "right-pointing angle bracket",
                     ],
                     [
                         9674,
-                        'lozenge'
+                        "lozenge",
                     ],
                     [
                         9824,
-                        'black spade suit'
+                        "black spade suit",
                     ],
                     [
                         9827,
-                        'black club suit'
+                        "black club suit",
                     ],
                     [
                         9829,
-                        'black heart suit'
+                        "black heart suit",
                     ],
                     [
                         9830,
-                        'black diamond suit'
+                        "black diamond suit",
                     ],
                     [
                         8194,
-                        'en space'
+                        "en space",
                     ],
                     [
                         8195,
-                        'em space'
+                        "em space",
                     ],
                     [
                         8201,
-                        'thin space'
+                        "thin space",
                     ],
                     [
                         8204,
-                        'zero width non-joiner'
+                        "zero width non-joiner",
                     ],
                     [
                         8205,
-                        'zero width joiner'
+                        "zero width joiner",
                     ],
                     [
                         8206,
-                        'left-to-right mark'
+                        "left-to-right mark",
                     ],
                     [
                         8207,
-                        'right-to-left mark'
-                    ]
-                ]
-            }
+                        "right-to-left mark",
+                    ],
+                ],
+            },
         ];
     };
-    var charmapFilter = function (charmap) {
-        return global$1.grep(charmap, function (item) {
+    var charmapFilter = function(charmap)
+    {
+        return global$1.grep(charmap, function(item)
+        {
             return isArray(item) && item.length === 2;
         });
     };
-    var getCharsFromSetting = function (settingValue) {
-        if (isArray(settingValue)) {
+    var getCharsFromSetting = function(settingValue)
+    {
+        if(isArray(settingValue))
+        {
             return charmapFilter(settingValue);
         }
-        if (typeof settingValue === 'function') {
+        if(typeof settingValue === "function")
+        {
             return settingValue();
         }
         return [];
     };
-    var extendCharMap = function (editor, charmap) {
+    var extendCharMap = function(editor, charmap)
+    {
         var userCharMap = getCharMap$1(editor);
-        if (userCharMap) {
+        if(userCharMap)
+        {
             charmap = [{
-                name: UserDefined,
-                characters: getCharsFromSetting(userCharMap)
+                name : UserDefined,
+                characters : getCharsFromSetting(userCharMap),
             }];
         }
         var userCharMapAppend = getCharMapAppend(editor);
-        if (userCharMapAppend) {
-            var userDefinedGroup = global$1.grep(charmap, function (cg) {
+        if(userCharMapAppend)
+        {
+            var userDefinedGroup = global$1.grep(charmap, function(cg)
+            {
                 return cg.name === UserDefined;
             });
-            if (userDefinedGroup.length) {
+            if(userDefinedGroup.length)
+            {
                 userDefinedGroup[0].characters = [].concat(userDefinedGroup[0].characters).concat(getCharsFromSetting(userCharMapAppend));
                 return charmap;
             }
             return charmap.concat({
-                name: UserDefined,
-                characters: getCharsFromSetting(userCharMapAppend)
+                name : UserDefined,
+                characters : getCharsFromSetting(userCharMapAppend),
             });
         }
         return charmap;
     };
-    var getCharMap = function (editor) {
+    var getCharMap = function(editor)
+    {
         var groups = extendCharMap(editor, getDefaultCharMap());
         return groups.length > 1 ? [{
-            name: 'All',
-            characters: bind(groups, function (g) {
+            name : "All",
+            characters : bind(groups, function(g)
+            {
                 return g.characters;
-            })
+            }),
         }].concat(groups) : groups;
     };
 
-    var get = function (editor) {
-        var getCharMap$1 = function () {
+    var get = function(editor)
+    {
+        var getCharMap$1 = function()
+        {
             return getCharMap(editor);
         };
-        var insertChar$1 = function (chr) {
+        var insertChar$1 = function(chr)
+        {
             insertChar(editor, chr);
         };
         return {
-            getCharMap: getCharMap$1,
-            insertChar: insertChar$1
+            getCharMap : getCharMap$1,
+            insertChar : insertChar$1,
         };
     };
 
-    var Cell = function (initial) {
+    var Cell = function(initial)
+    {
         var value = initial;
-        var get = function () {
+        var get = function()
+        {
             return value;
         };
-        var set = function (v) {
+        var set = function(v)
+        {
             value = v;
         };
         return {
-            get: get,
-            set: set
+            get : get,
+            set : set,
         };
     };
 
-    var last = function (fn, rate) {
+    var last = function(fn, rate)
+    {
         var timer = null;
-        var cancel = function () {
-            if (!isNull(timer)) {
+        var cancel = function()
+        {
+            if(!isNull(timer))
+            {
                 clearTimeout(timer);
                 timer = null;
             }
         };
-        var throttle = function () {
+        var throttle = function()
+        {
             var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
+            for(var _i = 0; _i < arguments.length; _i++)
+            {
                 args[_i] = arguments[_i];
             }
             cancel();
-            timer = setTimeout(function () {
+            timer = setTimeout(function()
+            {
                 timer = null;
                 fn.apply(null, args);
             }, rate);
         };
         return {
-            cancel: cancel,
-            throttle: throttle
+            cancel : cancel,
+            throttle : throttle,
         };
     };
 
     var nativeFromCodePoint = String.fromCodePoint;
-    var contains = function (str, substr) {
+    var contains = function(str, substr)
+    {
         return str.indexOf(substr) !== -1;
     };
-    var fromCodePoint = function () {
+    var fromCodePoint = function()
+    {
         var codePoints = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
+        for(var _i = 0; _i < arguments.length; _i++)
+        {
             codePoints[_i] = arguments[_i];
         }
-        if (nativeFromCodePoint) {
+        if(nativeFromCodePoint)
+        {
             return nativeFromCodePoint.apply(void 0, codePoints);
-        } else {
+        }
+        else
+        {
             var codeUnits = [];
             var codeLen = 0;
-            var result = '';
-            for (var index = 0, len = codePoints.length; index !== len; ++index) {
+            var result = "";
+            for(var index = 0, len = codePoints.length; index !== len; ++index)
+            {
                 var codePoint = +codePoints[index];
-                if (!(codePoint < 1114111 && codePoint >>> 0 === codePoint)) {
-                    throw RangeError('Invalid code point: ' + codePoint);
+                if(!(codePoint < 1114111 && codePoint >>> 0 === codePoint))
+                {
+                    throw RangeError("Invalid code point: " + codePoint);
                 }
-                if (codePoint <= 65535) {
+                if(codePoint <= 65535)
+                {
                     codeLen = codeUnits.push(codePoint);
-                } else {
+                }
+                else
+                {
                     codePoint -= 65536;
                     codeLen = codeUnits.push((codePoint >> 10) + 55296, codePoint % 1024 + 56320);
                 }
-                if (codeLen >= 16383) {
+                if(codeLen >= 16383)
+                {
                     result += String.fromCharCode.apply(null, codeUnits);
                     codeUnits.length = 0;
                 }
@@ -1528,161 +1617,195 @@
         }
     };
 
-    var charMatches = function (charCode, name, lowerCasePattern) {
-        if (contains(fromCodePoint(charCode).toLowerCase(), lowerCasePattern)) {
+    var charMatches = function(charCode, name, lowerCasePattern)
+    {
+        if(contains(fromCodePoint(charCode).toLowerCase(), lowerCasePattern))
+        {
             return true;
-        } else {
-            return contains(name.toLowerCase(), lowerCasePattern) || contains(name.toLowerCase().replace(/\s+/g, ''), lowerCasePattern);
+        }
+        else
+        {
+            return contains(name.toLowerCase(), lowerCasePattern) || contains(name.toLowerCase().replace(/\s+/g, ""), lowerCasePattern);
         }
     };
-    var scan = function (group, pattern) {
+    var scan = function(group, pattern)
+    {
         var matches = [];
         var lowerCasePattern = pattern.toLowerCase();
-        each(group.characters, function (g) {
-            if (charMatches(g[0], g[1], lowerCasePattern)) {
+        each(group.characters, function(g)
+        {
+            if(charMatches(g[0], g[1], lowerCasePattern))
+            {
                 matches.push(g);
             }
         });
-        return map(matches, function (m) {
+        return map(matches, function(m)
+        {
             return {
-                text: m[1],
-                value: fromCodePoint(m[0]),
-                icon: fromCodePoint(m[0])
+                text : m[1],
+                value : fromCodePoint(m[0]),
+                icon : fromCodePoint(m[0]),
             };
         });
     };
 
-    var patternName = 'pattern';
-    var open = function (editor, charMap) {
-        var makeGroupItems = function () {
+    var patternName = "pattern";
+    var open = function(editor, charMap)
+    {
+        var makeGroupItems = function()
+        {
             return [
                 {
-                    label: 'Search',
-                    type: 'input',
-                    name: patternName
+                    label : "Search",
+                    type : "input",
+                    name : patternName,
                 },
                 {
-                    type: 'collection',
-                    name: 'results'
-                }
+                    type : "collection",
+                    name : "results",
+                },
             ];
         };
-        var makeTabs = function () {
-            return map(charMap, function (charGroup) {
+        var makeTabs = function()
+        {
+            return map(charMap, function(charGroup)
+            {
                 return {
-                    title: charGroup.name,
-                    name: charGroup.name,
-                    items: makeGroupItems()
+                    title : charGroup.name,
+                    name : charGroup.name,
+                    items : makeGroupItems(),
                 };
             });
         };
-        var makePanel = function () {
+        var makePanel = function()
+        {
             return {
-                type: 'panel',
-                items: makeGroupItems()
+                type : "panel",
+                items : makeGroupItems(),
             };
         };
-        var makeTabPanel = function () {
+        var makeTabPanel = function()
+        {
             return {
-                type: 'tabpanel',
-                tabs: makeTabs()
+                type : "tabpanel",
+                tabs : makeTabs(),
             };
         };
-        var currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell('All');
-        var scanAndSet = function (dialogApi, pattern) {
-            find(charMap, function (group) {
+        var currentTab = charMap.length === 1 ? Cell(UserDefined) : Cell("All");
+        var scanAndSet = function(dialogApi, pattern)
+        {
+            find(charMap, function(group)
+            {
                 return group.name === currentTab.get();
-            }).each(function (f) {
+            }).each(function(f)
+            {
                 var items = scan(f, pattern);
-                dialogApi.setData({results: items});
+                dialogApi.setData({results : items});
             });
         };
         var SEARCH_DELAY = 40;
-        var updateFilter = last(function (dialogApi) {
+        var updateFilter = last(function(dialogApi)
+        {
             var pattern = dialogApi.getData().pattern;
             scanAndSet(dialogApi, pattern);
         }, SEARCH_DELAY);
         var body = charMap.length === 1 ? makePanel() : makeTabPanel();
         var initialData = {
-            pattern: '',
-            results: scan(charMap[0], '')
+            pattern : "",
+            results : scan(charMap[0], ""),
         };
         var bridgeSpec = {
-            title: 'Special Character',
-            size: 'normal',
-            body: body,
-            buttons: [{
-                type: 'cancel',
-                name: 'close',
-                text: 'Close',
-                primary: true
+            title : "Special Character",
+            size : "normal",
+            body : body,
+            buttons : [{
+                type : "cancel",
+                name : "close",
+                text : "Close",
+                primary : true,
             }],
-            initialData: initialData,
-            onAction: function (api, details) {
-                if (details.name === 'results') {
+            initialData : initialData,
+            onAction : function(api, details)
+            {
+                if(details.name === "results")
+                {
                     insertChar(editor, details.value);
                     api.close();
                 }
             },
-            onTabChange: function (dialogApi, details) {
+            onTabChange : function(dialogApi, details)
+            {
                 currentTab.set(details.newTabName);
                 updateFilter.throttle(dialogApi);
             },
-            onChange: function (dialogApi, changeData) {
-                if (changeData.name === patternName) {
+            onChange : function(dialogApi, changeData)
+            {
+                if(changeData.name === patternName)
+                {
                     updateFilter.throttle(dialogApi);
                 }
-            }
+            },
         };
         var dialogApi = editor.windowManager.open(bridgeSpec);
         dialogApi.focus(patternName);
     };
 
-    var register$1 = function (editor, charMap) {
-        editor.addCommand('mceShowCharmap', function () {
+    var register$1 = function(editor, charMap)
+    {
+        editor.addCommand("mceShowCharmap", function()
+        {
             open(editor, charMap);
         });
     };
 
-    var global = tinymce.util.Tools.resolve('tinymce.util.Promise');
+    var global = tinymce.util.Tools.resolve("tinymce.util.Promise");
 
-    var init = function (editor, all) {
-        editor.ui.registry.addAutocompleter('charmap', {
-            ch: ':',
-            columns: 'auto',
-            minChars: 2,
-            fetch: function (pattern, _maxResults) {
-                return new global(function (resolve, _reject) {
+    var init = function(editor, all)
+    {
+        editor.ui.registry.addAutocompleter("charmap", {
+            ch : ":",
+            columns : "auto",
+            minChars : 2,
+            fetch : function(pattern, _maxResults)
+            {
+                return new global(function(resolve, _reject)
+                {
                     resolve(scan(all, pattern));
                 });
             },
-            onAction: function (autocompleteApi, rng, value) {
+            onAction : function(autocompleteApi, rng, value)
+            {
                 editor.selection.setRng(rng);
                 editor.insertContent(value);
                 autocompleteApi.hide();
-            }
+            },
         });
     };
 
-    var register = function (editor) {
-        editor.ui.registry.addButton('charmap', {
-            icon: 'insert-character',
-            tooltip: 'Special character',
-            onAction: function () {
-                return editor.execCommand('mceShowCharmap');
-            }
+    var register = function(editor)
+    {
+        editor.ui.registry.addButton("charmap", {
+            icon : "insert-character",
+            tooltip : "Special character",
+            onAction : function()
+            {
+                return editor.execCommand("mceShowCharmap");
+            },
         });
-        editor.ui.registry.addMenuItem('charmap', {
-            icon: 'insert-character',
-            text: 'Special character...',
-            onAction: function () {
-                return editor.execCommand('mceShowCharmap');
-            }
+        editor.ui.registry.addMenuItem("charmap", {
+            icon : "insert-character",
+            text : "Special character...",
+            onAction : function()
+            {
+                return editor.execCommand("mceShowCharmap");
+            },
         });
     };
 
-    function Plugin() {
-        global$2.add('charmap', function (editor) {
+    function Plugin()
+    {
+        global$2.add("charmap", function(editor)
+        {
             var charMap = getCharMap(editor);
             register$1(editor, charMap);
             register(editor);

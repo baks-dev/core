@@ -22,7 +22,7 @@
  */
 
 return [
-	'success' => 'Success',
-	'danger' => 'Danger',
-	'warning' => 'Warning',
+    'success' => 'Success',
+    'danger' => 'Danger',
+    'warning' => 'Warning',
 ];

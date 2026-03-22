@@ -22,5 +22,5 @@
  */
 
 return [
-	'Search' => 'Search',
+    'Search' => 'Search',
 ];

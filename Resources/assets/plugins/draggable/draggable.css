@@ -30,7 +30,9 @@
     overflow-y: hidden;
 }
 
-.draggable-zone.child-hidden > .draggable { display: none; }
+.draggable-zone.child-hidden > .draggable {
+    display: none;
+}
 
 
 .fa-rotate-90 {

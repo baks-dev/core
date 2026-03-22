@@ -97,6 +97,7 @@ class CacheClearCommand extends Command
 
         /**
          * Сбрасываем кеш модулей
+         *
          * @var DirectoryIterator $moduleDir
          */
         foreach(new DirectoryIterator($path) as $moduleDir)
@@ -127,7 +128,7 @@ class CacheClearCommand extends Command
 
                 $this->messageDispatch->dispatch(
                     new CacheClearMessage($moduleDir->getFilename()),
-                    transport: 'async'
+                    transport: 'async',
                 );
             }
         }
@@ -141,7 +142,7 @@ class CacheClearCommand extends Command
             /** Сбрасываем кеш c namespace */
             $this->messageDispatch->dispatch(
                 new CacheClearMessage($module, restricted: false),
-                transport: 'async'
+                transport: 'async',
             );
 
             $io->success('Кеш модулей успешно удален');
@@ -153,6 +154,7 @@ class CacheClearCommand extends Command
 
         /**
          * Полностью удаляем кеш
+         *
          * @var DirectoryIterator $cache
          */
         foreach(new DirectoryIterator($path) as $cache)
@@ -186,7 +188,7 @@ class CacheClearCommand extends Command
         /** Отправляем сообщение */
         $this->messageDispatch->dispatch(
             new CacheClearMessage(),
-            transport: 'systemd'
+            transport: 'systemd',
         );
 
         $io->success('Кеш модулей успешно удален');

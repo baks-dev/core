@@ -28,10 +28,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.locale')]
 interface LocaleInterface
 {
+    public static function sort(): int;
+
     /** Возвращает значение статуса (value) */
     public function getValue(): string;
-
-    public static function sort(): int;
 
 }
 

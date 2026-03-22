@@ -88,7 +88,7 @@ final class ORMQueryBuilder extends QueryBuilder
             $this->entityManager,
             $this->translator,
             $this->cache,
-            $this->env
+            $this->env,
         );
 
         $newInstance->resetDQLParts();
@@ -99,6 +99,12 @@ final class ORMQueryBuilder extends QueryBuilder
         $newInstance->namespace = 'ORMCache';
 
         return $newInstance;
+    }
+
+    public function clear(): self
+    {
+        $this->entityManager->clear();
+        return $this;
     }
 
     /**
@@ -167,11 +173,32 @@ final class ORMQueryBuilder extends QueryBuilder
         return $this->getQuery()->getResult() ?: null;
     }
 
-
     public function flush(): void
     {
         $this->entityManager->flush();
         $this->entityManager->clear();
+    }
+
+    /**
+     * Метод создает параметр для запроса согласно локали Local
+     */
+    public function bindLocal(): self
+    {
+        $this->setParameter('local', new Locale($this->translator->getLocale()), Locale::TYPE);
+        return $this;
+    }
+
+    public function table(string $class): string
+    {
+        if(class_exists($class))
+        {
+            $ref = new ReflectionClass($class);
+            /** @var ReflectionAttribute $current */
+            $current = current($ref->getAttributes(Table::class));
+            return $current->getArguments()['name'] ?? $class;
+        }
+
+        return $class;
     }
 
     /**
@@ -199,33 +226,5 @@ final class ORMQueryBuilder extends QueryBuilder
         $lastDatetime->set(60 + time());
         $lastDatetime->expiresAfter($this->ttl);
         $this->cacheQueries->save($lastDatetime);
-    }
-
-    /**
-     * Метод создает параметр для запроса согласно локали Local
-     */
-    public function bindLocal(): self
-    {
-        $this->setParameter('local', new Locale($this->translator->getLocale()), Locale::TYPE);
-        return $this;
-    }
-
-    public function clear(): self
-    {
-        $this->entityManager->clear();
-        return $this;
-    }
-
-    public function table(string $class): string
-    {
-        if(class_exists($class))
-        {
-            $ref = new ReflectionClass($class);
-            /** @var ReflectionAttribute $current */
-            $current = current($ref->getAttributes(Table::class));
-            return $current->getArguments()['name'] ?? $class;
-        }
-
-        return $class;
     }
 }

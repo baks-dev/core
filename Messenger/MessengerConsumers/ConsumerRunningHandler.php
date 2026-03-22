@@ -80,7 +80,7 @@ final class ConsumerRunningHandler
             $consumers = explode('@', $service);
             $consumer = current($consumers);
 
-            $consumer = str_replace(array('baks-', $this->HOST.'-'), '', $consumer);
+            $consumer = str_replace(['baks-', $this->HOST.'-'], '', $consumer);
             $consumer = trim($consumer);
 
             if($consumer === 'systemd')

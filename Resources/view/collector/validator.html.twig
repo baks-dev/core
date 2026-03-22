@@ -19,10 +19,11 @@
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
 
     <script nonce="{{ csp_nonce() }}">
-        let w3cvalidator = document.getElementById('baks-w3cvalidator');
+        let w3cvalidator = document.getElementById("baks-w3cvalidator");
 
-        w3cvalidator.addEventListener('click', () => {
-            window.open('https://validator.w3.org/check?uri={{ collector.url }}', '_blank');
+        w3cvalidator.addEventListener("click", () =>
+        {
+            window.open('https://validator.w3.org/check?uri={{ collector.url }}', "_blank");
         });
     </script>
 

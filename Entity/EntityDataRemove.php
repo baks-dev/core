@@ -30,8 +30,6 @@ use Exception;
 
 final class EntityDataRemove
 {
-    protected ?ArrayCollection $remove = null;
-
     /**
      * Объект одиночки храниться в статичном поле класса. Это поле — массив, так
      * как мы позволим нашему Одиночке иметь подклассы. Все элементы этого
@@ -39,25 +37,13 @@ final class EntityDataRemove
      * мы вот-вот познакомимся с тем, как это работает.
      */
     private static $instances = [];
+    protected ?ArrayCollection $remove = null;
 
     /**
      * Конструктор Одиночки всегда должен быть скрытым, чтобы предотвратить
      * создание объекта через оператор new.
      */
     protected function __construct() {}
-
-    /**
-     * Одиночки не должны быть клонируемыми.
-     */
-    protected function __clone() {}
-
-    /**
-     * Одиночки не должны быть восстанавливаемыми из строк.
-     */
-    public function __wakeup()
-    {
-        throw new Exception("Cannot unserialize a singleton.");
-    }
 
     /**
      * Это статический метод, управляющий доступом к экземпляру одиночки. При
@@ -81,6 +67,14 @@ final class EntityDataRemove
     }
 
     /**
+     * Одиночки не должны быть восстанавливаемыми из строк.
+     */
+    public function __wakeup()
+    {
+        throw new Exception("Cannot unserialize a singleton.");
+    }
+
+    /**
      * Remove
      */
     public function getRemove(): ?ArrayCollection
@@ -101,4 +95,9 @@ final class EntityDataRemove
             $this->remove->add($add);
         }
     }
+
+    /**
+     * Одиночки не должны быть клонируемыми.
+     */
+    protected function __clone() {}
 }

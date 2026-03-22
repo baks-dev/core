@@ -43,7 +43,8 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
         #[Target('validatorLogger')] private readonly LoggerInterface $logger,
         private readonly ValidatorInterface $validator,
 
-    ) {
+    )
+    {
         parent::__construct();
 
         $this->uniqid = uniqid('', false);
@@ -73,10 +74,16 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
 
         $this->error(
             $message ?: 'Not found object',
-            $context ?: $item
+            $context ?: $item,
         );
 
         return $this->validate = false;
+    }
+
+    public function error($message, ?array $context = []): void
+    {
+        $this->errors->offsetSet($this->uniqid, (string) $message);
+        $this->logger->error($this->uniqid.': '.$message, $context ?: []);
     }
 
     public function isInvalid(): bool|string
@@ -113,12 +120,6 @@ final class ValidatorCollection extends ArrayObject implements ValidatorCollecti
         }
 
         return false;
-    }
-
-    public function error($message, ?array $context = []): void
-    {
-        $this->errors->offsetSet($this->uniqid, (string) $message);
-        $this->logger->error($this->uniqid.': '.$message, $context ?: []);
     }
 
     /**

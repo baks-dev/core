@@ -18,7 +18,6 @@
 namespace BaksDev\Core\Entity\Tests\EntityEvent\OneToMany;
 
 use BaksDev\Core\Entity\EntityEvent;
-use BaksDev\Core\Entity\EntityState;
 use BaksDev\Users\User\Type\Id\UserUid;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

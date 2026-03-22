@@ -19,7 +19,8 @@
 //centrifuge.connect();
 
 
-function createToast(ctx) {
+function createToast(ctx)
+{
 
     let data = JSON.parse(ctx);
 
@@ -29,68 +30,70 @@ function createToast(ctx) {
     let $href = data.href;
     let $name = data.name;
 
-    var toastDiv = document.getElementById('toast');
+    var toastDiv = document.getElementById("toast");
 
-    if (toastDiv) {
+    if(toastDiv)
+    {
         // class="alert alert-light" role="alert"
-        var toastEl = document.createElement('div');
-        toastEl.className = 'toast';
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('aria-live', 'assertive');
-        toastEl.setAttribute('aria-atomic', 'true');
+        var toastEl = document.createElement("div");
+        toastEl.className = "toast";
+        toastEl.setAttribute("role", "alert");
+        toastEl.setAttribute("aria-live", "assertive");
+        toastEl.setAttribute("aria-atomic", "true");
 
-        var tostHeader = document.createElement('div');
-        tostHeader.className = 'toast-header';
+        var tostHeader = document.createElement("div");
+        tostHeader.className = "toast-header";
         toastEl.append(tostHeader);
 
-        var toastSpan = document.createElement('SPAN');
-        toastSpan.classList.add('symbol');
-        toastSpan.classList.add('symbol-circle');
-        toastSpan.classList.add('toast-icon');
-        toastSpan.classList.add('bg-' + $type);
-        toastSpan.classList.add('me-3');
+        var toastSpan = document.createElement("SPAN");
+        toastSpan.classList.add("symbol");
+        toastSpan.classList.add("symbol-circle");
+        toastSpan.classList.add("toast-icon");
+        toastSpan.classList.add("bg-" + $type);
+        toastSpan.classList.add("me-3");
 
         tostHeader.append(toastSpan);
 
         /* Заголовок */
-        var tostStrong = document.createElement('strong');
-        tostStrong.classList.add('me-auto');
-        tostStrong.classList.add('mt-1');
+        var tostStrong = document.createElement("strong");
+        tostStrong.classList.add("me-auto");
+        tostStrong.classList.add("mt-1");
         tostStrong.textContent = $header;
         tostHeader.append(tostStrong);
 
         /* Кнопка закрыть */
-        var tostClosed = document.createElement('button');
-        tostClosed.type = 'button';
-        tostClosed.className = 'btn-close';
-        tostClosed.setAttribute('data-bs-dismiss', 'toast');
-        tostClosed.setAttribute('aria-label', 'Close');
+        var tostClosed = document.createElement("button");
+        tostClosed.type = "button";
+        tostClosed.className = "btn-close";
+        tostClosed.setAttribute("data-bs-dismiss", "toast");
+        tostClosed.setAttribute("aria-label", "Close");
         tostHeader.append(tostClosed);
 
 
         /* Текст сообщения */
-        var toastBody = document.createElement('div');
-        toastBody.className = 'toast-body';
+        var toastBody = document.createElement("div");
+        toastBody.className = "toast-body";
         toastEl.append(toastBody);
 
-        var toastText = document.createElement('p');
+        var toastText = document.createElement("p");
         toastText.textContent = $message;
         toastBody.append(toastText);
 
 
-        if ($href) {
-            var toastHref = document.createElement('a');
-            toastHref.classList.add('text-decoration-none');
-            toastHref.classList.add('ms-3');
+        if($href)
+        {
+            var toastHref = document.createElement("a");
+            toastHref.classList.add("text-decoration-none");
+            toastHref.classList.add("ms-3");
             toastHref.href = $href;
             toastHref.textContent = $name;
             toastText.append(toastHref);
         }
 
-        document.getElementById('toast').appendChild(toastEl);
-        document.getElementById('toast').appendChild(toastEl);
-        document.getElementById('toast').appendChild(toastEl);
+        document.getElementById("toast").appendChild(toastEl);
+        document.getElementById("toast").appendChild(toastEl);
+        document.getElementById("toast").appendChild(toastEl);
 
-        new bootstrap.Toast(toastEl, {delay: 3000000}).show();
+        new bootstrap.Toast(toastEl, {delay : 3000000}).show();
     }
 }

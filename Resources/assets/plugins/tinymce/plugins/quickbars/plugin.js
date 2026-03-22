@@ -6,393 +6,501 @@
  *
  * Version: 5.9.2 (2021-09-08)
  */
-(function () {
-    'use strict';
+(function()
+{
+    "use strict";
 
-    var global$3 = tinymce.util.Tools.resolve('tinymce.PluginManager');
+    var global$3 = tinymce.util.Tools.resolve("tinymce.PluginManager");
 
     var unique = 0;
-    var generate = function (prefix) {
+    var generate = function(prefix)
+    {
         var date = new Date();
         var time = date.getTime();
         var random = Math.floor(Math.random() * 1000000000);
         unique++;
-        return prefix + '_' + random + unique + String(time);
+        return prefix + "_" + random + unique + String(time);
     };
 
-    var createTableHtml = function (cols, rows) {
-        var html = '<table data-mce-id="mce" style="width: 100%">';
-        html += '<tbody>';
-        for (var y = 0; y < rows; y++) {
-            html += '<tr>';
-            for (var x = 0; x < cols; x++) {
-                html += '<td><br></td>';
+    var createTableHtml = function(cols, rows)
+    {
+        var html = "<table data-mce-id=\"mce\" style=\"width: 100%\">";
+        html += "<tbody>";
+        for(var y = 0; y < rows; y++)
+        {
+            html += "<tr>";
+            for(var x = 0; x < cols; x++)
+            {
+                html += "<td><br></td>";
             }
-            html += '</tr>';
+            html += "</tr>";
         }
-        html += '</tbody>';
-        html += '</table>';
+        html += "</tbody>";
+        html += "</table>";
         return html;
     };
-    var getInsertedElement = function (editor) {
-        var elms = editor.dom.select('*[data-mce-id]');
+    var getInsertedElement = function(editor)
+    {
+        var elms = editor.dom.select("*[data-mce-id]");
         return elms[0];
     };
-    var insertTableHtml = function (editor, cols, rows) {
-        editor.undoManager.transact(function () {
+    var insertTableHtml = function(editor, cols, rows)
+    {
+        editor.undoManager.transact(function()
+        {
             editor.insertContent(createTableHtml(cols, rows));
             var tableElm = getInsertedElement(editor);
-            tableElm.removeAttribute('data-mce-id');
-            var cellElm = editor.dom.select('td,th', tableElm);
+            tableElm.removeAttribute("data-mce-id");
+            var cellElm = editor.dom.select("td,th", tableElm);
             editor.selection.setCursorLocation(cellElm[0], 0);
         });
     };
-    var insertTable = function (editor, cols, rows) {
+    var insertTable = function(editor, cols, rows)
+    {
         editor.plugins.table ? editor.plugins.table.insertTable(cols, rows) : insertTableHtml(editor, cols, rows);
     };
-    var insertBlob = function (editor, base64, blob) {
+    var insertBlob = function(editor, base64, blob)
+    {
         var blobCache = editor.editorUpload.blobCache;
-        var blobInfo = blobCache.create(generate('mceu'), blob, base64);
+        var blobInfo = blobCache.create(generate("mceu"), blob, base64);
         blobCache.add(blobInfo);
-        editor.insertContent(editor.dom.createHTML('img', {src: blobInfo.blobUri()}));
+        editor.insertContent(editor.dom.createHTML("img", {src : blobInfo.blobUri()}));
     };
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.util.Promise');
+    var global$2 = tinymce.util.Tools.resolve("tinymce.util.Promise");
 
-    var blobToBase64 = function (blob) {
-        return new global$2(function (resolve) {
+    var blobToBase64 = function(blob)
+    {
+        return new global$2(function(resolve)
+        {
             var reader = new FileReader();
-            reader.onloadend = function () {
-                resolve(reader.result.split(',')[1]);
+            reader.onloadend = function()
+            {
+                resolve(reader.result.split(",")[1]);
             };
             reader.readAsDataURL(blob);
         });
     };
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.Env');
+    var global$1 = tinymce.util.Tools.resolve("tinymce.Env");
 
-    var global = tinymce.util.Tools.resolve('tinymce.util.Delay');
+    var global = tinymce.util.Tools.resolve("tinymce.util.Delay");
 
-    var pickFile = function (editor) {
-        return new global$2(function (resolve) {
-            var fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = 'image/*';
-            fileInput.style.position = 'fixed';
-            fileInput.style.left = '0';
-            fileInput.style.top = '0';
-            fileInput.style.opacity = '0.001';
+    var pickFile = function(editor)
+    {
+        return new global$2(function(resolve)
+        {
+            var fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = "image/*";
+            fileInput.style.position = "fixed";
+            fileInput.style.left = "0";
+            fileInput.style.top = "0";
+            fileInput.style.opacity = "0.001";
             document.body.appendChild(fileInput);
-            var changeHandler = function (e) {
+            var changeHandler = function(e)
+            {
                 resolve(Array.prototype.slice.call(e.target.files));
             };
-            fileInput.addEventListener('change', changeHandler);
-            var cancelHandler = function (e) {
-                var cleanup = function () {
+            fileInput.addEventListener("change", changeHandler);
+            var cancelHandler = function(e)
+            {
+                var cleanup = function()
+                {
                     resolve([]);
                     fileInput.parentNode.removeChild(fileInput);
                 };
-                if (global$1.os.isAndroid() && e.type !== 'remove') {
+                if(global$1.os.isAndroid() && e.type !== "remove")
+                {
                     global.setEditorTimeout(editor, cleanup, 0);
-                } else {
+                }
+                else
+                {
                     cleanup();
                 }
-                editor.off('focusin remove', cancelHandler);
+                editor.off("focusin remove", cancelHandler);
             };
-            editor.on('focusin remove', cancelHandler);
+            editor.on("focusin remove", cancelHandler);
             fileInput.click();
         });
     };
 
-    var setupButtons = function (editor) {
-        editor.ui.registry.addButton('quickimage', {
-            icon: 'image',
-            tooltip: 'Insert image',
-            onAction: function () {
-                pickFile(editor).then(function (files) {
-                    if (files.length > 0) {
+    var setupButtons = function(editor)
+    {
+        editor.ui.registry.addButton("quickimage", {
+            icon : "image",
+            tooltip : "Insert image",
+            onAction : function()
+            {
+                pickFile(editor).then(function(files)
+                {
+                    if(files.length > 0)
+                    {
                         var blob_1 = files[0];
-                        blobToBase64(blob_1).then(function (base64) {
+                        blobToBase64(blob_1).then(function(base64)
+                        {
                             insertBlob(editor, base64, blob_1);
                         });
                     }
                 });
-            }
+            },
         });
-        editor.ui.registry.addButton('quicktable', {
-            icon: 'table',
-            tooltip: 'Insert table',
-            onAction: function () {
+        editor.ui.registry.addButton("quicktable", {
+            icon : "table",
+            tooltip : "Insert table",
+            onAction : function()
+            {
                 insertTable(editor, 2, 2);
-            }
+            },
         });
     };
 
-    var typeOf = function (x) {
+    var typeOf = function(x)
+    {
         var t = typeof x;
-        if (x === null) {
-            return 'null';
-        } else if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
-            return 'array';
-        } else if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
-            return 'string';
-        } else {
+        if(x === null)
+        {
+            return "null";
+        }
+        else if(t === "object" && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === "Array"))
+        {
+            return "array";
+        }
+        else if(t === "object" && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === "String"))
+        {
+            return "string";
+        }
+        else
+        {
             return t;
         }
     };
-    var isType = function (type) {
-        return function (value) {
+    var isType = function(type)
+    {
+        return function(value)
+        {
             return typeOf(value) === type;
         };
     };
-    var isSimpleType = function (type) {
-        return function (value) {
+    var isSimpleType = function(type)
+    {
+        return function(value)
+        {
             return typeof value === type;
         };
     };
-    var eq = function (t) {
-        return function (a) {
+    var eq = function(t)
+    {
+        return function(a)
+        {
             return t === a;
         };
     };
-    var isString = isType('string');
-    var isObject = isType('object');
-    var isArray = isType('array');
-    var isBoolean = isSimpleType('boolean');
+    var isString = isType("string");
+    var isObject = isType("object");
+    var isArray = isType("array");
+    var isBoolean = isSimpleType("boolean");
     var isUndefined = eq(undefined);
-    var isFunction = isSimpleType('function');
+    var isFunction = isSimpleType("function");
 
-    var noop = function () {
+    var noop = function()
+    {
     };
-    var constant = function (value) {
-        return function () {
+    var constant = function(value)
+    {
+        return function()
+        {
             return value;
         };
     };
-    var identity = function (x) {
+    var identity = function(x)
+    {
         return x;
     };
     var never = constant(false);
     var always = constant(true);
 
-    var none = function () {
+    var none = function()
+    {
         return NONE;
     };
-    var NONE = function () {
-        var call = function (thunk) {
+    var NONE = function()
+    {
+        var call = function(thunk)
+        {
             return thunk();
         };
         var id = identity;
         var me = {
-            fold: function (n, _s) {
+            fold : function(n, _s)
+            {
                 return n();
             },
-            isSome: never,
-            isNone: always,
-            getOr: id,
-            getOrThunk: call,
-            getOrDie: function (msg) {
-                throw new Error(msg || 'error: getOrDie called on none.');
+            isSome : never,
+            isNone : always,
+            getOr : id,
+            getOrThunk : call,
+            getOrDie : function(msg)
+            {
+                throw new Error(msg || "error: getOrDie called on none.");
             },
-            getOrNull: constant(null),
-            getOrUndefined: constant(undefined),
-            or: id,
-            orThunk: call,
-            map: none,
-            each: noop,
-            bind: none,
-            exists: never,
-            forall: always,
-            filter: function () {
+            getOrNull : constant(null),
+            getOrUndefined : constant(undefined),
+            or : id,
+            orThunk : call,
+            map : none,
+            each : noop,
+            bind : none,
+            exists : never,
+            forall : always,
+            filter : function()
+            {
                 return none();
             },
-            toArray: function () {
+            toArray : function()
+            {
                 return [];
             },
-            toString: constant('none()')
+            toString : constant("none()"),
         };
         return me;
     }();
-    var some = function (a) {
+    var some = function(a)
+    {
         var constant_a = constant(a);
-        var self = function () {
+        var self = function()
+        {
             return me;
         };
-        var bind = function (f) {
+        var bind = function(f)
+        {
             return f(a);
         };
         var me = {
-            fold: function (n, s) {
+            fold : function(n, s)
+            {
                 return s(a);
             },
-            isSome: always,
-            isNone: never,
-            getOr: constant_a,
-            getOrThunk: constant_a,
-            getOrDie: constant_a,
-            getOrNull: constant_a,
-            getOrUndefined: constant_a,
-            or: self,
-            orThunk: self,
-            map: function (f) {
+            isSome : always,
+            isNone : never,
+            getOr : constant_a,
+            getOrThunk : constant_a,
+            getOrDie : constant_a,
+            getOrNull : constant_a,
+            getOrUndefined : constant_a,
+            or : self,
+            orThunk : self,
+            map : function(f)
+            {
                 return some(f(a));
             },
-            each: function (f) {
+            each : function(f)
+            {
                 f(a);
             },
-            bind: bind,
-            exists: bind,
-            forall: bind,
-            filter: function (f) {
+            bind : bind,
+            exists : bind,
+            forall : bind,
+            filter : function(f)
+            {
                 return f(a) ? me : NONE;
             },
-            toArray: function () {
+            toArray : function()
+            {
                 return [a];
             },
-            toString: function () {
-                return 'some(' + a + ')';
-            }
+            toString : function()
+            {
+                return "some(" + a + ")";
+            },
         };
         return me;
     };
-    var from = function (value) {
+    var from = function(value)
+    {
         return value === null || value === undefined ? NONE : some(value);
     };
     var Optional = {
-        some: some,
-        none: none,
-        from: from
+        some : some,
+        none : none,
+        from : from,
     };
 
-    function ClosestOrAncestor(is, ancestor, scope, a, isRoot) {
-        if (is(scope, a)) {
+    function ClosestOrAncestor(is, ancestor, scope, a, isRoot)
+    {
+        if(is(scope, a))
+        {
             return Optional.some(scope);
-        } else if (isFunction(isRoot) && isRoot(scope)) {
+        }
+        else if(isFunction(isRoot) && isRoot(scope))
+        {
             return Optional.none();
-        } else {
+        }
+        else
+        {
             return ancestor(scope, a, isRoot);
         }
     }
 
     var ELEMENT = 1;
 
-    var fromHtml = function (html, scope) {
+    var fromHtml = function(html, scope)
+    {
         var doc = scope || document;
-        var div = doc.createElement('div');
+        var div = doc.createElement("div");
         div.innerHTML = html;
-        if (!div.hasChildNodes() || div.childNodes.length > 1) {
-            console.error('HTML does not have a single root node', html);
-            throw new Error('HTML must have a single root node');
+        if(!div.hasChildNodes() || div.childNodes.length > 1)
+        {
+            console.error("HTML does not have a single root node", html);
+            throw new Error("HTML must have a single root node");
         }
         return fromDom(div.childNodes[0]);
     };
-    var fromTag = function (tag, scope) {
+    var fromTag = function(tag, scope)
+    {
         var doc = scope || document;
         var node = doc.createElement(tag);
         return fromDom(node);
     };
-    var fromText = function (text, scope) {
+    var fromText = function(text, scope)
+    {
         var doc = scope || document;
         var node = doc.createTextNode(text);
         return fromDom(node);
     };
-    var fromDom = function (node) {
-        if (node === null || node === undefined) {
-            throw new Error('Node cannot be null or undefined');
+    var fromDom = function(node)
+    {
+        if(node === null || node === undefined)
+        {
+            throw new Error("Node cannot be null or undefined");
         }
-        return {dom: node};
+        return {dom : node};
     };
-    var fromPoint = function (docElm, x, y) {
+    var fromPoint = function(docElm, x, y)
+    {
         return Optional.from(docElm.dom.elementFromPoint(x, y)).map(fromDom);
     };
     var SugarElement = {
-        fromHtml: fromHtml,
-        fromTag: fromTag,
-        fromText: fromText,
-        fromDom: fromDom,
-        fromPoint: fromPoint
+        fromHtml : fromHtml,
+        fromTag : fromTag,
+        fromText : fromText,
+        fromDom : fromDom,
+        fromPoint : fromPoint,
     };
 
-    var is = function (element, selector) {
+    var is = function(element, selector)
+    {
         var dom = element.dom;
-        if (dom.nodeType !== ELEMENT) {
+        if(dom.nodeType !== ELEMENT)
+        {
             return false;
-        } else {
+        }
+        else
+        {
             var elem = dom;
-            if (elem.matches !== undefined) {
+            if(elem.matches !== undefined)
+            {
                 return elem.matches(selector);
-            } else if (elem.msMatchesSelector !== undefined) {
+            }
+            else if(elem.msMatchesSelector !== undefined)
+            {
                 return elem.msMatchesSelector(selector);
-            } else if (elem.webkitMatchesSelector !== undefined) {
+            }
+            else if(elem.webkitMatchesSelector !== undefined)
+            {
                 return elem.webkitMatchesSelector(selector);
-            } else if (elem.mozMatchesSelector !== undefined) {
+            }
+            else if(elem.mozMatchesSelector !== undefined)
+            {
                 return elem.mozMatchesSelector(selector);
-            } else {
-                throw new Error('Browser lacks native selectors');
+            }
+            else
+            {
+                throw new Error("Browser lacks native selectors");
             }
         }
     };
 
-    typeof window !== 'undefined' ? window : Function('return this;')();
+    typeof window !== "undefined" ? window : Function("return this;")();
 
-    var name = function (element) {
+    var name = function(element)
+    {
         var r = element.dom.nodeName;
         return r.toLowerCase();
     };
 
-    var ancestor$1 = function (scope, predicate, isRoot) {
+    var ancestor$1 = function(scope, predicate, isRoot)
+    {
         var element = scope.dom;
         var stop = isFunction(isRoot) ? isRoot : never;
-        while (element.parentNode) {
+        while(element.parentNode)
+        {
             element = element.parentNode;
             var el = SugarElement.fromDom(element);
-            if (predicate(el)) {
+            if(predicate(el))
+            {
                 return Optional.some(el);
-            } else if (stop(el)) {
+            }
+            else if(stop(el))
+            {
                 break;
             }
         }
         return Optional.none();
     };
-    var closest$1 = function (scope, predicate, isRoot) {
-        var is = function (s, test) {
+    var closest$1 = function(scope, predicate, isRoot)
+    {
+        var is = function(s, test)
+        {
             return test(s);
         };
         return ClosestOrAncestor(is, ancestor$1, scope, predicate, isRoot);
     };
 
-    var ancestor = function (scope, selector, isRoot) {
-        return ancestor$1(scope, function (e) {
+    var ancestor = function(scope, selector, isRoot)
+    {
+        return ancestor$1(scope, function(e)
+        {
             return is(e, selector);
         }, isRoot);
     };
-    var closest = function (scope, selector, isRoot) {
-        var is$1 = function (element, selector) {
+    var closest = function(scope, selector, isRoot)
+    {
+        var is$1 = function(element, selector)
+        {
             return is(element, selector);
         };
         return ClosestOrAncestor(is$1, ancestor, scope, selector, isRoot);
     };
 
-    var validDefaultOrDie = function (value, predicate) {
-        if (predicate(value)) {
+    var validDefaultOrDie = function(value, predicate)
+    {
+        if(predicate(value))
+        {
             return true;
         }
-        throw new Error('Default value doesn\'t match requested type.');
+        throw new Error("Default value doesn't match requested type.");
     };
-    var items = function (value, defaultValue) {
-        if (isArray(value) || isObject(value)) {
-            throw new Error('expected a string but found: ' + value);
+    var items = function(value, defaultValue)
+    {
+        if(isArray(value) || isObject(value))
+        {
+            throw new Error("expected a string but found: " + value);
         }
-        if (isUndefined(value)) {
+        if(isUndefined(value))
+        {
             return defaultValue;
         }
-        if (isBoolean(value)) {
-            return value === false ? '' : defaultValue;
+        if(isBoolean(value))
+        {
+            return value === false ? "" : defaultValue;
         }
         return value;
     };
-    var getToolbarItemsOr_ = function (predicate) {
-        return function (editor, name, defaultValue) {
+    var getToolbarItemsOr_ = function(predicate)
+    {
+        return function(editor, name, defaultValue)
+        {
             validDefaultOrDie(defaultValue, predicate);
             var value = editor.getParam(name, defaultValue);
             return items(value, defaultValue);
@@ -400,69 +508,86 @@
     };
     var getToolbarItemsOr = getToolbarItemsOr_(isString);
 
-    var getTextSelectionToolbarItems = function (editor) {
-        return getToolbarItemsOr(editor, 'quickbars_selection_toolbar', 'bold italic | quicklink h2 h3 blockquote');
+    var getTextSelectionToolbarItems = function(editor)
+    {
+        return getToolbarItemsOr(editor, "quickbars_selection_toolbar", "bold italic | quicklink h2 h3 blockquote");
     };
-    var getInsertToolbarItems = function (editor) {
-        return getToolbarItemsOr(editor, 'quickbars_insert_toolbar', 'quickimage quicktable');
+    var getInsertToolbarItems = function(editor)
+    {
+        return getToolbarItemsOr(editor, "quickbars_insert_toolbar", "quickimage quicktable");
     };
-    var getImageToolbarItems = function (editor) {
-        return getToolbarItemsOr(editor, 'quickbars_image_toolbar', 'alignleft aligncenter alignright');
+    var getImageToolbarItems = function(editor)
+    {
+        return getToolbarItemsOr(editor, "quickbars_image_toolbar", "alignleft aligncenter alignright");
     };
 
-    var addToEditor$1 = function (editor) {
+    var addToEditor$1 = function(editor)
+    {
         var insertToolbarItems = getInsertToolbarItems(editor);
-        if (insertToolbarItems.trim().length > 0) {
-            editor.ui.registry.addContextToolbar('quickblock', {
-                predicate: function (node) {
+        if(insertToolbarItems.trim().length > 0)
+        {
+            editor.ui.registry.addContextToolbar("quickblock", {
+                predicate : function(node)
+                {
                     var sugarNode = SugarElement.fromDom(node);
                     var textBlockElementsMap = editor.schema.getTextBlockElements();
-                    var isRoot = function (elem) {
+                    var isRoot = function(elem)
+                    {
                         return elem.dom === editor.getBody();
                     };
-                    return closest(sugarNode, 'table', isRoot).fold(function () {
-                        return closest$1(sugarNode, function (elem) {
+                    return closest(sugarNode, "table", isRoot).fold(function()
+                    {
+                        return closest$1(sugarNode, function(elem)
+                        {
                             return name(elem) in textBlockElementsMap && editor.dom.isEmpty(elem.dom);
                         }, isRoot).isSome();
                     }, never);
                 },
-                items: insertToolbarItems,
-                position: 'line',
-                scope: 'editor'
+                items : insertToolbarItems,
+                position : "line",
+                scope : "editor",
             });
         }
     };
 
-    var addToEditor = function (editor) {
-        var isEditable = function (node) {
-            return editor.dom.getContentEditableParent(node) !== 'false';
+    var addToEditor = function(editor)
+    {
+        var isEditable = function(node)
+        {
+            return editor.dom.getContentEditableParent(node) !== "false";
         };
-        var isImage = function (node) {
-            return node.nodeName === 'IMG' || node.nodeName === 'FIGURE' && /image/i.test(node.className);
+        var isImage = function(node)
+        {
+            return node.nodeName === "IMG" || node.nodeName === "FIGURE" && /image/i.test(node.className);
         };
         var imageToolbarItems = getImageToolbarItems(editor);
-        if (imageToolbarItems.trim().length > 0) {
-            editor.ui.registry.addContextToolbar('imageselection', {
-                predicate: isImage,
-                items: imageToolbarItems,
-                position: 'node'
+        if(imageToolbarItems.trim().length > 0)
+        {
+            editor.ui.registry.addContextToolbar("imageselection", {
+                predicate : isImage,
+                items : imageToolbarItems,
+                position : "node",
             });
         }
         var textToolbarItems = getTextSelectionToolbarItems(editor);
-        if (textToolbarItems.trim().length > 0) {
-            editor.ui.registry.addContextToolbar('textselection', {
-                predicate: function (node) {
+        if(textToolbarItems.trim().length > 0)
+        {
+            editor.ui.registry.addContextToolbar("textselection", {
+                predicate : function(node)
+                {
                     return !isImage(node) && !editor.selection.isCollapsed() && isEditable(node);
                 },
-                items: textToolbarItems,
-                position: 'selection',
-                scope: 'editor'
+                items : textToolbarItems,
+                position : "selection",
+                scope : "editor",
             });
         }
     };
 
-    function Plugin() {
-        global$3.add('quickbars', function (editor) {
+    function Plugin()
+    {
+        global$3.add("quickbars", function(editor)
+        {
             setupButtons(editor);
             addToEditor$1(editor);
             addToEditor(editor);

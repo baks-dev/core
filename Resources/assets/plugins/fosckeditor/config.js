@@ -5,19 +5,19 @@
 
 CKEDITOR.disableAutoInline = true;
 
-CKEDITOR.editorConfig = function( config ) {
-	// Define changes to default configuration here. For example:
-	// config.language = 'fr';
-	// config.uiColor = '#AADC6E';
+CKEDITOR.editorConfig = function(config)
+{
+    // Define changes to default configuration here. For example:
+    // config.language = 'fr';
+    // config.uiColor = '#AADC6E';
 
     //config.extraPlugins = 'codesnippet';
 
 
     /*config.extraPlugins = 'autogrow';
-    config.autoGrow_minHeight = 200;
-    config.autoGrow_maxHeight = 600;
-    config.autoGrow_bottomSpace = 50;*/
-
+     config.autoGrow_minHeight = 200;
+     config.autoGrow_maxHeight = 600;
+     config.autoGrow_bottomSpace = 50;*/
 
 
     //config.extraPlugins = 'mentions';
@@ -27,8 +27,8 @@ CKEDITOR.editorConfig = function( config ) {
     //config.extraPlugins = 'autocomplete';
     //config.extraPlugins = 'textmatch';
 
-    config.extraPlugins = 'autocomplete';
-    config.extraPlugins = 'codemirror';
+    config.extraPlugins = "autocomplete";
+    config.extraPlugins = "codemirror";
 
     //config.contentsCss = 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css';
 };
