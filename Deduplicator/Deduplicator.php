@@ -139,11 +139,11 @@ final class Deduplicator implements DeduplicatorInterface
      *
      * @param DateInterval|string $delay - время в секундах, на которое необходимо отложить запрос
      */
-    public function getAndSaveNextTime(DateInterval|string $delay = '1 seconds'): DateInterval|false
+    public function getAndSaveNextTime(DateInterval|string $delay = '1 seconds'): DateInterval
     {
         if($this->cache === false || $this->key === false)
         {
-            return false;
+            return DateInterval::createFromDateString('1 seconds');
         }
 
         if(false === ($delay instanceof DateInterval))
