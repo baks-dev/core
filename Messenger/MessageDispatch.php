@@ -110,7 +110,7 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($isRunning === false && in_array($transport, ['files-res', 'search']))
             {
-                $this->logger->critical(sprintf('Обязательный MessengerTransport %s не найден', $transport));
+                $this->logger->warning(sprintf('Обязательный MessengerTransport %s не найден', $transport));
                 return null;
             }
 
