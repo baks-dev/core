@@ -5,7 +5,6 @@ $html = false;
  * *  Инициируем Bootstrap
  */
 
-
 /** Carousel */
 
 executeFunc(bindBootstrapCarousel);
