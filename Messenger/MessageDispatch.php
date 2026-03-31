@@ -114,6 +114,7 @@ final class MessageDispatch implements MessageDispatchInterface
                     sprintf('Обязательный MessengerTransport %s не найден', $transport),
                     [self::class.':'.__LINE__],
                 );
+
                 return null;
             }
 
