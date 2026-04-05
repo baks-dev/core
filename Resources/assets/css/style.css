@@ -782,3 +782,32 @@ img.loaded, div.loaded {
         color: #deb217;
     }
 }
+
+.d-blink {
+    -webkit-animation: d-blink 1s linear infinite;
+    animation: d-blink 1s linear infinite;
+}
+
+@-webkit-keyframes d-blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes d-blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

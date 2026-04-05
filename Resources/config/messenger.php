@@ -105,7 +105,7 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
 
     !$isDoctrine ?: $syncTransport->options([
-        'table_name' => 'messenger_core',
+        'table_name' => 'messenger_async',
         'auto_setup' => true,
         'queue_name' => 'async',
     ]);
@@ -133,7 +133,7 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
 
     !$isDoctrine ?: $asyncLowTransport->options([
-        'table_name' => 'messenger_core',
+        'table_name' => 'messenger_async',
         'auto_setup' => true,
         'queue_name' => 'low',
     ]);
