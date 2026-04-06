@@ -957,9 +957,20 @@ final class DBALQueryBuilder extends QueryBuilder
             return false;
         }
 
+        /** @var UserProfileUid $current */
+        $current = $this->UserProfileTokenStorageInterface->getProfileCurrent();
+
+        /**
+         * Если пользователь авторизован и его профиль равен профилю проекта
+         */
+        if($current->equals($this->projectProfile))
+        {
+            return false;
+        }
+
         $this->setParameter(
             key: self::CURRENT_PROFILE_KEY,
-            value: $this->UserProfileTokenStorageInterface->getProfileCurrent(),
+            value: $current,
             type: UserProfileUid::TYPE,
         );
 
