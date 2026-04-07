@@ -711,4 +711,9 @@ abstract class AbstractHandler
         $this->validatorCollection->add($this->event);
         $this->validatorCollection->add($this->main);
     }
+
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->entityManager;
+    }
 }
