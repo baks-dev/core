@@ -56,17 +56,17 @@ final class MessageDispatch implements MessageDispatchInterface
      * - Если воркера не найдено - сообщение обрабатываться синхронно
      * - Если транспорт UID - наличие запущенного воркера обязательно, в противном случае сообщение не отрабатывает
      */
-    public function dispatch(object $message, array $stamps = [], ?string $transport = null): ?Envelope
+    public function dispatch(object $message, array $stamps = [], string|object|null $transport = null): ?Envelope
     {
-        $this->transport = $transport;
+        $this->transport = $transport ?? (string) $this->transport;
 
-        if($transport)
+        if($this->transport)
         {
             /* Чистим кеш модуля (транспорта) */
-            $cache = $this->cache->init(str_replace('-low', '', $transport));
+            $cache = $this->cache->init(str_replace('-low', '', $this->transport));
             $cache->clear();
 
-            new FilesystemAdapter($transport)->clear();
+            new FilesystemAdapter($this->transport)->clear();
         }
 
         if($this->dispatch === false)
@@ -108,10 +108,10 @@ final class MessageDispatch implements MessageDispatchInterface
             /**
              * Транспорт resources (для отправки файлов на CDN) всегда должен быть запущен
              */
-            if($isRunning === false && in_array($transport, ['files-res', 'search']))
+            if($isRunning === false && in_array($this->transport, ['files-res', 'search']))
             {
                 $this->logger->warning(
-                    sprintf('Обязательный MessengerTransport %s не найден', $transport),
+                    sprintf('Обязательный MessengerTransport %s не найден', $this->transport),
                     [self::class.':'.__LINE__],
                 );
 
