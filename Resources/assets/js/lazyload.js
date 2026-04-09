@@ -1132,15 +1132,60 @@
 
     var load = function load(element, settings, instance)
     {
+        if(element.tagName === "SCRIPT")
+        {
+            elem = document.createElement("SCRIPT");
 
+            if(typeof element.dataset.src === "string")
+            {
+                elem.setAttribute("src", element.dataset.src);
+            }
+            else
+            {
+                /** Присваиваем скрипт из тега */
+                elem.text = element.text;
+            }
 
-        // console.log('load');
-        // console.log(element);
+            if(elem)
+            {
+                /** переопределяем аттрибуты */
+                if(element instanceof Element && typeof element.getAttributeNames == "function")
+                {
+                    element.getAttributeNames().forEach((function(e)
+                    {
+                        if(e != "data-src" && e != "data-href" && e != "class")
+                        {
+                            if(e == "data-nonce")
+                            {
+                                elem.setAttribute("nonce", element.getAttribute(e));
+                            }
+                            else
+                            {
+                                elem.setAttribute(e.toString(), element.getAttribute(e));
+                            }
+                        }
+                    }));
+                }
+
+                element.remove();
+
+                if(typeof callback == "function")
+                {
+                    elem.addEventListener("load", callback);
+                }
+
+                executeFunc(function initScriptElement()
+                {
+                    document.head.appendChild(elem);
+                    return true;
+                });
+
+                return;
+            }
+        }
 
         if(hasLoadEvent(element))
         {
-
-
             loadRegular(element, settings, instance);
         }
         else
