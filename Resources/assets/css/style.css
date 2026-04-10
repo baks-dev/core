@@ -747,40 +747,39 @@ img.loaded, div.loaded {
 }
 
 
-.rate {
+.rate .form-check {
+    position: relative;
+    padding-left: 0;
+}
 
-    .form-check {
-        position: relative;
-        padding-left: 0;
-    }
+.rate .form-check input[type="radio"] {
+    position: absolute;
+    top: -9999px;
+}
 
-    .form-check input[type="radio"] {
-        position: absolute;
-        top: -9999px;
-    }
+/** rate */
 
-    .form-check label {
-        width: 1em;
-        overflow: hidden;
-        white-space: nowrap;
-        cursor: pointer;
-        font-size: 30px;
-        color: #ccc;
-        display: block;
-        transition: color 0.2s;
-    }
+.rate .form-check label {
+    width: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 30px;
+    color: #ccc;
+    display: block;
+    transition: color 0.2s;
+}
 
-    .form-check label:before {
-        content: '★ ';
-    }
+.rate .form-check label:before {
+    content: '★ ';
+}
 
-    .form-check label.active {
-        color: #ffc700;
-    }
+.rate .form-check label.active {
+    color: #ffc700;
+}
 
-    .form-check label.hovered {
-        color: #deb217;
-    }
+.rate .form-check label.hovered {
+    color: #deb217;
 }
 
 .d-blink {
@@ -811,3 +810,4 @@ img.loaded, div.loaded {
         opacity: 1;
     }
 }
+
