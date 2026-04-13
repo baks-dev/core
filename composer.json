@@ -30,10 +30,9 @@
     "symfony/console": "7.3.*",
     "symfony/translation": "7.3.*"
   },
+
   "require-dev": {
-    "roave/security-advisories": "dev-latest"
-  },
-  "require-dev": {
+    "roave/security-advisories": "dev-latest",
     "phpunit/phpunit": "^11.1",
     "doctrine/doctrine-fixtures-bundle": "^4.3",
     "symfony/browser-kit": "7.3.*",
