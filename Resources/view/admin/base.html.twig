@@ -71,7 +71,7 @@
 
     <script nonce="{{ csp_nonce() }}">
         window.centrifugo_dsn = "{{ centrifugo_dsn }}";
-        window.centrifugo_token = "{{ user_token() }}";
+        window.centrifugo_token = "{{ centrifugo_user_token() }}";
     </script>
 
     <script nonce='{{ csp_nonce() }}' async
