@@ -45,13 +45,55 @@
         class="lazy"></script>
 <script nonce="{{ csp_nonce() }}" data-src='/assets/{{ version }}/js/script.min.js' class="lazy"></script>
 
+{# Профили #}
+
+{% if constant('BaksDev\\Users\\Profile\\UserProfile\\BaksDevUsersProfileUserProfileBundle::PATH') is defined %}
+
+    <script nonce="{{ csp_nonce() }}">
+
+        // профиль, выдавший доверенность (магазин)
+        {% if baks_profile.id is defined %}
+        window.profile_id = "{{ baks_profile.id }}";
+        {% endif %}
+
+        // доверенный профиль (пользователь)
+        {% if baks_profile.current is defined %}
+        window.current_profile = "{{ baks_profile.current }}";
+        {% endif %}
+
+    </script>
+{% endif %}
+
+
+{# Сокеты #}
+
+{% if constant('BaksDev\\Centrifugo\\BaksDevCentrifugoBundle::PATH') is defined %}
+
+    <script nonce="{{ csp_nonce() }}">
+        window.centrifugo_dsn = "{{ centrifugo_dsn }}";
+        window.centrifugo_token = "{{ centrifugo_user_token() }}";
+    </script>
+
+    <script nonce='{{ csp_nonce() }}' async
+            data-src="/assets/{{ version }}/centrifugo/centrifuge.min.js?v={{ version }}"
+            class='lazy'></script>
+
+    <script nonce='{{ csp_nonce() }}' async
+            data-src="/assets/{{ version }}/centrifugo/socket.min.js?v={{ version }}"
+            class='lazy'></script>
+
+    <script nonce='{{ csp_nonce() }}' async
+            data-src="/assets/{{ version }}/centrifugo/centrifuge.notification.min.js?v={{ version }}"
+            class='lazy'></script>
+{% endif %}
+
+
 {% block javascript %}{% endblock %}
 
 {% block footer %}{% endblock %}
 
-{# TOAST УВЕДОМЛЕНИЯ ****************************************************** #}
+{# TOAST УВЕДОМЛЕНИЯ #}
 {% include Template('/_includes/'~baks_settings.device~'/flash.html.twig') %}
-{# END УВЕДОМЛЕНИЯ ****************************************************** #}
 
 {# Блок модального окна data-bs-backdrop #}
 <div class="modal fade" tabindex="-1" id="modal" data-bs-backdrop="static">
