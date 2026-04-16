@@ -51,17 +51,19 @@
 
     <script nonce="{{ csp_nonce() }}">
 
-        // профиль, выдавший доверенность (магазин)
-        {% if baks_profile.id is defined %}
+        // профиль текущего пользователя
+        {% if baks_profile.current is defined %}
+        window.current_profile = "{{ baks_profile.current }}";
+
+        // профиль доверености (магазин)
+        {% if baks_profile.id is defined and baks_profile.id !== baks_profile.current %}
         window.profile_id = "{{ baks_profile.id }}";
         {% endif %}
 
-        // доверенный профиль (пользователь)
-        {% if baks_profile.current is defined %}
-        window.current_profile = "{{ baks_profile.current }}";
         {% endif %}
 
     </script>
+
 {% endif %}
 
 
