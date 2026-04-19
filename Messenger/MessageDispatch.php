@@ -56,9 +56,9 @@ final class MessageDispatch implements MessageDispatchInterface
      * - Если воркера не найдено - сообщение обрабатываться синхронно
      * - Если транспорт UID - наличие запущенного воркера обязательно, в противном случае сообщение не отрабатывает
      */
-    public function dispatch(object $message, array $stamps = [], string|object|null $transport = null): ?Envelope
+    public function dispatch(object $message, array $stamps = [], string|null|false|object $transport = null): ?Envelope
     {
-        $this->transport = $transport ?? (string) $this->transport;
+        $this->transport = empty($transport) ? null : (string) $transport;
 
         if($this->transport)
         {
