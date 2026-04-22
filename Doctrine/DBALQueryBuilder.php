@@ -54,7 +54,10 @@ use ReflectionAttribute;
 use ReflectionClass;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 // #[Autoconfigure(public: true)]
@@ -89,6 +92,7 @@ final class DBALQueryBuilder extends QueryBuilder
         private readonly AppCacheInterface $cache,
         private readonly DeduplicatorInterface $deduplicator,
         private readonly MessageDispatchInterface $dispatch,
+        private readonly RequestStack $request,
         private readonly ?UserProfileTokenStorageInterface $UserProfileTokenStorageInterface = null,
         #[Autowire(env: 'PROJECT_PROFILE')] private readonly ?string $projectProfile = null,
     )
@@ -96,6 +100,46 @@ final class DBALQueryBuilder extends QueryBuilder
         $this->connection = $connection;
 
         parent::__construct($this->connection);
+    }
+
+    public function getDevice(): string
+    {
+        $agent = $this->request->getCurrentRequest()->headers->get('User-Agent');
+
+        $device = 'pc';
+
+        if($agent)
+        {
+            $AppCache = $this->cache->init('core');
+
+            $device = $AppCache->get(md5($agent), function(ItemInterface $item) use ($agent) {
+
+                $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+
+                $browscap = ini_get('browscap') ? get_browser($agent) : null;
+
+                $device = 'pc';
+
+                if($browscap?->ismobiledevice)
+                {
+                    $device = 'mobile';
+
+                    if($browscap->istablet)
+                    {
+                        $device = 'tablet';
+                    }
+                }
+
+                return $device;
+            });
+
+            if(empty($device) || !in_array($device, ['pc', 'mobile', 'tablet']))
+            {
+                $device = 'pc';
+            }
+        }
+
+        return $device;
     }
 
     /**
@@ -453,6 +497,7 @@ final class DBALQueryBuilder extends QueryBuilder
             cache: $inst->cache,
             deduplicator: $inst->deduplicator,
             dispatch: $inst->dispatch,
+            request: $this->request,
             UserProfileTokenStorageInterface: $this->UserProfileTokenStorageInterface,
             projectProfile: $inst->projectProfile,
         );
