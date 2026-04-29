@@ -90,8 +90,7 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
      * SYNC TRANSPORT
      */
 
-
-    $syncTransport = $messenger
+    $messenger
         ->transport('sync')
         ->dsn('sync://');
 
@@ -100,17 +99,17 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
      * ASYNC TRANSPORT
      */
 
-    $syncTransport = $messenger
+    $asyncTransport = $messenger
         ->transport('async')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%');
 
-    !$isDoctrine ?: $syncTransport->options([
+    !$isDoctrine ?: $asyncTransport->options([
         'table_name' => 'messenger_async',
         'auto_setup' => true,
         'queue_name' => 'async',
     ]);
 
-    $syncTransport
+    $asyncTransport
         ->retryStrategy()
         ->maxRetries(5)
         ->delay(1000)
@@ -119,7 +118,7 @@ return static function(FrameworkConfig $framework, DoctrineConfig $doctrine) {
         ->jitter(0.1)
         ->service(null);
 
-    $syncTransport
+    $asyncTransport
         ->failureTransport('failed');
 
 
