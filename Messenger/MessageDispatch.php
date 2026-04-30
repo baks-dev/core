@@ -56,11 +56,15 @@ final class MessageDispatch implements MessageDispatchInterface
      * - Если воркера не найдено - сообщение обрабатываться синхронно
      * - Если транспорт UID - наличие запущенного воркера обязательно, в противном случае сообщение не отрабатывает
      */
-    public function dispatch(object $message, array $stamps = [], string|null|false|object $transport = null): ?Envelope
+    public function dispatch(
+        object $message,
+        array $stamps = [],
+        string|null|false|object $transport = 'sync'
+    ): ?Envelope
     {
-        $this->transport = empty($transport) ? null : (string) $transport;
+        $this->transport = (string) $transport;
 
-        if($this->transport)
+        if($this->transport !== 'sync')
         {
             /* Чистим кеш модуля (транспорта) */
             $cache = $this->cache->init(str_replace('-low', '', $this->transport));
@@ -69,7 +73,7 @@ final class MessageDispatch implements MessageDispatchInterface
             new FilesystemAdapter($this->transport)->clear();
         }
 
-        if($this->dispatch === false)
+        if($this->dispatch === false || $this->transport === 'test')
         {
             return null;
         }
@@ -81,9 +85,9 @@ final class MessageDispatch implements MessageDispatchInterface
              */
             if($stamp instanceof MessageDelay)
             {
-                if(is_null($this->transport))
+                if($this->transport === 'sync')
                 {
-                    throw new InvalidArgumentException('Транспорт для отложенного сообщения не установлен');
+                    throw new InvalidArgumentException('Транспорт для отложенного сообщения не установлен либо не должен быть «sync»');
                 }
 
                 $stamps[] = $stamp->getDelayStamp();
@@ -91,56 +95,51 @@ final class MessageDispatch implements MessageDispatchInterface
             }
         }
 
+
+        /* Делаем пинг на указанный транспорт */
+        $isRunning = $this->isConsumer();
+
         /**
-         * Если указан транспорт - пробуем отправить в очередь
+         * Транспорт resources (для отправки файлов на CDN) всегда должен быть запущен
          */
-
-        if($this->transport)
+        if($isRunning === false && in_array($this->transport, ['files-res', 'search']))
         {
-            if($this->transport === 'test')
-            {
-                return null;
-            }
+            $this->logger->warning(
+                sprintf('Обязательный MessengerTransport %s не найден', $this->transport),
+                [self::class.':'.__LINE__],
+            );
 
-            /* Делаем пинг на указанный транспорт */
-            $isRunning = $this->isConsumer();
-
-            /**
-             * Транспорт resources (для отправки файлов на CDN) всегда должен быть запущен
-             */
-            if($isRunning === false && in_array($this->transport, ['files-res', 'search']))
-            {
-                $this->logger->warning(
-                    sprintf('Обязательный MessengerTransport %s не найден', $this->transport),
-                    [self::class.':'.__LINE__],
-                );
-
-                return null;
-            }
-
-            /**
-             * Если транспорт запущен - отправляем сообщение в очередь
-             */
-            if($isRunning)
-            {
-                return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
-            }
-
-            $transportRequire = $this->isUid(); // транспорт UID
-
-            /**
-             * Если транспорт не определяется и он является UID (обязательным)
-             *
-             * @note транспорт UID является профильным
-             */
-            if($transportRequire)
-            {
-                return null;
-            }
+            return null;
         }
 
-        /** Если транспорт не определяется и он не является UID (обязательным) - обрабатываем синхронно */
-        return $this->messageBus->dispatch($message, $stamps);
+
+        /**
+         * Если транспорт запущен - отправляем сообщение в очередь
+         */
+        if($isRunning)
+        {
+            return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp([$this->transport])]));
+        }
+
+
+        /**
+         * Если транспорт не определяется и он является UID (обязательным)
+         *
+         * @note транспорт UID является профильным
+         */
+        $transportRequire = $this->isUid(); // транспорт UID
+
+        if($transportRequire)
+        {
+            return null;
+        }
+
+
+        /**
+         * Если транспорт не определяется и он не является UID (обязательным) - обрабатываем синхронно в транспорте «sync»
+         */
+        return $this->messageBus->dispatch($message, array_merge($stamps, [new TransportNamesStamp(['sync'])]));
+
     }
 
     /**
@@ -151,6 +150,11 @@ final class MessageDispatch implements MessageDispatchInterface
         if(is_null($this->transport) && is_null($transport))
         {
             return false;
+        }
+
+        if($this->transport === 'async')
+        {
+            return true;
         }
 
         /** Переопределяем транспорт, если передан в качестве аргумента */

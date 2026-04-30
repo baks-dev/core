@@ -692,10 +692,8 @@ function modalLink(item)
                     modalLink(item);
                 });
 
-
                 modal.querySelectorAll("form").forEach(function(forms)
                 {
-
                     /* событие отправки формы */
                     forms.addEventListener("submit", function(event)
                     {
