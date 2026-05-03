@@ -78,15 +78,15 @@
     </script>
 
     <script nonce='{{ csp_nonce() }}' async
-            data-src="/assets/{{ version }}/centrifugo/centrifuge.min.js?v={{ version }}"
+            data-src="/assets/{{ version }}/centrifugo/centrifuge.min.js"
             class='lazy'></script>
 
     <script nonce='{{ csp_nonce() }}' async
-            data-src="/assets/{{ version }}/centrifugo/socket.min.js?v={{ version }}"
+            data-src="/assets/{{ version }}/centrifugo/socket.min.js"
             class='lazy'></script>
 
     <script nonce='{{ csp_nonce() }}' async
-            data-src="/assets/{{ version }}/centrifugo/centrifuge.notification.min.js?v={{ version }}"
+            data-src="/assets/{{ version }}/centrifugo/centrifuge.notification.min.js"
             class='lazy'></script>
 {% endif %}
 

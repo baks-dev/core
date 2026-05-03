@@ -44,4 +44,7 @@ interface ValidatorCollectionInterface
      * Возвращает идентификатор ошибки
      */
     public function getErrorUniqid(): string;
+
+    /** Присвоить и записать ошибку в лог валидатора */
+    public function error($message, ?array $context = []): void;
 }
