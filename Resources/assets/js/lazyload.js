@@ -1134,7 +1134,7 @@
     {
         if(element.tagName === "SCRIPT")
         {
-            elem = document.createElement("SCRIPT");
+            let elem = document.createElement("SCRIPT");
 
             if(typeof element.dataset.src === "string")
             {
