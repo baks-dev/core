@@ -26,6 +26,7 @@ namespace BaksDev\Core\Controller;
 use BaksDev\Core\Cache\CacheCss\CacheCssInterface;
 use BaksDev\Core\Repository\SettingsMain\SettingsMainInterface;
 use BaksDev\Core\Type\Locale\Locale;
+use BaksDev\Users\Profile\UserProfile\Repository\UserProfileTokenStorage\UserProfileTokenStorageInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\User\Entity\User;
 use BaksDev\Users\User\Type\Id\UserUid;
@@ -60,10 +61,10 @@ abstract class AbstractController
         private RequestStack $requestStack,
         private FormFactoryInterface $formFactory,
         private TranslatorInterface $translator,
-        private TokenStorageInterface $tokenStorage,
         private SettingsMainInterface $settingsMain,
         private CacheCssInterface $cacheCss,
         private CsrfTokenManagerInterface $csrfTokenManager,
+        private UserProfileTokenStorageInterface $userProfileTokenStorage,
     ) {}
 
     public function settings(): ?array
@@ -474,65 +475,26 @@ abstract class AbstractController
         return str_ireplace($remove, '', $body);
     }
 
-    protected function getCurrentUsr(): UserUid
+    protected function getCurrentUsr(): UserUid|false
     {
-        $token = $this->tokenStorage->getToken();
+        return $this->userProfileTokenStorage->getUserCurrent();
+    }
 
-        /** @var User $usr */
-        $usr = $token?->getUser();
-
-        if($usr && $token instanceof SwitchUserToken)
-        {
-            /** @var User $originalUser */
-            $originalUser = $token->getOriginalToken()->getUser();
-
-            if($originalUser?->getUserIdentifier() !== $usr?->getUserIdentifier())
-            {
-                return $originalUser->getId();
-            }
-        }
-
-        return $usr->getId();
+    protected function getUsr(): UserInterface|User|false|null
+    {
+        return $this->userProfileTokenStorage->getUserInterface();
     }
 
     /** Возвращает идентификатор профиля */
-    protected function getProfileUid(): ?UserProfileUid
+    protected function getProfileUid(): UserProfileUid|false|null
     {
-        return $this->getUsr()?->getProfile();
-    }
-
-    protected function getUsr(): UserInterface|User|null
-    {
-        try
-        {
-            $token = $this->tokenStorage->getToken();
-        }
-        catch(UnauthorizedHttpException $exception)
-        {
-            $token = null;
-        }
-
-        return $token?->getUser();
+        return $this->userProfileTokenStorage->getProfile();
     }
 
     /** Возвращает идентификатор профиля, независимо от авторизации */
-    protected function getCurrentProfileUid(): ?UserProfileUid
+    protected function getCurrentProfileUid(): UserProfileUid|false|null
     {
-        $token = $this->tokenStorage->getToken();
-
-        $usr = $token?->getUser();
-
-        if($usr && $token instanceof SwitchUserToken)
-        {
-            $originalUser = $token->getOriginalToken()->getUser();
-
-            if($originalUser?->getUserIdentifier() !== $usr?->getUserIdentifier())
-            {
-                $usr = $originalUser;
-            }
-        }
-
-        return $usr?->getProfile();
+        return $this->userProfileTokenStorage->getProfileCurrent();
     }
 
     /**
