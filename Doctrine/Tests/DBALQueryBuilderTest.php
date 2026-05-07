@@ -39,6 +39,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -53,6 +54,7 @@ final class DBALQueryBuilderTest extends TestCase
     private DeduplicatorInterface $deduplicator;
     private MessageDispatchInterface $dispatch;
     private UserProfileTokenStorageInterface $storage;
+    private RequestStack $request;
 
     public function testCreateQueryBuilder(): void
     {
@@ -65,6 +67,7 @@ final class DBALQueryBuilderTest extends TestCase
             cache: $this->cache,
             deduplicator: $this->deduplicator,
             dispatch: $this->dispatch,
+            request: $this->request,
             UserProfileTokenStorageInterface: $this->storage,
             projectProfile: null,
         );
@@ -86,6 +89,7 @@ final class DBALQueryBuilderTest extends TestCase
         $this->deduplicator = $this->createMock(DeduplicatorInterface::class);
         $this->dispatch = $this->createMock(MessageDispatchInterface::class);
         $this->storage = $this->createMock(UserProfileTokenStorageInterface::class);
+        $this->request = $this->createMock(RequestStack::class);
     }
 
 }
