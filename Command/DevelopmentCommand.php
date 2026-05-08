@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Core\Command;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Manufacture\Part\Messenger\ManufacturePartMessage;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Type\Event\OrderEventUid;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
@@ -59,6 +60,12 @@ class DevelopmentCommand extends Command
             id: new ProductStockUid('019c0193-0fac-7918-8aa5-8df2e94fddf8'),
             event: new ProductStockEventUid('019c0198-3a2a-7686-9c35-24932eecea65'),
             last: new ProductStockEventUid('019c0196-79c3-76d3-b7e5-dc26e6d20582'),
+        );
+
+
+        $message = new ManufacturePartMessage(
+            '019e062b-3422-76ab-afa7-27fa993a6073',
+            '019e063d-e9db-7fd5-bf11-3c6669a17911',
         );
 
         $this->MessageDispatch->dispatch($message);
