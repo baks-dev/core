@@ -61,6 +61,20 @@ final class SearchForm extends AbstractType
             $data = $event->getData();
             $builder = $event->getForm();
 
+            $Request = $this->request->getCurrentRequest();
+
+            if($Request)
+            {
+                $query = $Request->query->get('search');
+
+                if($query)
+                {
+                    $data->setQuery($query);
+                    return;
+                }
+            }
+
+
             if($this->session === false)
             {
                 $this->session = $this->request->getSession();
