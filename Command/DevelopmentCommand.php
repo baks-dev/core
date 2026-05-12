@@ -30,6 +30,9 @@ use BaksDev\Manufacture\Part\Messenger\ManufacturePartMessage;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Type\Event\OrderEventUid;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
+use BaksDev\Products\Product\Messenger\ProductMessage;
+use BaksDev\Products\Product\Type\Event\ProductEventUid;
+use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Stocks\Messenger\Orders\EditProductStockTotal\EditProductStockTotalMessage;
 use BaksDev\Products\Stocks\Messenger\ProductStockMessage;
 use BaksDev\Products\Stocks\Type\Event\ProductStockEventUid;
@@ -66,6 +69,12 @@ class DevelopmentCommand extends Command
         $message = new ManufacturePartMessage(
             '019e062b-3422-76ab-afa7-27fa993a6073',
             '019e063d-e9db-7fd5-bf11-3c6669a17911',
+        );
+
+        $message = new ProductMessage(
+            id: new ProductUid('019dafee-031e-71c8-9db7-adaf6517cd0f'),
+            event: new ProductEventUid('019e1d75-92da-74e3-9371-45abebf9314d'),
+            last: new ProductEventUid('019db098-44a4-7140-80b4-d9c7757d39c3'),
         );
 
         $this->MessageDispatch->dispatch($message);
