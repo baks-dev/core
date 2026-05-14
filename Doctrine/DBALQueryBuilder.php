@@ -206,7 +206,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
                 $this->dispatch->dispatch(
                     $DBALCacheResetMessage,
-                    transport: $this->namespace.'-low',
+                    transport: 'async-low',
                 );
             }
 
@@ -235,7 +235,7 @@ final class DBALQueryBuilder extends QueryBuilder
 
     public function fetchHydrate(string $class, ?string $method = null): object|false
     {
-        $result = $this->executeQuery()->fetchAssociative();
+        $result = $this->executeDBALQuery()->fetchAssociative();
 
         if(empty($result))
         {
@@ -345,7 +345,7 @@ final class DBALQueryBuilder extends QueryBuilder
                 $this->dispatch->dispatch(
                     message: $DBALDelayMessage,
                     stamps: [new MessageDelay('5 seconds')],
-                    transport: $this->namespace.'-low',
+                    transport: 'async-low',
                 );
             }
 
