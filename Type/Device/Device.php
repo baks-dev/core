@@ -37,8 +37,13 @@ final class Device
     /**
      * По умолчанию присваивается Language Ru.
      */
-    public function __construct(self|string|DeviceInterface $device)
+    public function __construct(self|string|DeviceInterface|null|false $device)
     {
+        if(empty($device))
+        {
+            $device = new Desktop();
+        }
+
         if($device instanceof DeviceInterface)
         {
             $this->device = $device;

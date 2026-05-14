@@ -37,8 +37,13 @@ final class Locale
 
     private LocaleInterface $locale;
 
-    public function __construct(LocaleInterface|self|string $locale)
+    public function __construct(LocaleInterface|self|string|null|false $locale)
     {
+        if(empty($locale))
+        {
+            $locale = new Ru();
+        }
+
         if(is_string($locale) && class_exists($locale))
         {
             $instance = new $locale();
