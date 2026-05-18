@@ -27,7 +27,12 @@ use BaksDev\Core\Doctrine\DBALQueryBuilder;
 
 interface PaginatorInterface
 {
-    public function fetchAllHydrate(DBALQueryBuilder $qb, string $class, ?string $namespace = null): self;
+    public function fetchAllHydrate(
+        DBALQueryBuilder $qb,
+        string $class,
+        ?string $namespace = null,
+        int|string $ttl = '1 day'
+    ): self;
 
     public function fetchAllAssociativeIndexed(DBALQueryBuilder $qb, ?string $namespace = null): self;
 

@@ -103,7 +103,12 @@ final class Paginator implements PaginatorInterface
 
     }
 
-    public function fetchAllHydrate(DBALQueryBuilder $qb, string $class, ?string $namespace = null): self
+    public function fetchAllHydrate(
+        DBALQueryBuilder $qb,
+        string $class,
+        ?string $namespace = null,
+        int|string $ttl = '1 day'
+    ): self
     {
         $namespace = $namespace ?: $this->namespace;
 
@@ -120,7 +125,7 @@ final class Paginator implements PaginatorInterface
 
         if($namespace)
         {
-            $qb->enableCache($namespace);
+            $qb->enableCache($namespace, $ttl);
         }
 
         if(($this->request && $this->session?->get('statusCode') === 307))
