@@ -39,10 +39,10 @@ final class Locale
 
     public function __construct(LocaleInterface|self|string|null|false $locale)
     {
-        if(empty($locale))
-        {
-            $locale = new Ru();
-        }
+        //        if(empty($locale))
+        //        {
+        //            $locale = new Ru();
+        //        }
 
         if(is_string($locale) && class_exists($locale))
         {
