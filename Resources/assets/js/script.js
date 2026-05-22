@@ -307,11 +307,14 @@ document.querySelectorAll(".offcanvas-link").forEach(function(item, i, arr)
     {
         offcanvasLink(item);
     });
+
+    item.classList.remove("offcanvas-link");
 });
 
 
 async function offcanvasLink(offcanvas)
 {
+
     /** Показываем прелоад */
     let modal = document.getElementById("modal");
     //modal.innerHTML = "<div class=\"modal-dialog modal-dialog-centered\"><div class=\"d-flex justify-content-center w-100\"><div class=\"spinner-border text-light\" role=\"status\"><span class=\"visually-hidden\">Loading...</span></div></div></div>";
