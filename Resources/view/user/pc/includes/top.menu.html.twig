@@ -78,7 +78,7 @@
 
 
                                         <div>
-										<span class="icon rounded-circle bg-cover lazy p-1"
+										<span class="icon rounded-circle bg-contain lazy p-1"
                                               style="width: 43px; height: 43px;"
                                               data-bg="{{ image_path }}"
                                         >
@@ -142,7 +142,7 @@
                                     {% set category_cover_ext = menu.category_cover_cdn == true ? 'small.'~menu.category_cover_ext : menu.category_cover_ext %}
 
                                     <div>
-										<span class="icon rounded-circle bg-cover lazy p-1"
+										<span class="icon rounded-circle bg-contain lazy p-1"
                                               style="width: 43px; height: 43px;"
                                               data-bg="{{ menu.category_cover_dir ? img_path ~ menu.category_cover_dir ~ category_cover_ext : '/assets/'~version~'/img/blank.svg' }}"
                                         >
