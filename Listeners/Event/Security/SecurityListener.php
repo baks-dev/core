@@ -25,16 +25,19 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Listeners\Event\Security;
 
+use DomainException;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\User\UserInterface;
 use function is_array;
 
 #[AsEventListener(event: ControllerEvent::class)]
-final class SecurityListener
+final readonly class SecurityListener
 {
-    public function __construct(private readonly TokenStorageInterface $security) {}
+    public function __construct(private TokenStorageInterface $security) {}
 
     public function onKernelController(ControllerEvent $event): void
     {
@@ -47,14 +50,14 @@ final class SecurityListener
 
         $token = $this->security->getToken();
 
-        if(!$token)
+        if(false === ($token instanceof TokenInterface))
         {
-            throw new AccessDeniedException();
+            throw new DomainException(message: 'Unauthorized', code: 401);
         }
 
-        if(!$token->getUser())
+        if(false === ($token->getUser() instanceof UserInterface))
         {
-            throw new AccessDeniedException();
+            throw new DomainException(message: 'Unauthorized', code: 401);
         }
 
         $usr = $token->getUser();
@@ -62,7 +65,7 @@ final class SecurityListener
 
         if(empty($roles))
         {
-            throw new AccessDeniedException();
+            throw new DomainException(message: 'Access Denied', code: 403);
         }
 
         $granted = current($attributes[RoleSecurity::class])->getRoles();
@@ -74,7 +77,7 @@ final class SecurityListener
 
         if(empty($commonRoles))
         {
-            throw new AccessDeniedException();
+            throw new DomainException(message: 'Access Denied', code: 403);
         }
     }
 }
