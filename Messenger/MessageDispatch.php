@@ -102,7 +102,7 @@ final class MessageDispatch implements MessageDispatchInterface
         /**
          * Транспорт resources (для отправки файлов на CDN) всегда должен быть запущен
          */
-        if($isRunning === false && in_array($this->transport, ['files-res', 'search']))
+        if($isRunning === false && in_array($this->transport, ['files-res', 'search', 'finances']))
         {
             $this->logger->warning(
                 sprintf('Обязательный MessengerTransport %s не найден', $this->transport),
