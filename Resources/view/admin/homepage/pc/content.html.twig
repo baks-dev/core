@@ -1,6 +1,5 @@
 {% trans_default_domain('core') %}
 
-
 <main class="main d-print-none ">
 
     <section class="container px-4 mb-5">
@@ -27,92 +26,212 @@
                 </h1>
             </div>
 
-
-            <div class="w-100 d-flex align-items-center gap-3 justify-content-end">
-
-
-            </div>
-
-            {# Добавить #}
-            {# {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
-				<a href="{{ path('users-profile-type:admin.newedit.new') }}" class="btn btn-danger fw-bolder">
-					{{ 'btn.new'|trans({}, 'core.btn') }}
-				</a>
-			{% endif %} #}
-
-
-        </div>
-
-        <div class="border  border-light  rounded-4 p-3 p-3">
-
-            {# Форма поиска по разделу #}
-            {# {% include Template('/_includes/'~baks_settings.device~'/search.html.twig') %} #}
-
-
         </div>
 
     </section>
 
+    <section class="container px-4 mb-5">
+        <div class="row g-4">
+
+            {% if ozon_day %}
+
+                <!-- Блок 1: Озон -->
+                <div class="col-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                         class="bi bi-wallet2" viewBox="0 0 16 16">
+                                        <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">Экономика Озон</h6>
+                                    <small class="text-muted">{{ day_start|format_datetime(pattern="d MMMM Y") }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-3 d-flex flex-column">
+
+                            {% for ozon_day_item in ozon_day %}
+
+                                {% if ozon_day_item.getType() == 'cache_orders_day' %}
+                                    <h6 class="text-uppercase text-muted small fw-bold my-2">По заказам</h6>
+                                {% endif %}
+
+                                {% if ozon_day_item.getType() == 'cache_others_day' %}
+                                    <h6 class="text-uppercase text-muted small fw-bold my-2">Прочее</h6>
+                                {% endif %}
+
+                                {% if ozon_day_item.getType() != 'cache_all_day' %}
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="text-secondary small">{{ ozon_day_item.getName() }}</span>
+                                        <span class="fw-semibold small {{ ozon_day_item.getTotal().getValue() > 0 ? 'text-success' : 'text-danger' }}">
+                                        {{ ozon_day_item.getTotal().getValue()|number_format(2, '.', ' ') }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <div class="bg-light rounded-3 p-2 text-end border my-2">
+                                        <div class="text-muted small text-uppercase fw-bold mb-1"
+                                             style="font-size: 0.75rem;">{{ ozon_day_item.getName() }}</div>
+                                        <div class="h6 mb-0 fw-bolder text-primary">
+                                            {{ ozon_day_item.getTotal().getValue()|number_format(2, '.', ' ') }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {# {{ ozon_day_item.getType }} #}
+
+                            {% endfor %}
+
+                            {# <div class="mb-3">
+                                <h6 class="text-uppercase text-muted small fw-bold mb-2">Прочее</h6>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-secondary small">Прочие выплаты</span>
+                                    <span class="fw-semibold text-dark small">...</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-secondary small">Прочих удержаний</span>
+                                    <span class="fw-semibold text-danger small">...</span>
+                                </div>
+                            </div> #}
+
+                        </div>
+                    </div>
+                </div>
+
+            {% endif %}
+
+
+            <!-- Блок 2: Wildberries -->
+            {# <div class="col-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-danger bg-opacity-10 text-danger rounded p-2 me-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bag-check" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                    <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">Экономика WB</h6>
+                                <small class="text-muted">12.06.2026</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">По заказам</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Выплаты по заказам</span>
+                                <span class="fw-semibold text-dark small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Удержано по заказам</span>
+                                <span class="fw-semibold text-danger small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Недополученная прибыль</span>
+                                <span class="fw-semibold text-danger small">...</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Прочее</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Прочие выплаты</span>
+                                <span class="fw-semibold text-dark small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Прочих удержаний</span>
+                                <span class="fw-semibold text-danger small">...</span>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <hr class="my-3 text-muted opacity-25">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-bold text-dark small">Всего выплат</span>
+                                <span class="fw-bold text-success small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-dark small">Всего удержано</span>
+                                <span class="fw-bold text-danger small">...</span>
+                            </div>
+                            <div class="bg-light rounded-3 p-2 text-end border">
+                                <div class="text-muted small text-uppercase fw-bold mb-1">Итого</div>
+                                <div class="h6 mb-0 fw-bolder text-primary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> #}
+
+            <!-- Блок 3: Яндекс Маркет -->
+            {# <div class="col-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-warning bg-opacity-10 text-warning rounded p-2 me-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart-check" viewBox="0 0 16 16">
+                                    <path d="M11.354 5.646a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L8 8.293l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">Яндекс Маркет</h6>
+                                <small class="text-muted">10.06.2026</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-3 d-flex flex-column">
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">По заказам</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Выплаты по заказам</span>
+                                <span class="fw-semibold text-dark small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Удержано по заказам</span>
+                                <span class="fw-semibold text-danger small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Недополученная прибыль</span>
+                                <span class="fw-semibold text-danger small">...</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Прочее</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Прочие выплаты</span>
+                                <span class="fw-semibold text-dark small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-secondary small">Прочих удержаний</span>
+                                <span class="fw-semibold text-danger small">...</span>
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <hr class="my-3 text-muted opacity-25">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-bold text-dark small">Всего выплат</span>
+                                <span class="fw-bold text-success small">...</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-dark small">Всего удержано</span>
+                                <span class="fw-bold text-danger small">...</span>
+                            </div>
+                            <div class="bg-light rounded-3 p-2 text-end border">
+                                <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size: 0.75rem;">Итого</div>
+                                <div class="h6 mb-0 fw-bolder text-primary">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> #}
+
+        </div>
+    </section>
+
 </main>
-
-
-{# Тюлбар #}
-{#
-{{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
-
-<div class="d-flex flex-column-fluid align-items-start container mt-3">
-
-	<div class="clearfix position-absolute w-100 start-0 separator mt-3"></div>
-
-	<div class="content flex-row-fluid mt-10">
-		<div class="card card-flush">
-#}
-{# Форма поиска #}{#
-{{ include(_self|replace({ "content.html.twig": "_search.html.twig" })) }}
-
-<div class="card-body pt-0">
-    <div class="table-responsive">
-#}
-{# Список #}{#
-<table class="align-middle table-row-dashed fs-6 gy-5 dataTable no-footer mb-5">
-
-    {{ include(_self|replace({ "content.html.twig": "_table.thead.html.twig" })) }}
-
-    <tbody class="fw-bold text-gray-600">
-    {% for item in query.data %}
-        {{ include(_self|replace({ "content.html.twig": "_table.tbody.html.twig" })) }}
-    {% endfor %}
-    </tbody>
-
-</table>
-
-<div class="card-footer position-sticky bg-body pb-3" style="bottom: 0rem;">
-    <div class="d-flex d-none pb-5" id="all_usecase">
-        <a href="#" class="modal-link disabled btn btn-danger btn-sm fw-bolder"
-           data-bs-toggle="modal" data-bs-target="#modal">
-#}
-{# Удалить #}{#
-{{ 'btn.delete'|trans({}, 'core.btn') }}
-</a>
-
-<a href="#" class="modal-link disabled btn btn btn-sm fw-bolder"
-data-bs-toggle="modal" data-bs-target="#modal">
-#}
-{# Удалить #}{#
-{{ 'btn.delete'|trans({}, 'core.btn') }}
-</a>
-
-</div>
-<div class="d-flex justify-content-between">
-#}
-{# Пагинация #}{#
-{{ include('@Template/_includes/pagination.html.twig') }}
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-</div>
-</div> #}

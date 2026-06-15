@@ -27,6 +27,9 @@ namespace BaksDev\Core\Controller\Admin;
 
 use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
+use BaksDev\Ozon\Orders\Repository\OzonDashboard\OzonDashboardInterface;
+use DateInterval;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -37,8 +40,48 @@ use Symfony\Component\Routing\Attribute\Route;
 class HomeController extends AbstractController
 {
     #[Route('/admin', name: 'admin.homepage')]
-    public function index(Request $request): Response
+    public function index(
+        Request $request,
+        ?OzonDashboardInterface $OzonDashboardRepository = null
+
+    ): Response
     {
-        return $this->render([]);
+        $dayStart = new DateTimeImmutable()->sub(DateInterval::createFromDateString('1 day'));
+        $dayFinishDay = $dayStart;
+        $dayFinishMonth = $dayStart->sub(DateInterval::createFromDateString('1 month'));
+        $dayFinishYear = $dayStart->sub(DateInterval::createFromDateString('1 year'));
+
+        /** Озон дневная статистика */
+        $ozonDay = null;
+        $ozonMonth = null;
+        $ozonYear = null;
+
+        if($OzonDashboardRepository instanceof OzonDashboardInterface)
+        {
+            $ozonDay = $OzonDashboardRepository
+                ->dayStart($dayStart)
+                ->dayFinish($dayFinishDay)
+                ->findAll();
+
+            $ozonMonth = $OzonDashboardRepository
+                ->dayStart($dayStart)
+                ->dayFinish($dayFinishMonth)
+                ->findAll();
+
+            $ozonYear = $OzonDashboardRepository
+                ->dayStart($dayStart)
+                ->dayFinish($dayFinishYear)
+                ->findAll();
+        }
+
+        return $this->render([
+
+            'day_start' => $dayStart,
+            'day_finish_day' => $dayFinishDay,
+
+            'ozon_day' => $ozonDay,
+            'ozon_month' => $ozonMonth,
+            'ozon_year' => $ozonYear,
+        ]);
     }
 }
