@@ -30,6 +30,7 @@ use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Ozon\Orders\Repository\OzonDashboard\OzonDashboardInterface;
 use DateInterval;
 use DateTimeImmutable;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -43,13 +44,30 @@ class HomeController extends AbstractController
     public function index(
         Request $request,
         ?OzonDashboardInterface $OzonDashboardRepository = null
-
     ): Response
     {
-        $dayStart = new DateTimeImmutable()->sub(DateInterval::createFromDateString('1 day'));
-        $dayFinishDay = $dayStart;
-        $dayFinishMonth = $dayStart->sub(DateInterval::createFromDateString('1 month'));
-        $dayFinishYear = $dayStart->sub(DateInterval::createFromDateString('1 year'));
+
+        $date = $request->request->get('date', date('Y-m-d'));
+
+        try
+        {
+            $dayFinishDay = new DateTimeImmutable($date);
+        }
+        catch(Exception)
+        {
+            $dayFinishDay = new DateTimeImmutable('now');
+        }
+
+        $dateValid = new DateTimeImmutable('now')->sub(DateInterval::createFromDateString('1 day'));
+
+        if($dayFinishDay > $dateValid)
+        {
+            $dayFinishDay = $dateValid;
+        }
+
+        $dayStartDay = $dayFinishDay;
+        $dayStartMonth = $dayFinishDay->sub(DateInterval::createFromDateString('1 month'));
+        $dayStartYear = $dayFinishDay->sub(DateInterval::createFromDateString('1 year'));
 
         /** Озон дневная статистика */
         $ozonDay = null;
@@ -59,25 +77,28 @@ class HomeController extends AbstractController
         if($OzonDashboardRepository instanceof OzonDashboardInterface)
         {
             $ozonDay = $OzonDashboardRepository
-                ->dayStart($dayStart)
+                ->dayStart($dayStartDay)
                 ->dayFinish($dayFinishDay)
                 ->findAll();
 
             $ozonMonth = $OzonDashboardRepository
-                ->dayStart($dayStart)
-                ->dayFinish($dayFinishMonth)
+                ->dayStart($dayStartMonth)
+                ->dayFinish($dayFinishDay)
                 ->findAll();
 
             $ozonYear = $OzonDashboardRepository
-                ->dayStart($dayStart)
-                ->dayFinish($dayFinishYear)
+                ->dayStart($dayStartYear)
+                ->dayFinish($dayFinishDay)
                 ->findAll();
         }
 
         return $this->render([
 
-            'day_start' => $dayStart,
-            'day_finish_day' => $dayFinishDay,
+            'current_date' => $dayFinishDay->format('Y-m-d'),
+
+            'day_start' => $dayFinishDay,
+            'day_start_month' => $dayStartMonth,
+            'day_start_year' => $dayStartYear,
 
             'ozon_day' => $ozonDay,
             'ozon_month' => $ozonMonth,
