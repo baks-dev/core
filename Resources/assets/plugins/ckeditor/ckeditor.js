@@ -61312,7 +61312,7 @@
         QG.defaultConfig = {
             htmlSupport : {
                 allow : [{
-                    name : /^(div|section|article|li|button)$/,
+                    name : /^(div|section|article|li|button|aside)$/,
                     styles : true,
                     classes : true,
                     attributes : true,

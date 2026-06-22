@@ -74,7 +74,10 @@ class HomeController extends AbstractController
         $ozonMonth = null;
         $ozonYear = null;
 
-        if($OzonDashboardRepository instanceof OzonDashboardInterface)
+        if(
+            $OzonDashboardRepository instanceof OzonDashboardInterface
+            && $this->isGranted('ROLE_FINANCE')
+        )
         {
             $ozonDay = $OzonDashboardRepository
                 ->dayStart($dayStartDay)
