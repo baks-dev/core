@@ -14626,7 +14626,7 @@
                 this.renderingMode = e.renderingMode || "editing";
                 this.blockFillerMode = e.blockFillerMode || (this.renderingMode === "editing" ? "br" : "nbsp");
                 this.preElements = ["pre"];
-                this.blockElements = ["address", "article", "aside", "blockquote", "caption", "center", "dd", "details", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "legend", "li", "main", "menu", "nav", "ol", "p", "pre", "section", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul"];
+                this.blockElements = ["address", "article", "aside", "meta", "blockquote", "caption", "center", "dd", "details", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "legend", "li", "main", "menu", "nav", "ol", "p", "pre", "section", "summary", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul"];
                 this.inlineObjectElements = ["object", "iframe", "input", "button", "textarea", "select", "option", "video", "embed", "audio", "img", "canvas"];
                 this.unsafeElements = ["script", "style"];
                 this._domDocument = this.renderingMode === "editing" ? ic.document : ic.document.implementation.createHTMLDocument("");
@@ -24009,7 +24009,7 @@
 
             _toDom(t)
             {
-                if(!t.match(/<(?:html|body|head|meta)(?:\s[^>]*)?>/i))
+                if(!t.match(/<(?:html|body|head)(?:\s[^>]*)?>/i))
                 {
                     t = `<body>${t}</body>`;
                 }
@@ -38342,6 +38342,10 @@
             }, {
                 model : "htmlAside",
                 view : "aside",
+                modelSchema : {inheritAllFrom : "$container", isBlock : false},
+            }, {
+                model : "htmlMeta",
+                view : "meta",
                 modelSchema : {inheritAllFrom : "$container", isBlock : false},
             }, {
                 model : "htmlMain",
@@ -56773,10 +56777,13 @@
 
         function WF(t)
         {
-            const e = [{name : "address", isVoid : false}, {name : "article", isVoid : false}, {
-                name : "aside",
-                isVoid : false,
-            }, {name : "blockquote", isVoid : false}, {name : "br", isVoid : true}, {
+            const e = [
+                {name : "address", isVoid : false},
+                {name : "article", isVoid : false},
+                {name : "aside", isVoid : false},
+                {name : "meta", isVoid : false},
+                {name : "blockquote", isVoid : false},
+                {name : "br", isVoid : true}, {
                 name : "details",
                 isVoid : false,
             }, {name : "dialog", isVoid : false}, {name : "dd", isVoid : false}, {name : "div", isVoid : false}, {
@@ -61311,12 +61318,18 @@
         QG.builtinPlugins = [wE, UE, YE, aD, bD, ZD, eI, tS, QI, xM, $M, hB, jB, rN, kN, IN, fz, yz, MP, WP, vL, yL, pP, IL, LL, DO, OO, Bj, vV, iF, qB, GF, eH, BH, qG, ZG, rE];
         QG.defaultConfig = {
             htmlSupport : {
-                allow : [{
-                    name : /^(div|section|article|li|button|aside)$/,
-                    styles : true,
-                    classes : true,
-                    attributes : true,
-                }, {name : "img", classes : true, attributes : {"data-src" : true}}],
+                allow : [
+                    {
+                        name : /^(div|section|article|li|button|aside|meta)$/,
+                        styles : true,
+                        classes : true,
+                        attributes : true,
+                    }
+                    , {name : "img", classes : true, attributes : {"data-src" : true}}
+                    , {name : /^h[1-5]$/, classes : true, attributes : false},
+                ],
+                
+
                 disallow : [{
                     attributes : [{key : /^on(.*)/i, value : !0}, {
                         key : /.*/,
