@@ -249,7 +249,25 @@ executeFunc(function uQnFyjnB()
 
     const search = form.querySelector("#search_form_query");
 
+
     searchValue = search.value.trim();
+
+
+    // 2. Логика кнопки "Х" (Очистка поля и сессии)
+    form.querySelectorAll(".clear-btn").forEach(btn =>
+    {
+        btn.addEventListener("click", (e) =>
+        {
+            e.preventDefault();
+            const fieldId = btn.dataset.clear;
+
+            if(search.value)
+            {
+                search.value = ""; // Очищаем поле
+                form.submit();
+            }
+        });
+    });
 
     const debouncedSubmit = formDebounce(() =>
     {
@@ -265,6 +283,19 @@ executeFunc(function uQnFyjnB()
     // Вешаем на все relevant события
     search.addEventListener("input", debouncedSubmit);
     search.addEventListener("keyup", debouncedSubmit);
+
+    search.addEventListener("click", (event) =>
+    {
+        if(idFormDebounce)
+        {
+            clearTimeout(idFormDebounce);
+        }
+
+        if(lastFormDebounce)
+        {
+            clearTimeout(idFormDebounce);
+        }
+    });
 
     return true;
 });
@@ -298,7 +329,6 @@ document.querySelectorAll("[data-bs-toggle=\"modal\"]").forEach(function(item, i
 {
     modalLink(item);
 });
-
 
 /* вешаем события на OFFCANVAS */
 document.querySelectorAll(".offcanvas-link").forEach(function(item, i, arr)

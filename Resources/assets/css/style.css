@@ -809,6 +809,20 @@ img.loaded, div.loaded {
     animation: d-blink 1s linear infinite;
 }
 
+
+.input-wrapper {
+    display: flex;
+}
+
+.input-wrapper .clear-btn {
+    display: none;
+}
+
+.input-wrapper:hover .clear-btn {
+    display: block;
+}
+
+
 @-webkit-keyframes d-blink {
     0% {
         opacity: 1;

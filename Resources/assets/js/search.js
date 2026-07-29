@@ -49,7 +49,6 @@ if(search_form)
             }
         });
 
-
         /** Показать результат поиска при наведение курсора мыши курсора на форму поиска */
         search_form.addEventListener("mouseover", (event) =>
         {
