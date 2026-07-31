@@ -42,6 +42,8 @@ final class Paginator implements PaginatorInterface
 
     private int $next;
 
+    private bool $isSkipOffset = false;
+
     /** Номер предыдущей страницы */
     private ?int $previous = null;
 
@@ -103,6 +105,17 @@ final class Paginator implements PaginatorInterface
 
     }
 
+    /**
+     * Применяется если нужно пропустить смещение в запросе
+     * например если Offset применяется в CTE
+     */
+    public function skipOffset(): self
+    {
+        $this->isSkipOffset = true;
+        return $this;
+    }
+
+
     public function fetchAllHydrate(
         DBALQueryBuilder $qb,
         string $class,
@@ -121,7 +134,10 @@ final class Paginator implements PaginatorInterface
             $qb->setMaxResults($this->limit);
         }
 
-        $qb->setFirstResult($this->page * $this->limit);
+        if(false === $this->isSkipOffset)
+        {
+            $qb->setFirstResult($this->page * $this->limit);
+        }
 
         if($namespace)
         {
@@ -173,7 +189,10 @@ final class Paginator implements PaginatorInterface
             $qb->setMaxResults($this->limit);
         }
 
-        $qb->setFirstResult($this->page * $this->limit);
+        if(false === $this->isSkipOffset)
+        {
+            $qb->setFirstResult($this->page * $this->limit);
+        }
 
         if($namespace)
         {
@@ -234,7 +253,10 @@ final class Paginator implements PaginatorInterface
             $qb->setMaxResults($this->limit);
         }
 
-        $qb->setFirstResult($this->page * $this->limit);
+        if(false === $this->isSkipOffset)
+        {
+            $qb->setFirstResult($this->page * $this->limit);
+        }
 
         if($namespace)
         {
@@ -279,6 +301,11 @@ final class Paginator implements PaginatorInterface
     public function getPage(): int
     {
         return $this->page + 1;
+    }
+
+    public function getFirst(): int
+    {
+        return $this->page * $this->limit;
     }
 
     public function setPage(int $page): self
