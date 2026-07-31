@@ -642,6 +642,15 @@ img.loaded, div.loaded {
     opacity: 0.5;
 }
 
+.form-control:focus {
+    border-color: #5895df73;
+}
+
+input:focus::placeholder {
+    color: #346eb2;
+}
+
+
 .clearfix {
     display: block;
     clear: both;
