@@ -74,7 +74,13 @@ final class SearchForm extends AbstractType
                 }
             }
 
+            $article = $Request->query->get('article', null);
 
+            if($article)
+            {
+                return;
+            }
+            
             if($this->session === false)
             {
                 $this->session = $this->request->getSession();

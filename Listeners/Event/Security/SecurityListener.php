@@ -25,12 +25,12 @@ declare(strict_types=1);
 
 namespace BaksDev\Core\Listeners\Event\Security;
 
-use DomainException;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use function is_array;
 
@@ -52,12 +52,12 @@ final readonly class SecurityListener
 
         if(false === ($token instanceof TokenInterface))
         {
-            throw new DomainException(message: 'Unauthorized', code: 401);
+            throw new AuthenticationException('Unauthorized');
         }
 
         if(false === ($token->getUser() instanceof UserInterface))
         {
-            throw new DomainException(message: 'Unauthorized', code: 401);
+            throw new AuthenticationException('Unauthorized');
         }
 
         $usr = $token->getUser();
@@ -65,7 +65,7 @@ final readonly class SecurityListener
 
         if(empty($roles))
         {
-            throw new DomainException(message: 'Access Denied', code: 403);
+            throw new AccessDeniedException('Access Denied');
         }
 
         $granted = current($attributes[RoleSecurity::class])->getRoles();
@@ -77,7 +77,7 @@ final readonly class SecurityListener
 
         if(empty($commonRoles))
         {
-            throw new DomainException(message: 'Access Denied', code: 403);
+            throw new AccessDeniedException('Access Denied');
         }
     }
 }
