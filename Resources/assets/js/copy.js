@@ -26,7 +26,6 @@ document.querySelectorAll(".copy").forEach(el =>
     {
         navigator.clipboard.writeText(el.dataset.copy).then(() =>
         {
-
             let $successSupplyToast = "{ \"type\":\"success\" , " +
                 "\"header\":\"Копирование\"  , " +
                 "\"message\" : \"Результат успешно скопирован в буфер обмена\" }";
@@ -45,4 +44,7 @@ document.querySelectorAll(".copy").forEach(el =>
             console.log("Something went wrong", err);
         });
     });
+
+
+    el.classList.remove("copy");
 });

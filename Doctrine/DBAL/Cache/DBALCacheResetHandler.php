@@ -49,6 +49,8 @@ final readonly class DBALCacheResetHandler
     /** Обновляет кеш запроса */
     public function __invoke(DBALCacheResetMessage $message): void
     {
+        return;
+
 
         /** Получаем обновляемые данные */
 

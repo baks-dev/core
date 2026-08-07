@@ -47,6 +47,8 @@ final class DBALDelayHandler
 
     public function __invoke(DBALDelayMessage $message): void
     {
+        return;
+
         $tmpCache = $this
             ->DBALQueryBuilder
             ->createQueryBuilder(self::class)
