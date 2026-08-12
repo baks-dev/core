@@ -119,6 +119,7 @@
     --bs-tooltip-opacity: 0.9;
     --bs-tooltip-arrow-width: 0.8rem;
     --bs-tooltip-arrow-height: 0.4rem;
+    --bs-progress-height: 1rem;
 }
 
 .container-xxl, .container-xl, .container-lg, .container-md, .container-sm, .container {
