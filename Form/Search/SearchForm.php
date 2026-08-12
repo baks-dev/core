@@ -76,11 +76,18 @@ final class SearchForm extends AbstractType
 
             $article = $Request->query->get('article', null);
 
-            if($article)
+            if(false === empty($article))
             {
+                $data->setQuery($article);
+
+                $sessionArray['search'] = $article;
+                $sessionJson = json_encode($sessionArray, JSON_THROW_ON_ERROR);
+                $sessionData = base64_encode($sessionJson);
+                $this->request->getSession()->set($this->sessionKey, $sessionData);
+
                 return;
             }
-            
+
             if($this->session === false)
             {
                 $this->session = $this->request->getSession();
